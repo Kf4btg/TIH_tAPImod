@@ -45,6 +45,15 @@
             "notifyOnChange": true,
             "sync": false,
             "default": "R"
+        },
+        {
+            "name": "rowLock",
+            "displayName": "Locked Rows",
+            "type": "Integer",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": 1
         }
 
     ]

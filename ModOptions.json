@@ -1,0 +1,51 @@
+{
+    "options":
+    [
+        {
+            "name": "quickStack",
+            "displayName": "Quick Stack",
+            "type": "Keybinding",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": "Q"
+        },
+        {
+            "name": "depositAll",
+            "displayName": "Deposit All",
+            "type": "Keybinding",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": "Y"
+        },
+        {
+            "name": "lootAll",
+            "displayName": "Loot All",
+            "type": "Keybinding",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": "Z"
+        },
+        {
+            "name": "cleanStacks",
+            "displayName": "Consolidate Stacks",
+            "type": "Keybinding",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": "J"
+        },
+        {
+            "name": "sort",
+            "displayName": "Sort",
+            "type": "Keybinding",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": "R"
+        }
+
+    ]
+}

@@ -183,7 +183,7 @@ namespace InvisibleHand {
 					// find the first unlocked slot
 					// this would throw errors if range.Item1+filled somehow went over 49,
 					// but if the categorizer and slot-locker are functioning correctly,
-					// that _shouldn't_ be possible. Hopefully.
+					// that _shouldn't_ be possible. Shouldn't. Hopefully.
 					while (IHBase.LockedSlots[range.Item1+filled-10])
 					{
 						filled++;
@@ -198,7 +198,7 @@ namespace InvisibleHand {
 			{
 				if (checkLocks)
 				{
-					// find the first unlocked slot
+					// find the first unlocked slot.
 					// this loop _could_ in theory go over 49
 					while (i<range.Item2 && IHBase.LockedSlots[i-10])
 					{
@@ -261,8 +261,6 @@ namespace InvisibleHand {
 					{
 						item = new Item();
 						return;
-						// item = item2.Clone();	// swap item2 to the position of the old item1 & clear item2's position
-						// item2 = new Item();     // so this loop will continue to combine any more stacks of this item it finds
 					}
 				}
 			}

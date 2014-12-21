@@ -12,7 +12,7 @@ namespace InvisibleHand
         public static Keys
             key_sort, key_cleanStacks, key_quickStack, key_depositAll, key_lootAll;
 
-
+        public static ModBase self { get; private set; }
 
         /* 5-bit bitmap with each bit referring to a row in the player's inventory
          with top row (the hotbar) being the right-most (least-significant) bit,
@@ -54,6 +54,7 @@ namespace InvisibleHand
 
         public override void OnLoad()
         {
+            self = this;
             InventoryManager.Initialize();
 
             // key_sort        = (Keys)options["sort"].Value;

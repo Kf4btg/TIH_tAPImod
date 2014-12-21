@@ -45,17 +45,26 @@ namespace InvisibleHand
                     }
 
         This could theoretically be expanded to a 50-bit map stored in a long to accomodate locking
-        individual slots rather than just rows.
+        individual slots rather than just rows, but at that scale a simple array may be better.
         */
-        public static int LockedRowsOption = 1;
-        public const byte[] ROW_BIT_MASKS = {1,2,4,8,16};
+        // public static int LockedRowsOption = 1;
+        // public const byte[] ROW_BIT_MASKS = {1,2,4,8,16};
 
-        public static bool[] LockedRows = new bool[5];
+        // public static bool[] LockedRows = new bool[5];
+        public static bool[] LockedSlots = new bool[40]; //not the hotbar
 
         public override void OnLoad()
         {
             self = this;
+            
+            // need to find a way to SAVE the locked slots
+            for (int i=0; i<LockedSlots.Length; i++ )
+            {
+                IHBase.LockedSlots[i]=false;
+            }
+            
             InventoryManager.Initialize();
+            
 
             // key_sort        = (Keys)options["sort"].Value;
             // key_cleanStacks = (Keys)options["cleanStacks"].Value;
@@ -85,20 +94,20 @@ namespace InvisibleHand
                 case "lootAll":
                     key_lootAll = (Keys)option.Value;
                     break;
-                case "rowLock":
-                    LockedRowsOption = (int)option.Value;
-                    SetLockedRows((byte)LockedRowsOption);
-                    break;
+                // case "rowLock":
+                //     LockedRowsOption = (int)option.Value;
+                //     SetLockedRows((byte)LockedRowsOption);
+                //     break;
             }
         }
 
-        public static void SetLockedRows(byte rowMap)
-        {
-            for (int m=0; m<ROW_BIT_MASKS.Length; m++)
-            {
-                LockedRows[m]=((rowMap & ROW_BIT_MASKS[m]) == ROW_BIT_MASKS[m]);
-            }
-        }
+        // public static void SetLockedRows(byte rowMap)
+        // {
+        //     for (int m=0; m<ROW_BIT_MASKS.Length; m++)
+        //     {
+        //         LockedRows[m]=((rowMap & ROW_BIT_MASKS[m]) == ROW_BIT_MASKS[m]);
+        //     }
+        // }
     }
 
 

@@ -95,27 +95,33 @@ namespace InvisibleHand {
 					catOther		// 21 --must be last
 				});
 
+
+
+
 		} //end initialize()
 
 
 		/*************************************************************************
-		*  Inventory Management for the lazy.
+		*  SortPlayerInv - perform the sort operation on the items in the player's
+		*	inventory, excluding the hotbar and optionally any slots marked as locked
 		*
 		*  @param player: The player whose inventory to sort.
-		*  @param includeHotbar: whether or not to sort the player's hotbar
-		*         along with the rest of the inventory. Default=no.
+		*  @param checkLocks: whether to check for locked slots and exclude them
+		*         from the sort. Default=no.
 		*/
-		public static void SortPlayerInv(Player player, bool includeHotbar = false)
+		public static void SortPlayerInv(Player player, bool checkLocks = true)
 		{
 			ConsolidateStacks(player.inventory, 0, 49); //include hotbar in this step
-			Sort(player.inventory, new Tuple<int,int>(includeHotbar ? 0 : 10, 49));
+
+			// Sort(player.inventory, checklocks, new Tuple<int,int>(includeHotbar ? 0 : 10, 49));
+			Sort(player.inventory, checkLocks, 10, 49);
 		}
 
 		public static void SortChest(Chest chest)
 		{
 			ConsolidateStacks(chest.item);
 
-			Sort(chest.item);
+			Sort(chest.item, false);
 		}
 
 
@@ -123,26 +129,30 @@ namespace InvisibleHand {
 		*  Inventory Management for the lazy.
 		*
 		*  @param container: The container whose contents to sort.
+		*  @param checkLocks: whether to check for & exclude locked slots
 		*  @param rangeStart: starting index of the sort operation
 		*  @param rangeEnd: end index of the sort operation
 		*
 		*  Omitting both range arguments will sort the entire container.
 		*/
-		public static void Sort(Item[] container, int rangeStart, int rangeEnd)
+		public static void Sort(Item[] container, bool checkLocks, int rangeStart, int rangeEnd)
 		{
-			Sort(container, new Tuple<int,int>(rangeStart, rangeEnd));
+			Sort(container, checkLocks, new Tuple<int,int>(rangeStart, rangeEnd));
 		}
 
-		public static void Sort(Item[] container, Tuple<int,int> range = null)
+		public static void Sort(Item[] container, bool checkLocks = false, Tuple<int,int> range = null)
 		{
+			// if range param not specified, set it to whole container
 			if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
-			int offset = range.Item1;
-
 			List<CategorizedItem> itemSorter = new List<CategorizedItem>();
+
 			// delegate a category to each item, then add to sorted list
 			for (int i=range.Item1; i<=range.Item2; i++)
 			{
+				// if locking is enabled, check if slot is locked and skip if so
+				if (checkLocks && IHBase.LockedSlots[i-10]) continue;
+
 				if ( !container[i].IsBlank() )
 				{
 					Item itemcopy = container[i].Clone();
@@ -168,6 +178,17 @@ namespace InvisibleHand {
 			int filled = 0;
 			foreach (CategorizedItem citem in itemSorter)
 			{
+				if (checkLocks)
+				{
+					// find the first unlocked slot
+					// this would throw errors if range.Item1+filled somehow went over 49,
+					// but if the categorizer and slot-locker are functioning correctly,
+					// that _shouldn't_ be possible. Hopefully.
+					while (IHBase.LockedSlots[range.Item1+filled-10])
+					{
+						filled++;
+					}
+				}
 				container[range.Item1+filled] = citem.item.Clone();
 				filled++;
 			}
@@ -175,6 +196,18 @@ namespace InvisibleHand {
 			// and the rest of the slots should be empty
 			for (int i=range.Item1+filled; i<=range.Item2; i++)
 			{
+				if (checkLocks)
+				{
+					// find the first unlocked slot
+					// this loop _could_ in theory go over 49
+					while (i<range.Item2 && IHBase.LockedSlots[i-10])
+					{
+						i++;
+					}
+
+					// still need to check lock in case we exited on the 1st condition of the while loop
+					if (IHBase.LockedSlots[i-10]) break;
+				}
 				container[i] = new Item();
 			}
 

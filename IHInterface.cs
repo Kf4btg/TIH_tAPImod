@@ -13,21 +13,20 @@ namespace InvisibleHand
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (slot.type == "Inventory" && slot.index >=10)
+            if (slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
             {
                 if (lockedMarker == null)
                 {
-                    lockedMarker = IHBase.self.textures["resources/Lock1"];
-                    unlockedMarker = IHBase.self.textures["resources/Lock0"];
+                    lockedMarker = IHBase.self.textures["resources/LockIndicator"];
                 }
 
-                Texture2D tex = IHPlayer.SlotLocked(slot.index) ? lockedMarker : unlockedMarker;
+                // Color c = IHPlayer.SlotLocked(slot.index) ? Color.Red : Color.Green;
 
                 // TODO: replace the separate textures with one, colored by Color.xxxxx options
-                sb.Draw(tex,                // the texture to draw
+                sb.Draw(lockedMarker,                // the texture to draw
                         slot.pos,           // (Vector2) location in screen coords to draw sprite
                         null,               // Rectangle to specifies source texels from texture; null draws whole texture
-                        Color.White,        // color to tint sprite; color.white=full color, no tint
+                        Color.Firebrick,        // color to tint sprite; color.white=full color, no tint
                         0f,                 // angle in radians to rotate sprite around its center
                         default(Vector2),   // (Vector2) sprite origin, default=(0,0) i.e. upper left corner
                         slot.scale,         // (Vector2) scale factor

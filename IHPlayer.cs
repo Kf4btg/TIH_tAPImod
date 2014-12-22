@@ -17,6 +17,27 @@ namespace InvisibleHand
         public bool control_depositAll;
         public bool control_lootAll;
 
+        public static bool[] lockedSlots = new bool[40]; //not the hotbar
+
+        public override void Save(BinBuffer bb)
+        {
+            for (int i=0; i<lockedSlots.Length; i++)
+            {
+                bb.Write(lockedSlots[i]);
+            }
+        }
+
+        public override void Load(BinBuffer bb)
+        {
+            lockedSlots = new bool[40];
+            if (bb.IsEmpty) return;
+
+            for (int i=0; i<lockedSlots.Length; i++)
+            {
+                lockedSlots[i]=bb.ReadBool();
+            }
+        }
+
         public override void PreUpdate()
         {
 
@@ -44,7 +65,7 @@ namespace InvisibleHand
                         return;
                     }
                     // else call sort on the Item[] array returned by chestItems
-                    InventoryManager.Sort(player.chestItems);
+                    InventoryManager.SortChest(player.chestItems);
                     return;
                 }
 
@@ -52,7 +73,7 @@ namespace InvisibleHand
                 {
                     if ( player.chestItems == null )
                     {
-                        InventoryManager.ConsolidateStacks(player.inventory, 0, 50);  
+                        InventoryManager.ConsolidateStacks(player.inventory, 0, 50);
                         return;
                     }
                     InventoryManager.ConsolidateStacks(player.chestItems);
@@ -79,6 +100,16 @@ namespace InvisibleHand
                 }
 
             }
+        }
+
+        public static bool SlotLocked(int slotIndex)
+        {
+            return lockedSlots[slotIndex-10];
+        }
+
+        public static void ToggleLock(int slotIndex)
+        {
+            lockedSlots[slotIndex-10]=!lockedSlots[slotIndex-10];
         }
     }
 }

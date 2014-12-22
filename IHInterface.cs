@@ -21,7 +21,7 @@ namespace InvisibleHand
                     unlockedMarker = IHBase.self.textures["resources/Lock0"];
                 }
 
-                Texture2D tex = IsSlotLocked(slot) ? lockedMarker : unlockedMarker;
+                Texture2D tex = IHPlayer.SlotLocked(slot.index) ? lockedMarker : unlockedMarker;
 
                 // TODO: replace the separate textures with one, colored by Color.xxxxx options
                 sb.Draw(tex,                // the texture to draw
@@ -44,21 +44,12 @@ namespace InvisibleHand
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
-                    Item myItem = slot.MyItem;
-                    IHBase.LockedSlots[slot.index-10]=!IHBase.LockedSlots[slot.index-10]; //toggle lock state
+                    IHPlayer.ToggleLock(slot.index); //toggle lock state
                     Main.PlaySound(7, -1, -1, 1);
                 }
                 return false;
             }
             return true;
         }
-
-        //TODO: decide if this should check slot type or just assume that the caller
-        //      knows what they're doing
-        public static bool IsSlotLocked(ItemSlot slot)
-        {
-            return IHBase.LockedSlots[slot.index-10];
-        }
-
     }
 }

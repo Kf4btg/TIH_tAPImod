@@ -29,8 +29,6 @@ namespace InvisibleHand
                 // iterate through the player's inventory in reverse
                 for (int i=R_START; i >= R_END; i--)
                 {
-                    // Item invItem = player.inventory[i];
-
                     int retIdx = MoveItem(ref player.inventory[i], Main.chest[player.chest].item);
                     if (retIdx >= 0 ) // item/entire stack successfully moved
                     {
@@ -49,8 +47,6 @@ namespace InvisibleHand
             {
                 for (int i=R_START; i >= R_END; i--)
                 {
-                    // Item invItem = player.inventory[i];
-
                     if (MoveItem(ref player.inventory[i],
                                 player.chest == -3 ? player.bank2.item : player.bank.item) >= 0 )
                     {
@@ -99,7 +95,7 @@ namespace InvisibleHand
                     container[i] = player.GetItem(player.whoAmI, container[i]);
 
                     // ok I have no idea what this does but it's part of the original
-                    // loot-all code so I added it here as well.
+                    // loot-all code so I added it as well.
                     if (sendMessage) SendNetMessage(i);
                 }
             }
@@ -130,14 +126,12 @@ namespace InvisibleHand
 
             for (int i=0; i<Chest.maxItems; i++)
             {
-                // Item cItem = container[i];
                 //if chest item is not blank && not a full stack:
                 if (!container[i].IsBlank() && container[i].stack < container[i].maxStack)
                 {
                     //for each item in inventory (including coins, ammo, hotbar):
                     for (int j=0; j<58; j++)
                     {
-                        // Item invItem = player.inventory[j];
                         //if chest item matches inv. item:
                         if (container[i].IsTheSameAs(player.inventory[j]))
                         {
@@ -217,7 +211,6 @@ namespace InvisibleHand
 
             // return true to indicate stack has been emptied
             return itemSrc.IsBlank();
-
         }
 
         //plays the "item moved" sound

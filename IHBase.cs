@@ -14,24 +14,15 @@ namespace InvisibleHand
 
         public static ModBase self { get; private set; }
 
-        public static bool[] LockedSlots = new bool[40]; //not the hotbar
-
         public override void OnLoad()
         {
             self = this;
-
-            // need to find a way to SAVE the locked slots
-            for (int i=0; i<LockedSlots.Length; i++ )
-            {
-                IHBase.LockedSlots[i]=false;
-            }
 
             InventoryManager.Initialize();
         }
 
         public override void OptionChanged(Option option)
         {
-
             switch(option.name)
             {
                 case "sort":

@@ -94,10 +94,6 @@ namespace InvisibleHand {
 					catWall, 		//
 					catOther		// 21 --must be last
 				});
-
-
-
-
 		} //end initialize()
 
 
@@ -117,6 +113,13 @@ namespace InvisibleHand {
 			Sort(player.inventory, checkLocks, 10, 49);
 		}
 
+		public static void SortChest(Item[] chestitems)
+		{
+			ConsolidateStacks(chestitems);
+
+			Sort(chestitems, false);
+		}
+
 		public static void SortChest(Chest chest)
 		{
 			ConsolidateStacks(chest.item);
@@ -126,7 +129,7 @@ namespace InvisibleHand {
 
 
 		/*************************************************************************
-		*  Inventory Management for the lazy.
+		*  Sort Container
 		*
 		*  @param container: The container whose contents to sort.
 		*  @param checkLocks: whether to check for & exclude locked slots
@@ -151,7 +154,7 @@ namespace InvisibleHand {
 			for (int i=range.Item1; i<=range.Item2; i++)
 			{
 				// if locking is enabled, check if slot is locked and skip if so
-				if (checkLocks && IHBase.LockedSlots[i-10]) continue;
+				if (checkLocks && IHPlayer.SlotLocked(i)) continue;
 
 				if ( !container[i].IsBlank() )
 				{
@@ -184,7 +187,7 @@ namespace InvisibleHand {
 					// this would throw errors if range.Item1+filled somehow went over 49,
 					// but if the categorizer and slot-locker are functioning correctly,
 					// that _shouldn't_ be possible. Shouldn't. Hopefully.
-					while (IHBase.LockedSlots[range.Item1+filled-10])
+					while (IHPlayer.SlotLocked(range.Item1+filled))
 					{
 						filled++;
 					}
@@ -200,13 +203,13 @@ namespace InvisibleHand {
 				{
 					// find the first unlocked slot.
 					// this loop _could_ in theory go over 49
-					while (i<range.Item2 && IHBase.LockedSlots[i-10])
+					while (i<range.Item2 && IHPlayer.SlotLocked(i))
 					{
 						i++;
 					}
 
 					// still need to check lock in case we exited on the 1st condition of the while loop
-					if (IHBase.LockedSlots[i-10]) break;
+					if (IHPlayer.SlotLocked(i)) break;
 				}
 				container[i] = new Item();
 			}

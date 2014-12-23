@@ -16,28 +16,28 @@ namespace InvisibleHand {
 
 		// category id defines where its items will be sorted with regards
 		// to items of other categories.
-		public const int    ID_PICK 		=  1,
-							ID_AXE 			=  2,
-							ID_HAMMER 		=  3,
-							ID_MELEE 		=  4,
-							ID_RANGED 		=  5,
-							ID_MAGIC 		=  6,
-							ID_SUMMON 		=  7,
-							ID_AMMO 		=  8,
-							ID_HEAD 		=  9,
-							ID_BODY 		= 10,
-							ID_LEGS 		= 11,
-							ID_ACCESSORY 	= 12,
-							ID_VANITY 		= 13,
-							ID_PET 			= 14,
-							ID_CONSUME 		= 15,
-							ID_BAIT			= 16,
-							ID_DYE 			= 17,
-							ID_PAINT 		= 18,
-							ID_ORE			= 19,
-							ID_TILE 		= 20,
-							ID_WALL 		= 21,
-							ID_OTHER		= 22;
+		// public const int    ID_PICK 		=  1,
+		// 					ID_AXE 			=  2,
+		// 					ID_HAMMER 		=  3,
+		// 					ID_MELEE 		=  4,
+		// 					ID_RANGED 		=  5,
+		// 					ID_MAGIC 		=  6,
+		// 					ID_SUMMON 		=  7,
+		// 					ID_AMMO 		=  8,
+		// 					ID_HEAD 		=  9,
+		// 					ID_BODY 		= 10,
+		// 					ID_LEGS 		= 11,
+		// 					ID_ACCESSORY 	= 12,
+		// 					ID_VANITY 		= 13,
+		// 					ID_PET 			= 14,
+		// 					ID_CONSUME 		= 15,
+		// 					ID_BAIT			= 16,
+		// 					ID_DYE 			= 17,
+		// 					ID_PAINT 		= 18,
+		// 					ID_ORE			= 19,
+		// 					ID_TILE 		= 20,
+		// 					ID_WALL 		= 21,
+		// 					ID_OTHER		= 22;
 
 
 		/*************************************************************************
@@ -49,29 +49,29 @@ namespace InvisibleHand {
 			// Thanks for doing all the hard work figuring these out so I didn't have to!
 			// Edit: ok, so I ended up editing a few to make them mutually exclusive
 			// (e.g. adding the !vanity check to the armor items)
-			catPick		= new IMCategory<Item>( ID_PICK, 		item   	=> item.pick > 0);
-			catAxe		= new IMCategory<Item>( ID_AXE, 		item   	=> item.axe > 0);
-			catHammer	= new IMCategory<Item>( ID_HAMMER, 		item   	=> item.hammer > 0);
-			catHead		= new IMCategory<Item>( ID_HEAD,		item 	=> item.headSlot != -1 && !item.vanity);
-			catBody		= new IMCategory<Item>( ID_BODY,		item 	=> item.bodySlot != -1 && !item.vanity);
-			catLegs		= new IMCategory<Item>( ID_LEGS,		item 	=> item.legSlot  != -1 && !item.vanity);
-			catAccessory= new IMCategory<Item>( ID_ACCESSORY,	item   	=> item.accessory && !item.vanity);
-			catVanity	= new IMCategory<Item>( ID_VANITY,		item 	=> item.vanity);
-			catMelee	= new IMCategory<Item>( ID_MELEE,		item 	=> item.damage > 0 && item.melee);
-			catRanged	= new IMCategory<Item>( ID_RANGED,		item 	=> item.damage > 0 && item.ranged && (item.ammo == 0));
-			catAmmo		= new IMCategory<Item>( ID_AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
-			catMagic	= new IMCategory<Item>( ID_MAGIC, 		item   	=> item.damage > 0 && item.magic);
-			catSummon	= new IMCategory<Item>( ID_SUMMON, 		item   	=> item.damage > 0 && item.summon);
-			catConsume	= new IMCategory<Item>( ID_CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
-			catBait 	= new IMCategory<Item>( ID_BAIT, 		item   	=> item.bait > 0 && item.consumable);
-			catDye		= new IMCategory<Item>( ID_DYE, 		item   	=> item.dye != 0);
-			catPaint	= new IMCategory<Item>( ID_PAINT, 		item   	=> item.paint != 0);
-			catTile		= new IMCategory<Item>( ID_TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
-			// catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
-			catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> catTile.match_params(item) && item.name.EndsWith("Ore")  );
-			catWall		= new IMCategory<Item>( ID_WALL, 		item   	=> item.createWall != -1);
-			catPet		= new IMCategory<Item>( ID_PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
-			catOther	= new IMCategory<Item>( ID_OTHER, 		null);
+			catPick		= new IMCategory<Item>( ItemCat.PICK, 		item   	=> item.pick > 0);
+			catAxe		= new IMCategory<Item>( ItemCat.AXE, 		item   	=> item.axe > 0);
+			catHammer	= new IMCategory<Item>( ItemCat.HAMMER,		item   	=> item.hammer > 0);
+			catHead		= new IMCategory<Item>( ItemCat.HEAD,		item 	=> item.headSlot != -1 && !item.vanity);
+			catBody		= new IMCategory<Item>( ItemCat.BODY,		item 	=> item.bodySlot != -1 && !item.vanity);
+			catLegs		= new IMCategory<Item>( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && !item.vanity);
+			catAccessory= new IMCategory<Item>( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
+			catVanity	= new IMCategory<Item>( ItemCat.VANITY,		item 	=> item.vanity);
+			catMelee	= new IMCategory<Item>( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
+			catRanged	= new IMCategory<Item>( ItemCat.RANGED,		item 	=> item.damage > 0 && item.ranged && (item.ammo == 0));
+			catAmmo		= new IMCategory<Item>( ItemCat.AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
+			catMagic	= new IMCategory<Item>( ItemCat.MAGIC, 		item   	=> item.damage > 0 && item.magic);
+			catSummon	= new IMCategory<Item>( ItemCat.SUMMON,		item   	=> item.damage > 0 && item.summon);
+			catConsume	= new IMCategory<Item>( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
+			catBait 	= new IMCategory<Item>( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
+			catDye		= new IMCategory<Item>( ItemCat.DYE, 		item   	=> item.dye != 0);
+			catPaint	= new IMCategory<Item>( ItemCat.PAINT, 		item   	=> item.paint != 0);
+			catTile		= new IMCategory<Item>( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
+			// catOre 		= new IMCategory<Item>( ItemCat.ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
+			catOre 		= new IMCategory<Item>( ItemCat.ORE, 		item   	=> catTile.match_params(item) && item.name.EndsWith("Ore")  );
+			catWall		= new IMCategory<Item>( ItemCat.WALL, 		item   	=> item.createWall != -1);
+			catPet		= new IMCategory<Item>( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
+			catOther	= new IMCategory<Item>( ItemCat.OTHER, 		null);
 
 			Categories.AddRange(new IMCategory<Item>[]
 				{

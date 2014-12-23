@@ -13,10 +13,10 @@ namespace InvisibleHand
 	*/
 	public class IMCategory<T> : IComparable<IMCategory<T>>
 	{
-		public readonly int catID;
+		public readonly ItemCat catID;
 		public readonly Func<T, bool> match_params;
 
-		public IMCategory(int catID, Func<T, bool> match_params)
+		public IMCategory(ItemCat catID, Func<T, bool> match_params)
 		{
 			this.catID=catID;
 			this.match_params=match_params;

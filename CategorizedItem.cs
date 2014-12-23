@@ -36,12 +36,16 @@ namespace InvisibleHand
             // improve sorting within certain categories
             switch (category.catID)
             {
-                case InventoryManager.ID_ORE:
+                case ItemCat.ORE:
                     if (item.value!=other.item.value) return item.value.CompareTo(other.item.value);
                     break;
                 // default:
                 //     break;
             }
+
+            // // this was surprisingly effective in Shockah's FCM menu
+            // if ((item.value * item.maxStack)!=(other.item.value * other.item.maxStack))
+            //     return (item.value * item.maxStack).CompareTo(other.item.value * other.item.maxStack)
 
             if (item.type!=other.item.type) return item.type.CompareTo(other.item.type);
             if (item.rare!=other.item.rare) return item.rare.CompareTo(other.item.rare);

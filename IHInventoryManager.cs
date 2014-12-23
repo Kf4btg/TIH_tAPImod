@@ -66,8 +66,9 @@ namespace InvisibleHand {
 			catBait 	= new IMCategory<Item>( ID_BAIT, 		item   	=> item.bait > 0 && item.consumable);
 			catDye		= new IMCategory<Item>( ID_DYE, 		item   	=> item.dye != 0);
 			catPaint	= new IMCategory<Item>( ID_PAINT, 		item   	=> item.paint != 0);
-			catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
 			catTile		= new IMCategory<Item>( ID_TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
+			// catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
+			catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> catTile.match_params(item) && item.name.EndsWith("Ore")  );
 			catWall		= new IMCategory<Item>( ID_WALL, 		item   	=> item.createWall != -1);
 			catPet		= new IMCategory<Item>( ID_PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
 			catOther	= new IMCategory<Item>( ID_OTHER, 		null);

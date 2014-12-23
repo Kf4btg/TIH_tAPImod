@@ -32,6 +32,17 @@ namespace InvisibleHand
         public int CompareTo(CategorizedItem other)
         {
             if (category.CompareTo(other.category) != 0) return category.CompareTo(other.category);
+
+            // improve sorting within certain categories
+            switch (category.catID)
+            {
+                case InventoryManager.ID_ORE:
+                    if (item.value!=other.item.value) return item.value.CompareTo(other.item.value);
+                    break;
+                // default:
+                //     break;
+            }
+
             if (item.type!=other.item.type) return item.type.CompareTo(other.item.type);
             if (item.rare!=other.item.rare) return item.rare.CompareTo(other.item.rare);
             if (item.stack!=other.item.stack) return item.stack.CompareTo(other.item.stack);
@@ -39,6 +50,7 @@ namespace InvisibleHand
             if (item.prefix.id!=other.item.prefix.id) return item.prefix.id.CompareTo(other.item.prefix.id);
             return 0;
             //name?
+
         }
     }
 

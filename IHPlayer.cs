@@ -21,6 +21,7 @@ namespace InvisibleHand
 
         public override void Save(BinBuffer bb)
         {
+            if (!IHBase.lockingEnabled) return;
             for (int i=0; i<lockedSlots.Length; i++)
             {
                 bb.Write(lockedSlots[i]);
@@ -29,8 +30,8 @@ namespace InvisibleHand
 
         public override void Load(BinBuffer bb)
         {
-            lockedSlots = new bool[40];
             if (bb.IsEmpty) return;
+            lockedSlots = new bool[40];
 
             for (int i=0; i<lockedSlots.Length; i++)
             {

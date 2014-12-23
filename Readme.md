@@ -18,10 +18,10 @@ This mod implements a number of convenience features to make managing one's inve
         *  Collects stackable item-types and puts them into as few maximized-stacks as possible.
     2.  Sort Inventory
         -   Default key "R"
-        -   First, performs a stack-consolidation, then groups all items together with other items in their category (e.g. pickaxes, blocks, accessories, etc.) and resorts the player's inventory or currently open chest.
+        -   First, performs a stack-consolidation, then groups all items together with other items in their category (e.g. pickaxes, blocks, accessories, etc.) and re-sorts the player's inventory or currently open chest.
 
 #### Experimental/Beta Features
-  *  Lock item-slots in the player's main inventory by holding shift and then right-clicking (do the same again to unlock). An item in a locked slot will not moved around when the player sorts their inventory.
+  *  Lock item-slots in the player's main inventory by holding shift and then right-clicking (do the same again to unlock). An item in a locked slot will not be moved around when the player sorts their inventory.
 
 #### More features coming!
 

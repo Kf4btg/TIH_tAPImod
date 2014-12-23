@@ -102,29 +102,26 @@ namespace InvisibleHand {
 		*	inventory, excluding the hotbar and optionally any slots marked as locked
 		*
 		*  @param player: The player whose inventory to sort.
-		*  @param checkLocks: whether to check for locked slots and exclude them
-		*         from the sort. Default=no.
 		*/
-		public static void SortPlayerInv(Player player, bool checkLocks = true)
+		public static void SortPlayerInv(Player player)
 		{
 			ConsolidateStacks(player.inventory, 0, 49); //include hotbar in this step
 
-			// Sort(player.inventory, checklocks, new Tuple<int,int>(includeHotbar ? 0 : 10, 49));
-			Sort(player.inventory, checkLocks, 10, 49);
+			Sort(player.inventory, false, 10, 49);
 		}
 
 		public static void SortChest(Item[] chestitems)
 		{
 			ConsolidateStacks(chestitems);
 
-			Sort(chestitems, false);
+			Sort(chestitems, true);
 		}
 
 		public static void SortChest(Chest chest)
 		{
 			ConsolidateStacks(chest.item);
 
-			Sort(chest.item, false);
+			Sort(chest.item, true);
 		}
 
 
@@ -133,28 +130,33 @@ namespace InvisibleHand {
 		*
 		*  @param container: The container whose contents to sort.
 		*  @param checkLocks: whether to check for & exclude locked slots
+		*  @param chest : whether the container is a chest (otherwise the player inventory)
 		*  @param rangeStart: starting index of the sort operation
 		*  @param rangeEnd: end index of the sort operation
 		*
 		*  Omitting both range arguments will sort the entire container.
 		*/
-		public static void Sort(Item[] container, bool checkLocks, int rangeStart, int rangeEnd)
+		public static void Sort(Item[] container, bool chest, int rangeStart, int rangeEnd)
 		{
-			Sort(container, checkLocks, new Tuple<int,int>(rangeStart, rangeEnd));
+			Sort(container, chest, new Tuple<int,int>(rangeStart, rangeEnd));
 		}
 
-		public static void Sort(Item[] container, bool checkLocks = false, Tuple<int,int> range = null)
+		public static void Sort(Item[] container, bool chest, Tuple<int,int> range = null)
 		{
 			// if range param not specified, set it to whole container
 			if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
+			// for clarity
+			bool checkLocks = IHBase.lockingEnabled;
+
+			// initialize the list that will hold the items to sort
 			List<CategorizedItem> itemSorter = new List<CategorizedItem>();
 
 			// delegate a category to each item, then add to sorted list
 			for (int i=range.Item1; i<=range.Item2; i++)
 			{
-				// if locking is enabled, check if slot is locked and skip if so
-				if (checkLocks && IHPlayer.SlotLocked(i)) continue;
+				// if this is the player inv && locking is enabled && slot is locked skip it
+				if (!chest && checkLocks && IHPlayer.SlotLocked(i)) continue;
 
 				if ( !container[i].IsBlank() )
 				{
@@ -177,7 +179,44 @@ namespace InvisibleHand {
 			/* now this seems too easy... */
 			itemSorter.Sort();  // sort using the CategorizedItem.CompareTo() method
 
-			// and now that they're sorted, copy them back to the original container
+			// depending on user settings, decide if we re-copy items to end or beginning of container
+			bool fillFromEnd = false;
+			switch(IHBase.opt_reverseSort)
+			{
+				case IHBase.RS_DISABLE:		//normal sort to beginning
+					break;
+				case IHBase.RS_PLAYER:		//copy to end for player inventory only
+					fillFromEnd = !chest;
+					break;
+				case IHBase.RS_CHEST:		//copy to end for chests only
+					fillFromEnd = chest;
+					break;
+				case IHBase.RS_BOTH:		//copy to end for all containers
+					fillFromEnd=true;
+					break;
+			}
+
+			// set up the functions that will be used in the iterators ahead
+			Func<int,int> getIndex, getIter;
+			Func<int,bool> getCond, getWhileCond;
+
+			if (fillFromEnd)	// use decrementing iterators
+			{
+				getIndex = x => range.Item2 - x;
+				getIter = x => x-1;
+				getCond = x => x >= range.Item1;
+				getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(x);
+
+			}
+			else 	// use incrementing iterators
+			{
+				getIndex = y => range.Item1 + y;
+				getIter = y => y+1;
+				getCond = y => y <= range.Item2;
+				getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
+			}
+
+			// copy the sorted items back to the original container
 			int filled = 0;
 			foreach (CategorizedItem citem in itemSorter)
 			{
@@ -187,26 +226,24 @@ namespace InvisibleHand {
 					// this would throw errors if range.Item1+filled somehow went over 49,
 					// but if the categorizer and slot-locker are functioning correctly,
 					// that _shouldn't_ be possible. Shouldn't. Hopefully.
-					while (IHPlayer.SlotLocked(range.Item1+filled))
+					while (IHPlayer.SlotLocked(getIndex(filled)))
 					{
 						filled++;
 					}
 				}
-				container[range.Item1+filled] = citem.item.Clone();
+				container[getIndex(filled)] = citem.item.Clone();
 				filled++;
 			}
 
 			// and the rest of the slots should be empty
-			for (int i=range.Item1+filled; i<=range.Item2; i++)
+			for (int i=getIndex(filled); getCond(i); i=getIter(i))
 			{
 				if (checkLocks)
 				{
 					// find the first unlocked slot.
-					// this loop _could_ in theory go over 49
-					while (i<range.Item2 && IHPlayer.SlotLocked(i))
-					{
-						i++;
-					}
+					// this loop _could_ in theory go over 49, so add
+					// a check for the index bounds
+					while (getWhileCond(i)) { i=getIter(i); }
 
 					// still need to check lock in case we exited on the 1st condition of the while loop
 					if (IHPlayer.SlotLocked(i)) break;
@@ -216,6 +253,83 @@ namespace InvisibleHand {
 
 		} // sort()
 
+		// private static int Fill_StartFromFront(List<CategorizedItem> itemSorter, Item[] container, Tuple<int,int> range, bool checkLocks)
+		// {
+		// 	int filled = 0;
+		// 	foreach (CategorizedItem citem in itemSorter)
+		// 	{
+		// 		if (checkLocks)
+		// 		{
+		// 			// find the first unlocked slot
+		// 			// this would throw errors if range.Item1+filled somehow went over 49,
+		// 			// but if the categorizer and slot-locker are functioning correctly,
+		// 			// that _shouldn't_ be possible. Shouldn't. Hopefully.
+		// 			while (IHPlayer.SlotLocked(range.Item1+filled))
+		// 			{
+		// 				filled++;
+		// 			}
+		// 		}
+		// 		container[range.Item1+filled] = citem.item.Clone();
+		// 		filled++;
+		// 	}
+		//
+		// 	// and the rest of the slots should be empty
+		// 	for (int i=range.Item1+filled; i<=range.Item2; i++)
+		// 	{
+		// 		if (checkLocks)
+		// 		{
+		// 			// find the first unlocked slot.
+		// 			// this loop _could_ in theory go over 49
+		// 			while (i<range.Item2 && IHPlayer.SlotLocked(i))
+		// 			{
+		// 				i++;
+		// 			}
+		//
+		// 			// still need to check lock in case we exited on the 1st condition of the while loop
+		// 			if (IHPlayer.SlotLocked(i)) break;
+		// 		}
+		// 		container[i] = new Item();
+		// 	}
+		// }
+		//
+		// private static int Fill_StartFromEnd(List<CategorizedItem> itemSorter, Item[] container, Tuple<int,int> range, bool checkLocks)
+		// {
+		// 	int filled = 0;
+		// 	foreach (CategorizedItem citem in itemSorter)
+		// 	{
+		// 		if (checkLocks)
+		// 		{
+		// 			// find the first unlocked slot
+		// 			// this would throw errors if range.Item1+filled somehow went over 49,
+		// 			// but if the categorizer and slot-locker are functioning correctly,
+		// 			// that _shouldn't_ be possible. Shouldn't. Hopefully.
+		// 			while (IHPlayer.SlotLocked(range.Item2-filled))
+		// 			{
+		// 				filled++;
+		// 			}
+		// 		}
+		// 		container[range.Item2-filled] = citem.item.Clone();
+		// 		filled++;
+		// 	}
+		//
+		// 	// and the rest of the slots should be empty
+		// 	for (int i=range.Item2-filled; i>=range.Item1; i--)
+		// 	{
+		// 		if (checkLocks)
+		// 		{
+		// 			// find the first unlocked slot.
+		// 			// this loop _could_ in theory go over 49
+		// 			while (i>range.Item1 && IHPlayer.SlotLocked(i))
+		// 			{
+		// 				i--;
+		// 			}
+		//
+		// 			// still need to check lock in case we exited on the 1st condition of the while loop
+		// 			if (IHPlayer.SlotLocked(i)) break;
+		// 		}
+		// 		container[i] = new Item();
+		// 	}
+		// }
 
 		/*************************************************************************
 		*  Adapted from "PutItem()" in ShockahBase.SBase
@@ -250,6 +364,11 @@ namespace InvisibleHand {
 		private static void StackItems(ref Item item, Item[] container, int rangeStart, int rangeEnd)
 		{
 			// for (int j=rangeStart; j<=rangeEnd; j++)
+			// Func<int,int> jiter;
+			// if (IHBase.lockingEnabled) {
+			// 	jiter = jay => jay--;
+			// }
+
 			for (int j=rangeEnd; j>=rangeStart; j--) //iterate in reverse
 			{
 				Item item2 = container[j];

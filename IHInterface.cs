@@ -13,16 +13,13 @@ namespace InvisibleHand
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
+            if (IHBase.lockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
             {
                 if (lockedMarker == null)
                 {
                     lockedMarker = IHBase.self.textures["resources/LockIndicator"];
                 }
 
-                // Color c = IHPlayer.SlotLocked(slot.index) ? Color.Red : Color.Green;
-
-                // TODO: replace the separate textures with one, colored by Color.xxxxx options
                 sb.Draw(lockedMarker,                // the texture to draw
                         slot.pos,           // (Vector2) location in screen coords to draw sprite
                         null,               // Rectangle to specifies source texels from texture; null draws whole texture
@@ -39,7 +36,7 @@ namespace InvisibleHand
         // Shift + Right Click on inventory slot toggles the lock state
         public override bool PreItemSlotRightClick(ItemSlot slot, ref bool release)
         {
-            if (slot.modBase == null && Main.playerInventory && release && KState.Special.Shift.Down())
+            if (IHBase.lockingEnabled && slot.modBase == null && Main.playerInventory && release && KState.Special.Shift.Down())
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {

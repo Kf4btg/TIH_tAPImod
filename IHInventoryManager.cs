@@ -12,7 +12,7 @@ namespace InvisibleHand {
 
 		public static IMCategory<Item>
 			catHead, catBody, catLegs, catVanity, catMelee, catRanged, catAmmo, catMagic, catSummon, catAccessory,
-			catPick, catAxe, catHammer, catConsume, catDye, catPaint, catTile, catWall, catPet, catOther, catBait;
+			catPick, catAxe, catHammer, catConsume, catDye, catPaint, catOre, catTile, catWall, catPet, catOther, catBait;
 
 		// category id defines where its items will be sorted with regards
 		// to items of other categories.
@@ -34,9 +34,10 @@ namespace InvisibleHand {
 							ID_BAIT			= 16,
 							ID_DYE 			= 17,
 							ID_PAINT 		= 18,
-							ID_TILE 		= 19,
-							ID_WALL 		= 20,
-							ID_OTHER		= 21;
+							ID_ORE			= 19,
+							ID_TILE 		= 20,
+							ID_WALL 		= 21,
+							ID_OTHER		= 22;
 
 
 		/*************************************************************************
@@ -61,10 +62,11 @@ namespace InvisibleHand {
 			catAmmo		= new IMCategory<Item>( ID_AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
 			catMagic	= new IMCategory<Item>( ID_MAGIC, 		item   	=> item.damage > 0 && item.magic);
 			catSummon	= new IMCategory<Item>( ID_SUMMON, 		item   	=> item.damage > 0 && item.summon);
-			catConsume	= new IMCategory<Item>( ID_CONSUME, 	item   	=> item.consumable && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
+			catConsume	= new IMCategory<Item>( ID_CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
 			catBait 	= new IMCategory<Item>( ID_BAIT, 		item   	=> item.bait > 0 && item.consumable);
 			catDye		= new IMCategory<Item>( ID_DYE, 		item   	=> item.dye != 0);
 			catPaint	= new IMCategory<Item>( ID_PAINT, 		item   	=> item.paint != 0);
+			catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
 			catTile		= new IMCategory<Item>( ID_TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
 			catWall		= new IMCategory<Item>( ID_WALL, 		item   	=> item.createWall != -1);
 			catPet		= new IMCategory<Item>( ID_PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
@@ -89,10 +91,11 @@ namespace InvisibleHand {
 					catConsume,
 					catBait,		//
 					catDye, 		//
-					catPaint, 		//
+					catPaint,
+					catOre, 		//
 					catTile, 		//
 					catWall, 		//
-					catOther		// 21 --must be last
+					catOther		//  --must be last
 				});
 		} //end initialize()
 
@@ -103,25 +106,25 @@ namespace InvisibleHand {
 		*
 		*  @param player: The player whose inventory to sort.
 		*/
-		public static void SortPlayerInv(Player player)
+		public static void SortPlayerInv(Player player, bool reverse=false)
 		{
 			ConsolidateStacks(player.inventory, 0, 49); //include hotbar in this step
 
-			Sort(player.inventory, false, 10, 49);
+			Sort(player.inventory, false, reverse, 10, 49);
 		}
 
-		public static void SortChest(Item[] chestitems)
+		public static void SortChest(Item[] chestitems, bool reverse=false)
 		{
 			ConsolidateStacks(chestitems);
 
-			Sort(chestitems, true);
+			Sort(chestitems, true, reverse);
 		}
 
-		public static void SortChest(Chest chest)
+		public static void SortChest(Chest chest, bool reverse=false)
 		{
 			ConsolidateStacks(chest.item);
 
-			Sort(chest.item, true);
+			Sort(chest.item, true, reverse);
 		}
 
 
@@ -136,12 +139,12 @@ namespace InvisibleHand {
 		*
 		*  Omitting both range arguments will sort the entire container.
 		*/
-		public static void Sort(Item[] container, bool chest, int rangeStart, int rangeEnd)
+		public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
 		{
-			Sort(container, chest, new Tuple<int,int>(rangeStart, rangeEnd));
+			Sort(container, chest, reverse, new Tuple<int,int>(rangeStart, rangeEnd));
 		}
 
-		public static void Sort(Item[] container, bool chest, Tuple<int,int> range = null)
+		public static void Sort(Item[] container, bool chest, bool reverse, Tuple<int,int> range = null)
 		{
 			// if range param not specified, set it to whole container
 			if (range == null) range = new Tuple<int,int>(0, container.Length -1);
@@ -178,6 +181,7 @@ namespace InvisibleHand {
 
 			/* now this seems too easy... */
 			itemSorter.Sort();  // sort using the CategorizedItem.CompareTo() method
+			if (reverse) itemSorter.Reverse();
 
 			// depending on user settings, decide if we re-copy items to end or beginning of container
 			bool fillFromEnd = false;
@@ -216,120 +220,43 @@ namespace InvisibleHand {
 				getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
 			}
 
-			// copy the sorted items back to the original container
 			int filled = 0;
-			foreach (CategorizedItem citem in itemSorter)
+			if (!chest && checkLocks) // move these checks out of the loop
 			{
-				if (checkLocks)
-				{
-					// find the first unlocked slot
-					// this would throw errors if range.Item1+filled somehow went over 49,
-					// but if the categorizer and slot-locker are functioning correctly,
-					// that _shouldn't_ be possible. Shouldn't. Hopefully.
-					while (IHPlayer.SlotLocked(getIndex(filled)))
-					{
-						filled++;
-					}
-				}
-				container[getIndex(filled)] = citem.item.Clone();
-				filled++;
-			}
-
-			// and the rest of the slots should be empty
-			for (int i=getIndex(filled); getCond(i); i=getIter(i))
-			{
-				if (checkLocks)
+				// copy the sorted items back to the original container
+				foreach (CategorizedItem citem in itemSorter)
 				{
 					// find the first unlocked slot.
-					// this loop _could_ in theory go over 49, so add
-					// a check for the index bounds
-					while (getWhileCond(i)) { i=getIter(i); }
-
-					// still need to check lock in case we exited on the 1st condition of the while loop
-					if (IHPlayer.SlotLocked(i)) break;
+					// this would throw an exception if range.Item1+filled somehow went over 49,
+					// but if the categorizer and slot-locker are functioning correctly,
+					// that _shouldn't_ be possible. Shouldn't. Probably.
+					while (IHPlayer.SlotLocked(getIndex(filled))) { filled++; }
+					container[getIndex(filled++)] = citem.item.Clone();
 				}
-				container[i] = new Item();
-			}
+				// and the rest of the slots should be empty
+				for (int i=getIndex(filled); getCond(i); i=getIter(i))
+				{
+					// find the first unlocked slot.
+					if (IHPlayer.SlotLocked(i)) continue;
 
+					container[i] = new Item();
+				}
+			}
+			else // just run through 'em all
+			{
+				foreach (CategorizedItem citem in itemSorter)
+				{
+					container[getIndex(filled++)] = citem.item.Clone();
+					// filled++;
+				}
+				// and the rest of the slots should be empty
+				for (int i=getIndex(filled); getCond(i); i=getIter(i))
+				{
+					container[i] = new Item();
+				}
+			}
 		} // sort()
 
-		// private static int Fill_StartFromFront(List<CategorizedItem> itemSorter, Item[] container, Tuple<int,int> range, bool checkLocks)
-		// {
-		// 	int filled = 0;
-		// 	foreach (CategorizedItem citem in itemSorter)
-		// 	{
-		// 		if (checkLocks)
-		// 		{
-		// 			// find the first unlocked slot
-		// 			// this would throw errors if range.Item1+filled somehow went over 49,
-		// 			// but if the categorizer and slot-locker are functioning correctly,
-		// 			// that _shouldn't_ be possible. Shouldn't. Hopefully.
-		// 			while (IHPlayer.SlotLocked(range.Item1+filled))
-		// 			{
-		// 				filled++;
-		// 			}
-		// 		}
-		// 		container[range.Item1+filled] = citem.item.Clone();
-		// 		filled++;
-		// 	}
-		//
-		// 	// and the rest of the slots should be empty
-		// 	for (int i=range.Item1+filled; i<=range.Item2; i++)
-		// 	{
-		// 		if (checkLocks)
-		// 		{
-		// 			// find the first unlocked slot.
-		// 			// this loop _could_ in theory go over 49
-		// 			while (i<range.Item2 && IHPlayer.SlotLocked(i))
-		// 			{
-		// 				i++;
-		// 			}
-		//
-		// 			// still need to check lock in case we exited on the 1st condition of the while loop
-		// 			if (IHPlayer.SlotLocked(i)) break;
-		// 		}
-		// 		container[i] = new Item();
-		// 	}
-		// }
-		//
-		// private static int Fill_StartFromEnd(List<CategorizedItem> itemSorter, Item[] container, Tuple<int,int> range, bool checkLocks)
-		// {
-		// 	int filled = 0;
-		// 	foreach (CategorizedItem citem in itemSorter)
-		// 	{
-		// 		if (checkLocks)
-		// 		{
-		// 			// find the first unlocked slot
-		// 			// this would throw errors if range.Item1+filled somehow went over 49,
-		// 			// but if the categorizer and slot-locker are functioning correctly,
-		// 			// that _shouldn't_ be possible. Shouldn't. Hopefully.
-		// 			while (IHPlayer.SlotLocked(range.Item2-filled))
-		// 			{
-		// 				filled++;
-		// 			}
-		// 		}
-		// 		container[range.Item2-filled] = citem.item.Clone();
-		// 		filled++;
-		// 	}
-		//
-		// 	// and the rest of the slots should be empty
-		// 	for (int i=range.Item2-filled; i>=range.Item1; i--)
-		// 	{
-		// 		if (checkLocks)
-		// 		{
-		// 			// find the first unlocked slot.
-		// 			// this loop _could_ in theory go over 49
-		// 			while (i>range.Item1 && IHPlayer.SlotLocked(i))
-		// 			{
-		// 				i--;
-		// 			}
-		//
-		// 			// still need to check lock in case we exited on the 1st condition of the while loop
-		// 			if (IHPlayer.SlotLocked(i)) break;
-		// 		}
-		// 		container[i] = new Item();
-		// 	}
-		// }
 
 		/*************************************************************************
 		*  Adapted from "PutItem()" in ShockahBase.SBase

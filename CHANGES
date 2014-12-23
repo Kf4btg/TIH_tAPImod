@@ -1,0 +1,11 @@
+Version 1.0.0 -> 1.1.0
+    -   Added ability to lock items in place by shift-right-clicking the slot. Items in these slots will not be moved by the sort operation.
+
+
+Version 1.1.0-rc3+tr14a
+    -   Added mod-option to entirely disable the locking mechanism
+    -   Add mod-option for selecting whether to sort items to end or beginning of inventory
+        -   can set for inventory, chests, or both
+    -   Added reverse-sort function
+        -   Hold shift + press sort key
+    -   Improved sorting parameters

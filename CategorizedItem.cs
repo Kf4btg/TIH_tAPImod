@@ -31,12 +31,14 @@ namespace InvisibleHand
         */
         public int CompareTo(CategorizedItem other)
         {
-            return (category.CompareTo(other.category) == 0 ?
-                    (item.type.CompareTo(other.item.type) == 0 ?
-                            item.netID.CompareTo(other.item.netID) :
-                            item.type.CompareTo(other.item.type)) :
-                        category.CompareTo(other.category)
-                    );
+            if (category.CompareTo(other.category) != 0) return category.CompareTo(other.category);
+            if (item.type!=other.item.type) return item.type.CompareTo(other.item.type);
+            if (item.rare!=other.item.rare) return item.rare.CompareTo(other.item.rare);
+            if (item.stack!=other.item.stack) return item.stack.CompareTo(other.item.stack);
+            if (item.netID!=other.item.netID) return item.netID.CompareTo(other.item.netID);
+            if (item.prefix.id!=other.item.prefix.id) return item.prefix.id.CompareTo(other.item.prefix.id);
+            return 0;
+            //name?
         }
     }
 

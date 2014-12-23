@@ -17,6 +17,9 @@ namespace InvisibleHand
         public bool control_depositAll;
         public bool control_lootAll;
 
+        //alt functions
+        public bool control_rSort;      // shift+sort=reverse sort
+
         public static bool[] lockedSlots = new bool[40]; //not the hotbar
 
         public override void Save(BinBuffer bb)
@@ -41,9 +44,6 @@ namespace InvisibleHand
 
         public override void PreUpdate()
         {
-
-            control_sort = control_clean = control_qStack = control_depositAll = control_lootAll = false;
-
             //activate only if:
                 // not typing
                 // inventory is open
@@ -51,22 +51,31 @@ namespace InvisibleHand
                 // not talking to an npc
             if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && Main.localPlayer.talkNPC==-1)
             {
+                control_sort = control_clean = control_qStack = control_depositAll = control_lootAll = false;
+                control_rSort = false;
 
-                control_sort       = IHBase.key_sort.Pressed();
-                control_clean      = IHBase.key_cleanStacks.Pressed();
-                control_qStack     = IHBase.key_quickStack.Pressed();
-                control_depositAll = IHBase.key_depositAll.Pressed();
-                control_lootAll    = IHBase.key_lootAll.Pressed();
+                if (KState.Special.Shift.Down()) //alt functions
+                {
+                    control_rSort       = IHBase.key_sort.Pressed();
+                }
+                else
+                {
+                    control_sort       = IHBase.key_sort.Pressed();
+                    control_clean      = IHBase.key_cleanStacks.Pressed();
+                    control_qStack     = IHBase.key_quickStack.Pressed();
+                    control_depositAll = IHBase.key_depositAll.Pressed();
+                    control_lootAll    = IHBase.key_lootAll.Pressed();
+                }
 
-                if (control_sort)
+                if (control_sort || control_rSort)
                 {
                     if ( player.chestItems == null ) // no valid chest open, sort player inventory
                     {
-                        InventoryManager.SortPlayerInv(player);
+                        InventoryManager.SortPlayerInv(player, control_rSort);
                         return;
                     }
                     // else call sort on the Item[] array returned by chestItems
-                    InventoryManager.SortChest(player.chestItems);
+                    InventoryManager.SortChest(player.chestItems, control_rSort);
                     return;
                 }
 

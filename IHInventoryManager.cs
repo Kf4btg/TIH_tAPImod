@@ -12,7 +12,7 @@ namespace InvisibleHand {
 
 		public static IMCategory<Item>
 			catHead, catBody, catLegs, catVanity, catMelee, catRanged, catAmmo, catMagic, catSummon, catAccessory,
-			catPick, catAxe, catHammer, catConsume, catDye, catPaint, catTile, catWall, catPet, catOther, catBait;
+			catPick, catAxe, catHammer, catConsume, catDye, catPaint, catOre, catTile, catWall, catPet, catOther, catBait;
 
 		// category id defines where its items will be sorted with regards
 		// to items of other categories.
@@ -34,9 +34,10 @@ namespace InvisibleHand {
 							ID_BAIT			= 16,
 							ID_DYE 			= 17,
 							ID_PAINT 		= 18,
-							ID_TILE 		= 19,
-							ID_WALL 		= 20,
-							ID_OTHER		= 21;
+							ID_ORE			= 19,
+							ID_TILE 		= 20,
+							ID_WALL 		= 21,
+							ID_OTHER		= 22;
 
 
 		/*************************************************************************
@@ -61,10 +62,11 @@ namespace InvisibleHand {
 			catAmmo		= new IMCategory<Item>( ID_AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
 			catMagic	= new IMCategory<Item>( ID_MAGIC, 		item   	=> item.damage > 0 && item.magic);
 			catSummon	= new IMCategory<Item>( ID_SUMMON, 		item   	=> item.damage > 0 && item.summon);
-			catConsume	= new IMCategory<Item>( ID_CONSUME, 	item   	=> item.consumable && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
+			catConsume	= new IMCategory<Item>( ID_CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
 			catBait 	= new IMCategory<Item>( ID_BAIT, 		item   	=> item.bait > 0 && item.consumable);
 			catDye		= new IMCategory<Item>( ID_DYE, 		item   	=> item.dye != 0);
 			catPaint	= new IMCategory<Item>( ID_PAINT, 		item   	=> item.paint != 0);
+			catOre 		= new IMCategory<Item>( ID_ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
 			catTile		= new IMCategory<Item>( ID_TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
 			catWall		= new IMCategory<Item>( ID_WALL, 		item   	=> item.createWall != -1);
 			catPet		= new IMCategory<Item>( ID_PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
@@ -89,60 +91,76 @@ namespace InvisibleHand {
 					catConsume,
 					catBait,		//
 					catDye, 		//
-					catPaint, 		//
+					catPaint,
+					catOre, 		//
 					catTile, 		//
 					catWall, 		//
-					catOther		// 21 --must be last
+					catOther		//  --must be last
 				});
-
 		} //end initialize()
 
 
 		/*************************************************************************
-		*  Inventory Management for the lazy.
+		*  SortPlayerInv - perform the sort operation on the items in the player's
+		*	inventory, excluding the hotbar and optionally any slots marked as locked
 		*
 		*  @param player: The player whose inventory to sort.
-		*  @param includeHotbar: whether or not to sort the player's hotbar
-		*         along with the rest of the inventory. Default=no.
 		*/
-		public static void SortPlayerInv(Player player, bool includeHotbar = false)
+		public static void SortPlayerInv(Player player, bool reverse=false)
 		{
 			ConsolidateStacks(player.inventory, 0, 49); //include hotbar in this step
-			Sort(player.inventory, new Tuple<int,int>(includeHotbar ? 0 : 10, 49));
+
+			Sort(player.inventory, false, reverse, 10, 49);
 		}
 
-		public static void SortChest(Chest chest)
+		public static void SortChest(Item[] chestitems, bool reverse=false)
+		{
+			ConsolidateStacks(chestitems);
+
+			Sort(chestitems, true, reverse);
+		}
+
+		public static void SortChest(Chest chest, bool reverse=false)
 		{
 			ConsolidateStacks(chest.item);
 
-			Sort(chest.item);
+			Sort(chest.item, true, reverse);
 		}
 
 
 		/*************************************************************************
-		*  Inventory Management for the lazy.
+		*  Sort Container
 		*
 		*  @param container: The container whose contents to sort.
+		*  @param checkLocks: whether to check for & exclude locked slots
+		*  @param chest : whether the container is a chest (otherwise the player inventory)
 		*  @param rangeStart: starting index of the sort operation
 		*  @param rangeEnd: end index of the sort operation
 		*
 		*  Omitting both range arguments will sort the entire container.
 		*/
-		public static void Sort(Item[] container, int rangeStart, int rangeEnd)
+		public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
 		{
-			Sort(container, new Tuple<int,int>(rangeStart, rangeEnd));
+			Sort(container, chest, reverse, new Tuple<int,int>(rangeStart, rangeEnd));
 		}
 
-		public static void Sort(Item[] container, Tuple<int,int> range = null)
+		public static void Sort(Item[] container, bool chest, bool reverse, Tuple<int,int> range = null)
 		{
+			// if range param not specified, set it to whole container
 			if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
-			int offset = range.Item1;
+			// for clarity
+			bool checkLocks = IHBase.lockingEnabled;
 
+			// initialize the list that will hold the items to sort
 			List<CategorizedItem> itemSorter = new List<CategorizedItem>();
+
 			// delegate a category to each item, then add to sorted list
 			for (int i=range.Item1; i<=range.Item2; i++)
 			{
+				// if this is the player inv && locking is enabled && slot is locked skip it
+				if (!chest && checkLocks && IHPlayer.SlotLocked(i)) continue;
+
 				if ( !container[i].IsBlank() )
 				{
 					Item itemcopy = container[i].Clone();
@@ -163,21 +181,80 @@ namespace InvisibleHand {
 
 			/* now this seems too easy... */
 			itemSorter.Sort();  // sort using the CategorizedItem.CompareTo() method
+			if (reverse) itemSorter.Reverse();
 
-			// and now that they're sorted, copy them back to the original container
+			// depending on user settings, decide if we re-copy items to end or beginning of container
+			bool fillFromEnd = false;
+			switch(IHBase.opt_reverseSort)
+			{
+				case IHBase.RS_DISABLE:		//normal sort to beginning
+					break;
+				case IHBase.RS_PLAYER:		//copy to end for player inventory only
+					fillFromEnd = !chest;
+					break;
+				case IHBase.RS_CHEST:		//copy to end for chests only
+					fillFromEnd = chest;
+					break;
+				case IHBase.RS_BOTH:		//copy to end for all containers
+					fillFromEnd=true;
+					break;
+			}
+
+			// set up the functions that will be used in the iterators ahead
+			Func<int,int> getIndex, getIter;
+			Func<int,bool> getCond, getWhileCond;
+
+			if (fillFromEnd)	// use decrementing iterators
+			{
+				getIndex = x => range.Item2 - x;
+				getIter = x => x-1;
+				getCond = x => x >= range.Item1;
+				getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(x);
+
+			}
+			else 	// use incrementing iterators
+			{
+				getIndex = y => range.Item1 + y;
+				getIter = y => y+1;
+				getCond = y => y <= range.Item2;
+				getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
+			}
+
 			int filled = 0;
-			foreach (CategorizedItem citem in itemSorter)
+			if (!chest && checkLocks) // move these checks out of the loop
 			{
-				container[range.Item1+filled] = citem.item.Clone();
-				filled++;
-			}
+				// copy the sorted items back to the original container
+				foreach (CategorizedItem citem in itemSorter)
+				{
+					// find the first unlocked slot.
+					// this would throw an exception if range.Item1+filled somehow went over 49,
+					// but if the categorizer and slot-locker are functioning correctly,
+					// that _shouldn't_ be possible. Shouldn't. Probably.
+					while (IHPlayer.SlotLocked(getIndex(filled))) { filled++; }
+					container[getIndex(filled++)] = citem.item.Clone();
+				}
+				// and the rest of the slots should be empty
+				for (int i=getIndex(filled); getCond(i); i=getIter(i))
+				{
+					// find the first unlocked slot.
+					if (IHPlayer.SlotLocked(i)) continue;
 
-			// and the rest of the slots should be empty
-			for (int i=range.Item1+filled; i<=range.Item2; i++)
+					container[i] = new Item();
+				}
+			}
+			else // just run through 'em all
 			{
-				container[i] = new Item();
+				foreach (CategorizedItem citem in itemSorter)
+				{
+					container[getIndex(filled++)] = citem.item.Clone();
+					// filled++;
+				}
+				// and the rest of the slots should be empty
+				for (int i=getIndex(filled); getCond(i); i=getIter(i))
+				{
+					container[i] = new Item();
+				}
 			}
-
 		} // sort()
 
 
@@ -214,6 +291,11 @@ namespace InvisibleHand {
 		private static void StackItems(ref Item item, Item[] container, int rangeStart, int rangeEnd)
 		{
 			// for (int j=rangeStart; j<=rangeEnd; j++)
+			// Func<int,int> jiter;
+			// if (IHBase.lockingEnabled) {
+			// 	jiter = jay => jay--;
+			// }
+
 			for (int j=rangeEnd; j>=rangeStart; j--) //iterate in reverse
 			{
 				Item item2 = container[j];
@@ -228,8 +310,6 @@ namespace InvisibleHand {
 					{
 						item = new Item();
 						return;
-						// item = item2.Clone();	// swap item2 to the position of the old item1 & clear item2's position
-						// item2 = new Item();     // so this loop will continue to combine any more stacks of this item it finds
 					}
 				}
 			}

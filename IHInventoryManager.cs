@@ -68,7 +68,7 @@ namespace InvisibleHand {
 			catPaint	= new IMCategory<Item>( ItemCat.PAINT, 		item   	=> item.paint != 0);
 			catTile		= new IMCategory<Item>( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
 			// catOre 		= new IMCategory<Item>( ItemCat.ORE, 		item   	=> item.createTile != -1 && item.tileWand == -1 && item.consumable && item.maxStack==999 && item.name != "Xmas decorations"  );
-			catOre 		= new IMCategory<Item>( ItemCat.ORE, 		item   	=> catTile.match_params(item) && item.name.EndsWith("Ore")  );
+			catOre 		= new IMCategory<Item>( ItemCat.ORE, 		item   	=> catTile.matches(item) && item.name.EndsWith("Ore")  );
 			catWall		= new IMCategory<Item>( ItemCat.WALL, 		item   	=> item.createWall != -1);
 			catPet		= new IMCategory<Item>( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
 			catOther	= new IMCategory<Item>( ItemCat.OTHER, 		null);
@@ -95,9 +95,10 @@ namespace InvisibleHand {
 					catPaint,
 					catOre, 		//
 					catTile, 		//
-					catWall, 		//
-					catOther		//  --must be last
+					catWall 		//
 				});
+
+				//catOther NOT added to the list
 		} //end initialize()
 
 
@@ -111,21 +112,21 @@ namespace InvisibleHand {
 		{
 			ConsolidateStacks(player.inventory, 0, 49); //include hotbar in this step
 
-			Sort(player.inventory, false, reverse, 10, 49);
+			IHOrganizer.Sort(player.inventory, false, reverse, 10, 49);
 		}
 
 		public static void SortChest(Item[] chestitems, bool reverse=false)
 		{
 			ConsolidateStacks(chestitems);
 
-			Sort(chestitems, true, reverse);
+			IHOrganizer.Sort(chestitems, true, reverse);
 		}
 
 		public static void SortChest(Chest chest, bool reverse=false)
 		{
 			ConsolidateStacks(chest.item);
 
-			Sort(chest.item, true, reverse);
+			IHOrganizer.Sort(chest.item, true, reverse);
 		}
 
 
@@ -171,7 +172,7 @@ namespace InvisibleHand {
 					// the checks (except for the last category, Other, which isn't checked and
 					// into which all unmatched items will fall).
 					int cid = 0;
-					while ( cid<(Categories.Count - 1) && !Categories[cid].match_params(itemcopy) ) { cid++; }
+					while ( cid<(Categories.Count - 1) && !Categories[cid].matches(itemcopy) ) { cid++; }
 
 					// currently, this makes category order dependent on the order
 					// in which they are added to the Categories[] array...which is

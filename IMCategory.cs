@@ -11,20 +11,25 @@ namespace InvisibleHand
 	*  @param match_params: Function that determines whether an object fits
 	*         in this category.
 	*/
-	public class IMCategory<T> : IComparable<IMCategory<T>>
+	public class IMCategory<T> : IComparable<IMCategory<T>>, IEquatable<IMCategory<T>>
 	{
-		public readonly ItemCat catID;
-		public readonly Func<T, bool> match_params;
+		public readonly Enum catID;
+		public readonly Func<T, bool> matches;
 
-		public IMCategory(ItemCat catID, Func<T, bool> match_params)
+		public IMCategory(ItemCat cID, Func<T, bool> match_params)
 		{
-			this.catID=catID;
-			this.match_params=match_params;
+			catID=cID;
+			matches=match_params;
 		}
 
 		public int CompareTo(IMCategory<T> c2)
 		{
-			return this.catID.CompareTo(c2.catID);
+			return catID.CompareTo(c2.catID);
+		}
+
+		public bool Equals(IMCategory<T> c2)
+		{
+			return catID == c2.catID;
 		}
 
 	}

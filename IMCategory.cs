@@ -16,7 +16,7 @@ namespace InvisibleHand
 		public readonly Enum catID;
 		public readonly Func<T, bool> matches;
 
-		public IMCategory(ItemCat cID, Func<T, bool> match_params)
+		public IMCategory(Enum cID, Func<T, bool> match_params)
 		{
 			catID=cID;
 			matches=match_params;

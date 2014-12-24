@@ -39,7 +39,7 @@ namespace InvisibleHand
             {   // category.Key is IMCategory<Item>
                 // IQueryable<Item> query;
                 List<String> sortFields;
-                switch(category.Key.catID)
+                switch((ItemCat)category.Key.catID)
                 {
                     case ItemCat.PICK:
                         sortFields=new List<String>() {"rare", "pick", "type", "value"};
@@ -120,6 +120,7 @@ namespace InvisibleHand
 
             }
 
+            return sortedList;
 
         }
 
@@ -136,45 +137,57 @@ namespace InvisibleHand
             source type is IGrouping<IMCategory<Item>,CategorizedItem>
         */
         public static IQueryable<Item> BuildQuery(IQueryable<Item> source, List<String> sortFields)
-                {
+        {
 
             //Create the Parameter Expression for the query
             // Expressions.ParameterExpression
             var eachItemAsParam = Expression.Parameter(typeof(Item), "item");
 
             // Prepare Expression vars
-            MethodCallExpression orderByExp;
+            MethodCallExpression orderByExp = null;
             MemberExpression orderByProperty;
 
+            Expression baseExp = source.Expression; //was having troubles with "unassigned variable" errors...
+            String opString = "OrderBy";    //create expression to represent source.OrderBy(...)
             bool first = true;
             foreach (String s in sortFields)
             {
                 orderByProperty = Expression.Property(eachItemAsParam, s);
 
-                if (first)
-                {   //create expression to represent source.OrderBy(...)
-                    first=false;
-                    orderByExp = Expression.Call(
-                        typeof(Queryable),
-                        "OrderBy",
-                        new Type[] { source.ElementType, typeof(IComparable) },
-                        source.Expression,
-                        Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
-                        );
-                }
-                else
-                {
-                    // Create similar expression trees for any other specified properties, using a ThenBy call
-                    // (could make this recursive)
+                orderByExp = Expression.Call(
+                    typeof(Queryable),
+                    opString,
+                    new Type[] { source.ElementType, typeof(IComparable) },
+                    baseExp,
+                    Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
+                );
 
-                    orderByExp = Expression.Call(
-                        typeof(Queryable),
-                        "ThenBy",
-                        new Type[] { source.ElementType, typeof(IComparable) },
-                        orderByExp,
-                        Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
-                        );
+                baseExp = orderByExp;
+                if (first)
+                {  // Create similar expression trees for any other specified properties, using a ThenBy call
+                    opString = "ThenBy";
+                    first=false;
                 }
+
+                    // orderByExp = Expression.Call(
+                    //     typeof(Queryable),
+                    //     "OrderBy",
+                    //     new Type[] { source.ElementType, typeof(IComparable) },
+                    //     source.Expression,
+                    //     Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
+                    //     );
+
+                // else
+                // {
+
+                    // orderByExp = Expression.Call(
+                    //     typeof(Queryable),
+                    //     "ThenBy",
+                    //     new Type[] { source.ElementType, typeof(IComparable) },
+                    //     orderByExp,
+                    //     Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
+                    //     );
+                // }
             }
 
             // create and return the query

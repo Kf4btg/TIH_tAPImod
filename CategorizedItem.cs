@@ -34,7 +34,7 @@ namespace InvisibleHand
             if (category.CompareTo(other.category) != 0) return category.CompareTo(other.category);
 
             // improve sorting within certain categories
-            switch (category.catID)
+            switch ((ItemCat)category.catID)
             {
                 case ItemCat.ORE:
                     if (item.value!=other.item.value) return item.value.CompareTo(other.item.value);

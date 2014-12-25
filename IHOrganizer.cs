@@ -9,7 +9,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-
     public static class IHOrganizer
     {
         // this will sort the categorized items first by category, then by
@@ -116,14 +115,28 @@ namespace InvisibleHand
                         sortFields=new List<String>() {"material", "type", "netID", "stack"};
                         break;
                 }
+                // sortedList.AddRange( BuildDynamicQuery(category.AsQueryable(), sortFields.TosString()).ToList() );
 
-                sortedList.AddRange( BuildQuery(category.AsQueryable(), sortFields).ToList() );
+                sortedList.AddRange( (category.AsQueryable().OrderBy(sortFields.ToString())).ToList() );
+            }
+            return sortedList;
+        }
 
+        public static IQueryable<Item> BuildDynamicQuery(IQueryable<Item> source, List<String> sortFields)
+        {
+            // bool first = true;
+            String orderString = "";
+            foreach (String s in sortFields)
+            {
+                orderString+=s;
+                // orderString
             }
 
-            return sortedList;
+            return source.OrderBy(orderString);
 
         }
+
+
 
         /************************************************************
          Build an expression tree to represent the query:
@@ -135,7 +148,7 @@ namespace InvisibleHand
         AKA:
             category.OrderBy(item => item.property1).ThenBy(item => item.property2)....
 
-            source type is IGrouping<IMCategory<Item>,CategorizedItem>
+            source type is IGrouping<IMCategory<Item>,Item>
         */
         public static IQueryable<Item> BuildQuery(IQueryable<Item> source, List<String> sortFields)
         {

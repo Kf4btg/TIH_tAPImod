@@ -9,7 +9,7 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        private Texture2D lockedMarker = null, unlockedMarker = null;
+        private Texture2D lockedMarker = null;
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
@@ -36,7 +36,7 @@ namespace InvisibleHand
         // Shift + Right Click on inventory slot toggles the lock state
         public override bool PreItemSlotRightClick(ItemSlot slot, ref bool release)
         {
-            if (IHBase.lockingEnabled && slot.modBase == null && Main.playerInventory && release && KState.Special.Shift.Down())
+            if (KState.Special.Shift.Down() && IHBase.lockingEnabled && slot.modBase == null && Main.playerInventory && release )
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {

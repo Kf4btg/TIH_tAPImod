@@ -9,6 +9,18 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    public static class ItemExtension
+    {
+        public static IMCategory<Item> GetCategory(this Item item)
+        {
+            foreach (var category in InventoryManager.Categories)
+            {
+                if (category.matches(item)) { return category; }
+            }
+            return InventoryManager.catOther;
+        }
+    }
+
     public static class IHOrganizer
     {
         // this will sort the categorized items first by category, then by
@@ -17,16 +29,16 @@ namespace InvisibleHand
         public static List<Item> OrganizeItems(List<Item> source)
         {
             // returns an IEnumerable<IGrouping<IMCategory<Item>,CategorizedItem>>
-            // var byCategory =
-            //     from item in source
-            //     group item by item.category into category
-            //     orderby category.Key
-            //     select category;
+            var byCategory =
+                from item in source
+                group item by item.GetCategory() into category
+                orderby category.Key
+                select category;
 
             /*  create a Category -> list_of_items indexer using ToLookup()
                 Returns an ILookup<IMCategory<Item>,List<Item>> which is really an
                     IEnumerable<IGrouping<IMCategory<Item>, List<Item>> */
-            var byCategory = source.ToLookup( item => GetCategory(item) );
+            // var byCategory = source.ToLookup( item => GetCategory(item) );
 
             /* This Lookup can possibly later be used for matching categories between chests and inventories
                 by using chestCategories.contains(itemCategory), or even chestCats[itemCat]
@@ -88,7 +100,7 @@ namespace InvisibleHand
                         break;
                     case ItemCat.CONSUME:
                         // first option will include fish, shrooms, etc.
-                        sortFields=new List<String>() {"potion", "name.EndsWith('Potion')", "buffType", "type", "stack"};
+                        sortFields=new List<String>() {"potion", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack"};
                         break;
                     case ItemCat.BAIT:
                         sortFields=new List<String>() {"bait", "type", "stack"};
@@ -104,7 +116,7 @@ namespace InvisibleHand
                         break;
                     case ItemCat.TILE:
                         // gems have alpha==50, cobwebs==100
-                        sortFields=new List<String>() {"name.EndsWith('Bar')", "name.EndsWith('Seeds')", "alpha",
+                        sortFields=new List<String>() {"name.EndsWith(\"Bar\") desc", "name.EndsWith(\"Seeds\") desc", "alpha desc",
                                                         "tileWand", "createTile", "type", "stack"};
                         break;
                     case ItemCat.WALL:
@@ -112,25 +124,39 @@ namespace InvisibleHand
                         break;
 
                     default: // catOther
-                        sortFields=new List<String>() {"material", "type", "netID", "stack"};
+                        sortFields=new List<String>() {"material desc", "type", "netID", "stack"};
                         break;
                 }
-                // sortedList.AddRange( BuildDynamicQuery(category.AsQueryable(), sortFields.TosString()).ToList() );
 
-                sortedList.AddRange( (category.AsQueryable().OrderBy(sortFields.ToString())).ToList() );
+                var result=BuildDynamicQuery(category.AsQueryable(), sortFields);
+
+                // var result = category.AsQueryable().OrderBy("type, stack");
+
+                foreach (Item i in result)
+                {
+                    sortedList.Add(i);
+                }
+
+                // sortedList.AddRange( BuildDynamicQuery(category.AsQueryable(), sortFields).ToList() );
+
+                // sortedList.AddRange( (category.AsQueryable().OrderBy(String.Join(", ",sortFields))).ToArray() );
             }
             return sortedList;
         }
 
-        public static IQueryable<Item> BuildDynamicQuery(IQueryable<Item> source, List<String> sortFields)
+        public static IEnumerable<Item> BuildDynamicQuery(IQueryable<Item> source, List<String> sortFields)
         {
             // bool first = true;
-            String orderString = "";
-            foreach (String s in sortFields)
-            {
-                orderString+=s;
-                // orderString
-            }
+            // String orderString = "";
+            // for (int i=0; i<sortFields.Count-1; i++)
+            // foreach (String s in sortFields)
+            // {
+            //     orderString+=s;
+            //     // orderString+=", "
+            //     // orderString
+            // }
+
+            String orderString = String.Join(", ", sortFields);
 
             return source.OrderBy(orderString);
 
@@ -149,7 +175,7 @@ namespace InvisibleHand
             category.OrderBy(item => item.property1).ThenBy(item => item.property2)....
 
             source type is IGrouping<IMCategory<Item>,Item>
-        */
+
         public static IQueryable<Item> BuildQuery(IQueryable<Item> source, List<String> sortFields)
         {
 
@@ -207,6 +233,7 @@ namespace InvisibleHand
             // create and return the query
             return source.Provider.CreateQuery<Item>(orderByExp);
         }
+        */
 
         // go through category list, checking the item against the match parameters
         // for each until the item either matches a category or fails all
@@ -281,7 +308,7 @@ namespace InvisibleHand
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
-                    if (container[i].IsBlank()) itemSorter.Add(container[i].Clone());
+                    if (!container[i].IsBlank()) itemSorter.Add(container[i].Clone());
                 }
             }
 

@@ -13,7 +13,7 @@ namespace InvisibleHand
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (IHBase.lockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
+            if (IHBase.oLockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
             {
                     if (lockedMarker == null)
                     {
@@ -36,7 +36,7 @@ namespace InvisibleHand
         // Shift + Right Click on inventory slot toggles the lock state
         public override bool PreItemSlotRightClick(ItemSlot slot, ref bool release)
         {
-            if (KState.Special.Shift.Down() && IHBase.lockingEnabled && slot.modBase == null && Main.playerInventory && release )
+            if (KState.Special.Shift.Down() && IHBase.oLockingEnabled && slot.modBase == null && Main.playerInventory && release )
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {

@@ -24,7 +24,7 @@ namespace InvisibleHand
 
         public override void Save(BinBuffer bb)
         {
-            if (!IHBase.lockingEnabled) return;
+            if (!IHBase.oLockingEnabled) return;
             for (int i=0; i<lockedSlots.Length; i++)
             {
                 bb.Write(lockedSlots[i]);
@@ -71,11 +71,11 @@ namespace InvisibleHand
                 {
                     if ( player.chestItems == null ) // no valid chest open, sort player inventory
                     {
-                        InventoryManager.SortPlayerInv(player, control_rSort);
+                        IHOrganizer.SortPlayerInv(player, control_rSort ^ IHBase.oRevSortPlayer);
                         return;
                     }
                     // else call sort on the Item[] array returned by chestItems
-                    InventoryManager.SortChest(player.chestItems, control_rSort);
+                    IHOrganizer.SortChest(player.chestItems, control_rSort ^ IHBase.oRevSortChest);
                     return;
                 }
 
@@ -83,10 +83,10 @@ namespace InvisibleHand
                 {
                     if ( player.chestItems == null )
                     {
-                        InventoryManager.ConsolidateStacks(player.inventory, 0, 50);
+                        IHOrganizer.ConsolidateStacks(player.inventory, 0, 50);
                         return;
                     }
-                    InventoryManager.ConsolidateStacks(player.chestItems);
+                    IHOrganizer.ConsolidateStacks(player.chestItems);
                     return;
                 }
 

@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using TAPI;
 using Terraria;
 using Microsoft.Xna.Framework.Input;
@@ -12,17 +12,16 @@ namespace InvisibleHand
         public static Keys
             key_sort, key_cleanStacks, key_quickStack, key_depositAll, key_lootAll;
 
-        public static bool lockingEnabled;
+        public static bool oLockingEnabled;
 
         /* Whether to place items at end of inventory or beginning
-            when sorting.
-            Possible values: */
-        public const int RS_DISABLE = 0;    //0 = disabled (sort at beginning)
-        public const int RS_PLAYER = 1;    //1 = enabled for player inventory
-        public const int RS_CHEST = 2;   //2 = enabled for chest inventories
-        public const int RS_BOTH = 3;    //3 = enabled both chest and player inventories
+            when sorting. */
+        public static bool oRearSortPlayer;
+        public static bool oRearSortChest;
 
-        public static int opt_reverseSort;
+        //default sort = reversed ?
+        public static bool oRevSortPlayer;
+        public static bool oRevSortChest;
 
         public static ModBase self { get; private set; }
 
@@ -30,7 +29,7 @@ namespace InvisibleHand
         {
             self = this;
 
-            InventoryManager.Initialize();
+            CategoryDef.Initialize();
         }
 
         public override void OptionChanged(Option option)
@@ -53,27 +52,46 @@ namespace InvisibleHand
                     key_lootAll = (Keys)option.Value;
                     break;
                 case "enableLocking":
-                    lockingEnabled = (bool)option.Value;
+                    oLockingEnabled = (bool)option.Value;
+                    break;
+                case "rearSort":
+                    switch ((String)option.Value)
+                    {
+                        case "Player Inventory":
+                            oRearSortPlayer = true;
+                            oRearSortChest  = false;
+                            break;
+                        case "Chests":
+                            oRearSortPlayer = false;
+                            oRearSortChest  = true;
+                            break;
+                        case "Both":
+                            oRearSortPlayer = oRearSortChest = true;
+                            break;
+                        case "Disabled":
+                            oRearSortPlayer = oRearSortChest = false;
+                            break;
+                    }
                     break;
                 case "reverseSort":
                     switch ((String)option.Value)
                     {
                         case "Player Inventory":
-                            opt_reverseSort=RS_PLAYER;
+                            oRevSortPlayer = true;
+                            oRevSortChest  = false;
                             break;
                         case "Chests":
-                            opt_reverseSort=RS_CHEST;
+                            oRevSortPlayer = false;
+                            oRevSortChest  = true;
                             break;
                         case "Both":
-                            opt_reverseSort=RS_BOTH;
+                            oRevSortPlayer = oRevSortChest = true;
                             break;
                         case "Disabled":
-                            opt_reverseSort=RS_DISABLE;
+                            oRevSortPlayer = oRevSortChest = false;
                             break;
                     }
-                    break;
-
-
+                break;
             }
         }
     }

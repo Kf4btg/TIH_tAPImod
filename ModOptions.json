@@ -35,7 +35,7 @@
             "notify": true,
             "notifyOnChange": true,
             "sync": false,
-            "default": "J"
+            "default": "X"
         },
         {
             "name": "sort",
@@ -56,8 +56,23 @@
             "default": true
         },
         {
+            "name": "rearSort",
+            "displayName": "Sort from end",
+            "type": "List",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "list": [
+                "Player Inventory",
+                "Chests",
+                "Both",
+                "Disabled"
+            ],
+            "default": 3
+        },
+        {
             "name": "reverseSort",
-            "displayName": "Sort from end of inventory",
+            "displayName": "Reverse default sort order",
             "type": "List",
             "notify": true,
             "notifyOnChange": true,

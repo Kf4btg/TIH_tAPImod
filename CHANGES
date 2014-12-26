@@ -1,6 +1,8 @@
 Version 1.0.0 -> 1.1.0
     -   Added ability to lock items in place by shift-right-clicking the slot. Items in these slots will not be moved by the sort operation.
 
+Version 1.1.1-rc1+tr14a
+    -   Major overhaul of the sorting system. This may not be so noticeable to the player--outside of some improvements to the arrangement of sorted items--but greatly increases the ease with which the sorting parameters can be tweaked and paves the way for more player control of the sorting and categorization system in the future.
 
 Version 1.1.0-rc3+tr14a
     -   Added mod-option to entirely disable the locking mechanism
@@ -8,4 +10,5 @@ Version 1.1.0-rc3+tr14a
         -   can set for inventory, chests, or both
     -   Added reverse-sort function
         -   Hold shift + press sort key
+        -   Can set reverse sort as default for inventory, chests, or both
     -   Improved sorting parameters

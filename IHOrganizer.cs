@@ -11,6 +11,7 @@ namespace InvisibleHand
 {
     public static class ItemExtension
     {
+        // use myItem.GetCategory()
         public static IHCategory<Item> GetCategory(this Item item)
         {
             foreach (var category in CategoryDef.Categories)
@@ -24,7 +25,7 @@ namespace InvisibleHand
     public static class IHOrganizer
     {
         // this will sort the categorized items first by category, then by
-        // more specific traits.
+        // more specific traits. Sorting Rules defined in CategoryDef class.
         public static List<Item> OrganizeItems(List<Item> source)
         {
             // returns an IEnumerable<IGrouping<IHCategory<Item>,CategorizedItem>>
@@ -38,7 +39,6 @@ namespace InvisibleHand
                 Returns an ILookup<IHCategory<Item>,List<Item>> which is really an
                     IEnumerable<IGrouping<IHCategory<Item>, List<Item>> */
             // var byCategory = source.ToLookup( item => GetCategory(item) );
-
             /* This Lookup can possibly later be used for matching categories between chests and inventories
                 by using chestCategories.contains(itemCategory), or even chestCats[itemCat]
             */
@@ -49,88 +49,12 @@ namespace InvisibleHand
             // expression methods with arbitrary (maybe later user-defined) sorting parameters.
             foreach (var category in byCategory)
             {   // category.Key is IHCategory<Item>
-                // List<String> sortFields;
-                // switch((ItemCat)category.Key.catID)
-                // {
-                //     case ItemCat.PICK:
-                //         sortFields=new List<String>() {"rare", "pick", "type", "value"};
-                //         break;
-                //     case ItemCat.AXE:
-                //         sortFields=new List<String>() {"rare", "axe", "type", "value"};
-                //         break;
-                //     case ItemCat.HAMMER:
-                //         sortFields=new List<String>() {"rare", "hammer", "type", "value"};
-                //         break;
-                //     case ItemCat.MELEE:
-                //         // stack to sort the stackable boomerangs separately
-                //         sortFields=new List<String>() {"maxStack", "stack desc", "damage", "type", "rare", "value"};
-                //         break;
-                //     case ItemCat.RANGED:
-                //         // consumable to sort throwing weapons separately
-                //         sortFields=new List<String>() {"consumable", "stack desc", "damage", "type", "rare", "value"};
-                //         break;
-                //     case ItemCat.MAGIC:
-                //         sortFields=new List<String>() {"damage", "rare", "type", "value"};
-                //         break;
-                //     case ItemCat.SUMMON:
-                //         sortFields=new List<String>() {"damage", "rare", "type", "value"};
-                //         break;
-                //     case ItemCat.AMMO:
-                //         sortFields=new List<String>() {"rare", "damage", "type", "value", "stack desc"};
-                //         break;
-                //     case ItemCat.HEAD:
-                //         sortFields=new List<String>() {"rare", "defense", "value", "type"};
-                //         break;
-                //     case ItemCat.BODY:
-                //         sortFields=new List<String>() {"rare", "defense", "value", "type"};
-                //         break;
-                //     case ItemCat.LEGS:
-                //         sortFields=new List<String>() {"rare", "defense", "value", "type"};
-                //         break;
-                //     case ItemCat.ACCESSORY:
-                //         sortFields=new List<String>() {"type", "rare", "value", "prefix.id"};
-                //         break;
-                //     case ItemCat.VANITY:
-                //         // stack because of those fishbowls...
-                //         sortFields=new List<String>() {"name", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.PET:
-                //         sortFields=new List<String>() {"buffType", "type"};
-                //         break;
-                //     case ItemCat.CONSUME:
-                //         // first option will include fish, shrooms, etc.
-                //         sortFields=new List<String>() {"potion desc", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.BAIT:
-                //         sortFields=new List<String>() {"bait", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.DYE:
-                //         sortFields=new List<String>() {"dye", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.PAINT:
-                //         sortFields=new List<String>() {"paint", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.ORE:
-                //         sortFields=new List<String>() {"rare", "value", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.TILE:
-                //         // gems have alpha==50, cobwebs==100
-                //         sortFields=new List<String>() {"name.EndsWith(\"Bar\") desc", "name.EndsWith(\"Seeds\") desc", "alpha desc",
-                //                                         "tileWand", "createTile", "type", "stack desc"};
-                //         break;
-                //     case ItemCat.WALL:
-                //         sortFields=new List<String>() {"createWall", "type", "stack desc"};
-                //         break;
-                //
-                //     default: // catOther
-                //         sortFields=new List<String>() {"material desc", "type", "netID", "stack desc"};
-                //         break;
-                // }
 
-                // var result=BuildDynamicQuery(category.AsQueryable(), sortFields);
-
+                // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
+                // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
                 var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[(ItemCat)category.Key.catID]));
 
+                // execute the query and put the result in a list to return
                 foreach (Item i in result)
                 {
                     sortedList.Add(i);
@@ -139,18 +63,12 @@ namespace InvisibleHand
             return sortedList;
         }
 
-        // public static IEnumerable<Item> BuildDynamicQuery(IQueryable<Item> source, List<String> sortFields)
-        // {
-        //     String orderString = String.Join(", ", sortFields);
-        //
-        //     return source.OrderBy(orderString);
-        //
-        // }
         /*************************************************************************
         *  SortPlayerInv - perform the sort operation on the items in the player's
         *	inventory, excluding the hotbar and optionally any slots marked as locked
         *
         *  @param player: The player whose inventory to sort.
+        *  @param reverse: whether to reverse the list of item once it's sorted
         */
         public static void SortPlayerInv(Player player, bool reverse=false)
         {
@@ -159,6 +77,7 @@ namespace InvisibleHand
             Sort(player.inventory, false, reverse, 10, 49);
         }
 
+        // as above, but for the Item[] array of a chest
         public static void SortChest(Item[] chestitems, bool reverse=false)
         {
             ConsolidateStacks(chestitems);
@@ -166,6 +85,7 @@ namespace InvisibleHand
             Sort(chestitems, true, reverse);
         }
 
+        // as above, but given the actual chest object, pull out the array
         public static void SortChest(Chest chest, bool reverse=false)
         {
             ConsolidateStacks(chest.item);
@@ -177,7 +97,6 @@ namespace InvisibleHand
         *  Sort Container
         *
         *  @param container: The container whose contents to sort.
-        *  @param checkLocks: whether to check for & exclude locked slots
         *  @param chest : whether the container is a chest (otherwise the player inventory)
         *  @param rangeStart: starting index of the sort operation
         *  @param rangeEnd: end index of the sort operation
@@ -211,7 +130,7 @@ namespace InvisibleHand
                     itemSorter.Add(container[i].Clone());
                 }
             }
-            else
+            else //only skip blank slots
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
@@ -219,30 +138,13 @@ namespace InvisibleHand
                 }
             }
 
-            /* now this seems too easy... */
-            // itemSorter.Sort();  // sort using the CategorizedItem.CompareTo() method
-            // Well it was easy, then I had to screw it up.
+            //send items off to be sorted
             itemSorter = OrganizeItems(itemSorter);
 
-            if (reverse) itemSorter.Reverse();
+            if (reverse) itemSorter.Reverse(); //reverse on user request
 
-            // depending on user settings, decide if we re-copy items to end or beginning of container
-            // bool fillFromEnd = false;
+            // depending on user settings, decide if we copy items to end or beginning of container
             bool fillFromEnd = chest ? IHBase.oRearSortChest : IHBase.oRearSortPlayer;
-            // switch(IHBase.opt_rearSort)
-            // {
-            //     case RearSort.DISABLE:		//normal sort to beginning
-            //         break;
-            //     case RearSort.PLAYER:		//copy to end for player inventory only
-            //     fillFromEnd = !chest;
-            //         break;
-            //     case RearSort.CHEST:		//copy to end for chests only
-            //     fillFromEnd = chest;
-            //         break;
-            //     case RearSort.BOTH:		//copy to end for all containers
-            //     fillFromEnd=true;
-            //         break;
-            // }
 
             // set up the functions that will be used in the iterators ahead
             Func<int,int> getIndex, getIter;
@@ -332,12 +234,6 @@ namespace InvisibleHand
         // range for other non-max stacks of that item
         private static void StackItems(ref Item item, Item[] container, int rangeStart, int rangeEnd)
         {
-            // for (int j=rangeStart; j<=rangeEnd; j++)
-            // Func<int,int> jiter;
-            // if (IHBase.oLockingEnabled) {
-            // 	jiter = jay => jay--;
-            // }
-
             for (int j=rangeEnd; j>=rangeStart; j--) //iterate in reverse
             {
                 Item item2 = container[j];
@@ -352,9 +248,9 @@ namespace InvisibleHand
                     {
                         item = new Item();
                         return;
-                    }
-                }
-            }
-        }
-    }
-}
+                    }//\item blank
+                }//\matching stack
+            }//\go through container range
+        }//\StackItems()
+    }//\class
+}//\namespace

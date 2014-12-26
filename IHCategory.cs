@@ -7,7 +7,7 @@ namespace InvisibleHand
 {
 	/**
 	*  A generic category.
-	*  @param catID: integer that allows sorting of categories
+	*  @param catID: Enum that allows sorting of categories
 	*  @param match_params: Function that determines whether an object fits
 	*         in this category.
 	*/

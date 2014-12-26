@@ -17,11 +17,12 @@ namespace InvisibleHand
         public bool control_depositAll;
         public bool control_lootAll;
 
-        //alt functions
+        //alt functions (maybe more later)
         public bool control_rSort;      // shift+sort=reverse sort
 
         public static bool[] lockedSlots = new bool[40]; //not the hotbar
 
+        // save locked-slot state with player
         public override void Save(BinBuffer bb)
         {
             if (!IHBase.oLockingEnabled) return;
@@ -31,6 +32,7 @@ namespace InvisibleHand
             }
         }
 
+        //load back locked-slot state
         public override void Load(BinBuffer bb)
         {
             if (bb.IsEmpty) return;
@@ -56,7 +58,7 @@ namespace InvisibleHand
 
                 if (KState.Special.Shift.Down()) //alt functions
                 {
-                    control_rSort       = IHBase.key_sort.Pressed();
+                    control_rSort      = IHBase.key_sort.Pressed();
                 }
                 else
                 {
@@ -67,7 +69,7 @@ namespace InvisibleHand
                     control_lootAll    = IHBase.key_lootAll.Pressed();
                 }
 
-                if (control_sort || control_rSort)
+                if (control_sort || control_rSort) // Sort inventory/chest
                 {
                     if ( player.chestItems == null ) // no valid chest open, sort player inventory
                     {
@@ -79,7 +81,7 @@ namespace InvisibleHand
                     return;
                 }
 
-                if (control_clean)
+                if (control_clean) //Consolidate Stacks
                 {
                     if ( player.chestItems == null )
                     {
@@ -90,19 +92,19 @@ namespace InvisibleHand
                     return;
                 }
 
-                if (control_qStack)
+                if (control_qStack) //QuickStack
                 {
                     if ( player.chestItems == null ) return;
                     IHUtils.DoQuickStack(player);
                     return;
                 }
-                if (control_lootAll)
+                if (control_lootAll) //LootAll
                 {
                     if ( player.chestItems == null ) return;
                     IHUtils.DoLootAll(player);
                     return;
                 }
-                if (control_depositAll)
+                if (control_depositAll) //DepositAll
                 {
                     if ( player.chestItems == null ) return;
                     IHUtils.DoDepositAll(player);

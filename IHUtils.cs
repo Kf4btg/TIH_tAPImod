@@ -7,6 +7,12 @@ namespace InvisibleHand
 
     public static class IHUtils
     {
+        // The methods here are pretty much just cleaned up and somewhat
+        // refactored versions of the vanilla code. It really surprised
+        // me that these weren't given function-calls in the original code...
+
+        // Overall, these don't interact or rely much on the rest of the mod.
+        // TODO: make them recognize locked slots in some fashion.
 
 #region depositall
         private const int R_START=49;   //start from end of main inventory

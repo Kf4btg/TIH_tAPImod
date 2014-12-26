@@ -19,7 +19,7 @@ namespace InvisibleHand
         public static bool oRearSortPlayer;
         public static bool oRearSortChest;
 
-        //default sort = reversed
+        //default sort = reversed ?
         public static bool oRevSortPlayer;
         public static bool oRevSortChest;
 

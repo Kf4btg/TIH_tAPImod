@@ -25,7 +25,6 @@ namespace InvisibleHand
     {
         // this will sort the categorized items first by category, then by
         // more specific traits.
-        // public static List<Item> OrganizeItems(List<CategorizedItem> source)
         public static List<Item> OrganizeItems(List<Item> source)
         {
             // returns an IEnumerable<IGrouping<IMCategory<Item>,CategorizedItem>>
@@ -45,11 +44,11 @@ namespace InvisibleHand
             */
 
             List<Item> sortedList = new List<Item>();
-            // and that was the easy part. Now need to dynamically construct Queries using
-            // LINQ expression methods with arbitrary (maybe later user-defined) sorting parameters.
+
+            //  Now we can dynamically construct Queries using Dynamic LINQ
+            // expression methods with arbitrary (maybe later user-defined) sorting parameters.
             foreach (var category in byCategory)
             {   // category.Key is IMCategory<Item>
-                // IQueryable<Item> query;
                 List<String> sortFields;
                 switch((ItemCat)category.Key.catID)
                 {
@@ -64,11 +63,11 @@ namespace InvisibleHand
                         break;
                     case ItemCat.MELEE:
                         // stack to sort the stackable boomerangs separately
-                        sortFields=new List<String>() {"maxStack", "stack", "damage", "type", "rare", "value"};
+                        sortFields=new List<String>() {"maxStack", "stack desc", "damage", "type", "rare", "value"};
                         break;
                     case ItemCat.RANGED:
                         // consumable to sort throwing weapons separately
-                        sortFields=new List<String>() {"consumable", "stack", "damage", "type", "rare", "value"};
+                        sortFields=new List<String>() {"consumable", "stack desc", "damage", "type", "rare", "value"};
                         break;
                     case ItemCat.MAGIC:
                         sortFields=new List<String>() {"damage", "rare", "type", "value"};
@@ -77,7 +76,7 @@ namespace InvisibleHand
                         sortFields=new List<String>() {"damage", "rare", "type", "value"};
                         break;
                     case ItemCat.AMMO:
-                        sortFields=new List<String>() {"maxStack", "stack", "damage", "type", "rare", "value"};
+                        sortFields=new List<String>() {"rare", "damage", "type", "value", "stack desc"};
                         break;
                     case ItemCat.HEAD:
                         sortFields=new List<String>() {"rare", "defense", "value", "type"};
@@ -93,177 +92,60 @@ namespace InvisibleHand
                         break;
                     case ItemCat.VANITY:
                         // stack because of those fishbowls...
-                        sortFields=new List<String>() {"name", "type", "stack"};
+                        sortFields=new List<String>() {"name", "type", "stack desc"};
                         break;
                     case ItemCat.PET:
                         sortFields=new List<String>() {"buffType", "type"};
                         break;
                     case ItemCat.CONSUME:
                         // first option will include fish, shrooms, etc.
-                        sortFields=new List<String>() {"potion", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack"};
+                        sortFields=new List<String>() {"potion desc", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack desc"};
                         break;
                     case ItemCat.BAIT:
-                        sortFields=new List<String>() {"bait", "type", "stack"};
+                        sortFields=new List<String>() {"bait", "type", "stack desc"};
                         break;
                     case ItemCat.DYE:
-                        sortFields=new List<String>() {"dye", "type", "stack"};
+                        sortFields=new List<String>() {"dye", "type", "stack desc"};
                         break;
                     case ItemCat.PAINT:
-                        sortFields=new List<String>() {"paint", "type", "stack"};
+                        sortFields=new List<String>() {"paint", "type", "stack desc"};
                         break;
                     case ItemCat.ORE:
-                        sortFields=new List<String>() {"rare", "value", "type", "stack"};
+                        sortFields=new List<String>() {"rare", "value", "type", "stack desc"};
                         break;
                     case ItemCat.TILE:
                         // gems have alpha==50, cobwebs==100
                         sortFields=new List<String>() {"name.EndsWith(\"Bar\") desc", "name.EndsWith(\"Seeds\") desc", "alpha desc",
-                                                        "tileWand", "createTile", "type", "stack"};
+                                                        "tileWand", "createTile", "type", "stack desc"};
                         break;
                     case ItemCat.WALL:
-                        sortFields=new List<String>() {"createWall", "type", "stack"};
+                        sortFields=new List<String>() {"createWall", "type", "stack desc"};
                         break;
 
                     default: // catOther
-                        sortFields=new List<String>() {"material desc", "type", "netID", "stack"};
+                        sortFields=new List<String>() {"material desc", "type", "netID", "stack desc"};
                         break;
                 }
 
-                var result=BuildDynamicQuery(category.AsQueryable(), sortFields);
+                // var result=BuildDynamicQuery(category.AsQueryable(), sortFields);
 
-                // var result = category.AsQueryable().OrderBy("type, stack");
+                var result = category.AsQueryable().OrderBy(String.Join(", ", sortFields));
 
                 foreach (Item i in result)
                 {
                     sortedList.Add(i);
                 }
-
-                // sortedList.AddRange( BuildDynamicQuery(category.AsQueryable(), sortFields).ToList() );
-
-                // sortedList.AddRange( (category.AsQueryable().OrderBy(String.Join(", ",sortFields))).ToArray() );
             }
             return sortedList;
         }
 
         public static IEnumerable<Item> BuildDynamicQuery(IQueryable<Item> source, List<String> sortFields)
         {
-            // bool first = true;
-            // String orderString = "";
-            // for (int i=0; i<sortFields.Count-1; i++)
-            // foreach (String s in sortFields)
-            // {
-            //     orderString+=s;
-            //     // orderString+=", "
-            //     // orderString
-            // }
-
             String orderString = String.Join(", ", sortFields);
 
             return source.OrderBy(orderString);
 
         }
-
-
-
-        /************************************************************
-         Build an expression tree to represent the query:
-            from item in category
-            orderby item.property1,
-            item.property2,
-            ...
-            select item
-        AKA:
-            category.OrderBy(item => item.property1).ThenBy(item => item.property2)....
-
-            source type is IGrouping<IMCategory<Item>,Item>
-
-        public static IQueryable<Item> BuildQuery(IQueryable<Item> source, List<String> sortFields)
-        {
-
-            //Create the Parameter Expression for the query
-            // Expressions.ParameterExpression
-            var eachItemAsParam = Expression.Parameter(typeof(Item), "item");
-
-            // Prepare Expression vars
-            MethodCallExpression orderByExp = null;
-            MemberExpression orderByProperty;
-
-            Expression baseExp = source.Expression; //was having troubles with "unassigned variable" errors...
-            String opString = "OrderBy";    //create expression to represent source.OrderBy(...)
-            bool first = true;
-            foreach (String s in sortFields)
-            {
-                orderByProperty = Expression.Property(eachItemAsParam, s);
-
-                orderByExp = Expression.Call(
-                    typeof(Queryable),
-                    opString,
-                    new Type[] { source.ElementType, typeof(IComparable) },
-                    baseExp,
-                    Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
-                );
-
-                baseExp = orderByExp;
-                if (first)
-                {  // Create similar expression trees for any other specified properties, using a ThenBy call
-                    opString = "ThenBy";
-                    first=false;
-                }
-
-                    // orderByExp = Expression.Call(
-                    //     typeof(Queryable),
-                    //     "OrderBy",
-                    //     new Type[] { source.ElementType, typeof(IComparable) },
-                    //     source.Expression,
-                    //     Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
-                    //     );
-
-                // else
-                // {
-
-                    // orderByExp = Expression.Call(
-                    //     typeof(Queryable),
-                    //     "ThenBy",
-                    //     new Type[] { source.ElementType, typeof(IComparable) },
-                    //     orderByExp,
-                    //     Expression.Lambda<Func<Item, IComparable>>(orderByProperty, new ParameterExpression[] { eachItemAsParam })
-                    //     );
-                // }
-            }
-
-            // create and return the query
-            return source.Provider.CreateQuery<Item>(orderByExp);
-        }
-        */
-
-        // go through category list, checking the item against the match parameters
-        // for each until the item either matches a category or fails all
-        // checks (except for the last category, Other, which isn't checked and
-        // into which all unmatched items will fall).
-        public static IMCategory<Item> GetCategory(Item item)
-        {
-            foreach (var category in InventoryManager.Categories)
-            {
-                if (category.matches(item)) { return category; }
-            }
-            return InventoryManager.catOther;
-        }
-
-        // go through category-list, checking the item against the match parameters
-        // for each category until the item either matches a category or fails all
-        // the checks (except for the last category, Other, which isn't checked and
-        // into which all unmatched items will fall).
-        // public static List<Item> MatchCategory(List<Item> items, IMCategory<Item> category)
-        // {
-        //     List<Item> matchedItems = new List<Item>();
-        //     foreach (Item item in items)
-        //     {
-        //
-        //         if (category.matches(item)){ matchedItems.Add(item); }
-        //         // int cid = 0;
-        //         // while ( cid<(InventoryManager.Categories.Count - 1) &&
-        //         //     !InventoryManager.Categories[cid++].match_params(item) ) { }
-        //     }
-        // }
 
 
         /*************************************************************************
@@ -317,22 +199,21 @@ namespace InvisibleHand
             // Well it was easy, then I had to screw it up.
             itemSorter = OrganizeItems(itemSorter);
 
-
             if (reverse) itemSorter.Reverse();
 
             // depending on user settings, decide if we re-copy items to end or beginning of container
             bool fillFromEnd = false;
-            switch(IHBase.opt_reverseSort)
+            switch(IHBase.opt_rearSort)
             {
-                case IHBase.RS_DISABLE:		//normal sort to beginning
+                case RearSort.DISABLE:		//normal sort to beginning
                     break;
-                case IHBase.RS_PLAYER:		//copy to end for player inventory only
+                case RearSort.PLAYER:		//copy to end for player inventory only
                 fillFromEnd = !chest;
                     break;
-                case IHBase.RS_CHEST:		//copy to end for chests only
+                case RearSort.CHEST:		//copy to end for chests only
                 fillFromEnd = chest;
                     break;
-                case IHBase.RS_BOTH:		//copy to end for all containers
+                case RearSort.BOTH:		//copy to end for all containers
                 fillFromEnd=true;
                     break;
             }
@@ -406,18 +287,6 @@ namespace InvisibleHand
         //     }
         //     return props;
         // }
-        // public static List<CategorizedItem> oreSort(IGrouping<IMCategory<Item>,CategorizedItem> ores)
-        // {
-        //     // List<CategorizedItem> sorted = new List<CategorizedItem>();
-        //
-        //
-        // }
-        //
-        // public static IEnumerable<CategorizedItem> sortBy(IEnumerable<CategorizedItem> items, IEnumerable<ItemSortProperty> props)
-        // {
-        //
-        // }
-
 
     }
 

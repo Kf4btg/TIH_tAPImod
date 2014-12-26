@@ -6,6 +6,17 @@ using Microsoft.Xna.Framework.Input;
 
 namespace InvisibleHand
 {
+
+    [FLAG]
+    public enum RearSort
+    {
+        DISABLE = 0;    //0 = disabled (sort at beginning)
+        PLAYER = 1;    //1 = enabled for player inventory
+        CHEST = 2;   //2 = enabled for chest inventories
+        BOTH = PLAYER | CHEST;    //4 = enabled both chest and player inventories
+
+    }
+
     public class IHBase : ModBase
     {
 
@@ -17,12 +28,8 @@ namespace InvisibleHand
         /* Whether to place items at end of inventory or beginning
             when sorting.
             Possible values: */
-        public const int RS_DISABLE = 0;    //0 = disabled (sort at beginning)
-        public const int RS_PLAYER = 1;    //1 = enabled for player inventory
-        public const int RS_CHEST = 2;   //2 = enabled for chest inventories
-        public const int RS_BOTH = 3;    //3 = enabled both chest and player inventories
 
-        public static int opt_reverseSort;
+        public static RearSort opt_rearSort;
 
         public static ModBase self { get; private set; }
 
@@ -59,16 +66,16 @@ namespace InvisibleHand
                     switch ((String)option.Value)
                     {
                         case "Player Inventory":
-                            opt_reverseSort=RS_PLAYER;
+                            opt_rearSort=RearSort.PLAYER;
                             break;
                         case "Chests":
-                            opt_reverseSort=RS_CHEST;
+                            opt_rearSort=RearSort.CHEST;
                             break;
                         case "Both":
-                            opt_reverseSort=RS_BOTH;
+                            opt_rearSort=RearSort.BOTH;
                             break;
                         case "Disabled":
-                            opt_reverseSort=RS_DISABLE;
+                            opt_rearSort=RearSort.DISABLE;
                             break;
                     }
                     break;

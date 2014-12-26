@@ -27,3 +27,5 @@ This mod implements a number of convenience features to make managing one's inve
 
 #### License
   This mod was created by wuli1986(a)forums.terraria.org/Kf4btg(a)GitHub. This mod is released as open source, and you are free to modify it or use pieces of it in your own personal project. You may NOT re-release this mod in its original form or with only minor modifications and claim it as your own.  Any use you make of this mod or any mod designed for tAPI is subject to the terms of use defined by Re-Logic and the tAPI developers.
+
+  The Dynamic LINQ API is (c) 2006 Microsoft Corporation, included here under the Microsoft Public License (see accompanying LICENSE file).

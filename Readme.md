@@ -37,5 +37,5 @@ This mod implements a number of convenience features to make managing one's inve
 
   The Dynamic LINQ API is (c) 2006 Microsoft Corporation, included here under the Microsoft Public License ([see accompanying LICENSE file][2]).
 
-[1]:[http://forums.terraria.org/index.php?threads/the-invisible-hand-inventory-management-for-the-organizationally-challenged.7547/]
-[2]:[./DynamicQuery/LICENSE]
+[1]:http://forums.terraria.org/index.php?threads/the-invisible-hand-inventory-management-for-the-organizationally-challenged.7547/
+[2]:/DynamicQuery/LICENSE

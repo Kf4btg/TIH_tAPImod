@@ -3,6 +3,6 @@
     "displayName"  : "The Invisible Hand",
     "author"       : "wuli1986",
     "icon"         : "IHicon",
-    "version"      : "1.1.0-rc3+tr14a",
+    "version"      : "1.1.0+tr14a",
     "info"         : "Inventory management for the organizationally-\nchallenged. Configure keys to your liking in the mod options.\nShift-right-click slot in your inventory to lock it."
 }

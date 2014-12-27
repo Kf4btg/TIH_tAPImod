@@ -11,21 +11,8 @@ namespace InvisibleHand
 {
     public static class ItemExtension
     {
-        // use myItem.GetCategory()
-        // public static IHCategory<Item> GetCategory(this Item item)
-        // {
-        //     foreach (var category in CategoryDef.Categories)
-        //     {
-        //         if (category.matches(item)) { return category; }
-        //     }
-        //     return CategoryDef.catOther;
-        // }
-
         public static ItemCat GetCategory(this Item item)
         {
-            // //this shouldn't happen...but I think it does
-            // if (item.IsBlank()) return (ItemCat)-1;
-
             foreach (ItemCat catID in Enum.GetValues(typeof(ItemCat)))
             {
                 if (CategoryDef.Categories[catID].Invoke(item)) { return catID; }
@@ -46,14 +33,6 @@ namespace InvisibleHand
                 group item by item.GetCategory() into category
                 orderby category.Key
                 select category;
-
-            /*  create a Category -> list_of_items indexer using ToLookup()
-                Returns an ILookup<ItemCat,List<Item>> which is really an
-                    IEnumerable<IGrouping<ItemCat, List<Item>> */
-            // var byCategory = source.ToLookup( item => GetCategory(item) );
-            /* This Lookup can possibly later be used for matching categories between chests and inventories
-                by using chestCategories.contains(itemCategory), or even chestCats[itemCat]
-            */
 
             List<Item> sortedList = new List<Item>();
 
@@ -82,6 +61,8 @@ namespace InvisibleHand
         *  @param chest : whether the container is a chest (otherwise the player inventory)
         *  @param rangeStart: index within container to start copying
         *  @param rangeEnd: index within container to stop copying
+        *
+        *  @returns: the list, or null if no items were added.
         */
         public static List<Item> GetItemCopies(Item[] container, bool chest, int rangeStart, int rangeEnd)
         {
@@ -95,6 +76,8 @@ namespace InvisibleHand
             // initialize the list that will hold the copied items
             var itemList = new List<Item>();
 
+            int count = 0; //having trouble with empty lists...
+
             // get copies of viable items from container.
             // will need a different list if locking is enabled
             if (!chest && IHBase.oLockingEnabled)
@@ -104,6 +87,7 @@ namespace InvisibleHand
                     if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
 
                     itemList.Add(container[i].Clone());
+                    count++;
                 }
             }
             else //only skip blank slots
@@ -111,11 +95,10 @@ namespace InvisibleHand
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
                     if (!container[i].IsBlank()) itemList.Add(container[i].Clone());
+                    count++;
                 }
             }
-
-            return itemList;
-
+            return count > 0 ? itemList : null;
         }
 
         /*************************************************************************
@@ -171,33 +154,9 @@ namespace InvisibleHand
             // for clarity
             bool checkLocks = IHBase.oLockingEnabled;
 
-            // initialize the list that will hold the items to sort
-            // var itemSorter = new List<Item>();
-            //
-            // // get copies of sortable items from container
-            // // will need a different list to pass to the sorter if locking is enabled
-            // if (!chest && checkLocks)
-            // {
-            //     for (int i=range.Item1; i<=range.Item2; i++)
-            //     {
-            //         if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
-            //
-            //         itemSorter.Add(container[i].Clone());
-            //     }
-            // }
-            // else //only skip blank slots
-            // {
-            //     for (int i=range.Item1; i<=range.Item2; i++)
-            //     {
-            //         if (!container[i].IsBlank()) itemSorter.Add(container[i].Clone());
-            //     }
-            // }
-
-
-            // var itemSorter = GetItemCopies(container, chest, range);
-
-            //send copies of items off to be sorted
+            // get copies of the items and send them off to be sorted
             var itemSorter = OrganizeItems(GetItemCopies(container, chest, range));
+            if (itemSorter == null) return;
 
             if (reverse) itemSorter.Reverse(); //reverse on user request
 

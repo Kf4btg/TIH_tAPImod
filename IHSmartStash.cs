@@ -12,7 +12,7 @@ namespace InvisibleHand
         /****************************************************
         *   This will compare the categories of items in the player's
             inventory to those of items in the open container and
-            move any items that match categories.
+            deposit any items of matching categories.
         */
         public static void SmartDeposit()
         {
@@ -31,30 +31,29 @@ namespace InvisibleHand
             }
             else
             {
-                chestItems = Main.localPlayer.chest==-3 ? Main.localPlayer.bank2.item :
-                Main.localPlayer.bank.item;
+                chestItems = Main.localPlayer.chest==-3 ? Main.localPlayer.bank2.item : Main.localPlayer.bank.item;
                 sendNetMsg = false;
                 coinFunc=Main.BankCoins;
             }
 
-            // create a Category -> list_of_items indexer using ToLookup()
-            // Returns an ILookup<ItemCat,List<Item>> which is really an
-            // IEnumerable<IGrouping<ItemCat, IEnumerable<Item>>
+            // create a query that creates category groups for the items in the chests,
+            // then pull out the category keys into a distinct list
+            List<ItemCat> catList =
+                    (from item in chestItems
+                        where !item.IsBlank()
+                        group item by item.GetCategory() into catGroup
+                        from cat in catGroup
+                        select catGroup.Key).Distinct()
+                        .ToList();
 
-            // Send to GetItemCopies first to exclude blank slots (which would
-            // otherwise come back as ItemCat.OTHER)
-            var chestCats = IHOrganizer.GetItemCopies(chestItems, true).ToLookup( item => item.GetCategory() );
-            /* This Lookup can be used for matching categories between chests and inventories
-            by using chestCategories.contains(itemCategory), or even chestCats[itemCat]
-            */
-
+            // basically just the deposit all code with an extra check for category
             bool moveSuccess = false;
             if (IHBase.oLockingEnabled) //slot locking on
             {
                 for (int i=49; i>=10; i--)  // reverse through player inv
                 {
                     if ( !pInventory[i].IsBlank() && !IHPlayer.SlotLocked(i) &&
-                        chestCats.Contains(pInventory[i].GetCategory()) )
+                    catList.Contains(pInventory[i].GetCategory()) )
                     {
                         // returned index
                         int retIdx = IHUtils.MoveItem(ref pInventory[i], chestItems);
@@ -73,7 +72,7 @@ namespace InvisibleHand
                 for (int i=49; i>=10; i--)
                 {
                     // if chest contains a matching category
-                    if ( !pInventory[i].IsBlank() && chestCats.Contains(pInventory[i].GetCategory()) )
+                    if ( !pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()) )
                     {
                         // returned index
                         int retIdx = IHUtils.MoveItem(ref pInventory[i], chestItems);

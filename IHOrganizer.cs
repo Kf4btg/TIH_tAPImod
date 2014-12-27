@@ -27,6 +27,8 @@ namespace InvisibleHand
         // more specific traits. Sorting Rules defined in CategoryDef class.
         public static List<Item> OrganizeItems(List<Item> source)
         {
+            if (source == null) return null;
+
             // returns an IEnumerable<IGrouping<ItemCat,Item>>
             var byCategory =
                 from item in source

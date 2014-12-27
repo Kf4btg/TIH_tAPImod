@@ -50,6 +50,11 @@ namespace InvisibleHand
             Categories.Add( ItemCat.PAINT, 		item   	=> item.paint != 0);
             Categories.Add( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
             Categories.Add( ItemCat.ORE, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.name.EndsWith("Ore")  );
+            Categories.Add( ItemCat.BAR, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.name.EndsWith("Bar")  );
+            // pretty sure only gems will match the next category
+            Categories.Add( ItemCat.GEM, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.alpha==50  );
+            Categories.Add( ItemCat.SEED, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.name.EndsWith("Seeds")  );
+
             Categories.Add( ItemCat.WALL, 		item   	=> item.createWall != -1);
             Categories.Add( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) ||
                                                         (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
@@ -94,8 +99,10 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.DYE,      new List<String> {"dye", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.PAINT,    new List<String> {"paint", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.ORE,      new List<String> {"rare", "value", "type", "stack desc"});
-            // gems have alpha==50, cobwebs==100
-            ItemSortRules.Add( ItemCat.TILE,     new List<String> {"name.EndsWith(\"Bar\") desc", "alpha desc", "name.EndsWith(\"Seeds\") desc",
+            ItemSortRules.Add( ItemCat.BAR,      new List<String> {"rare", "value", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.GEM,      new List<String> {"rare", "value", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.SEED,     new List<String> {"name", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.TILE,     new List<String> {"name.EndsWith(\"Block\") desc", "name.EndsWith(\"Brick\") desc",
                                                                    "tileWand", "createTile", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.WALL,     new List<String> {"createWall", "type", "stack desc"});
             // generic stuff

@@ -23,6 +23,9 @@ namespace InvisibleHand
         DYE,
         PAINT,
         ORE,
+        BAR,
+        GEM,
+        SEED,
         TILE,
         WALL,
         OTHER

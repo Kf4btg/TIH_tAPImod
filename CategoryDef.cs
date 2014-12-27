@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System;
-// using System.Linq;
+using System.Linq;
 // using System.Linq.Expressions;
 // using System.Linq.Dynamic;
-using System.Reflection;
+// using System.Reflection;
 using TAPI;
 using Terraria;
 
@@ -11,25 +11,28 @@ namespace InvisibleHand
 {
     public static class CategoryDef
     {
-        public static List<IHCategory<Item>> Categories;// = new List<IHCategory<Item>>();
-        public static Dictionary<ItemCat, List<String>> ItemSortRules;// = new Dictionary<ItemCat, List<String>>();
+        // public static List<IHCategory<Item>> Categories;// = new List<IHCategory<Item>>();
+        // pass initial capacity as ItemCat.OTHER -- this trick will work so long as OTHER remains the last member of the Enum
+        public static readonly Dictionary<ItemCat, List<String>> ItemSortRules = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
+        public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories = new Dictionary<ItemCat, Func<Item, bool>>((Int32)ItemCat.OTHER+1);
 
-        public static IHCategory<Item>
-        catHead, catBody, catLegs, catVanity, catMelee, catRanged, catAmmo, catMagic, catSummon, catAccessory,
-        catPick, catAxe, catHammer, catConsume, catDye, catPaint, catOre, catTile, catWall, catPet, catOther, catBait;
+        // public static IHCategory<Item>
+        // catHead, catBody, catLegs, catVanity, catMelee, catRanged, catAmmo, catMagic, catSummon, catAccessory,
+        // catPick, catAxe, catHammer, catConsume, catDye, catPaint, catOre, catTile, catWall, catPet, catOther, catBait;
 
 
         public static void Initialize()
         {
-            Categories = new List<IHCategory<Item>>();
-            ItemSortRules = new Dictionary<ItemCat, List<String>>();
+            // Categories = new List<IHCategory<Item>>();
+            // ItemSortRules = new Dictionary<ItemCat, List<String>>();
+            // Categories = new Dictionary<ItemCat, Func<Item, bool>>();
 
             SetupCategories();
             SetupSortingRules();
         }
 
         /*************************************************************************
-        *  Define the categories and their matching rules, then put them in the list.
+        *  Define the categories and their matching rules
         */
         public static void SetupCategories()
         {
@@ -37,53 +40,80 @@ namespace InvisibleHand
             // who graciously did all the hard work figuring these out so I didn't have to!
             // Although I did end up editing a few to make them mutually more exclusive
             // (e.g. adding the !vanity check to the armor items)
-            catPick		= new IHCategory<Item>( ItemCat.PICK, 		item   	=> item.pick > 0);
-            catAxe		= new IHCategory<Item>( ItemCat.AXE, 		item   	=> item.axe > 0);
-            catHammer	= new IHCategory<Item>( ItemCat.HAMMER,		item   	=> item.hammer > 0);
-            catHead		= new IHCategory<Item>( ItemCat.HEAD,		item 	=> item.headSlot != -1 && !item.vanity);
-            catBody		= new IHCategory<Item>( ItemCat.BODY,		item 	=> item.bodySlot != -1 && !item.vanity);
-            catLegs		= new IHCategory<Item>( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && !item.vanity);
-            catAccessory= new IHCategory<Item>( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
-            catVanity	= new IHCategory<Item>( ItemCat.VANITY,		item 	=> item.vanity);
-            catMelee	= new IHCategory<Item>( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
-            catRanged	= new IHCategory<Item>( ItemCat.RANGED,		item 	=> item.damage > 0 && item.ranged && (item.ammo == 0));
-            catAmmo		= new IHCategory<Item>( ItemCat.AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
-            catMagic	= new IHCategory<Item>( ItemCat.MAGIC, 		item   	=> item.damage > 0 && item.magic);
-            catSummon	= new IHCategory<Item>( ItemCat.SUMMON,		item   	=> item.damage > 0 && item.summon);
-            catConsume	= new IHCategory<Item>( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
-            catBait 	= new IHCategory<Item>( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
-            catDye		= new IHCategory<Item>( ItemCat.DYE, 		item   	=> item.dye != 0);
-            catPaint	= new IHCategory<Item>( ItemCat.PAINT, 		item   	=> item.paint != 0);
-            catTile		= new IHCategory<Item>( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
-            catOre 		= new IHCategory<Item>( ItemCat.ORE, 		item   	=> catTile.matches(item) && item.name.EndsWith("Ore")  );
-            catWall		= new IHCategory<Item>( ItemCat.WALL, 		item   	=> item.createWall != -1);
-            catPet		= new IHCategory<Item>( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
-            catOther	= new IHCategory<Item>( ItemCat.OTHER, 		null);
+            // catPick		= new IHCategory<Item>( ItemCat.PICK, 		item   	=> item.pick > 0);
+            // catAxe		= new IHCategory<Item>( ItemCat.AXE, 		item   	=> item.axe > 0);
+            // catHammer	= new IHCategory<Item>( ItemCat.HAMMER,		item   	=> item.hammer > 0);
+            // catHead		= new IHCategory<Item>( ItemCat.HEAD,		item 	=> item.headSlot != -1 && !item.vanity);
+            // catBody		= new IHCategory<Item>( ItemCat.BODY,		item 	=> item.bodySlot != -1 && !item.vanity);
+            // catLegs		= new IHCategory<Item>( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && !item.vanity);
+            // catAccessory= new IHCategory<Item>( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
+            // catVanity	= new IHCategory<Item>( ItemCat.VANITY,		item 	=> item.vanity);
+            // catMelee	= new IHCategory<Item>( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
+            // catRanged	= new IHCategory<Item>( ItemCat.RANGED,		item 	=> item.damage > 0 && item.ranged && (item.ammo == 0));
+            // catAmmo		= new IHCategory<Item>( ItemCat.AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
+            // catMagic	= new IHCategory<Item>( ItemCat.MAGIC, 		item   	=> item.damage > 0 && item.magic);
+            // catSummon	= new IHCategory<Item>( ItemCat.SUMMON,		item   	=> item.damage > 0 && item.summon);
+            // catConsume	= new IHCategory<Item>( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1 && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
+            // catBait 	= new IHCategory<Item>( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
+            // catDye		= new IHCategory<Item>( ItemCat.DYE, 		item   	=> item.dye != 0);
+            // catPaint	= new IHCategory<Item>( ItemCat.PAINT, 		item   	=> item.paint != 0);
+            // catTile		= new IHCategory<Item>( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
+            // catOre 		= new IHCategory<Item>( ItemCat.ORE, 		item   	=> catTile.matches(item) && item.name.EndsWith("Ore")  );
+            // catWall		= new IHCategory<Item>( ItemCat.WALL, 		item   	=> item.createWall != -1);
+            // catPet		= new IHCategory<Item>( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
+            // catOther	= new IHCategory<Item>( ItemCat.OTHER, 		null);
 
-            Categories.AddRange(new IHCategory<Item>[]
-            {
-                catPick,
-                catAxe,
-                catHammer,
-                catMelee,
-                catRanged,
-                catMagic,
-                catSummon,
-                catAmmo,
-                catHead,
-                catBody,
-                catLegs,
-                catAccessory,
-                catVanity,
-                catPet,
-                catConsume,
-                catBait,
-                catDye,
-                catPaint,
-                catOre,
-                catTile,
-                catWall
-                });
+            Categories.Add( ItemCat.PICK, 		item   	=> item.pick > 0);
+            Categories.Add( ItemCat.AXE, 		item   	=> item.axe > 0);
+            Categories.Add( ItemCat.HAMMER,		item   	=> item.hammer > 0);
+            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && !item.vanity);
+            Categories.Add( ItemCat.BODY,		item 	=> item.bodySlot != -1 && !item.vanity);
+            Categories.Add( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && !item.vanity);
+            Categories.Add( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
+            Categories.Add( ItemCat.VANITY,		item 	=> item.vanity);
+            Categories.Add( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
+            Categories.Add( ItemCat.RANGED,		item 	=> item.damage > 0 && item.ranged && (item.ammo == 0));
+            Categories.Add( ItemCat.AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
+            Categories.Add( ItemCat.MAGIC, 		item   	=> item.damage > 0 && item.magic);
+            Categories.Add( ItemCat.SUMMON,		item   	=> item.damage > 0 && item.summon);
+            Categories.Add( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1
+                                                        && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
+            Categories.Add( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
+            Categories.Add( ItemCat.DYE, 		item   	=> item.dye != 0);
+            Categories.Add( ItemCat.PAINT, 		item   	=> item.paint != 0);
+            Categories.Add( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
+            Categories.Add( ItemCat.ORE, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.name.EndsWith("Ore")  );
+            Categories.Add( ItemCat.WALL, 		item   	=> item.createWall != -1);
+            Categories.Add( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) ||
+                                                        (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
+            Categories.Add( ItemCat.OTHER, 		item    => true);
+
+
+
+            // Categories.AddRange(new IHCategory<Item>[]
+            // {
+            //     catPick,
+            //     catAxe,
+            //     catHammer,
+            //     catMelee,
+            //     catRanged,
+            //     catMagic,
+            //     catSummon,
+            //     catAmmo,
+            //     catHead,
+            //     catBody,
+            //     catLegs,
+            //     catAccessory,
+            //     catVanity,
+            //     catPet,
+            //     catConsume,
+            //     catBait,
+            //     catDye,
+            //     catPaint,
+            //     catOre,
+            //     catTile,
+            //     catWall
+            //     });
                 //catOther NOT added to the list
 
             } //end initialize()
@@ -102,89 +132,120 @@ namespace InvisibleHand
         */
         public static void SetupSortingRules()
         {
-            foreach (var category in Categories)
-            {
-                List<String> sortFields;
-                switch((ItemCat)category.catID)
-                {
-                    case ItemCat.PICK:
-                        sortFields=new List<String>() {"rare", "pick", "type", "value"};
-                        break;
-                    case ItemCat.AXE:
-                        sortFields=new List<String>() {"rare", "axe", "type", "value"};
-                        break;
-                    case ItemCat.HAMMER:
-                        sortFields=new List<String>() {"rare", "hammer", "type", "value"};
-                        break;
-                    case ItemCat.MELEE:
-                        // stack to sort the stackable boomerangs separately
-                        sortFields=new List<String>() {"maxStack", "stack desc", "damage", "type", "rare", "value"};
-                        break;
-                    case ItemCat.RANGED:
-                        // consumable to sort throwing weapons separately
-                        sortFields=new List<String>() {"consumable", "stack desc", "damage", "type", "rare", "value"};
-                        break;
-                    case ItemCat.MAGIC:
-                        sortFields=new List<String>() {"damage", "rare", "type", "value"};
-                        break;
-                    case ItemCat.SUMMON:
-                        sortFields=new List<String>() {"damage", "rare", "type", "value"};
-                        break;
-                    case ItemCat.AMMO:
-                        sortFields=new List<String>() {"rare", "damage", "type", "value", "stack desc"};
-                        break;
-                    case ItemCat.HEAD:
-                        sortFields=new List<String>() {"rare", "defense", "value", "type"};
-                        break;
-                    case ItemCat.BODY:
-                        sortFields=new List<String>() {"rare", "defense", "value", "type"};
-                        break;
-                    case ItemCat.LEGS:
-                        sortFields=new List<String>() {"rare", "defense", "value", "type"};
-                        break;
-                    case ItemCat.ACCESSORY:
-                        sortFields=new List<String>() {"type", "rare", "value", "prefix.id"};
-                        break;
-                    case ItemCat.VANITY:
-                        // stack because of those fishbowls...
-                        sortFields=new List<String>() {"name", "type", "stack desc"};
-                        break;
-                    case ItemCat.PET:
-                        sortFields=new List<String>() {"buffType", "type"};
-                        break;
-                    case ItemCat.CONSUME:
-                        // first option will include fish, shrooms, etc.
-                        sortFields=new List<String>() {"potion desc", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack desc"};
-                        break;
-                    case ItemCat.BAIT:
-                        sortFields=new List<String>() {"bait", "type", "stack desc"};
-                        break;
-                    case ItemCat.DYE:
-                        sortFields=new List<String>() {"dye", "type", "stack desc"};
-                        break;
-                    case ItemCat.PAINT:
-                        sortFields=new List<String>() {"paint", "type", "stack desc"};
-                        break;
-                    case ItemCat.ORE:
-                        sortFields=new List<String>() {"rare", "value", "type", "stack desc"};
-                        break;
-                    case ItemCat.TILE:
-                        // gems have alpha==50, cobwebs==100
-                        sortFields=new List<String>() {"name.EndsWith(\"Bar\") desc", "name.EndsWith(\"Seeds\") desc", "alpha desc",
-                                                        "tileWand", "createTile", "type", "stack desc"};
-                        break;
-                    case ItemCat.WALL:
-                        sortFields=new List<String>() {"createWall", "type", "stack desc"};
-                        break;
 
-                    default: // catOther/there's a bug and this shouldn't be reached
-                        sortFields=new List<String>() {"material desc", "type", "netID", "stack desc"};
-                        break;
-                }
-                ItemSortRules.Add((ItemCat)category.catID, sortFields);
-            }
+            ItemSortRules.Add( ItemCat.PICK,     new List<String> {"rare", "pick", "type", "value"});
+            ItemSortRules.Add( ItemCat.AXE,      new List<String> {"rare", "axe", "type", "value"});
+            ItemSortRules.Add( ItemCat.HAMMER,   new List<String> {"rare", "hammer", "type", "value"});
+            // stack to sort the stackable boomerangs separately
+            ItemSortRules.Add( ItemCat.MELEE,    new List<String> {"maxStack", "stack desc", "damage", "type", "rare", "value"});
+            // consumable to sort throwing weapons separately
+            ItemSortRules.Add( ItemCat.RANGED,   new List<String> {"consumable", "stack desc", "damage", "type", "rare", "value"});
+            ItemSortRules.Add( ItemCat.MAGIC,    new List<String> {"damage", "rare", "type", "value"});
+            ItemSortRules.Add( ItemCat.SUMMON,   new List<String> {"damage", "rare", "type", "value"});
+            ItemSortRules.Add( ItemCat.AMMO,     new List<String> {"rare", "damage", "type", "value", "stack desc"});
+            ItemSortRules.Add( ItemCat.HEAD,     new List<String> {"rare", "defense", "value", "type"});
+            ItemSortRules.Add( ItemCat.BODY,     new List<String> {"rare", "defense", "value", "type"});
+            ItemSortRules.Add( ItemCat.LEGS,     new List<String> {"rare", "defense", "value", "type"});
+            ItemSortRules.Add( ItemCat.ACCESSORY,new List<String> {"type", "rare", "value", "prefix.id"});
+            // stack because of those fishbowls...
+            ItemSortRules.Add( ItemCat.VANITY,   new List<String> {"name", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.PET,      new List<String> {"buffType", "type"});
+            ItemSortRules.Add( ItemCat.CONSUME,  new List<String> {"potion desc", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.BAIT,     new List<String> {"bait", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.DYE,      new List<String> {"dye", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.PAINT,    new List<String> {"paint", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.ORE,      new List<String> {"rare", "value", "type", "stack desc"});
+            // gems have alpha==50, cobwebs==100
+            ItemSortRules.Add( ItemCat.TILE,     new List<String> {"name.EndsWith(\"Bar\") desc", "alpha desc", "name.EndsWith(\"Seeds\") desc",
+                                                                   "tileWand", "createTile", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.WALL,     new List<String> {"createWall", "type", "stack desc"});
+
+            ItemSortRules.Add( ItemCat.OTHER,    new List<String> {"material desc", "type", "netID", "stack desc"});
+
+
+            // foreach (var category in Categories)
+            // {
+            //     List<String> sortFields;
+            //     switch(category.Key)
+            //     {
+            //         case ItemCat.PICK:
+            //             sortFields=new List<String>() {"rare", "pick", "type", "value"};
+            //             break;
+            //         case ItemCat.AXE:
+            //             sortFields=new List<String>() {"rare", "axe", "type", "value"};
+            //             break;
+            //         case ItemCat.HAMMER:
+            //             sortFields=new List<String>() {"rare", "hammer", "type", "value"};
+            //             break;
+            //         case ItemCat.MELEE:
+            //             // stack to sort the stackable boomerangs separately
+            //             sortFields=new List<String>() {"maxStack", "stack desc", "damage", "type", "rare", "value"};
+            //             break;
+            //         case ItemCat.RANGED:
+            //             // consumable to sort throwing weapons separately
+            //             sortFields=new List<String>() {"consumable", "stack desc", "damage", "type", "rare", "value"};
+            //             break;
+            //         case ItemCat.MAGIC:
+            //             sortFields=new List<String>() {"damage", "rare", "type", "value"};
+            //             break;
+            //         case ItemCat.SUMMON:
+            //             sortFields=new List<String>() {"damage", "rare", "type", "value"};
+            //             break;
+            //         case ItemCat.AMMO:
+            //             sortFields=new List<String>() {"rare", "damage", "type", "value", "stack desc"};
+            //             break;
+            //         case ItemCat.HEAD:
+            //             sortFields=new List<String>() {"rare", "defense", "value", "type"};
+            //             break;
+            //         case ItemCat.BODY:
+            //             sortFields=new List<String>() {"rare", "defense", "value", "type"};
+            //             break;
+            //         case ItemCat.LEGS:
+            //             sortFields=new List<String>() {"rare", "defense", "value", "type"};
+            //             break;
+            //         case ItemCat.ACCESSORY:
+            //             sortFields=new List<String>() {"type", "rare", "value", "prefix.id"};
+            //             break;
+            //         case ItemCat.VANITY:
+            //             // stack because of those fishbowls...
+            //             sortFields=new List<String>() {"name", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.PET:
+            //             sortFields=new List<String>() {"buffType", "type"};
+            //             break;
+            //         case ItemCat.CONSUME:
+            //             // first option will include fish, shrooms, etc.
+            //             sortFields=new List<String>() {"potion desc", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.BAIT:
+            //             sortFields=new List<String>() {"bait", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.DYE:
+            //             sortFields=new List<String>() {"dye", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.PAINT:
+            //             sortFields=new List<String>() {"paint", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.ORE:
+            //             sortFields=new List<String>() {"rare", "value", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.TILE:
+            //             // gems have alpha==50, cobwebs==100
+            //             sortFields=new List<String>() {"name.EndsWith(\"Bar\") desc", "name.EndsWith(\"Seeds\") desc", "alpha desc",
+            //                                             "tileWand", "createTile", "type", "stack desc"};
+            //             break;
+            //         case ItemCat.WALL:
+            //             sortFields=new List<String>() {"createWall", "type", "stack desc"};
+            //             break;
+            //
+            //         default: // catOther/there's a bug and this shouldn't be reached
+            //             sortFields=new List<String>() {"material desc", "type", "netID", "stack desc"};
+            //             break;
+            //     }
+            //     ItemSortRules.Add(category.Key, sortFields);
+            // }
             // because this is not in the category list
-            ItemSortRules.Add(ItemCat.OTHER, new List<String>() {"material desc", "type", "netID", "stack desc"});
+            // ItemSortRules.Add(ItemCat.OTHER, new List<String>() {"material desc", "type", "netID", "stack desc"});
         }//end setup sorting rules
 
     }

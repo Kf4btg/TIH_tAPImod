@@ -13,12 +13,13 @@ namespace InvisibleHand
         public bool control_sort;
         public bool control_clean;      //combine stacks
 
-        public bool control_qStack;
-        public bool control_depositAll;
-        public bool control_lootAll;
+        public bool control_qStack, control_depositAll, control_lootAll;
+
+
 
         //alt functions (maybe more later)
-        public bool control_rSort;      // shift+sort=reverse sort
+        public bool control_rSort,      // shift+sort=reverse sort
+                    control_sDeposit, control_rStack;
 
         public static bool[] lockedSlots = new bool[40]; //not the hotbar
 
@@ -58,7 +59,9 @@ namespace InvisibleHand
 
                 if (KState.Special.Shift.Down()) //alt functions
                 {
-                    control_rSort      = IHBase.key_sort.Pressed();
+                    control_rSort      = IHBase.key_sort.Pressed();         // reverse sort
+                    control_sDeposit   = IHBase.key_depositAll.Pressed();   // smart-deposit
+                    control_rStack     = IHBase.key_quickStack.Pressed();   // "Reverse" quickstack
                 }
                 else
                 {
@@ -108,6 +111,12 @@ namespace InvisibleHand
                 {
                     if ( player.chestItems == null ) return;
                     IHUtils.DoDepositAll(player);
+                    return;
+                }
+                if (control_sDeposit) //SmartDeposit
+                {
+                    if ( player.chestItems == null ) return;
+                    IHSmartStash.SmartDeposit();
                     return;
                 }
 

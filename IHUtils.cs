@@ -35,6 +35,7 @@ namespace InvisibleHand
                 // iterate through the player's inventory in reverse
                 for (int i=R_START; i >= R_END; i--)
                 {
+                    // returned index
                     int retIdx = MoveItem(ref player.inventory[i], Main.chest[player.chest].item);
                     if (retIdx >= 0 ) // item/entire stack successfully moved
                     {
@@ -67,7 +68,7 @@ namespace InvisibleHand
 
             // play sound if deposit was at least somewhat successful
             if (moveSuccess) {
-                RingTheBell(); }
+                RingBell(); }
 
         } //\DoDepositAll()
 #endregion
@@ -146,7 +147,7 @@ namespace InvisibleHand
                             {
                                 player.inventory[j] = new Item();
 
-                                RingTheBell();
+                                RingBell();
                                 if (sendMessage) SendNetMessage(i);
                             }
                         }
@@ -220,7 +221,7 @@ namespace InvisibleHand
         }
 
         //plays the "item moved" sound
-        public static void RingTheBell()
+        public static void RingBell()
         {
             Main.PlaySound(7, -1, -1, 1);
         }

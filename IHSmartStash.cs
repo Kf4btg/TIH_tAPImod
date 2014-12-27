@@ -91,5 +91,16 @@ namespace InvisibleHand
             if (moveSuccess) IHUtils.RingBell();
 
         }
+
+        /****************************************************
+        *   This is a bit of a "reverse-quick-stack" in that only items that add to
+        *   stacks currently in the player's inventory will be pulled from the chest.
+        */
+        public static void SmartLoot()
+        {
+            IHUtils.DoQuickStack(Main.localPlayer);
+
+        }
+
     }
 }

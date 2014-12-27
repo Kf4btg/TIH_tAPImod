@@ -119,6 +119,12 @@ namespace InvisibleHand
                     IHSmartStash.SmartDeposit();
                     return;
                 }
+                if (control_rStack) //SmartLoot
+                {
+                    if ( player.chestItems == null ) return;
+                    IHSmartStash.SmartLoot();
+                    return;
+                }
 
             }
         }

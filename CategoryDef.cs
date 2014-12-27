@@ -11,7 +11,7 @@ namespace InvisibleHand
 {
     public static class CategoryDef
     {
-        // pass initial capacity as ItemCat.OTHER -- this trick will work so long as OTHER remains the last member of the Enum
+        // pass initial capacity as ItemCat.OTHER -- this trick should work so long as OTHER remains the last member of the Enum
         public static readonly Dictionary<ItemCat, List<String>> ItemSortRules = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
         public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories = new Dictionary<ItemCat, Func<Item, bool>>((Int32)ItemCat.OTHER+1);
 

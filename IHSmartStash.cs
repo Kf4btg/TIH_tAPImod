@@ -7,6 +7,7 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    //<class>
     public static class IHSmartStash
     {
         /****************************************************
@@ -95,12 +96,84 @@ namespace InvisibleHand
         /****************************************************
         *   This is a bit of a "reverse-quick-stack" in that only items that add to
         *   stacks currently in the player's inventory will be pulled from the chest.
+        *
+        *   The code actually works out to be a bit of a combination of the
+        *   QuickStack and LootAll methods.
+        *
+        *   @param takeAll : original implementation of this would take ALL stacks
+        *       of a matching item from the chest if even one <max stack was present
+        *       in the player's inventory. Leaving this functionality in place as a
+        *       possible future option.
         */
-        public static void SmartLoot()
+        public static void SmartLoot(bool takeAll = false)
         {
-            IHUtils.DoQuickStack(Main.localPlayer);
+            if (Main.localPlayer.chest == -1) return;
 
-        }
+            Item[] pInventory = Main.localPlayer.inventory;
+            Item[] chestItems;
+            bool sendNetMsg;
 
-    }
-}
+            if (Main.localPlayer.chest >-1)
+            {
+                chestItems = Main.chest[Main.localPlayer.chest].item;
+                sendNetMsg = true;
+            }
+            else
+            {
+                chestItems = Main.localPlayer.chest==-3 ? Main.localPlayer.bank2.item : Main.localPlayer.bank.item;
+                sendNetMsg = false;
+            }
+
+            #region takeAll
+            if (takeAll){
+                //for each item in inventory (including coins, ammo, hotbar)...
+                for (int i=0; i<58; i++)
+                {
+                    //...if item is not blank && not a full stack...
+                    if (!pInventory[i].IsBlank() && pInventory[i].stack < pInventory[i].maxStack)
+                    {   //...check every item in chest...
+                        for (int j=0; j<Chest.maxItems; j++)
+                        {   //...for a matching item...
+                            if (chestItems[j].IsTheSameAs(pInventory[i]))
+                            {   //...and move it to the Player's inventory
+                                chestItems[j] = Main.localPlayer.GetItem(Main.localPlayer.whoAmI, chestItems[j]);
+                                if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
+                            }
+                        }
+                    }
+                }
+            return;}
+            #endregion
+
+            //for each item in inventory (including coins, ammo, hotbar)...
+            for (int i=0; i<58; i++)
+            {
+                //...if item is not blank && not a full stack...
+                if (!pInventory[i].IsBlank() && pInventory[i].stack < pInventory[i].maxStack)
+                {   //...check every item in chest...
+                    for (int j=0; j<Chest.maxItems; j++)
+                    {   //...for a matching item stack...
+                        if (chestItems[j].IsTheSameAs(pInventory[i]))
+                        {
+                            IHUtils.RingBell();
+                            //...and merge it to the Player's inventory
+                            if (IHUtils.StackMerge(ref chestItems[j], ref pInventory[i]))
+                            {
+                                chestItems[j] = new Item(); //reset this item if all stack transferred
+                                if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
+                            }
+                            //now check to see if original stack is full, move to next item if true
+                            if (pInventory[i].stack==pInventory[i].maxStack) break;
+
+                        }
+                    }// </for inner>
+                }
+            }// </for outer>
+
+            //when all is said and done, check for newly available recipes.
+            Recipe.FindRecipes();
+
+        } // </smartloot>
+
+    } // </class>
+} // </namespace>

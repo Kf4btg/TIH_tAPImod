@@ -93,6 +93,9 @@ namespace InvisibleHand
             }
         } // \DoLootAll()
 
+		/********************************************************
+        *   LootAll
+        */
         private static void LootAll(Player player, Item[] container, bool sendMessage = false)
         {
             for (int i=0; i<Chest.maxItems; i++)

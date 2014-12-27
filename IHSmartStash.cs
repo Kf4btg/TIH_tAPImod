@@ -145,25 +145,41 @@ namespace InvisibleHand
             return;}
             #endregion
 
-            //for each item in inventory (including coins, ammo, hotbar)...
-            for (int i=0; i<58; i++)
+
+            //do a first run through to fill the ammo slots
+            for (int ak=0; ak<Chest.maxItems; ak++)
             {
+                if (!chestItems[ak].IsBlank() && chestItems[ak].ammo > 0 && !chestItems[ak].notAmmo) //if ammo
+                {
+                    chestItems[ak]=Main.localPlayer.FillAmmo(Main.localPlayer.whoAmI, chestItems[ak]);
+                }
+            }
+
+            int index=0;
+            //for each item in inventory (including coins & hotbar)...
+            for (int i=-4; i<50; i++)   //this little i=-4 trick from the vanilla code
+            {
+                index = i<0 ? 54 + i : i; //do coins first
+
                 //...if item is not blank && not a full stack...
-                if (!pInventory[i].IsBlank() && pInventory[i].stack < pInventory[i].maxStack)
+                if (!pInventory[index].IsBlank() && pInventory[index].stack < pInventory[index].maxStack)
                 {   //...check every item in chest...
                     for (int j=0; j<Chest.maxItems; j++)
                     {   //...for a matching item stack...
-                        if (chestItems[j].IsTheSameAs(pInventory[i]))
+                        if (chestItems[j].IsTheSameAs(pInventory[index]))
                         {
                             IHUtils.RingBell();
                             //...and merge it to the Player's inventory
-                            if (IHUtils.StackMerge(ref chestItems[j], ref pInventory[i]))
+                            if (IHUtils.StackMerge(ref chestItems[j], ref pInventory[index]))
                             {
                                 chestItems[j] = new Item(); //reset this item if all stack transferred
                                 if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
                             }
-                            //now check to see if original stack is full, move to next item if true
-                            if (pInventory[i].stack==pInventory[i].maxStack) break;
+                            Main.localPlayer.DoCoins(index); // call coin-handling code
+
+                            // now check to see if original stack is full, stop looking for more stacks if true.
+                            // the do coins call could also have reduced the stack to 0
+                            if (pInventory[index].stack==pInventory[index].maxStack || pInventory[index].stack==0) break;
 
                         }
                     }// </for inner>

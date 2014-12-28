@@ -11,14 +11,13 @@ namespace InvisibleHand
 {
     public static class ItemExtension
     {
-        // use myItem.GetCategory()
-        public static IHCategory<Item> GetCategory(this Item item)
+        public static ItemCat GetCategory(this Item item)
         {
-            foreach (var category in CategoryDef.Categories)
+            foreach (ItemCat catID in Enum.GetValues(typeof(ItemCat)))
             {
-                if (category.matches(item)) { return category; }
+                if (CategoryDef.Categories[catID].Invoke(item)) { return catID; }
             }
-            return CategoryDef.catOther;
+            return ItemCat.OTHER;
         }
     }
 
@@ -28,31 +27,24 @@ namespace InvisibleHand
         // more specific traits. Sorting Rules defined in CategoryDef class.
         public static List<Item> OrganizeItems(List<Item> source)
         {
-            // returns an IEnumerable<IGrouping<IHCategory<Item>,CategorizedItem>>
+            if (source == null) return null;
+
+            // returns an IEnumerable<IGrouping<ItemCat,Item>>
             var byCategory =
                 from item in source
                 group item by item.GetCategory() into category
                 orderby category.Key
                 select category;
 
-            /*  create a Category -> list_of_items indexer using ToLookup()
-                Returns an ILookup<IHCategory<Item>,List<Item>> which is really an
-                    IEnumerable<IGrouping<IHCategory<Item>, List<Item>> */
-            // var byCategory = source.ToLookup( item => GetCategory(item) );
-            /* This Lookup can possibly later be used for matching categories between chests and inventories
-                by using chestCategories.contains(itemCategory), or even chestCats[itemCat]
-            */
-
             List<Item> sortedList = new List<Item>();
 
             //  Now we can dynamically construct Queries using Dynamic LINQ
             // expression methods with arbitrary (maybe later user-defined) sorting parameters.
             foreach (var category in byCategory)
-            {   // category.Key is IHCategory<Item>
-
+            {
                 // pull the sorting rules for this category from the ItemSortRules dictionary, convert them to a
                 // single string using "String.Join()", and pass it to the Dynamic LINQ OrderBy() method.
-                var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[(ItemCat)category.Key.catID]));
+                var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
 
                 // execute the query and put the result in a list to return
                 foreach (Item i in result)
@@ -61,6 +53,54 @@ namespace InvisibleHand
                 }
             }
             return sortedList;
+        }
+
+        /*************************************************************************
+        *  GetItemCopies - Construct a list containing cloned copies of items in the given
+        *   container, skipping blank (and optionally locked) slots.
+        *
+        *  @param container: The Item[] array containing the items in questions
+        *  @param chest : whether the container is a chest (otherwise the player inventory)
+        *  @param rangeStart: index within container to start copying
+        *  @param rangeEnd: index within container to stop copying
+        *
+        *  @returns: the list, or null if no items were added.
+        */
+        public static List<Item> GetItemCopies(Item[] container, bool chest, int rangeStart, int rangeEnd)
+        {
+            return GetItemCopies(container, chest, new Tuple<int, int>(rangeStart, rangeEnd));
+        }
+
+        public static List<Item> GetItemCopies(Item[] container, bool chest, Tuple<int,int> range = null)
+        {
+            if (range == null) range = new Tuple<int,int>(0, container.Length -1);
+
+            // initialize the list that will hold the copied items
+            var itemList = new List<Item>();
+
+            int count = 0; //having trouble with empty lists...
+
+            // get copies of viable items from container.
+            // will need a different list if locking is enabled
+            if (!chest && IHBase.oLockingEnabled)
+            {
+                for (int i=range.Item1; i<=range.Item2; i++)
+                {
+                    if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
+
+                    itemList.Add(container[i].Clone());
+                    count++;
+                }
+            }
+            else //only skip blank slots
+            {
+                for (int i=range.Item1; i<=range.Item2; i++)
+                {
+                    if (!container[i].IsBlank()) itemList.Add(container[i].Clone());
+                    count++;
+                }
+            }
+            return count > 0 ? itemList : null;
         }
 
         /*************************************************************************
@@ -116,30 +156,9 @@ namespace InvisibleHand
             // for clarity
             bool checkLocks = IHBase.oLockingEnabled;
 
-            // initialize the list that will hold the items to sort
-            var itemSorter = new List<Item>();
-
-            // get copies of sortable items from container
-            // will need a different list to pass to the sorter if locking is enabled
-            if (!chest && checkLocks)
-            {
-                for (int i=range.Item1; i<=range.Item2; i++)
-                {
-                    if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
-
-                    itemSorter.Add(container[i].Clone());
-                }
-            }
-            else //only skip blank slots
-            {
-                for (int i=range.Item1; i<=range.Item2; i++)
-                {
-                    if (!container[i].IsBlank()) itemSorter.Add(container[i].Clone());
-                }
-            }
-
-            //send items off to be sorted
-            itemSorter = OrganizeItems(itemSorter);
+            // get copies of the items and send them off to be sorted
+            var itemSorter = OrganizeItems(GetItemCopies(container, chest, range));
+            if (itemSorter == null) return;
 
             if (reverse) itemSorter.Reverse(); //reverse on user request
 

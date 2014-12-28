@@ -24,9 +24,10 @@ This mod implements a number of convenience features to make managing one's inve
         -   Hold Shift while pressing this key to sort the items in reverse order.
     2.  Smart Deposit
         -   Hold Shift and press the Deposit All hotkey to only deposit items from your inventory that match a category of an item already in that chest.
+        -   Items in locked inventory slots will not be deposited by this action.
         -   Organized storage made easy!
     9.  Reverse Stack
-        -   Hold Shift and press the Quickstack key to perform what is effectively a backwards Quickstack. Any stack of items in your inventory that is not already at its maximum will pull matching items from an open chest to refill itself (only as many as needed to reach the max-stack for that item type, or as many as it can before the chest's supply is exhausted).
+        -   Hold Shift and press the Quickstack key to perform what is effectively a backwards Quickstack. Any stack of items in your inventory that is not already at its maximum will pull matching items from an open chest to refill to refill its stack (either to maximum or as much as it can).
         -   Good for a quick refill of materials when building and crafting or for replenishing your waning reserves of potions and ammo.
 
   * __Several other features accessible through the mod-options__

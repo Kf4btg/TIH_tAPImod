@@ -15,8 +15,6 @@ namespace InvisibleHand
 
         public bool control_qStack, control_depositAll, control_lootAll;
 
-
-
         //alt functions (maybe more later)
         public bool control_rSort,      // shift+sort=reverse sort
                     control_sDeposit, control_rStack;

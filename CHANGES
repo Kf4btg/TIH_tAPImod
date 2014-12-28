@@ -1,4 +1,8 @@
 Version 1.1.1+tr14a
+    -   Added new Categories, all pulled out of the "tile" category:
+        -   Mechanism, crafting station, light sources, furniture, statues, wall decoration, banners, decorative clutter
+
+Version 1.1.1+tr14a
     -   Added Smart Deposit action
     -   Added Smart Loot action
     -   Added separate categories for Ore, Bars, Gems, and Seeds

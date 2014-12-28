@@ -19,6 +19,18 @@ namespace InvisibleHand
             }
             return ItemCat.OTHER;
         }
+
+        // just because.
+        // for vanilla, should return true for all the woods, pumpkin, and hay
+        public static bool
+        IsWoodLike(this Item tile)
+        {
+            // return CategoryDef.Categories[ItemCat.TILE].Invoke(tile) &&
+
+            //to speed things up, we'll assume it's already verified as a TILE
+            return tile.width==8 && tile.height==10 && tile.maxStack==999;
+        }
+
     }
 
     public static class IHOrganizer

@@ -22,8 +22,7 @@ namespace InvisibleHand
 
         // just because.
         // for vanilla, should return true for all the woods, pumpkin, and hay
-        public static bool
-        IsWoodLike(this Item tile)
+        public static bool IsWoodLike(this Item tile)
         {
             // return CategoryDef.Categories[ItemCat.TILE].Invoke(tile) &&
 

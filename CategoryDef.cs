@@ -18,7 +18,7 @@ namespace InvisibleHand
         // A large number of "Tile"-type items will share a .createTile attribute with items that fulfill a similar purpose.
         // This gives us a handy way to sort and possibly even categorize these item types.
         // Here are few, constant-ified.
-/**/    public const int TILE_TORCH             =     4;  // NOTE: torches/candles etc also have noWet=true
+/**/    public const int TILE_TORCH             =     4; // NOTE: torches/candles etc also have noWet=true
 /**/    public const int TILE_DOOR              =    10;
 /**/    public const int TILE_CUPS              =    13; // pink vase, wine glass, bottles, &c.
 /**/    public const int TILE_TABLE             =    14;
@@ -53,7 +53,7 @@ namespace InvisibleHand
         public const int TILE_DYE_MATERIAL      =   227; // consecutive ids, 1107-1114, 1115-119 are husks, mucus, ink ##kick these out of the TILE group
 /**/    public const int TILE_BAR               =   239; // SEEMS TO HAVE THEM ALL
 /**/    public const int TILE_TROPHY            =   240; // also some paintings and decorative wall hangings
-/**/    public const int TILE_PAINTING          =   242; //some in 240, "Catacomb" is 241, two in 245
+/**/    public const int TILE_PAINTING          =   242; // some in 240, "Catacomb" is 241, two in 245
 /**/    public const int TILE_BEACH_STUFF       =   324;
 /**/    public const int TILE_TEXT_STATUE       =   337;
 
@@ -81,26 +81,40 @@ namespace InvisibleHand
         /*************************************************************************
         Create a number of hashsets to quickly check values of "item.createTile" to aid in categorization/sorting
         */
-        public static readonly HashSet<int> TileGroupFurniture  = new HashSet<int>
-            ( new int[] { TILE_DOOR, TILE_TABLE, TILE_CHAIR, TILE_PLATFORM, TILE_BED, TILE_PIANO, TILE_DRESSER, TILE_SOFA, TILE_BATHTUB, TILE_BOOKCASE, TILE_CLOCK, TILE_CHEST,
+        public static readonly HashSet<int> TileGroupFurniture
+            = new HashSet<int>( new int[] {
+                TILE_DOOR, TILE_TABLE, TILE_CHAIR, TILE_PLATFORM,
+                TILE_BED, TILE_PIANO, TILE_DRESSER, TILE_SOFA,
+                TILE_BATHTUB, TILE_BOOKCASE, TILE_CLOCK, TILE_CHEST,
                 29, 55, 97,102, 124, 128, 269 } ); //piggy, sign, safe, throne, wooden beam, wo/mannequin
-        public static readonly HashSet<int> TileGroupLighting   = new HashSet<int>
-            ( new int[] { TILE_TORCH, TILE_CANDLE, TILE_CHANDELIER, TILE_LANTERN, TILE_LAMP, TILE_CANDELABRA, 35, 95, 98, 215, 270, 271 } ); //jackolantern, chinese, skull, campfire, bugs in bottles
 
-        public static readonly HashSet<int> TileGroupStatue     = new HashSet<int>
-            ( new int[] { TILE_GRAVE, TILE_STATUE, TILE_FOUNTAIN, TILE_TEXT_STATUE, 244 } ); //bubble machine
+        public static readonly HashSet<int> TileGroupLighting
+            = new HashSet<int>( new int[] {
+                TILE_TORCH, TILE_CANDLE, TILE_CHANDELIER, TILE_LANTERN,
+                TILE_LAMP, TILE_CANDELABRA, 35, 95, 98, 215, 270, 271 } ); //jackolantern, chinese, skull, campfire, bugs in bottles
 
-        public static readonly HashSet<int> TileGroupWallDeco   = new HashSet<int>
-            ( new int[] { TILE_TROPHY, TILE_PAINTING, 241, 245 } );
+        public static readonly HashSet<int> TileGroupStatue
+            = new HashSet<int>( new int[] {
+                TILE_GRAVE, TILE_STATUE, TILE_FOUNTAIN, TILE_TEXT_STATUE, 244 } ); //bubble machine
 
-        public static readonly HashSet<int> TileGroupClutter    = new HashSet<int>
-            ( new int[] { TILE_CUPS, TILE_BOWL, TILE_BEACH_STUFF, 50 /*Book*/, 81/*Coral*/, 319/*Ship in bottle*/, 316, 317, 318 } ); //jellyfish jars
+        public static readonly HashSet<int> TileGroupWallDeco
+            = new HashSet<int>( new int[] {
+                TILE_TROPHY, TILE_PAINTING, 241, 245 } );
 
-        public static readonly HashSet<int> TileGroupCrafting   = new HashSet<int>
-            ( new int[] { TILE_WORKBENCH, TILE_ANVIL_BASIC, TILE_ANVIL_ADV, TILE_FURNACE3, TILE_COOKING_POT,
-            17, 77, 86, 94, 106, 114, 125, 217, 218, 219, 220, 228, 243, 247, 283, 300, 301, 302, 303, 304, 305, 306, 307, 308 } ); //blergh
+        public static readonly HashSet<int> TileGroupClutter
+            = new HashSet<int>( new int[] {
+                TILE_CUPS, TILE_BOWL, TILE_BEACH_STUFF, 50 /*Book*/, 81/*Coral*/,
+                319/*Ship in bottle*/, 316, 317, 318 } ); //jellyfish jars
 
-        public static readonly HashSet<int> TileGroupOre  = new HashSet<int>(new int[] { 37, 56, 58 }); //meteorite, obsidian, hellstone (get others by name)
+        public static readonly HashSet<int> TileGroupCrafting
+            = new HashSet<int>( new int[] {
+                TILE_WORKBENCH, TILE_ANVIL_BASIC, TILE_ANVIL_ADV, TILE_FURNACE3, TILE_COOKING_POT,
+                17, 77, 86, 94, 106, 114, 125, 217, 218, 219, 220, 228, 243,
+                247, 283, 300, 301, 302, 303, 304, 305, 306, 307, 308 } ); //blergh
+
+        public static readonly HashSet<int> TileGroupOre
+            = new HashSet<int>( new int[] {
+                37, 56, 58 }); //meteorite, obsidian, hellstone (get others by name)
 
 
         public static void Initialize()
@@ -126,11 +140,11 @@ namespace InvisibleHand
             Categories.Add( ItemCat.PICK, 		item   	=> item.pick > 0);
             Categories.Add( ItemCat.AXE, 		item   	=> item.axe > 0);
             Categories.Add( ItemCat.HAMMER,		item   	=> item.hammer > 0);
-            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && item.defense>0);// && item.headSlot != 13); //13=empty bucket
+            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && item.defense>0 && item.headSlot != 13); //13=empty bucket
             Categories.Add( ItemCat.BODY,		item 	=> item.bodySlot != -1 && item.defense>0);
             Categories.Add( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && item.defense>0);
             Categories.Add( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
-            Categories.Add( ItemCat.VANITY,		item 	=> item.vanity || item.headSlot!=-1 || item.bodySlot!=-1 || item.legSlot!=-1 ); //catch the non-armor
+            Categories.Add( ItemCat.VANITY,		item 	=> (item.vanity || item.headSlot!=-1 || item.bodySlot!=-1 || item.legSlot!=-1) && item.defense==0 ); //catch the non-armor
             Categories.Add( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
             Categories.Add( ItemCat.RANGED,		item 	=> item.damage > 0 && item.ranged && (item.ammo == 0));
             Categories.Add( ItemCat.AMMO, 		item   	=> item.damage > 0 && item.ranged && item.ammo != 0 && !item.notAmmo);
@@ -139,14 +153,19 @@ namespace InvisibleHand
             Categories.Add( ItemCat.MECH,       item    => item.mech || item.cartTrack );
             Categories.Add( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1
                                                         && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
+
+            // for some reason, all vanilla potions have w=14, h=24. Food, ale, etc. are all different.
+            Categories.Add( ItemCat.POTION, 	item   	=> Categories[ItemCat.CONSUME].Invoke(item) && item.width==14 && item.height==24 );
+
             Categories.Add( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
             Categories.Add( ItemCat.DYE, 		item   	=> item.dye != 0);
             Categories.Add( ItemCat.PAINT, 		item   	=> item.paint != 0);
             Categories.Add( ItemCat.TILE, 		item   	=> (item.createTile != -1 && item.createTile!=TILE_DYE_MATERIAL) || item.tileWand != -1 || item.name == "Xmas decorations" );
-            Categories.Add( ItemCat.ORE, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && (item.name.EndsWith("Ore") || TileGroupOre.Contains(item.createTile)) );
+            Categories.Add( ItemCat.ORE, 		item   	=> item.createTile != -1 && (item.name.EndsWith("Ore") || TileGroupOre.Contains(item.createTile)) );
             Categories.Add( ItemCat.BAR, 		item   	=> item.createTile==TILE_BAR );
             Categories.Add( ItemCat.GEM, 		item   	=> item.createTile==TILE_GEM );
-            Categories.Add( ItemCat.SEED, 		item   	=> item.createTile==TILE_SEED ); //leaves out crimson, hallowed, etc
+            Categories.Add( ItemCat.SEED, 		item   	=> item.createTile==TILE_SEED || (item.createTile != -1
+                                                        && (item.name.EndsWith("Seeds") || item.name == "Pumpkin Seed" || item.name == "Acorn")));
             Categories.Add( ItemCat.CRAFT, 		item   	=> TileGroupCrafting.Contains(item.createTile) );
             Categories.Add( ItemCat.LIGHT, 		item   	=> TileGroupLighting.Contains(item.createTile) );
             Categories.Add( ItemCat.FURNITURE, 	item   	=> TileGroupFurniture.Contains(item.createTile) );
@@ -155,13 +174,20 @@ namespace InvisibleHand
             Categories.Add( ItemCat.BANNER, 	item   	=> item.createTile==TILE_BANNER );
             Categories.Add( ItemCat.CLUTTER, 	item   	=> TileGroupClutter.Contains(item.createTile) );
 
+            Categories.Add( ItemCat.BLOCK,   	item   	=> item.createTile != -1 && (item.IsWoodLike() || (item.width==12 && item.height==12 && item.value==0)) );
+            Categories.Add( ItemCat.BRICK,   	item   	=> Categories[ItemCat.BLOCK].Invoke(item) && (item.name.EndsWith("Brick")
+                                                            || item.name.EndsWith("Slab") || item.name.EndsWith("Plating")) );
+
+
             Categories.Add( ItemCat.WALL, 		item   	=> item.createWall != -1);
-            Categories.Add( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot]) ||
-                                                        (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
+            Categories.Add( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot])
+                                                        || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
             Categories.Add( ItemCat.OTHER, 		item    => true);
             // Categories.Add( ItemCat.BAR, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.name.EndsWith("Bar")  );
             // pretty sure only gems will match the next category
             // Categories.Add( ItemCat.GEM, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.alpha==50  );
+
+            //note on liquid potions: useAnimation=17; useSound=3; useStyle=2;**** w=14,h=24****
 
 
         } //end setupCategories()
@@ -200,7 +226,8 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.VANITY,   new List<String> { "headSlot!=-1 desc", "bodySlot!=-1 desc", "legSlot!=-1 desc", "name", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.PET,      new List<String> { "buffType", "type"});
             ItemSortRules.Add( ItemCat.MECH,     new List<String> { "cartTrack", "tileBoost", "createTile desc", "value", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.CONSUME,  new List<String> { "potion desc", "name.EndsWith(\"Potion\") desc", "buffType", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.CONSUME,  new List<String> { "potion desc", "buffType", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.POTION,   new List<String> { "healLife desc", "healMana desc", "buffType!=0 desc", "buffType", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.BAIT,     new List<String> { "bait", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.DYE,      new List<String> { "dye", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.PAINT,    new List<String> { "paint", "type", "stack desc"});
@@ -216,9 +243,10 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.WALLDECO, new List<String> { "createTile", "type", "name", "stack desc"});
             ItemSortRules.Add( ItemCat.BANNER,   new List<String> { "type", "stack desc"});
             ItemSortRules.Add( ItemCat.CLUTTER,  new List<String> { "createTile", "type", "name", "stack desc"});
-            // had to hard-code my IsWoodLike check b/c dynamic linq doesn't like extension methods...
-            ItemSortRules.Add( ItemCat.TILE,     new List<String> { "(width==8 && height==10 && maxStack==999) desc", "name.EndsWith(\"Block\") desc", "name.EndsWith(\"Brick\") desc",
-                                                                    "tileWand", "createTile", "type", "name", "stack desc"});
+            //"width" check should sort wood first
+            ItemSortRules.Add( ItemCat.BLOCK,    new List<String> { "width", "createTile", "type", "name", "stack desc" });
+            ItemSortRules.Add( ItemCat.BRICK,    new List<String> { "createTile", "type", "name", "stack desc" });
+            ItemSortRules.Add( ItemCat.TILE,     new List<String> { "tileWand", "createTile", "type", "name", "stack desc"});
             ItemSortRules.Add( ItemCat.WALL,     new List<String> { "createWall", "type", "stack desc"});
             // generic stuff
             ItemSortRules.Add( ItemCat.OTHER,    new List<String> { "material desc", "type", "netID", "stack desc"});

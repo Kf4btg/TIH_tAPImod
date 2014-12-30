@@ -19,6 +19,7 @@ namespace InvisibleHand
         VANITY,
         PET,
         MECH,
+        POTION,
         CONSUME,
         BAIT,
         DYE,
@@ -34,6 +35,8 @@ namespace InvisibleHand
         WALLDECO,
         BANNER,
         CLUTTER,
+        BRICK,
+        BLOCK,
         TILE,
         WALL,
         OTHER

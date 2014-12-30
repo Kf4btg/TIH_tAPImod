@@ -75,7 +75,6 @@ namespace InvisibleHand
         //                                                                 //furnace, hellforge
                                                                         //300-308=all the new custom stuff
 
-        //also, items with width=8, height=10: all woods, platforms, tile-wands (rare), pumpkin, pumpkin seed, hay
         // quest fish: uniquestack=true, rare=-11
 
         /*************************************************************************
@@ -188,7 +187,18 @@ namespace InvisibleHand
             // Categories.Add( ItemCat.GEM, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.alpha==50  );
 
             //note on liquid potions: useAnimation=17; useSound=3; useStyle=2;**** w=14,h=24****
+		// though i wanted to avoid this, I'm afraid there are some items that will need to be assigned to 
+		// categories manually, by type.  These would include:
 
+			// bucket = OTHER
+			// acorn, pumpkin seed = SEED
+			// 
+
+		// TODO: divide the "OTHER" category into OTHER_MATERIALS & OTHER (stuff like umbrella, hooks)
+		// TODO: make bombs/dynamite & boss summoning items be separate from food and other 
+		//		  buffing consumables.
+		// TODO: see if possible to read some NPCdef file to figure out if an item is an NPC or an environment 
+		//		(entity or tile) drop. 
 
         } //end setupCategories()
 

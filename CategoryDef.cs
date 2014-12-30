@@ -18,42 +18,42 @@ namespace InvisibleHand
         // A large number of "Tile"-type items will share a .createTile attribute with items that fulfill a similar purpose.
         // This gives us a handy way to sort and possibly even categorize these item types.
         // Here are few, constant-ified.
-/**/    public const int TILE_TORCH             =   4;  // NOTE: torches/candles etc also have noWet=true
-/**/    public const int TILE_DOOR              =   10;
-/**/    public const int TILE_CUPS              =   13; // pink vase, wine glass, bottles, &c.
-/**/    public const int TILE_TABLE             =   14;
-/**/    public const int TILE_CHAIR             =   15;
-/**/    public const int TILE_ANVIL_BASIC       =   16; // Iron & Lead only
-/**/    public const int TILE_WORKBENCH         =   18;
-/**/    public const int TILE_PLATFORM          =   19;
-/**/    public const int TILE_CHEST             =   21;
-/**/    public const int TILE_CANDLE            =   33; // not water candle
-/**/    public const int TILE_CHANDELIER        =   34;
-/**/    public const int TILE_LANTERN           =   42;
-/**/    public const int TILE_BED               =   79;
-/**/    public const int TILE_SEED              =   82; // THE "POTION-FARM" PLANTS
-/**/    public const int TILE_GRAVE             =   85;
-/**/    public const int TILE_PIANO             =   87;
-/**/    public const int TILE_DRESSER           =   88;
-/**/    public const int TILE_SOFA              =   89; //ALSO, the two Benches
-/**/    public const int TILE_BATHTUB           =   90;
-        public const int TILE_BANNER            =   91;
-/**/    public const int TILE_LAMP              =   93;
-/**/    public const int TILE_COOKING_POT       =   96; //only includes cooking pot & cauldron
+/**/    public const int TILE_TORCH             =     4;  // NOTE: torches/candles etc also have noWet=true
+/**/    public const int TILE_DOOR              =    10;
+/**/    public const int TILE_CUPS              =    13; // pink vase, wine glass, bottles, &c.
+/**/    public const int TILE_TABLE             =    14;
+/**/    public const int TILE_CHAIR             =    15;
+/**/    public const int TILE_ANVIL_BASIC       =    16; // Iron & Lead only
+/**/    public const int TILE_WORKBENCH         =    18;
+/**/    public const int TILE_PLATFORM          =    19;
+/**/    public const int TILE_CHEST             =    21;
+/**/    public const int TILE_CANDLE            =    33; // not water candle
+/**/    public const int TILE_CHANDELIER        =    34;
+/**/    public const int TILE_LANTERN           =    42;
+/**/    public const int TILE_BED               =    79;
+/**/    public const int TILE_SEED              =    82; // THE "POTION-FARM" PLANTS
+/**/    public const int TILE_GRAVE             =    85;
+/**/    public const int TILE_PIANO             =    87;
+/**/    public const int TILE_DRESSER           =    88;
+/**/    public const int TILE_SOFA              =    89; //ALSO, the two Benches
+/**/    public const int TILE_BATHTUB           =    90;
+        public const int TILE_BANNER            =    91;
+/**/    public const int TILE_LAMP              =    93;
+/**/    public const int TILE_COOKING_POT       =    96; //only includes cooking pot & cauldron
 /**/    public const int TILE_CANDELABRA        =   100;
 /**/    public const int TILE_BOOKCASE          =   101;
 /**/    public const int TILE_CLOCK             =   104;
 /**/    public const int TILE_BOWL              =   103; //wooden and glass?
-/**/    public const int TILE_STATUE            =   105;    //ALSO VASES
-/**/    public const int TILE_FURNACE3          =   133;    //Adamant, Orich forge
-/**/    public const int TILE_ANVIL_ADV         =   134;    //Mythril-quality
+/**/    public const int TILE_STATUE            =   105; //ALSO VASES
+/**/    public const int TILE_FURNACE3          =   133; //Adamant, Orich forge
+/**/    public const int TILE_ANVIL_ADV         =   134; //Mythril-quality
         public const int TILE_MUSIC_BOX         =   139;
 /**/    public const int TILE_GEM               =   178;
 /**/    public const int TILE_FOUNTAIN          =   207;
-        // public const int TILE_DYE_MATERIAL      =   227; // consecutive ids, 1107-1114, 1115-119 are husks, mucus, ink
+        public const int TILE_DYE_MATERIAL      =   227; // consecutive ids, 1107-1114, 1115-119 are husks, mucus, ink ##kick these out of the TILE group
 /**/    public const int TILE_BAR               =   239; // SEEMS TO HAVE THEM ALL
 /**/    public const int TILE_TROPHY            =   240; // also some paintings and decorative wall hangings
-/**/    public const int TILE_PAINTING          =   242;  //some in 240, "Catacomb" is 241, two in 245
+/**/    public const int TILE_PAINTING          =   242; //some in 240, "Catacomb" is 241, two in 245
 /**/    public const int TILE_BEACH_STUFF       =   324;
 /**/    public const int TILE_TEXT_STATUE       =   337;
 
@@ -82,7 +82,8 @@ namespace InvisibleHand
         Create a number of hashsets to quickly check values of "item.createTile" to aid in categorization/sorting
         */
         public static readonly HashSet<int> TileGroupFurniture  = new HashSet<int>
-            ( new int[] { TILE_DOOR, TILE_TABLE, TILE_CHAIR, TILE_PLATFORM, TILE_BED, TILE_PIANO, TILE_DRESSER, TILE_SOFA, TILE_BATHTUB, TILE_BOOKCASE, TILE_CLOCK, TILE_CHEST, 29, 55, 97,102, 124, 128, 269 } ); //piggy, sign, safe, throne, wooden beam, wo/mannequin
+            ( new int[] { TILE_DOOR, TILE_TABLE, TILE_CHAIR, TILE_PLATFORM, TILE_BED, TILE_PIANO, TILE_DRESSER, TILE_SOFA, TILE_BATHTUB, TILE_BOOKCASE, TILE_CLOCK, TILE_CHEST,
+                29, 55, 97,102, 124, 128, 269 } ); //piggy, sign, safe, throne, wooden beam, wo/mannequin
         public static readonly HashSet<int> TileGroupLighting   = new HashSet<int>
             ( new int[] { TILE_TORCH, TILE_CANDLE, TILE_CHANDELIER, TILE_LANTERN, TILE_LAMP, TILE_CANDELABRA, 35, 95, 98, 215, 270, 271 } ); //jackolantern, chinese, skull, campfire, bugs in bottles
 
@@ -98,6 +99,8 @@ namespace InvisibleHand
         public static readonly HashSet<int> TileGroupCrafting   = new HashSet<int>
             ( new int[] { TILE_WORKBENCH, TILE_ANVIL_BASIC, TILE_ANVIL_ADV, TILE_FURNACE3, TILE_COOKING_POT,
             17, 77, 86, 94, 106, 114, 125, 217, 218, 219, 220, 228, 243, 247, 283, 300, 301, 302, 303, 304, 305, 306, 307, 308 } ); //blergh
+
+        public static readonly HashSet<int> TileGroupOre  = new HashSet<int>(new int[] { 37, 56, 58 }); //meteorite, obsidian, hellstone (get others by name)
 
 
         public static void Initialize()
@@ -139,8 +142,8 @@ namespace InvisibleHand
             Categories.Add( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
             Categories.Add( ItemCat.DYE, 		item   	=> item.dye != 0);
             Categories.Add( ItemCat.PAINT, 		item   	=> item.paint != 0);
-            Categories.Add( ItemCat.TILE, 		item   	=> item.createTile != -1 || item.tileWand != -1 || item.name == "Xmas decorations");
-            Categories.Add( ItemCat.ORE, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && item.name.EndsWith("Ore")  );
+            Categories.Add( ItemCat.TILE, 		item   	=> (item.createTile != -1 && item.createTile!=TILE_DYE_MATERIAL) || item.tileWand != -1 || item.name == "Xmas decorations" );
+            Categories.Add( ItemCat.ORE, 		item   	=> Categories[ItemCat.TILE].Invoke(item) && (item.name.EndsWith("Ore") || TileGroupOre.Contains(item.createTile)) );
             Categories.Add( ItemCat.BAR, 		item   	=> item.createTile==TILE_BAR );
             Categories.Add( ItemCat.GEM, 		item   	=> item.createTile==TILE_GEM );
             Categories.Add( ItemCat.SEED, 		item   	=> item.createTile==TILE_SEED ); //leaves out crimson, hallowed, etc
@@ -220,31 +223,6 @@ namespace InvisibleHand
             // generic stuff
             ItemSortRules.Add( ItemCat.OTHER,    new List<String> { "material desc", "type", "netID", "stack desc"});
         }//end setup sorting rules
-
-        /*************************************************************************
-        Create a number of hashsets to quickly check values of "item.createTile" to aid in categorization/sorting
-        */
-        // public static void CreateTileGroups()
-        // {
-        //     TileGroupFurniture  = new HashSet<int>( new int[] { TILE_TABLE, TILE_CHAIR, TILE_PLATFORM, TILE_BED, TILE_PIANO, TILE_DRESSER,
-        //                             TILE_SOFA, TILE_BATHTUB, TILE_BOOKCASE, TILE_CLOCK, TILE_CHEST, 29, 55, 97,102, 124, 128, 269 } ); //piggy, sign, safe, throne, wooden beam, wo/mannequin
-        //
-        //     TileGroupLighting   = new HashSet<int>( new int[] { TILE_TORCH, TILE_CANDLE, TILE_CHANDELIER, TILE_LANTERN, TILE_LAMP, TILE_CANDELABRA, 35, 95, 98, 215, 270, 271 } ); //jackolantern, chinese, skull, campfire, bugs in bottles
-        //
-        //     TileGroupStatue     = new HashSet<int>( new int[] { TILE_GRAVE, TILE_STATUE, TILE_FOUNTAIN, TILE_TEXT_STATUE, 244 } );
-        //
-        //     TileGroupWallDeco   = new HashSet<int>( new int[] { TILE_TROPHY, TILE_PAINTING, 241, 245 } );
-        //
-        //     TileGroupClutter    = new HashSet<int>( new int[] { TILE_CUPS, TILE_BOWL, TILE_BEACH_STUFF, 50 /*Book*/, 81/*Coral*/, 319/*Ship in bottle*/, 316, 317, 318 } ); //jellyfish jars
-        //     for (int i=288; i<=299; i++){   //butterfly jars & critter cages
-        //         TileGroupClutter.Add(i);
-        //     }
-        //
-        //     TileGroupCrafting   = new HashSet<int>( new int[] { TILE_WORKBENCH, TILE_ANVIL_BASIC, TILE_ANVIL_ADV, TILE_FURNACE3, TILE_COOKING_POT,
-        //         17, 77, 86, 94, 106, 114, 125, 217, 218, 219, 220, 228, 243, 247, 283, 300, 301, 302, 303, 304, 305, 306, 307, 308 } ); //blergh
-        // }
-
-
 
 
     }

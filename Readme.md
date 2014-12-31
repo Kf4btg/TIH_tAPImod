@@ -126,7 +126,9 @@ A few details on the defined categories presented in the order in which they wil
   2.  __Special Items__ :<br>
  `Boss summoning items, heart and mana crystals.`
   2.  __Other__ :<br>
- `If, somehow, something doesn't fit ANY of the above categories, you'll find it here. Umbrellas are a Vanilla example; unique mod items may land here for now. Further revisions to categories could move these items up the list at any item.`
+```
+If, somehow, something doesn't fit ANY of the above categories, you'll find it here. Umbrellas are a Vanilla example; unique mod items may land here for now. Further revisions to categories could move these items up the list at any item.
+```
 
 #### License
   This mod was created by wuli1986(a)forums.terraria.org/Kf4btg(a)GitHub. This mod is released as open source, and you are free to modify it or use pieces of it in your own personal project. You may NOT re-release this mod in its original form or with only minor modifications and claim it as your own.  Any use you make of this mod or any mod designed for tAPI is subject to the terms of use defined by Re-Logic and the tAPI developers.

@@ -4,11 +4,13 @@ namespace InvisibleHand
 {
     public enum ItemCat
     {
+        COIN,
         PICK,
         AXE,
         HAMMER,
         MELEE,
         RANGED,
+        BOMB,
         MAGIC,
         SUMMON,
         AMMO,
@@ -16,6 +18,8 @@ namespace InvisibleHand
         BODY,
         LEGS,
         ACCESSORY,
+        // HOOK,
+        TOOL,
         VANITY,
         PET,
         MECH,
@@ -36,9 +40,12 @@ namespace InvisibleHand
         BANNER,
         CLUTTER,
         BRICK,
+        WOOD,
         BLOCK,
         TILE,
         WALL,
+        MISC_MAT,
+        SPECIAL,    //Boss summoning items, heart containers, mana crystals
         OTHER
 
     }

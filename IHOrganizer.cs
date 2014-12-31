@@ -9,29 +9,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public static class ItemExtension
-    {
-        public static ItemCat GetCategory(this Item item)
-        {
-            foreach (ItemCat catID in Enum.GetValues(typeof(ItemCat)))
-            {
-                if (CategoryDef.Categories[catID].Invoke(item)) { return catID; }
-            }
-            return ItemCat.OTHER;
-        }
-
-        // just because.
-        // for vanilla, should return true for all the woods, pumpkin, and hay
-        public static bool IsWoodLike(this Item tile)
-        {
-            // return CategoryDef.Categories[ItemCat.TILE].Invoke(tile) &&
-
-            //to speed things up, we'll assume it's already verified as a TILE
-            return tile.width==8 && tile.height==10 && tile.maxStack==999;
-        }
-
-    }
-
     public static class IHOrganizer
     {
         // this will sort the categorized items first by category, then by

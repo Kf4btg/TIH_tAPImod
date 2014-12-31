@@ -3,11 +3,14 @@ using System;
 using TAPI;
 using Terraria;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
+
 
 namespace InvisibleHand
 {
     public class IHBase : ModBase
     {
+        public static Texture2D lockedIcon;
 
         public static Keys
             key_sort, key_cleanStacks, key_quickStack, key_depositAll, key_lootAll;
@@ -28,6 +31,7 @@ namespace InvisibleHand
         public override void OnLoad()
         {
             self = this;
+            lockedIcon = self.textures["resources/LockIndicator"];
 
             CategoryDef.Initialize();
         }

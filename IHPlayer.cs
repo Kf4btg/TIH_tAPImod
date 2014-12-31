@@ -129,11 +129,12 @@ namespace InvisibleHand
 
         public static bool SlotLocked(int slotIndex)
         {
-            return lockedSlots[slotIndex-10];
+            return slotIndex>9 && slotIndex<50 && lockedSlots[slotIndex-10];
         }
 
         public static void ToggleLock(int slotIndex)
         {
+            if (slotIndex<10 || slotIndex>49) return;
             lockedSlots[slotIndex-10]=!lockedSlots[slotIndex-10];
         }
     }

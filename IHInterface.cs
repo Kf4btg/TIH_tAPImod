@@ -9,18 +9,27 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        private Texture2D lockedMarker = null;
+        // private Texture2D lockedIcon = null;
+
+        // public override void ModifyInterfaceLayerList(List<InterfaceLayer>list)
+        // {
+        //     if (!Main.playerInventory) return;
+        // }
+        //
+        // public InterfaceLayer lockMarkers = new InterfaceLayer.Action("InvisibleHand:lockMarkers", (layer, sb) =>
+        // {
+        //     if (!Main.playerInventory) return;
+        //
+        //
+        //
+        //
+        //     })
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (IHBase.oLockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
+            if (IHBase.oLockingEnabled && slot.type == "Inventory" && IHPlayer.SlotLocked(slot.index))
             {
-                    if (lockedMarker == null)
-                    {
-                        lockedMarker = IHBase.self.textures["resources/LockIndicator"];
-                    }
-
-                    sb.Draw(lockedMarker,                // the texture to draw
+                sb.Draw(IHBase.lockedIcon,                // the texture to draw
                             slot.pos,           // (Vector2) location in screen coords to draw sprite
                             null,               // Rectangle to specifies source texels from texture; null draws whole texture
                             Color.Firebrick,        // color to tint sprite; color.white=full color, no tint
@@ -36,16 +45,27 @@ namespace InvisibleHand
         // Shift + Right Click on inventory slot toggles the lock state
         public override bool PreItemSlotRightClick(ItemSlot slot, ref bool release)
         {
-            if (KState.Special.Shift.Down() && IHBase.oLockingEnabled && slot.modBase == null && Main.playerInventory && release )
+            if (!KState.Special.Shift.Down()) return true;
+
+            if (IHBase.oLockingEnabled && slot.modBase == null && Main.playerInventory && release )
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(slot.index); //toggle lock state
                     Main.PlaySound(7, -1, -1, 1);
                 }
-                return false;
             }
-            return true;
+            return false;
         }
+
+        // public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)
+        // {
+        //     if (IHBase.oLockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
+        //     {
+        //
+        //     }
+        //     return null;
+        // }
+
     }
 }

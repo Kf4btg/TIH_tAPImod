@@ -1,3 +1,8 @@
+1.1.2
+    -   Added Categories:
+        -   Potion (separate from other consumables), Block, Brick, Wood, Tool, Special (boss summon, stat increase items) Misc_Materials (that fail to fit any other category)
+        -   tweaked Seed, many other categories & sort order.
+
 Version 1.1.1+tr14a
     -   Added new Categories, all pulled out of the "tile" category:
         -   Mechanism, crafting station, light sources, furniture, statues, wall decoration, banners, decorative clutter

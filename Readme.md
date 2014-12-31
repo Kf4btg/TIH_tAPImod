@@ -51,83 +51,83 @@ A few details on the defined categories presented in the order in which they wil
   2.  __Axes/Chainsaws__
    - For murdering trees (you monster).
   2.  __Hammers__
-		- "Mr. Redigit, tear down this wall!"
+	- "Mr. Redigit, tear down this wall!"
   2.  __Tools (other)__
-		- Non-pick/axe/hammer useful things, e.g. bug net, fishing poles, ropes, glowsticks, ...
+   - Non-pick/axe/hammer useful things, e.g. bug net, fishing poles, ropes, glowsticks, ...
   2.  __Mechanisms__
-		- Wire, switches, wrenches, most anything related to the wiring system. And minecart tracks.
+   - Wire, switches, wrenches, most anything related to the wiring system. And minecart tracks.
   2.  __Melee Weapons__
-		- Swords, Flails, Spears. The classics. (Also boomerangs).
+   - Swords, Flails, Spears. The classics. (Also boomerangs).
   2.  __Ranged Weapons__
-		- Bows, guns, shurikens--anything that keeps you out of poking distance.
+   - Bows, guns, shurikens--anything that keeps you out of poking distance.
   2.  __Bombs__
-		- Grenades, bombs, dynamite, et al. Boom.
+   - Grenades, bombs, dynamite, et al. Boom.
   2.  __Ammo__
-		- Because throwing your gun at enemies is surprisingly ineffective.
+   - Because throwing your gun at enemies is surprisingly ineffective.
   2.  __Magic Weapons__
-		- Wizard.
+   - Wizard.
   2.  __Summoning Weapons__
-		- Minions of all magnitudes.
+   - Minions of all magnitudes.
   2.  __Pets__
-		- Faithful and useless companions (though some produce light).
+   - Faithful and useless companions (though some produce light).
   2.  __Head Armor__
-		- For keeping your wits about you.
+   - For keeping your wits about you.
   2.  __Body Armor__
-		- For seriously tough torsos.
+   - For seriously tough torsos.
   2.  __Leg Armor__
-		- For preventing scuffed knees.
+   - For preventing scuffed knees.
   2.  __Accessories__
-		- For feeling fabulous.
+   - For feeling fabulous.
   2.  __Vanity Items__
-		- For looking glamorous.
+   - For looking glamorous.
   2.  __Potions__
-		- All things quaffable.
+   - All things quaffable.
   2.  __Consumables__
-		- One time use stuff that you don't drink (includes food).
+   - One time use stuff that you don't drink (includes food).
   2.  __Bait__
-		- Worms, fireflies, Master Bait, enough said.
+   - Worms, fireflies, Master Bait, enough said.
   2.  __Dyes__
-		- Color is the spice of life. I think.
+   - Color is the spice of life. I think.
   2.  __Paint__
-		- For when you grow tired of brown and grey.
+   - For when you grow tired of brown and grey.
   2.  __Ores__
-		- Those rocks with "Ore" in their name. Also obsidian, hellstone, meteorite.
+   - Those rocks with "Ore" in their name. Also obsidian, hellstone, meteorite.
   2.  __Metal Bars__
-		- The above rocks made useful.
+   - The above rocks made useful.
   2.  __Gems__
-		- All the shiny stones you can dig up. Also amber.
+   - All the shiny stones you can dig up. Also amber.
   2.  __Seeds__
-		- Herb, grass, and pumpkin seeds; acorns.
+   - Herb, grass, and pumpkin seeds; acorns.
   2.  __Light Sources__
-		- Torches, candles, lamps, etc. (not glowsticks)
+   - Torches, candles, lamps, etc. (not glowsticks)
   2.  __Crafting Stations__
-		- From workbenches to kegs to the AutoHammer.
+   - From workbenches to kegs to the AutoHammer.
   2.  __Furniture__
-		- All household objects and containers (chests) not used for crafting.
+   - All household objects and containers (chests) not used for crafting.
   2.  __Statues__
-		- Statues (obviously); also gravestones & the bubble machine.
+   - Statues (obviously); also gravestones & the bubble machine.
   2.  __Wall Decorations__
-		- Paintings, trophies, a few other things.
+   - Paintings, trophies, a few other things.
   2.  __Banners__
-		- Both found and dropped by NPCs.
+   - Both found and dropped by NPCs.
   2.  __Decorative Clutter__
-		- bowls, books, bottles, beer, etc
+   - bowls, books, bottles, beer, etc
   2.  __Wood__
-		- Raw dead trees, all varieties.
+   - Raw dead trees, all varieties.
   2.  __Blocks__
-		- e.g. dirt, stone, sand, etc.
+   - e.g. dirt, stone, sand, etc.
   2.  __Bricks__
-		- Fancy blocks.
+   - Fancy blocks.
   2.  __Tiles__
-		- All other placeable items that do not fall into one of the above categories
+   - All other placeable items that do not fall into one of the above categories
   2.  __Walls__
-		- Universally reviled by hammers.
+   - Universally reviled by hammers.
   2.  __Miscellaneous Materials__
-		- If you can't eat it, wear it, throw it, shoot it, or build your house out of it--but you *can* make it into something else--it'll end up here. Think herbs, goblin cloth, rotten chunks, etc.
+   - If you can't eat it, wear it, throw it, shoot it, or build your house out of it--but you *can* make it into something else--it'll end up here. Think herbs, goblin cloth, rotten chunks, etc.
   2.  __Special Items__
-		- Boss summoning items, heart and mana crystals.
+   - Boss summoning items, heart and mana crystals.
   2.  __Other__
-		- If, somehow, something doesn't fit ANY of the above categories, you'll find it here. Umbrellas are a Vanilla example; unique mod items may land here for now. Further revisions to categories could move these items up the list at any item.
+   - If, somehow, something doesn't fit ANY of the above categories, you'll find it here. Umbrellas are a Vanilla example; unique mod items may land here for now. Further revisions to categories could move these items up the list at any item.
 
 #### License
   This mod was created by wuli1986(a)forums.terraria.org/Kf4btg(a)GitHub. This mod is released as open source, and you are free to modify it or use pieces of it in your own personal project. You may NOT re-release this mod in its original form or with only minor modifications and claim it as your own.  Any use you make of this mod or any mod designed for tAPI is subject to the terms of use defined by Re-Logic and the tAPI developers.

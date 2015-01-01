@@ -164,21 +164,38 @@ namespace InvisibleHand
         /******************************************************
         *   MoveItem - moves a single item to a different container
         *
-        *   @return >=0 : index in container where item was placed/stacked
-        *            -1 : failed to move item or some stack remains
-        *            -2 : item passed was blank
+        *    @param item : the item to move
+        *    @param container: where to move the item
+        *    
+        *    @param rangeStart, rangeEnd : first and last index to consider eligigible
+        *        move destinations in the target container.
+        *    @param desc : whether to move item to end of container rather than beginning
+        *
+        *    @return >=0 : index in container where item was placed/stacked
+        *             -1 : failed to move item or some stack remains
+        *             -2 : item passed was blank
         */
-        public static int MoveItem(ref Item item, Item[] container)
+        public static int MoveItem(ref Item item, Item[] container, bool desc = false)
         {
-            return MoveItem(ref item, container, 0, container.Length -1);
+            return MoveItem(ref item, container, 0, container.Length -1, desc);
         }
 
-        public static int MoveItem(ref Item item, Item[] container, int rangeStart, int rangeEnd)
+        public static int MoveItem(ref Item item, Item[] container, int rangeStart, int rangeEnd, bool desc = false)
         {
             if (item.IsBlank()) return -2;
 
+            int iStart = rangeStart;
+            Func<int,bool> iCheck = i => i <= rangeEnd;
+            Func<int,int> iNext = i => i+1;
+
+            if (desc){
+                iStart = rangeEnd;
+                iCheck = i => i >= rangeStart;
+                iNext  = i => i-1;
+            }
+
             //search container for matching non-maxed stacks
-            for (int j=rangeStart; j<=rangeEnd; j++)
+            for (int j=iStart; iCheck(j); j=iNext(j))
             {
                 Item item2 = container[j];
 
@@ -193,7 +210,7 @@ namespace InvisibleHand
                 }
 
                 //move remainder of stack to first empty slot
-                for (int k=rangeStart; k<=rangeEnd; k++)
+                for (int k=iStart; iCheck(k); k=iNext(k))
                 {
                     if (container[k].IsBlank())
                     {

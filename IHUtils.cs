@@ -26,50 +26,21 @@ namespace InvisibleHand
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
 
-            //flag for playing the sound
-            bool moveSuccess = false;
-
-            //regular chest
-            if (player.chest >= 0)
+            // iterate through the player's inventory in reverse
+            for (int i=R_START; i >= R_END; i--)
             {
-                // iterate through the player's inventory in reverse
-                for (int i=R_START; i >= R_END; i--)
+                // returned index
+                int? retIdx = IHUtils.MoveItem(ref player.inventory[i], player.chestItems);
+                if (retIdx.HasValue)
                 {
-                    // returned index
-                    int retIdx = MoveItem(ref player.inventory[i], Main.chest[player.chest].item);
-                    if (retIdx >= 0 ) // item/entire stack successfully moved
-                    {
-                        player.inventory[i] = new Item();
-                        if (!moveSuccess) moveSuccess=true; //toggle success flag
-
-                        SendNetMessage(retIdx); //only for non-bank chest
-                    }
-                }//\inv iteration
-
-                Main.ChestCoins();
-            }
-
-            // one of the banks
-            else
-            {
-                for (int i=R_START; i >= R_END; i--)
-                {
-                    if (MoveItem(ref player.inventory[i],
-                                player.chest == -3 ? player.bank2.item : player.bank.item) >= 0 )
-                    {
-                        player.inventory[i] = new Item();
-                        if (!moveSuccess) moveSuccess=true; //toggle success flag
-                    }
-                }//\inv iteration
-
-                Main.BankCoins();
-
-            } //\depositing items
-
-            // play sound if deposit was at least somewhat successful
-            if (moveSuccess) {
-                RingBell(); }
-
+                    RingBell(); //some movement occurred
+                    // if whole stack moved, empty item slot
+                    if ((int)retIdx>=0) player.inventory[i] = new Item();
+                    //only for non-bank chest
+                    if (player.chest>=0) SendNetMessage((int)retIdx);
+                }
+            }//\inv iteration
+            player.chest < -1 ? Main.BankCoins() : Main.ChestCoins();
         } //\DoDepositAll()
 #endregion
 
@@ -80,23 +51,16 @@ namespace InvisibleHand
         public static void DoLootAll(Player player)
         {
             //this shouldn't happen if method is called correctly
-            if (player.chest == -1) {return;}
+            if (player.chest == -1) return;
 
-            //regular chest
-            if (player.chest >= 0 )
-            {
-                LootAll(player, Main.chest[player.chest].item, true);
-            }
-            else //should be one of the banks
-            {
-                LootAll(player, player.chest == -3 ? player.bank2.item : player.bank.item);
-            }
+            // welp
+            LootAll(player, player.chestItems, player.chest >= 0);
         } // \DoLootAll()
 
 		/********************************************************
         *   LootAll
         */
-        private static void LootAll(Player player, Item[] container, bool sendMessage = false)
+        private static void LootAll(Player player, Item[] container, bool sendMessage)
         {
             for (int i=0; i<Chest.maxItems; i++)
             {
@@ -107,8 +71,7 @@ namespace InvisibleHand
                     // ok I have no idea what this does but it's part of the original
                     // loot-all code so I added it as well.
                     if (sendMessage) SendNetMessage(i);
-                }
-            }
+                }}
         } // \LootAll()
 #endregion
 
@@ -118,45 +81,29 @@ namespace InvisibleHand
         */
         public static void DoQuickStack(Player player)
         {
-            //regular chest
-            if (player.chest >= 0)
-            {
-                QuickStack(player, Main.chest[player.chest].item, true);
-                Main.ChestCoins();
-            }
-            else
-            {  //do the same for the banks
-                QuickStack(player, player.chest == -3 ? player.bank2.item : player.bank.item);
-                Main.BankCoins();
-            }
+            if (player.chest == -1) return;
+            QuickStack(player, player.chestItems, player.chest >= 0);
+            player.chest >= 0 ? Main.ChestCoins() : Main.BankCoins();
         }//\DoQuickStack()
 
-        private static void QuickStack(Player player, Item[] container, bool sendMessage = false)
+        private static void QuickStack(Player player, Item[] container, bool sendMessage)
         {
-
             for (int i=0; i<Chest.maxItems; i++)
             {
                 //if chest item is not blank && not a full stack:
                 if (!container[i].IsBlank() && container[i].stack < container[i].maxStack)
                 {
                     //for each item in inventory (including coins, ammo, hotbar):
-                    for (int j=0; j<58; j++)
-                    {
-                        //if chest item matches inv. item:
-                        if (container[i].IsTheSameAs(player.inventory[j]))
-                        {
-                            // merge inv. item stack to chest item stack
-                            if (StackMerge(ref player.inventory[j], ref container[i]))
-                            {
-                                player.inventory[j] = new Item();
-
-                                RingBell();
-                                if (sendMessage) SendNetMessage(i);
-                            }
-                        }
-                    }
-                }
-            }
+                    for (int j=0; j<58; j++) {
+                        //if chest item matches inv. item, then...
+                        if (container[i].IsTheSameAs(player.inventory[j])
+                            // ...merge inv. item stack to chest item stack
+                        && StackMerge(ref player.inventory[j], ref container[i]))
+                        {   // reset slot if all stack removed
+                            player.inventory[j] = new Item();
+                            RingBell();
+                            if (sendMessage) SendNetMessage(i);
+                        }}}}
         }//\QuickStack()
 #endregion
 
@@ -166,48 +113,44 @@ namespace InvisibleHand
         *
         *    @param item : the item to move
         *    @param container: where to move the item
-        *    
+        *
         *    @param rangeStart, rangeEnd : first and last index to consider eligigible
         *        move destinations in the target container.
         *    @param desc : whether to move item to end of container rather than beginning
         *
         *    @return >=0 : index in container where item was placed/stacked
-        *             -1 : failed to move item or some stack remains
-        *             -2 : item passed was blank
+        *             <0 : some stack remains (returned value is difference between initial
+        *                    stack and current stack)
+        *             null : item passed was blank or failed to move item
         */
-        public static int MoveItem(ref Item item, Item[] container, bool desc = false)
+        public static int? MoveItem(ref Item item, Item[] container, bool desc = false)
         {
             return MoveItem(ref item, container, 0, container.Length -1, desc);
         }
 
-        public static int MoveItem(ref Item item, Item[] container, int rangeStart, int rangeEnd, bool desc = false)
+        public static int? MoveItem(ref Item item, Item[] container, int rangeStart, int rangeEnd, bool desc = false)
         {
-            if (item.IsBlank()) return -2;
+            if (item.IsBlank()) return null;
 
             int iStart = rangeStart;
             Func<int,bool> iCheck = i => i <= rangeEnd;
             Func<int,int> iNext = i => i+1;
 
-            if (desc){
+            if (desc) {
                 iStart = rangeEnd;
                 iCheck = i => i >= rangeStart;
-                iNext  = i => i-1;
-            }
+                iNext  = i => i-1; }
 
+            int preStack = item.stack;
             //search container for matching non-maxed stacks
-            for (int j=iStart; iCheck(j); j=iNext(j))
-            {
+            for (int j=iStart; iCheck(j); j=iNext(j)){
                 Item item2 = container[j];
 
                 // found a non-empty slot containing a <full stack of the same item type
-                if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
-                {
-                    if (StackMerge(ref item, ref item2))
-                    {
-                        // item = new Item();
-                        return j;  //if item's stack was reduced to 0
-                    }
-                }
+                if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack
+                && //then
+                StackMerge(ref item, ref item2))
+                    return j;  //if item's stack was reduced to 0
 
                 //move remainder of stack to first empty slot
                 for (int k=iStart; iCheck(k); k=iNext(k))
@@ -217,13 +160,10 @@ namespace InvisibleHand
                         container[k] = item.Clone();
                         // item = new Item();
                         return k;
-                    }
-                }
-            }
+                    }}}
 
             //unable to move item/entire stack to container
-            return -1;
-
+            return preStack==item.stack ? null : (int?)item.stack-preStack ;
         }//\MoveItem()
 
         // Moves as much of itemSrc.stack to itemDest.stack as possible.
@@ -241,9 +181,9 @@ namespace InvisibleHand
         }
 
         //plays the "item moved" sound
-        public static void RingBell()
+        public static void RingBell(int o1 = -1, int o2 = -1, int o3 = 1)
         {
-            Main.PlaySound(7, -1, -1, 1);
+            Main.PlaySound(7, o1, o2, o3);
         }
 
         // calls the NetMessage.sendData method for the current chest
@@ -254,10 +194,7 @@ namespace InvisibleHand
             {
                 NetMessage.SendData(32, -1, -1, "", Main.localPlayer.chest, (float)index, 0, 0, 0);
             }
-
         }
 #endregion
-
     }// \class
-
 }

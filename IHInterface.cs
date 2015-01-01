@@ -66,22 +66,39 @@ namespace InvisibleHand
                 }
                 else if (slot.type == "Chest")
                 {
-                    Item cItem = slot.MyItem;
-
-                    // MoveItem returns true if original item ends up empty
-                    if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
-                        MoveChestSlotItem(ref slot, 50, 53))) return false;
-
-                    if (cItem.Matches(ItemCat.AMMO) &&
-                        MoveChestSlotItem(ref slot, 54, 57)) return false;
-
-                    MoveChestSlotItem(ref slot, 0, 49);
+                    MoveSlotItem(ref slot);
+                    // Item cItem = slot.MyItem;
+                    //
+                    // // MoveItem returns true if original item ends up empty
+                    // if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
+                    //     MoveChestSlotItem(ref slot, 50, 53))) return false;
+                    //
+                    // if (cItem.Matches(ItemCat.AMMO) &&
+                    //     MoveChestSlotItem(ref slot, 54, 57)) return false;
+                    //
+                    // MoveChestSlotItem(ref slot, 0, 49);
 
                     // Main.PlaySound(7, -1, -1, 1);
                     // slot.MyItem = cItem;
                 }
                 return false;
             }
+            if (Main.craftGuide)
+            {
+                if (Main.guideItem.IsBlank() && (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo"))
+                {
+                    Main.PlaySound(7, -1, -1, 1);
+                    Main.guideItem = slot.MyItem.Clone();
+                    slot.MyItem = new Item();
+                    return false;
+                }
+                if (!Main.guideItem.IsBlank() && (slot.type == "CraftGuide"))
+                {
+                    if (MoveSlotItem(ref slot)) Recipe.FindRecipes();
+                }
+                return false;
+            }
+
             return true;
         }
 
@@ -104,11 +121,6 @@ namespace InvisibleHand
         /**************************************************************
         *   returns true if item moved/itemstack emptied
         */
-        // MoveChestSlotItem - moves item from chest slot to player inventory
-        public static bool MoveChestSlotItem(ref ItemSlot slot, int ixStart, int ixStop)
-        {
-            return MoveSlotItem(ref slot, Main.localPlayer.inventory, ixStart, ixStop, true);
-        }
 
         // move item from player inventory slot to chest
         public static bool MovePlayerSlotItem(ref ItemSlot slot)
@@ -116,12 +128,36 @@ namespace InvisibleHand
             return MoveSlotItem(ref slot, Main.localPlayer.chestItems, 0, Chest.maxItems);
         }
 
+        // move craft guide item to player inventory
+        // public static bool MoveGuideSlotItem(ref ItemSlot slot)
+        // {
+        //     return MoveSlotItem
+        // }
+
+        // MoveChestSlotItem - moves item from chest/guide slot to player inventory
+        public static bool MoveSlotItem(ref ItemSlot slot)
+        {
+            Item cItem = slot.MyItem;
+
+            // MoveItem returns true if original item ends up empty
+            if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
+            MoveSlotItem(ref slot, Main.localPlayer.inventory, 50, 53, true))) return false;
+
+            if (cItem.Matches(ItemCat.AMMO) &&
+            MoveSlotItem(ref slot, Main.localPlayer.inventory, 54, 57, true)) return false;
+            //else:
+            MoveSlotItem(ref slot, Main.localPlayer.inventory,  0, 49, true);
+
+
+            // return MoveSlotItem(ref slot, Main.localPlayer.inventory, ixStart, ixStop, true);
+        }
+
         public static bool MoveSlotItem(ref ItemSlot slot, Item[] container, int ixStart, int ixStop, bool desc=false)
         {
             int? retIdx = IHUtils.MoveItem(ref slot.MyItem, container, ixStart, ixStop, desc);
             if (retIdx.HasValue)
             {   //some movement occurred
-                IHUtils.RingBell();
+                Main.PlaySound(7, -1, -1, 1);
 
                 // if whole stack moved, empty item slot
                 if ((int)retIdx>=0) {

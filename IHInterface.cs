@@ -7,7 +7,7 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public class IHInterface : ModInterface
+    public class IHInterface : ModInterface 
     {
         // private Texture2D lockedIcon = null;
 
@@ -46,59 +46,60 @@ namespace InvisibleHand
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
         {
             if (!(bool)IHBase.self.options["enableShiftMove"].Value) return true;
-            if (!(slot.modBase == null && release && KState.Special.Shift.Down())) return true;
 
-            if (Main.localPlayer.chestItems != null)
+            if (slot.modBase == null && release && KState.Special.Shift.Down())
             {
-                if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
+                if (Main.localPlayer.chestItems != null)
                 {
-                    MovePlayerSlotItem(ref slot);
+                    if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
+                    {
+                        MovePlayerSlotItem(ref slot);
 
-                    // Item pItem = slot.MyItem;
-                    // int? retIdx = IHUtils.MoveItem(ref pItem, Main.localPlayer.chestItems);
-                    // if (retIdx.HasValue)
-                    // {//some movement occurred
-                    //     Main.PlaySound(7, -1, -1, 1);
-                    //     if ((int)retIdx>=0) slot.MyItem = new Item();
-                    // }
-                    // Main.PlaySound(7, -1, -1, 1);
-                    // slot.MyItem = myItem;
-                }
-                else if (slot.type == "Chest")
-                {
-                    MoveSlotItem(ref slot);
-                    // Item cItem = slot.MyItem;
-                    //
-                    // // MoveItem returns true if original item ends up empty
-                    // if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
-                    //     MoveChestSlotItem(ref slot, 50, 53))) return false;
-                    //
-                    // if (cItem.Matches(ItemCat.AMMO) &&
-                    //     MoveChestSlotItem(ref slot, 54, 57)) return false;
-                    //
-                    // MoveChestSlotItem(ref slot, 0, 49);
+                        // Item pItem = slot.MyItem;
+                        // int? retIdx = IHUtils.MoveItem(ref pItem, Main.localPlayer.chestItems);
+                        // if (retIdx.HasValue)
+                        // {//some movement occurred
+                        //     Main.PlaySound(7, -1, -1, 1);
+                        //     if ((int)retIdx>=0) slot.MyItem = new Item();
+                        // }
+                        // Main.PlaySound(7, -1, -1, 1);
+                        // slot.MyItem = myItem;
+                    }
+                    else if (slot.type == "Chest")
+                    {
+                        MoveSlotItem(ref slot);
+                        // Item cItem = slot.MyItem;
+                        //
+                        // // MoveItem returns true if original item ends up empty
+                        // if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
+                        //     MoveChestSlotItem(ref slot, 50, 53))) return false;
+                        //
+                        // if (cItem.Matches(ItemCat.AMMO) &&
+                        //     MoveChestSlotItem(ref slot, 54, 57)) return false;
+                        //
+                        // MoveChestSlotItem(ref slot, 0, 49);
 
-                    // Main.PlaySound(7, -1, -1, 1);
-                    // slot.MyItem = cItem;
-                }
-                return false;
-            }
-            if (Main.craftGuide)
-            {
-                if (Main.guideItem.IsBlank() && (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo"))
-                {
-                    Main.PlaySound(7, -1, -1, 1);
-                    Main.guideItem = slot.MyItem.Clone();
-                    slot.MyItem = new Item();
+                        // Main.PlaySound(7, -1, -1, 1);
+                        // slot.MyItem = cItem;
+                    }
                     return false;
                 }
-                if (!Main.guideItem.IsBlank() && (slot.type == "CraftGuide"))
+                if (Main.craftGuide)
                 {
-                    if (MoveSlotItem(ref slot)) Recipe.FindRecipes();
+                    if (Main.guideItem.IsBlank() && (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo"))
+                    {
+                        Main.PlaySound(7, -1, -1, 1);
+                        Main.guideItem = slot.MyItem.Clone();
+                        slot.MyItem = new Item();
+                    }
+                    else if (!Main.guideItem.IsBlank() && slot.type == "CraftGuide")
+                    {
+                        MoveSlotItem(ref slot);
+                        // if (MoveSlotItem(ref slot)) Recipe.FindRecipes();
+                    }
+                    return false;
                 }
-                return false;
             }
-
             return true;
         }
 
@@ -128,28 +129,21 @@ namespace InvisibleHand
             return MoveSlotItem(ref slot, Main.localPlayer.chestItems, 0, Chest.maxItems);
         }
 
-        // move craft guide item to player inventory
-        // public static bool MoveGuideSlotItem(ref ItemSlot slot)
-        // {
-        //     return MoveSlotItem
-        // }
-
         // MoveChestSlotItem - moves item from chest/guide slot to player inventory
         public static bool MoveSlotItem(ref ItemSlot slot)
         {
             Item cItem = slot.MyItem;
 
+            if (cItem.IsBlank()) return false;
+
             // MoveItem returns true if original item ends up empty
-            if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
-            MoveSlotItem(ref slot, Main.localPlayer.inventory, 50, 53, true))) return false;
+            if (cItem.Matches(ItemCat.COIN) &&
+            MoveSlotItem(ref slot, Main.localPlayer.inventory, 50, 53, true)) return true;
 
             if (cItem.Matches(ItemCat.AMMO) &&
-            MoveSlotItem(ref slot, Main.localPlayer.inventory, 54, 57, true)) return false;
-            //else:
-            MoveSlotItem(ref slot, Main.localPlayer.inventory,  0, 49, true);
+            MoveSlotItem(ref slot, Main.localPlayer.inventory, 54, 57, true)) return true;
 
-
-            // return MoveSlotItem(ref slot, Main.localPlayer.inventory, ixStart, ixStop, true);
+            return MoveSlotItem(ref slot, Main.localPlayer.inventory,  0, 49, true);
         }
 
         public static bool MoveSlotItem(ref ItemSlot slot, Item[] container, int ixStart, int ixStop, bool desc=false)
@@ -166,9 +160,6 @@ namespace InvisibleHand
                 }
             }
             return false;
-
-            // if (IHUtils.DoMoveItem())
-            // return false;
         }
 
         // public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)

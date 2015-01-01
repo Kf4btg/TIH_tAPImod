@@ -29,16 +29,19 @@ namespace InvisibleHand
             // iterate through the player's inventory in reverse
             for (int i=R_START; i >= R_END; i--)
             {
+
+                DoMoveItem(player.inventory, i, player.chestItems, player.chest>=0);
+
                 // returned index
-                int? retIdx = IHUtils.MoveItem(ref player.inventory[i], player.chestItems);
-                if (retIdx.HasValue)
-                {
-                    RingBell(); //some movement occurred
-                    // if whole stack moved, empty item slot
-                    if ((int)retIdx>=0) player.inventory[i] = new Item();
-                    //only for non-bank chest
-                    if (player.chest>=0) SendNetMessage((int)retIdx);
-                }
+                // int? retIdx = IHUtils.MoveItem(ref player.inventory[i], player.chestItems);
+                // if (retIdx.HasValue)
+                // {
+                //     RingBell(); //some movement occurred
+                //     // if whole stack moved, empty item slot
+                //     if ((int)retIdx>=0) player.inventory[i] = new Item();
+                //     //only for non-bank chest
+                //     if (player.chest>=0) SendNetMessage((int)retIdx);
+                // }
             }//\inv iteration
             player.chest < -1 ? Main.BankCoins() : Main.ChestCoins();
         } //\DoDepositAll()
@@ -96,14 +99,14 @@ namespace InvisibleHand
                     //for each item in inventory (including coins, ammo, hotbar):
                     for (int j=0; j<58; j++) {
                         //if chest item matches inv. item, then...
-                        if (container[i].IsTheSameAs(player.inventory[j])
+                        if (container[i].IsTheSameAs(player.inventory[j]) &&
                             // ...merge inv. item stack to chest item stack
-                        && StackMerge(ref player.inventory[j], ref container[i]))
-                        {   // reset slot if all stack removed
-                            player.inventory[j] = new Item();
-                            RingBell();
-                            if (sendMessage) SendNetMessage(i);
-                        }}}}
+                            StackMerge(ref player.inventory[j], ref container[i]))
+                            {   // reset slot if all stack removed
+                                player.inventory[j] = new Item();
+                                RingBell();
+                                if (sendMessage) SendNetMessage(i);
+                            }}}}
         }//\QuickStack()
 #endregion
 
@@ -119,8 +122,10 @@ namespace InvisibleHand
         *    @param desc : whether to move item to end of container rather than beginning
         *
         *    @return >=0 : index in container where item was placed/stacked
-        *             <0 : some stack remains (returned value is difference between initial
-        *                    stack and current stack)
+        *             <0 : some stack remains (returned value is this:
+                            let x = index in container where MoveItem most recently transferred items from the source stack
+                            return value = -(x+1)   // done to prevent ambiguous return value of 0
+                            (e.g return value of -7 means container[6] now holds items from this stack)
         *             null : item passed was blank or failed to move item
         */
         public static int? MoveItem(ref Item item, Item[] container, bool desc = false)
@@ -141,29 +146,42 @@ namespace InvisibleHand
                 iCheck = i => i >= rangeStart;
                 iNext  = i => i-1; }
 
-            int preStack = item.stack;
-            //search container for matching non-maxed stacks
-            for (int j=iStart; iCheck(j); j=iNext(j)){
-                Item item2 = container[j];
-
-                // found a non-empty slot containing a <full stack of the same item type
-                if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack
-                && //then
-                StackMerge(ref item, ref item2))
-                    return j;  //if item's stack was reduced to 0
-
-                //move remainder of stack to first empty slot
-                for (int k=iStart; iCheck(k); k=iNext(k))
+            int stackIndex=-1;
+            if (item.maxStack > 1)
+            {
+                //search container for matching non-maxed stacks
+                for (int j=iStart; iCheck(j); j=iNext(j))
                 {
-                    if (container[k].IsBlank())
-                    {
-                        container[k] = item.Clone();
-                        // item = new Item();
-                        return k;
-                    }}}
+                    Item item2 = container[j];
 
-            //unable to move item/entire stack to container
-            return preStack==item.stack ? null : (int?)item.stack-preStack ;
+                    // found a non-empty slot containing a <full stack of the same item type
+                    if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
+                    {
+                        if (StackMerge(ref item, ref item2)) return j;  //if item's stack was reduced to 0
+                        stackIndex = j+1; //otherwise, store this index
+                    }
+                } // if we don't return in this loop, still have some stack remaining
+            }
+
+            // reaching here means item is not stackable, or still have some stack left
+            // So move item/remainder of stack to first empty slot
+            for (int k=iStart; iCheck(k); k=iNext(k))
+            {
+                if (container[k].IsBlank())
+                {
+                    container[k] = item.Clone();
+                    // item = new Item();
+                    return k;
+                }
+            }
+            // and if we're here, we couldn't find an empty slot for it
+
+            // if stackIndex is still -1, this is either not a stackable item
+            // or there were no available matching stacks, so return
+            // null to indicate that no movement whatsoever occurred.
+            // Otherwise, some of the stack was transferred, so indicate this by
+            // returning the negated value of stackIndex.
+            return stackIndex < 0 ? null : (int?)-stackIndex ;
         }//\MoveItem()
 
         /********************************************************
@@ -171,30 +189,34 @@ namespace InvisibleHand
         *   @param source
             @param iSource : index of the item in source
             @param dest
-            @param destIsBank : is the destination container a regular chest (i.e. not
+            @param toChest : is the destination container a regular chest (i.e. not
                 one of the global "banks", and not the player inventory)?
 
             @return : True if item was (entirely) removed from source; otherwise false.
         */
 
-        public static bool DoMoveItem(Item[] source, int iSource, Item[] dest, bool destIsChest = false, bool desc = false)
+        public static bool DoMoveItem(Item[] source, int iSource, Item[] dest, bool toChest = false, bool desc = false)
         {
-            return DoMoveItem(source, iSource, dest, 0, dest.Length -1, destIsChest, desc);
+            return DoMoveItem(source, iSource, dest, 0, dest.Length -1, toChest, desc);
         }
 
 
-        public static bool DoMoveItem(Item[] source, int iSource, Item[] dest, int rangeStart, int rangeEnd, bool destIsChest = false, bool desc = false)
+        public static bool DoMoveItem(Item[] source, int iSource, Item[] dest, int rangeStart, int rangeEnd, bool toChest = false, bool desc = false)
         {
             int? retIdx = IHUtils.MoveItem(ref source[iSource], dest, rangeStart, rangeEnd, desc);
             if (retIdx.HasValue)
             {   //some movement occurred
                 RingBell();
-                //only for non-bank chest
-                if (destIsChest) SendNetMessage((int)retIdx);
+
+                if ((int)retIdx<0) { //some stack left
+                    if (toChest) SendNetMessage(-1-(int)retIdx); // -1-retIdx extracts the positive, 0-based index
+                }
 
                 // if whole stack moved, empty item slot
-                if ((int)retIdx>=0) {
+                else { //((int)retIdx>=0) {
                     source[iSource] = new Item();
+                    //only for non-bank chest
+                    if (toChest) SendNetMessage((int)retIdx);
                     return true;
                 }
             }

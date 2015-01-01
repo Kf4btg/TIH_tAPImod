@@ -16,9 +16,14 @@ namespace InvisibleHand
         {
             foreach (ItemCat catID in CategoryDef.CheckOrder)
             {
-                if (CategoryDef.Categories[catID].Invoke(item)) { return catID; }
+                if (CategoryDef.Categories[catID].Invoke(item)) return catID;
             }
             return ItemCat.OTHER;
+        }
+
+        public static bool Matches(this Item item, ItemCat isCategory)
+        {
+            return CategoryDef.Categories[isCategory].Invoke(item);
         }
 
         public static bool IsHook(this Item item)
@@ -204,7 +209,7 @@ namespace InvisibleHand
             Categories.Add( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
             Categories.Add( ItemCat.VANITY,		item 	=> (item.vanity || item.headSlot!=-1 || item.bodySlot!=-1 || item.legSlot!=-1) && item.defense==0 ); //catch the non-armor
             // for some reason, all vanilla potions have w=14, h=24. Food, ale, etc. are all different.
-            Categories.Add( ItemCat.POTION, 	item   	=> Categories[ItemCat.CONSUME].Invoke(item) && item.width==14 && item.height==24 );
+            Categories.Add( ItemCat.POTION, 	item   	=> item.Matches(ItemCat.CONSUME) && item.width==14 && item.height==24 );
             Categories.Add( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1
                                                         && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
 
@@ -224,7 +229,7 @@ namespace InvisibleHand
             Categories.Add( ItemCat.CLUTTER, 	item   	=> TileGroupClutter.Contains(item.createTile) );
             Categories.Add( ItemCat.WOOD,       item    => ItemDef.itemGroups["g:Wood"].Contains(item) );
             Categories.Add( ItemCat.BLOCK,   	item   	=> item.createTile != -1 && item.width==12 && item.height==12 && item.value==0 );
-            Categories.Add( ItemCat.BRICK,   	item   	=> Categories[ItemCat.BLOCK].Invoke(item) && (item.name.EndsWith("Brick")
+            Categories.Add( ItemCat.BRICK,   	item   	=> item.Matches(ItemCat.BLOCK) && (item.name.EndsWith("Brick")
                                                             || item.name.EndsWith("Slab") || item.name.EndsWith("Plating")) );
 
 

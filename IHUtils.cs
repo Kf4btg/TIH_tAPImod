@@ -166,10 +166,47 @@ namespace InvisibleHand
             return preStack==item.stack ? null : (int?)item.stack-preStack ;
         }//\MoveItem()
 
+        /********************************************************
+        *   MoveItemHandler
+        *   @param source
+            @param iSource : index of the item in source
+            @param dest
+            @param destIsBank : is the destination container a regular chest (i.e. not
+                one of the global "banks", and not the player inventory)?
+
+            @return : True if item was (entirely) removed from source; otherwise false.
+        */
+
+        public static bool DoMoveItem(Item[] source, int iSource, Item[] dest, bool destIsChest = false, bool desc = false)
+        {
+            return DoMoveItem(source, iSource, dest, 0, dest.Length -1, destIsChest, desc);
+        }
+
+
+        public static bool DoMoveItem(Item[] source, int iSource, Item[] dest, int rangeStart, int rangeEnd, bool destIsChest = false, bool desc = false)
+        {
+            int? retIdx = IHUtils.MoveItem(ref source[iSource], dest, rangeStart, rangeEnd, desc);
+            if (retIdx.HasValue)
+            {   //some movement occurred
+                RingBell();
+                //only for non-bank chest
+                if (destIsChest) SendNetMessage((int)retIdx);
+
+                // if whole stack moved, empty item slot
+                if ((int)retIdx>=0) {
+                    source[iSource] = new Item();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /******************************************************
         // Moves as much of itemSrc.stack to itemDest.stack as possible.
         // Returns true if itemSrc.stack is reduced to 0; false otherwise.
         // Does not check for item equality or existence of passed items;
         // that must be ensured by the calling method.
+        */
         public static bool StackMerge(ref Item itemSrc, ref Item itemDest)
         {
             int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);

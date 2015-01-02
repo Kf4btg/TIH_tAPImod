@@ -52,6 +52,7 @@ namespace InvisibleHand
         /********************************************************
         *   DoLootAll
         */
+
         public static void DoLootAll(Player player)
         {
             //this shouldn't happen if method is called correctly
@@ -64,6 +65,7 @@ namespace InvisibleHand
 
 		/********************************************************
         *   LootAll
+        *   !ref:Main:#22272.00#
         */
         private static void LootAll(Player player, Item[] container, bool sendMessage)
         {
@@ -146,7 +148,7 @@ namespace InvisibleHand
         //for chest->player
         public static int MoveItemC2P(ref Item item, Item[] inventory, int rangeStart, int rangeEnd, bool desc = true)
         {
-            if (item.IsBlank()) return -3;
+            if (item.stack<=0) return -3;
 
             int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
 
@@ -195,7 +197,7 @@ namespace InvisibleHand
         //for player->chest
         public static int MoveItemP2C(ref Item item, Item[] container, Action doCoins, bool sendMessage=true, bool desc = false)
         {
-            if (item.IsBlank()) return -3;
+            if (item.stack<=0) return -3;
 
             int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
 
@@ -308,6 +310,16 @@ namespace InvisibleHand
             doCoins();
             // return true to indicate stack has been emptied
             return itemSrc.IsBlank();
+        }
+
+        //this one returns the amount transferred
+        public static int StackMergeD(ref Item itemSrc, ref Item itemDest)
+        {
+            int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
+            itemDest.stack += diff;
+            itemSrc.stack  -= diff;
+            
+            return diff;
         }
 
         //plays the "item moved" sound

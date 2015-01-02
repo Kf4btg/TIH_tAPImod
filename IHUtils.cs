@@ -86,6 +86,10 @@ namespace InvisibleHand
         /********************************************************
         *   DoQuickStack
         *   !ref:Main:#22476.44##22637.44#
+
+            FIXME: If there's a stack of any type of coin in the destination
+            container, ALL coins (regardless of type) will go to the container.
+            Vanilla only stacks that type. (NOTE: this appears to be a TAPI bug.)
         */
         public static void DoQuickStack(Player player)
         {
@@ -298,124 +302,6 @@ namespace InvisibleHand
     #endregion
 
     #region oldcode
-
-        //     for (int j=iStart; iCheck(j); j=iNext(j))
-        //     {   Item item2 = container[j];
-        //         // found a non-empty slot containing a <full stack of the same item type
-        //         if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
-        //         {
-        //             if (StackMerge(ref item, ref item2, doCoins)) return j;  //if item's stack was reduced to 0, return index to indicate this
-        //             if (container[j].IsBlank())  //now check container slot to see if doCoins emptied it
-        //             {
-        //                 container[j] = item.Clone(); // move inv item to chest slot
-        //                 return j;  // return index to indicate that item slot should be reset
-        //             }
-        //             if (sendMessage) SendNetMessage(j); //still have to send this apparently
-        // }   }
-
-        // for (int k=iStart; iCheck(k); k=iNext(k))
-        // {//move to first empty slot
-        //     if (container[k].IsBlank())
-        //     {   container[k] = item.Clone();
-        //         return k;
-        // }   }
-
-
-        /* I don't think I ever use this...*/
-        // public static bool MoveItemToPlayer(Item[] container, int iSource, Item[] inventory, int rangeStart, int rangeEnd, bool sendMessage = true, bool desc = true)
-        // {
-        //     int retIdx = MoveItemC2P(ref container[iSource], inventory, rangeStart, rangeEnd, desc);
-        //     if (retIdx > -2)
-        //     { //some movement occurred
-        //         RingBell();
-        //
-        //         // if whole stack moved, empty item slot
-        //         if (retIdx > -1)
-        //         {
-        //             container[iSource] = new Item();
-        //             //only for non-bank chest
-        //             if (sendMessage) SendNetMessage(retIdx);
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // }
-
-        //for chest->player
-        // public static int MoveItemC2P(ref Item item, Item[] inventory, int rangeStart, int rangeEnd, bool desc = true)
-        // {
-        //     if (item.stack<=0) return -3;
-        //
-        //     int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
-        //
-        //     if (desc) {
-        //         iStart = rangeEnd;
-        //         iCheck = i => i >= rangeStart;
-        //         iNext  = i => i-1;
-        //     } else {
-        //         iStart = rangeStart;
-        //         iCheck = i => i <= rangeEnd;
-        //         iNext  = i => i+1;
-        //     }
-        //
-        //     int stackB4 = item.stack;
-        //     if (item.maxStack > 1)  // !ref:Main:#22320.00##22360.00#
-        //     {
-        //         //search inventory for matching non-maxed stacks
-        //         for (int j=iStart; iCheck(j); j=iNext(j))
-        //         {
-        //             Item item2 = inventory[j];
-        //             // found a non-empty slot containing a <full stack of the same item type
-        //             if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
-        //             {
-        //                 if (StackMerge(ref item, ref item2)) return j;  //if item's stack was reduced to 0
-        //             }
-        //         } // if we don't return in this loop, there is still some stack remaining
-        //     }
-        //
-        //     // reaching here means item is not stackable, or still have some stack left
-        //     // So move item/remainder of stack to first empty slot
-        //     for (int k=iStart; iCheck(k); k=iNext(k)) //!ref:Main:#22416.00#
-        //     {
-        //         if (inventory[k].IsBlank())
-        //         {
-        //             inventory[k] = item.Clone();
-        //             return k; //return index of destination slot
-        //         }
-        //     }
-        //     // and if we're here, we couldn't find an empty slot for it
-        //
-        //     // if stackB4==item.stack, no movement/stacking occurred at all
-        //     return stackB4==item.stack ? -2 : -1;
-        //
-        // }//\MoveItem()
-
-        // public static int ShiftItemToPlayer(ref Item item, Item[] inventory, int rangeStart, int rangeEnd, bool desc = true)
-        // {
-        //     if (item.stack<=0) return -3;
-        //
-        //     int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
-        //
-        //     if (desc) { iStart =   rangeEnd; iCheck = i => i >= rangeStart; iNext = i => i-1; }
-        //     else      { iStart = rangeStart; iCheck = i => i <=   rangeEnd; iNext = i => i+1; }
-        //
-        //     //this time, do the "find empty slot" first.
-        //     int j=MoveToFirstEmpty(item, inventory, iStart, iCheck, iNext);
-        //
-        //     if (j<0) // no empty slots, so try to stack the item
-        //     {
-        //         int stackB4 = item.stack;
-        //         if (item.maxStack > 1)  // !ref:Main:#22320.00##22360.00#
-        //         {
-        //             j=TryStackMerge(ref item, inventory, iStart, iCheck, iNext);
-        //         }
-        //         if (j<0) //stack failed/was incomplete
-        //         {
-        //             return stackB4==item.stack ? -2 : -1;
-        //         }
-        //     }
-        //     return j;
-        // }//\MoveItem()
 
         // public static bool GetItem(Item item, int itemIndex)
         // {

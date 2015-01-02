@@ -60,6 +60,17 @@ namespace InvisibleHand
         }
 
     #region shiftmove
+
+        /************************************************************************
+        *   An implementation of the "Shift-click to move item between containers"
+        *   concept. Possibly temporary, though it includes the feature of working
+        *   with the craft-guide slot, which I really like.
+        *
+        *   Known Issues:
+            FIXME: Items should go to empty hotbar slot first
+            FIXME: fill ammo from top down (ascending)
+            FIXME: shift-moving coins should stack them properly
+        */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
         {
@@ -121,8 +132,9 @@ namespace InvisibleHand
         public static bool ShiftToChest(ref ItemSlot slot)
         {
             bool sendMessage = Main.localPlayer.chest > -1;
+            Item pItem = slot.MyItem;
 
-            int retIdx = IHUtils.MoveToFirstEmpty( slot.MyItem, Main.localPlayer.chestItems, 0,
+            int retIdx = IHUtils.MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
             new Func<int,bool>( i => i<Chest.maxItems ),
             new Func<int,int>( i => i+1 ) );
 
@@ -131,12 +143,12 @@ namespace InvisibleHand
             { //return IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true);
 
                 Action doCoins;
-                sendMessage ? doCoins = Main.ChestCoins : doCoins = Main.BankCoins;
+                doCoins = sendMessage ? (Action)Main.ChestCoins : (Action)Main.BankCoins;
 
-                int stackB4 = slot.MyItem.stack;
-                if (slot.MyItem.maxStack > 1)  //try to stack the item if possible
+                int stackB4 = pItem.stack;
+                if (pItem.maxStack > 1)  //try to stack the item if possible
                 {
-                    retIdx = IHUtils.TryStackMerge(ref slot.MyItem, Main.localPlayer.chestItems,
+                    retIdx = IHUtils.TryStackMerge(ref pItem, Main.localPlayer.chestItems,
                         doCoins, sendMessage, 0,
                         new Func<int,bool>( i => i<Chest.maxItems ),
                         new Func<int,int>( i => i+1 ) );
@@ -144,7 +156,7 @@ namespace InvisibleHand
 
                 if (retIdx < 0)  //stack failed/was incomplete
                 {
-                    if (stackB4!=slot.MyItem.stack) //some movement occurred
+                    if (stackB4!=pItem.stack) //some movement occurred
                     {
                         Main.PlaySound(7, -1, -1, 1);
                         Recipe.FindRecipes();
@@ -153,6 +165,7 @@ namespace InvisibleHand
                 }
             }
             //else, success!
+            slot.MyItem = new Item();
             if (sendMessage) IHUtils.SendNetMessage(retIdx);
             return true;
             // }

@@ -78,6 +78,9 @@ namespace InvisibleHand
         *       of a matching item from the chest if even one <max stack was present
         *       in the player's inventory. Leaving this functionality in place as a
         *       possible future option.
+
+            FIXME: this always pulls ALL the ammo it finds into the ammo slot,
+                even if the player doesn't have any ammo in their inventory at all.
         */
         // public static void SmartLoot(bool takeAll = false)
         public static void SmartLoot()

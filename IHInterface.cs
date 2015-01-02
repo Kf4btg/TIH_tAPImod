@@ -72,16 +72,6 @@ namespace InvisibleHand
                     {
                         if (!slot.MyItem.IsBlank() && MovePlayerSlotItem(ref slot))
                             Recipe.FindRecipes(); // !ref:Main:#22640.36#
-
-                        // Item pItem = slot.MyItem;
-                        // int? retIdx = IHUtils.MoveItem(ref pItem, Main.localPlayer.chestItems);
-                        // if (retIdx.HasValue)
-                        // {//some movement occurred
-                        //     Main.PlaySound(7, -1, -1, 1);
-                        //     if ((int)retIdx>=0) slot.MyItem = new Item();
-                        // }
-                        // Main.PlaySound(7, -1, -1, 1);
-                        // slot.MyItem = myItem;
                     }
                     else if (slot.type == "Chest" && !slot.MyItem.IsBlank())
                     {
@@ -89,20 +79,6 @@ namespace InvisibleHand
                         slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
                         if (Main.localPlayer.chest > -1) IHUtils.SendNetMessage(slot.index);
                         // MoveSlotItem(ref slot, Main.localPlayer.chest >- 1);
-
-                        // Item cItem = slot.MyItem;
-                        //
-                        // // MoveItem returns true if original item ends up empty
-                        // if (cItem.IsBlank() || (cItem.Matches(ItemCat.COIN) &&
-                        //     MoveChestSlotItem(ref slot, 50, 53))) return false;
-                        //
-                        // if (cItem.Matches(ItemCat.AMMO) &&
-                        //     MoveChestSlotItem(ref slot, 54, 57)) return false;
-                        //
-                        // MoveChestSlotItem(ref slot, 0, 49);
-
-                        // Main.PlaySound(7, -1, -1, 1);
-                        // slot.MyItem = cItem;
                     }
                     return false;
                 }
@@ -110,15 +86,20 @@ namespace InvisibleHand
                 {
                     if (Main.guideItem.IsBlank() && !slot.MyItem.IsBlank() && (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo") )
                     {
-                        Main.PlaySound(7, -1, -1, 1);
-                        Main.guideItem = slot.MyItem.Clone();
-                        slot.MyItem = new Item();
+                        if (slot.MyItem.material && !slot.MyItem.notMaterial)
+                        {
+                            Main.PlaySound(7, -1, -1, 1);
+                            Main.guideItem = slot.MyItem.Clone();
+                            slot.MyItem = new Item();
+                            Recipe.FindRecipes();
+                        }
                     }
                     else if (!Main.guideItem.IsBlank() && slot.type == "CraftGuide")
                     {
-                        Main.guideItem = Main.localPlayer.GetItem(Main.myPlayer, Main.guideItem);
-                        // MoveGuideItem(ref slot);
-                        // if (MoveSlotItem(ref slot)) Recipe.FindRecipes();
+                        Main.localPlayer.GetItem(Main.myPlayer, Main.guideItem);
+                        Main.guideItem = new Item();
+                        // if (MoveSlotItem(ref slot))
+                        Recipe.FindRecipes();
                     }
                     return false;
                 }

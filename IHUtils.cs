@@ -201,8 +201,8 @@ namespace InvisibleHand
 
             int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
 
-            if (desc) { iStart = Chest.maxItems; iCheck = i => i >= 0; iNext  = i => i-1; }
-            else      { iStart = 0; iCheck = i => i <= Chest.maxItems; iNext  = i => i+1; }
+            if (desc) { iStart = Chest.maxItems - 1; iCheck = i => i >= 0; iNext  = i => i-1; }
+            else      { iStart = 0;      iCheck = i => i < Chest.maxItems; iNext  = i => i+1; }
 
             int stackB4 = item.stack;
             if (item.maxStack > 1)
@@ -318,7 +318,7 @@ namespace InvisibleHand
             int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
             itemDest.stack += diff;
             itemSrc.stack  -= diff;
-            
+
             return diff;
         }
 

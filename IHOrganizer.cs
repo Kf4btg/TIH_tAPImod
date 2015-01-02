@@ -200,6 +200,7 @@ namespace InvisibleHand
                 foreach ( Item item in itemSorter)
                 {
                     container[getIndex(filled++)] = item.Clone();
+                    Main.PlaySound(7, -1, -1, 1);
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
@@ -250,7 +251,7 @@ namespace InvisibleHand
                     int diff = Math.Min(item2.maxStack - item2.stack, item.stack);
                     item2.stack += diff;
                     item.stack -= diff;
-
+                    Main.PlaySound(7, -1, -1, 1);
                     if (item.IsBlank())
                     {
                         item = new Item();

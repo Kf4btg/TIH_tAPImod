@@ -10,7 +10,7 @@ using Terraria.ID;
 
 namespace InvisibleHand
 {
-    public static class ItemExtension
+    public static class IHItemExtension
     {
         public static ItemCat GetCategory(this Item item)
         {
@@ -51,7 +51,7 @@ namespace InvisibleHand
     public static class CategoryDef
     {
         // pass initial capacity as ItemCat.OTHER -- this trick should work so long as OTHER remains the last member of the Enum
-        public static readonly Dictionary<ItemCat, List<String>> ItemSortRules = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
+        public static readonly Dictionary<ItemCat, List<String>> ItemSortRules  = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
         public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories = new Dictionary<ItemCat, Func<Item, bool>>((Int32)ItemCat.OTHER+1);
 
         //the ItemCat Enum defines the actual Sort Order of the categories,
@@ -151,7 +151,7 @@ namespace InvisibleHand
                 TileID.WormCage, TileID.GrasshopperCage } );
 
         public static readonly
-            HashSet<int> TileGroupCrafting   = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupCrafting = new HashSet<int>( new int[] {
                 TileID.WorkBenches, TileID.Anvils, TileID.MythrilAnvil, TileID.AdamantiteForge,
                 TileID.CookingPots, TileID.Furnaces, TileID.Hellforge, TileID.Loom, TileID.Kegs,
                 TileID.Sawmill, TileID.TinkerersWorkbench, TileID.CrystalBall, TileID.Blendomatic,
@@ -161,15 +161,15 @@ namespace InvisibleHand
                 TileID.SkyMill, TileID.IceMachine, TileID.SteampunkBoiler, TileID.HoneyDispenser } ); //blergh
 
         public static readonly
-            HashSet<int> TileGroupOre        = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupOre      = new HashSet<int>( new int[] {
                 TileID.Meteorite, TileID.Obsidian, TileID.Hellstone }); //(get others by name)
 
         public static readonly
-            HashSet<int> TileGroupCoin       = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupCoin     = new HashSet<int>( new int[] {
                 TileID.CopperCoinPile, TileID.SilverCoinPile, TileID.GoldCoinPile, TileID.PlatinumCoinPile });
 
         public static readonly
-            HashSet<int> TileGroupSeed       = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupSeed     = new HashSet<int>( new int[] {
                 TileID.ImmatureHerbs, TileID.Saplings /*Acorn*/, TileID.Pumpkins /*Pumpkin Seed*/ } );
                 // get the rest by EndsWith("Seeds")
 
@@ -316,15 +316,6 @@ namespace InvisibleHand
             // quest fish: uniquestack=true, rare=-11
             ItemSortRules.Add( ItemCat.OTHER,    new List<String> { "uniqueStack", "rare", "type", "netID", "stack desc"});
         }//end setup sorting rules
-
-
-
-        private static bool IsBomb(Item item)
-        {
-            //grenades, bombs, etc
-            return (ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16);
-        }
-
     }
 
 }

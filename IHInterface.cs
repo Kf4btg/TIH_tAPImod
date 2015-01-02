@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using TAPI;
 using TAPI.UIKit;
 using Terraria;
@@ -70,14 +71,17 @@ namespace InvisibleHand
                 {
                     if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
                     {
-                        if (!slot.MyItem.IsBlank() && MovePlayerSlotItem(ref slot))
+                        if (!slot.MyItem.IsBlank() && ShiftToChest(ref slot))
                             Recipe.FindRecipes(); // !ref:Main:#22640.36#
                     }
                     else if (slot.type == "Chest" && !slot.MyItem.IsBlank())
                     {
+
+                        if (ShiftToPlayer(ref slot, Main.localPlayer.chest>-1))
+                            Recipe.FindRecipes();
                         // seriously is this all it takes aaaarrrhghghghaghggggghgghhh
-                        slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
-                        if (Main.localPlayer.chest > -1) IHUtils.SendNetMessage(slot.index);
+                        // slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
+                        // if (Main.localPlayer.chest > -1) IHUtils.SendNetMessage(slot.index);
                         // MoveSlotItem(ref slot, Main.localPlayer.chest >- 1);
                     }
                     return false;
@@ -96,8 +100,10 @@ namespace InvisibleHand
                     }
                     else if (!Main.guideItem.IsBlank() && slot.type == "CraftGuide")
                     {
-                        Main.localPlayer.GetItem(Main.myPlayer, Main.guideItem);
-                        Main.guideItem = new Item();
+                        // Main.localPlayer.GetItem(Main.myPlayer, Main.guideItem);
+                        // if ( IHUtils.ShiftItemToPlayer(ref Main.guideItem, Main.localPlayer.inventory, 0, 57, true) >= 0 )
+                        if (ShiftToPlayer(ref slot, false))
+                            Main.guideItem = new Item();
                         // if (MoveSlotItem(ref slot))
                         Recipe.FindRecipes();
                     }
@@ -112,51 +118,120 @@ namespace InvisibleHand
         */
 
         // move item from player inventory slot to chest
-        public static bool MovePlayerSlotItem(ref ItemSlot slot)
+        public static bool ShiftToChest(ref ItemSlot slot)
         {
-            // if regular chest
-            return (Main.localPlayer.chest > -1) ?
-                 IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true) :
+            bool sendMessage = Main.localPlayer.chest > -1;
+
+            int retIdx = IHUtils.MoveToFirstEmpty( slot.MyItem, Main.localPlayer.chestItems, 0,
+            new Func<int,bool>( i => i<Chest.maxItems ),
+            new Func<int,int>( i => i+1 ) );
+
+            // if we didn't find an empty slot...
+            if (retIdx < 0)
+            { //return IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true);
+
+                Action doCoins;
+                sendMessage ? doCoins = Main.ChestCoins : doCoins = Main.BankCoins;
+
+                int stackB4 = slot.MyItem.stack;
+                if (slot.MyItem.maxStack > 1)  //try to stack the item if possible
+                {
+                    retIdx = IHUtils.TryStackMerge(ref slot.MyItem, Main.localPlayer.chestItems,
+                        doCoins, sendMessage, 0,
+                        new Func<int,bool>( i => i<Chest.maxItems ),
+                        new Func<int,int>( i => i+1 ) );
+                }
+
+                if (retIdx < 0)  //stack failed/was incomplete
+                {
+                    if (stackB4!=slot.MyItem.stack) //some movement occurred
+                    {
+                        Main.PlaySound(7, -1, -1, 1);
+                        Recipe.FindRecipes();
+                    }
+                    return false;
+                }
+            }
+            //else, success!
+            if (sendMessage) IHUtils.SendNetMessage(retIdx);
+            return true;
+            // }
             //else banks
-                IHUtils.MoveItemToChest(slot.index, Main.BankCoins, false);
+
+            // if (retIdx < 0)
+            // { //return IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true);
+            //     int stackB4 = slot.MyItem.stack;
+            //     if (slot.MyItem.maxStack > 1)  //try to stack the item if possible
+            //     {
+            //         retIdx = IHUtils.TryStackMerge(ref slot.MyItem, Main.localPlayer.chestItems, Main.BankCoins, false, 0,
+            //             new Func<int,bool>( i => i<Chest.maxItems ),
+            //             new Func<int,int>( i => i+1 ) );
+            //     }
+            //     if (retIdx < 0)  //stack failed/was incomplete
+            //     {
+            //         if (stackB4!=slot.MyItem.stack) //some movement occurred
+            //         {
+            //             Main.PlaySound(7, -1, -1, 1);
+            //             Recipe.FindRecipes();
+            //         }
+            //         return false;
+            //     }
+            // }
+            // return true;
+
+            // return (retIdx < 0) ? IHUtils.MoveItemToChest(slot.index, Main.BankCoins, false) : true;
+
+
+            // return (Main.localPlayer.chest > -1) ?
+            //      IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true) :
+            // //else banks
+            //     IHUtils.MoveItemToChest(slot.index, Main.BankCoins, false);
         }
         // public static bool MoveGuideItem(ref ItemSlot slot)
         // {
         //
         // }
-        // // MoveChestSlotItem - moves item from chest/guide slot to player inventory
-        // public static bool MoveSlotItem(ref ItemSlot slot, bool sendMessage)
-        // {
-        //     Item cItem = slot.MyItem;
-        //
-        //     if (cItem.IsBlank()) return false;
-        //
-        //     // MoveItem returns true if original item ends up empty
-        //     if (cItem.Matches(ItemCat.COIN) &&
-        //     MoveSlotItem(ref slot, Main.localPlayer.inventory, 50, 53, sendMessage, true)) return true;
-        //
-        //     if (cItem.Matches(ItemCat.AMMO) &&
-        //     MoveSlotItem(ref slot, Main.localPlayer.inventory, 54, 57, sendMessage, true)) return true;
-        //
-        //     return MoveSlotItem(ref slot, Main.localPlayer.inventory,  0, 49, true);
-        // }
-        //
-        // public static bool MoveSlotItem(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc=false)
-        // {
-        //     int retIdx = IHUtils.MoveItemC2P(ref slot.MyItem, Main.localPlayer.inventory, ixStart, ixStop, desc);
-        //     if (retIdx > -2)
-        //     {   //some movement occurred
-        //         Main.PlaySound(7, -1, -1, 1);
-        //
-        //         // if whole stack moved, empty item slot
-        //         if (retIdx > -1) {
-        //             slot.MyItem = new Item();
-        //             if (sendMessage) IHUtils.SendNetMessage(retIdx);
-        //                 return true;
-        //         }
-        //     }
-        //     return false;
-        // }
+        // MoveChestSlotItem - moves item from chest/guide slot to player inventory
+        public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
+        {
+            Item cItem = slot.MyItem;
+            // IHUtils.ShiftItemToPlayer(ref Main.guideItem, Main.localPlayer.inventory, 0, 57, true) >= 0 )
+
+            if (cItem.IsBlank()) return false;
+
+            // MoveItem returns true if original item ends up empty
+            if (cItem.Matches(ItemCat.COIN) &&
+            ShiftToPlayer(ref slot, 50, 53, sendMessage, true)) return true;
+
+            if (cItem.Matches(ItemCat.AMMO) &&
+            ShiftToPlayer(ref slot, 54, 57, sendMessage, true)) return true;
+
+            if (ShiftToPlayer(ref slot,  0, 49, sendMessage, true)) return true;
+
+            //if all of the above failed, then we have no empty slots.
+            // Let's save some work and just get traditional:
+            slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
+            return (slot.MyItem.IsBlank());
+
+        }
+        // attempts to move an item to an empty slot
+        public static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc=false)
+        {
+            int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
+
+            if (desc) { iStart =  ixStop; iCheck = i => i >= ixStart; iNext = i => i-1; }
+            else      { iStart = ixStart; iCheck = i => i <=  ixStop; iNext = i => i+1; }
+
+            int retIdx = IHUtils.MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
+            if (retIdx >= 0)
+            {
+                Main.PlaySound(7, -1, -1, 1);
+                slot.MyItem = new Item();
+                if (sendMessage) IHUtils.SendNetMessage(retIdx);
+                return true;
+            }
+            return false;
+        }
     #endregion
 
         // public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)

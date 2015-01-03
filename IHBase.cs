@@ -61,7 +61,7 @@ namespace InvisibleHand
                 case "rearSort":
                     switch ((String)option.Value)
                     {
-                        case "Player Inventory":
+                        case "Inventory":
                             oRearSortPlayer = true;
                             oRearSortChest  = false;
                             break;
@@ -80,7 +80,7 @@ namespace InvisibleHand
                 case "reverseSort":
                     switch ((String)option.Value)
                     {
-                        case "Player Inventory":
+                        case "Inventory":
                             oRevSortPlayer = true;
                             oRevSortChest  = false;
                             break;

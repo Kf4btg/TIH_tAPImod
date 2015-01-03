@@ -70,6 +70,7 @@ namespace InvisibleHand
             FIXME: Items should go to empty hotbar slot first
             FIXME: fill ammo from top down (ascending)
             FIXME: shift-moving coins should stack them properly
+            IDEA: only "shift" a full stack--merge non-full stacks normally.
         */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
@@ -80,11 +81,13 @@ namespace InvisibleHand
             {
                 if (Main.localPlayer.chestItems != null)
                 {
+                    // Moving inventory item -> chest
                     if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
                     {
                         if (!slot.MyItem.IsBlank() && ShiftToChest(ref slot))
                             Recipe.FindRecipes(); // !ref:Main:#22640.36#
                     }
+                    // Moving chest item -> inventory
                     else if (slot.type == "Chest" && !slot.MyItem.IsBlank())
                     {
 
@@ -105,7 +108,7 @@ namespace InvisibleHand
                         {
                             Main.PlaySound(7, -1, -1, 1);
                             Main.guideItem = slot.MyItem.Clone();
-                            slot.MyItem = new Item();
+                            slot.MyItem    = new Item();
                             Recipe.FindRecipes();
                         }
                     }
@@ -132,26 +135,28 @@ namespace InvisibleHand
         public static bool ShiftToChest(ref ItemSlot slot)
         {
             bool sendMessage = Main.localPlayer.chest > -1;
+            Action doCoins;
+            doCoins = sendMessage ? (Action)Main.ChestCoins : (Action)Main.BankCoins;
+
             Item pItem = slot.MyItem;
 
-            int retIdx = IHUtils.MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
-            new Func<int,bool>( i => i<Chest.maxItems ),
-            new Func<int,int>( i => i+1 ) );
-
+            int retIdx = -1;
+            if (pItem.stack == pItem.maxStack){ //move non-stackable items or full stacks to empty slot.
+                retIdx =  IHUtils.MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
+                                new Func<int,bool>( i => i<Chest.maxItems ),
+                                new Func<int,int> ( i => i+1 ) );
+            }
             // if we didn't find an empty slot...
             if (retIdx < 0)
             { //return IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true);
-
-                Action doCoins;
-                doCoins = sendMessage ? (Action)Main.ChestCoins : (Action)Main.BankCoins;
 
                 int stackB4 = pItem.stack;
                 if (pItem.maxStack > 1)  //try to stack the item if possible
                 {
                     retIdx = IHUtils.TryStackMerge(ref pItem, Main.localPlayer.chestItems,
-                        doCoins, sendMessage, 0,
-                        new Func<int,bool>( i => i<Chest.maxItems ),
-                        new Func<int,int>( i => i+1 ) );
+                                doCoins, sendMessage, 0,
+                                new Func<int,bool>( i => i<Chest.maxItems ),
+                                new Func<int,int> ( i => i+1 ) );
                 }
 
                 if (retIdx < 0)  //stack failed/was incomplete
@@ -165,10 +170,12 @@ namespace InvisibleHand
                 }
             }
             //else, success!
+            doCoins();
             slot.MyItem = new Item();
             if (sendMessage) IHUtils.SendNetMessage(retIdx);
             return true;
-            // }
+
+        }
             //else banks
 
             // if (retIdx < 0)
@@ -199,7 +206,7 @@ namespace InvisibleHand
             //      IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true) :
             // //else banks
             //     IHUtils.MoveItemToChest(slot.index, Main.BankCoins, false);
-        }
+        // }
         // public static bool MoveGuideItem(ref ItemSlot slot)
         // {
         //
@@ -207,19 +214,30 @@ namespace InvisibleHand
         // MoveChestSlotItem - moves item from chest/guide slot to player inventory
         public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
         {
+            //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
             Item cItem = slot.MyItem;
             // IHUtils.ShiftItemToPlayer(ref Main.guideItem, Main.localPlayer.inventory, 0, 57, true) >= 0 )
 
             if (cItem.IsBlank()) return false;
 
-            // MoveItem returns true if original item ends up empty
-            if (cItem.Matches(ItemCat.COIN) &&
-            ShiftToPlayer(ref slot, 50, 53, sendMessage, true)) return true;
+            if (cItem.Matches(ItemCat.COIN)) {
+                // ShiftToPlayer(ref slot, 50, 53, sendMessage, true);// return true;
+                // don't bother with "shifting", just move it as usual
+                slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
+                return (slot.MyItem.IsBlank());// return true;
+            }
 
-            if (cItem.Matches(ItemCat.AMMO) &&
-            ShiftToPlayer(ref slot, 54, 57, sendMessage, true)) return true;
+            // ShiftToPlayer returns true if original item ends up empty
+            else if (cItem.Matches(ItemCat.AMMO)) {
+                // if it's a stackable item and the stack is *full*, just shift it.
+                if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) return true; //ammo goes top-to-bottom
+            }
 
-            if (ShiftToPlayer(ref slot,  0, 49, sendMessage, true)) return true;
+            else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
+                if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //) return true; //try hotbar first, ascending order (vanilla parity)
+                //if (
+                ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //the other slots, descending
+            }
 
             //if all of the above failed, then we have no empty slots.
             // Let's save some work and just get traditional:

@@ -95,7 +95,7 @@ namespace InvisibleHand
         {
             if (player.chest == -1) return;
             if (player.chest > -1 )
-                QuickStack(player.inventory, player.chestItems, true, Main.ChestCoins);
+                QuickStack(player.inventory, player.chestItems,  true, Main.ChestCoins);
             else
                 QuickStack(player.inventory, player.chestItems, false, Main.BankCoins);
 
@@ -159,17 +159,15 @@ namespace InvisibleHand
 
             int j=-1;
             int stackB4 = item.stack;
-            if (item.maxStack > 1)
-            {   //search container for matching non-maxed stacks
-                j=TryStackMerge(ref item, container, doCoins, sendMessage, iStart, iCheck, iNext);
-            }
+            if (item.maxStack > 1) //search container for matching non-maxed stacks
+                j = TryStackMerge(ref item, container, doCoins, sendMessage, iStart, iCheck, iNext);
+
             if (j<0) //remaining stack or non-stackable
             {
-                j=MoveToFirstEmpty(item, container, iStart, iCheck, iNext);
+                j = MoveToFirstEmpty(item, container, iStart, iCheck, iNext);
+
                 if (j<0) //no empty slots
-                {
                     return stackB4==item.stack ? -2 : -1; //exit status
-                }
             }
             return j;
         }

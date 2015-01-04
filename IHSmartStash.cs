@@ -67,8 +67,6 @@ namespace InvisibleHand
         *       in the player's inventory. Leaving this functionality in place as a
         *       possible future option.
 
-            FIXME: this always pulls ALL the ammo it finds into the ammo slot,
-                even if the player doesn't have any ammo in their inventory at all.
         */
         // public static void SmartLoot(bool takeAll = false)
         public static void SmartLoot()
@@ -101,19 +99,25 @@ namespace InvisibleHand
         #endregion
 
             //do a first run through to fill the ammo slots
-            for (int ak=0; ak<Chest.maxItems; ak++)
-            {
-                if (!chestItems[ak].IsBlank() && chestItems[ak].ammo > 0 && !chestItems[ak].notAmmo) //if ammo
-                {
-                    chestItems[ak]=Main.localPlayer.FillAmmo(Main.localPlayer.whoAmI, chestItems[ak]);
-                }
-            }
+            // for (int ak=0; ak<Chest.maxItems; ak++)
+            // {
+            //     if (!chestItems[ak].IsBlank() && chestItems[ak].ammo > 0 && !chestItems[ak].notAmmo) //if ammo
+            //     {
+            //         for (int j=54; j<58; j++)
+            //         {
+            //             if (pInventory[j].IsTheSameAs(chestItems[ak]))
+            //             chestItems[ak]=Main.localPlayer.FillAmmo(Main.localPlayer.whoAmI, chestItems[ak]);
+            //
+            //         }
+            //
+            //     }
+            // } actually forget all that
 
             int index=0;
             //for each item in inventory (including coins & hotbar)...
-            for (int i=-4; i<50; i++)   //this i=-4 trick from the vanilla code
+            for (int i=-8; i<50; i++)   //this trick from the vanilla code
             {
-                index = i<0 ? 54 + i : i; //do coins first
+                index = i<0 ? 58 + i : i; //do ammo and coins first
 
                 //...if item is not blank && not a full stack...
                 if (!pInventory[index].IsBlank() && pInventory[index].stack < pInventory[index].maxStack)

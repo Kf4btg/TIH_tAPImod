@@ -53,7 +53,7 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(slot.index); //toggle lock state
-                    Main.PlaySound(7, -1, -1, 1);
+                    IHUtils.RingBell();
                 }
             }
             return false;
@@ -67,10 +67,8 @@ namespace InvisibleHand
         *   with the craft-guide slot, which I really like.
         *
         *   Known Issues:
-            FIXME: Items should go to empty hotbar slot first
-            FIXME: fill ammo from top down (ascending)
-            FIXME: shift-moving coins should stack them properly
-            IDEA: only "shift" a full stack--merge non-full stacks normally.
+            CHANGED: fill ammo from top down (ascending)
+            FIXME: Fixed the not-moving-<full-stacks thing, but still have a problem where coins will get messed up and duplicate themselves if you attempt to shift-move a stack of, say, copper coins (call it CS1) to a chest which already has a stack of that same type (CS2) and CS1 would send CS2.stack over 100...basically you'll add 1 to the stack of silver coins, which is right, but you'll end up with TWO stacks, each of which contains (CS2.stack-(100-CS2.stack)) copper coins.
         */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
@@ -79,16 +77,16 @@ namespace InvisibleHand
 
             if (slot.modBase == null && release && KState.Special.Shift.Down())
             {
-                if (Main.localPlayer.chestItems != null)
+                if (Main.localPlayer.chestItems != null && !slot.MyItem.IsBlank())
                 {
                     // Moving inventory item -> chest
                     if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
                     {
-                        if (!slot.MyItem.IsBlank() && ShiftToChest(ref slot))
+                        if (ShiftToChest(ref slot))
                             Recipe.FindRecipes(); // !ref:Main:#22640.36#
                     }
                     // Moving chest item -> inventory
-                    else if (slot.type == "Chest" && !slot.MyItem.IsBlank())
+                    else if (slot.type == "Chest")
                     {
 
                         if (ShiftToPlayer(ref slot, Main.localPlayer.chest>-1))
@@ -106,7 +104,7 @@ namespace InvisibleHand
                     {
                         if (slot.MyItem.material && !slot.MyItem.notMaterial)
                         {
-                            Main.PlaySound(7, -1, -1, 1);
+                            IHUtils.RingBell();
                             Main.guideItem = slot.MyItem.Clone();
                             slot.MyItem    = new Item();
                             Recipe.FindRecipes();
@@ -141,39 +139,63 @@ namespace InvisibleHand
             Item pItem = slot.MyItem;
 
             int retIdx = -1;
-            if (pItem.stack == pItem.maxStack){ //move non-stackable items or full stacks to empty slot.
+            if (pItem.stack == pItem.maxStack) //move non-stackable items or full stacks to empty slot.
+            {
                 retIdx =  IHUtils.MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
                                 new Func<int,bool>( i => i<Chest.maxItems ),
                                 new Func<int,int> ( i => i+1 ) );
             }
+
             // if we didn't find an empty slot...
             if (retIdx < 0)
-            { //return IHUtils.MoveItemToChest(slot.index, Main.ChestCoins, true);
+            {
+                if (pItem.maxStack == 1) return false; //we can't stack it, so we already know there's no place for it.
 
-                int stackB4 = pItem.stack;
-                if (pItem.maxStack > 1)  //try to stack the item if possible
-                {
-                    retIdx = IHUtils.TryStackMerge(ref pItem, Main.localPlayer.chestItems,
-                                doCoins, sendMessage, 0,
-                                new Func<int,bool>( i => i<Chest.maxItems ),
-                                new Func<int,int> ( i => i+1 ) );
-                }
+                retIdx = IHUtils.MoveItemP2C(ref pItem, Main.localPlayer.chestItems, doCoins, sendMessage);
 
-                if (retIdx < 0)  //stack failed/was incomplete
+                if (retIdx < 0)
                 {
-                    if (stackB4!=pItem.stack) //some movement occurred
+                    if (retIdx == -1)  // partial success (stack amt changed), but we don't want to reset the item.
                     {
-                        Main.PlaySound(7, -1, -1, 1);
+                        IHUtils.RingBell();
                         Recipe.FindRecipes();
                     }
                     return false;
                 }
+
             }
             //else, success!
-            doCoins();
+            IHUtils.RingBell();
+            // doCoins();
             slot.MyItem = new Item();
             if (sendMessage) IHUtils.SendNetMessage(retIdx);
             return true;
+
+
+                // //otherwise, try to stack the item
+                // int stackB4 = pItem.stack;
+                // retIdx = IHUtils.TryStackMerge(ref pItem, Main.localPlayer.chestItems,
+                //             doCoins, sendMessage, 0,
+                //             new Func<int,bool>( i => i<Chest.maxItems ),
+                //             new Func<int,int> ( i => i+1 ) );
+                // if (retIdx < 0)  //stack failed/was incomplete
+                // {
+                //     // still gotta try to find an empty slot now!
+                //     retIdx =  IHUtils.MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
+                //     new Func<int,bool>( i => i<Chest.maxItems ),
+                //     new Func<int,int> ( i => i+1 ) );
+                //
+                //     if (retIdx < 0)
+                //     {
+                //         if (stackB4!=pItem.stack) //some movement occurred
+                //         {
+                //             IHUtils.RingBell();
+                //             Recipe.FindRecipes();
+                //         }
+                //         // return false;
+                //     }
+                // }
+
 
         }
             //else banks
@@ -228,7 +250,7 @@ namespace InvisibleHand
             }
 
             // ShiftToPlayer returns true if original item ends up empty
-            else if (cItem.Matches(ItemCat.AMMO)) {
+            if (cItem.Matches(ItemCat.AMMO)) {
                 // if it's a stackable item and the stack is *full*, just shift it.
                 if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) return true; //ammo goes top-to-bottom
             }
@@ -246,7 +268,7 @@ namespace InvisibleHand
 
         }
         // attempts to move an item to an empty slot
-        public static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc=false)
+        public static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
         {
             int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
 
@@ -256,7 +278,7 @@ namespace InvisibleHand
             int retIdx = IHUtils.MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
             if (retIdx >= 0)
             {
-                Main.PlaySound(7, -1, -1, 1);
+                IHUtils.RingBell();
                 slot.MyItem = new Item();
                 if (sendMessage) IHUtils.SendNetMessage(retIdx);
                 return true;

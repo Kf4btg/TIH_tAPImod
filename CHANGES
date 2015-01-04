@@ -1,8 +1,16 @@
+1.1.2a
+    -   Experimental implementation of a shift-left-click-to-move-item action (disabled by default)
+        -   Added because I suspected I may be having some conflicts with Shockah's mods (and I really didn't want to live without that ability...)
+        -   There are a few differences in functionality, but one noticeable addition I did make was to allow shift-moving in and out of the guide's craft-info slot.
+
 1.1.2
     -   Added Categories:
         -   Potion (separate from other consumables), Block, Brick, Wood, Tool, Special (boss summon, stat increase items), Misc_Materials (that fail to fit any other category)
-        -   tweaked sort order of categories and individual category sorting rules.
-        -   Fixed shift-right-click picking up items bug.
+    -   tweaked sort order of categories and individual category sorting rules.
+    -   Fixed shift-right-click picking up items bug.
+    -   A large number of back-end changes, many of which were intended to bring most of my reimplemented operations closer into parity with Vanilla.
+    -   Changed QuickStack to only stack a particular type of coin if that type already exists in the container (rather than move all coins)
+    -   Fixed bug where Reverse-Stack would pull any ammo in chest, rather than just types that were already in the player's ammo slots.
 
 Version 1.1.1+tr14a
     -   Added new Categories, all pulled out of the "tile" category:

@@ -130,6 +130,8 @@ namespace InvisibleHand
         *  @param rangeEnd: end index of the sort operation
         *
         *  Omitting both range arguments will sort the entire container.
+
+        FIXME: the "item-moved" sound plays even if the order doesn't change.
         */
         public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {

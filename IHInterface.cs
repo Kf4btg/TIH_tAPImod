@@ -67,8 +67,6 @@ namespace InvisibleHand
         *   with the craft-guide slot, which I really like.
         *
         *   Known Issues:
-            CHANGED: fill ammo from top down (ascending)
-            FIXME: Fixed the not-moving-<full-stacks thing, but still have a problem where coins will get messed up and duplicate themselves if you attempt to shift-move a stack of, say, copper coins (call it CS1) to a chest which already has a stack of that same type (CS2) and CS1 would send CS2.stack over 100...basically you'll add 1 to the stack of silver coins, which is right, but you'll end up with TWO stacks, each of which contains (CS2.stack-(100-CS2.stack)) copper coins.
         */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
@@ -133,8 +131,8 @@ namespace InvisibleHand
         public static bool ShiftToChest(ref ItemSlot slot)
         {
             bool sendMessage = Main.localPlayer.chest > -1;
-            Action doCoins;
-            doCoins = sendMessage ? (Action)Main.ChestCoins : (Action)Main.BankCoins;
+            // Action doCoins;
+            // doCoins = sendMessage ? (Action)Main.ChestCoins : (Action)Main.BankCoins;
 
             Item pItem = slot.MyItem;
 
@@ -151,7 +149,7 @@ namespace InvisibleHand
             {
                 if (pItem.maxStack == 1) return false; //we can't stack it, so we already know there's no place for it.
 
-                retIdx = IHUtils.MoveItemP2C(ref pItem, Main.localPlayer.chestItems, doCoins, sendMessage);
+                retIdx = IHUtils.MoveItemP2C(ref pItem, Main.localPlayer.chestItems, sendMessage);
 
                 if (retIdx < 0)
                 {
@@ -170,6 +168,7 @@ namespace InvisibleHand
             slot.MyItem = new Item();
             if (sendMessage) IHUtils.SendNetMessage(retIdx);
             return true;
+        }
 
 
                 // //otherwise, try to stack the item
@@ -197,7 +196,6 @@ namespace InvisibleHand
                 // }
 
 
-        }
             //else banks
 
             // if (retIdx < 0)
@@ -251,10 +249,10 @@ namespace InvisibleHand
 
             // ShiftToPlayer returns true if original item ends up empty
             if (cItem.Matches(ItemCat.AMMO)) {
-                // if it's a stackable item and the stack is *full*, just shift it.
                 if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) return true; //ammo goes top-to-bottom
             }
 
+            // if it's a stackable item and the stack is *full*, just shift it.
             else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
                 if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //) return true; //try hotbar first, ascending order (vanilla parity)
                 //if (

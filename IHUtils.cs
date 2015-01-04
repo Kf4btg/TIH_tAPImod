@@ -27,21 +27,22 @@ namespace InvisibleHand
         {
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
+            bool sendNetMsg = player.chest > -1;
 
             // if regular chest
-            if (player.chest > -1)
-            {
-                for (int i=R_START; i >= R_END; i--) // iterate through the player's inventory in reverse
-                {
-                    if (!player.inventory[i].IsBlank()) MoveItemToChest(i, Main.ChestCoins, true);
-                }
-                Recipe.FindRecipes(); // !ref:Main:#22640.36#
-                return;
-            }
-            //else banks
+            // if (player.chest > -1)
+            // {
+            //     for (int i=R_START; i >= R_END; i--) // iterate through the player's inventory in reverse
+            //     {
+            //         if (!player.inventory[i].IsBlank()) MoveItemToChest(i, Main.ChestCoins, sendNetMsg);
+            //     }
+            //     Recipe.FindRecipes(); // !ref:Main:#22640.36#
+            //     return;
+            // }
+            // //else banks
             for (int i=R_START; i >= R_END; i--)
             {
-                if (!player.inventory[i].IsBlank()) MoveItemToChest(i, Main.BankCoins, false);
+                if (!player.inventory[i].IsBlank()) MoveItemToChest(i, sendNetMsg);
             }
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
 
@@ -50,25 +51,17 @@ namespace InvisibleHand
 
     #region lootall
         /********************************************************
-        *   DoLootAll
+        *   DoLootAll !ref:Main:#22272.00#
         */
 
         public static void DoLootAll(Player player)
         {
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
+            bool sendNetMsg = player.chest > -1;
+            Item[] container = player.chestItems;
+            // LootAll(player, player.chestItems, player.chest >= 0);
 
-            LootAll(player, player.chestItems, player.chest >= 0);
-
-            Recipe.FindRecipes(); // !ref:Main:#22640.36#
-        } // \DoLootAll()
-
-		/********************************************************
-        *   LootAll
-        *   !ref:Main:#22272.00#
-        */
-        private static void LootAll(Player player, Item[] container, bool sendMessage)
-        {
             for (int i=0; i<Chest.maxItems; i++)
             {
                 if (!container[i].IsBlank())
@@ -77,9 +70,30 @@ namespace InvisibleHand
 
                     // ok I have no idea what this does but it's part of the original
                     // loot-all code so I added it as well.
-                    if (sendMessage) SendNetMessage(i);
-                }}
-        } // \LootAll()
+                    if (sendNetMsg) SendNetMessage(i);
+                }
+            }
+
+            Recipe.FindRecipes(); // !ref:Main:#22640.36#
+        } // \DoLootAll()
+
+		// /********************************************************
+        // *   LootAll
+        // *   !ref:Main:#22272.00#
+        // */
+        // private static void LootAll(Player player, Item[] container, bool sendMessage)
+        // {
+        //     for (int i=0; i<Chest.maxItems; i++)
+        //     {
+        //         if (!container[i].IsBlank())
+        //         {
+        //             container[i] = player.GetItem(player.whoAmI, container[i]);
+        //
+        //             // ok I have no idea what this does but it's part of the original
+        //             // loot-all code so I added it as well.
+        //             if (sendMessage) SendNetMessage(i);
+        //         }}
+        // } // \LootAll()
     #endregion
 
 #region quickstack
@@ -94,15 +108,12 @@ namespace InvisibleHand
         public static void DoQuickStack(Player player)
         {
             if (player.chest == -1) return;
-            if (player.chest > -1 )
-                QuickStack(player.inventory, player.chestItems,  true, Main.ChestCoins);
-            else
-                QuickStack(player.inventory, player.chestItems, false, Main.BankCoins);
+            QuickStack(player.inventory, player.chestItems,  player.chest > -1);
 
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
         }//\DoQuickStack()
 
-        private static void QuickStack(Item[] inventory, Item[] container, bool sendMessage, Action doCoins)
+        private static void QuickStack(Item[] inventory, Item[] container, bool sendMessage)
         {
             for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
             {                                                                                   //if chest item is not blank && not a full stack, then
@@ -114,7 +125,7 @@ namespace InvisibleHand
                         {
                             RingBell();                                                         //...play "item-moved" sound and...
                                                                                                 // ...merge inv. item stack to chest item stack
-                            if (StackMerge(ref inventory[iP], ref container[iC], doCoins))
+                            if (StackMerge(ref inventory[iP], container, iC))
                             {                                                                   // do merge & check return (inv stack empty) status
                                 inventory[iP] = new Item();                                     // reset slot if all inv stack moved
                             }
@@ -148,7 +159,7 @@ namespace InvisibleHand
         */
 
         //for player->chest
-        public static int MoveItemP2C(ref Item item, Item[] container, Action doCoins, bool sendMessage=true, bool desc = false)
+        public static int MoveItemP2C(ref Item item, Item[] container, bool sendMessage=true, bool desc = false)
         {
             if (item.stack<=0) return -3;
 
@@ -160,7 +171,7 @@ namespace InvisibleHand
             int j=-1;
             int stackB4 = item.stack;
             if (item.maxStack > 1) //search container for matching non-maxed stacks
-                j = TryStackMerge(ref item, container, doCoins, sendMessage, iStart, iCheck, iNext);
+                j = TryStackMerge(ref item, container, sendMessage, iStart, iCheck, iNext);
 
             if (j<0) //remaining stack or non-stackable
             {
@@ -190,7 +201,7 @@ namespace InvisibleHand
         }
 
         // @return: >=0 if entire stack moved; -1 if failed to move or some remains
-        public static int TryStackMerge(ref Item item, Item[] dest, Action doCoins, bool sendMessage, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
+        public static int TryStackMerge(ref Item item, Item[] dest, bool sendMessage, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
         {
             //search inventory for matching non-maxed stacks
             for (int i=iStart; iCheck(i); i=iNext(i))
@@ -199,7 +210,7 @@ namespace InvisibleHand
                 // found a non-empty slot containing a < full stack of the same item type
                 if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
                 {
-                    if (StackMerge(ref item, ref item2, doCoins)) return i;  //if item's stack was reduced to 0
+                    if (StackMerge(ref item, dest, i)) return i;  //if item's stack was reduced to 0
                     if (dest[i].IsBlank())  //now check container slot to see if doCoins emptied it
                     {
                         dest[i] = item.Clone(); // move inv item to chest slot
@@ -214,7 +225,6 @@ namespace InvisibleHand
         /********************************************************
         *   MoveItemToChest
             @param iPlayer : index of the item in source
-            @param doCoins: either Main.ChestCoins or Main.BankCoins
             @param sendMessage : should ==true if regular chest, false for banks
             @param desc : whether to place item towards end of @dest rather than beginning
 
@@ -222,12 +232,11 @@ namespace InvisibleHand
         */
 
         // player main inventory->chest/bank
-        public static bool MoveItemToChest(int iPlayer, Action doCoins, bool sendMessage, bool desc = false)
+        public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
         {
             int retIdx = MoveItemP2C (
             ref Main.localPlayer.inventory[iPlayer],                        // item in inventory
             Main.localPlayer.chestItems,                                    // destination container
-            doCoins,                                                        // chest or bank doCoins
             sendMessage,                                                    // if true, sendMessage
             desc);                                                          // check container indices descending?
 
@@ -262,12 +271,12 @@ namespace InvisibleHand
             return itemSrc.IsBlank();
         }
 
-        public static bool StackMerge(ref Item itemSrc, ref Item itemDest, Action doCoins )
+        public static bool StackMerge(ref Item itemSrc, Item[] dest, int dIndex )
         {
-            int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
-            itemDest.stack += diff;
+            int diff = Math.Min(dest[dIndex].maxStack - dest[dIndex].stack, itemSrc.stack);
+            dest[dIndex].stack += diff;
             itemSrc.stack  -= diff;
-            doCoins();
+            DoContainerCoins(dest, dIndex);
             // return true to indicate stack has been emptied
             return itemSrc.IsBlank();
         }
@@ -282,6 +291,31 @@ namespace InvisibleHand
             return diff;
         }
 
+        /**********************************************************
+        *   DoContainerCoins
+        *
+        *   Adapted from the Player.DoCoins(int i) method because Main.MoveCoins() wasn't doing what I wanted.
+        */
+        public static void DoContainerCoins(Item[] container, int i)
+        {
+            if (container[i].stack == 100 && (container[i].type == 71 || container[i].type == 72 || container[i].type == 73))
+            {
+                container[i].SetDefaults(container[i].type + 1);
+                for (int j = 0; j < container.Length; j++)
+                {
+                    if (container[j].IsTheSameAs(container[i]) && j != i && container[j].type == container[i].type && container[j].stack < container[j].maxStack)
+                    {
+                        container[j].stack++;
+                        container[i] = new Item();
+                        DoContainerCoins(container, j);
+                    }
+                }
+            }
+        }
+
+        /**********************************************************
+        *   Wrapper functions
+        */
         //plays the "item moved" sound
         public static void RingBell(int o1 = -1, int o2 = -1, int o3 = 1)
         {

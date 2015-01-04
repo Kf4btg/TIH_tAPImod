@@ -21,19 +21,7 @@ namespace InvisibleHand
 
             Item[] pInventory = Main.localPlayer.inventory;
             Item[] chestItems = Main.localPlayer.chestItems;
-            bool sendNetMsg;
-            Action coinFunc;
-
-            if (Main.localPlayer.chest >-1)
-            {
-                sendNetMsg = true;
-                coinFunc=Main.ChestCoins;
-            }
-            else
-            {
-                sendNetMsg = false;
-                coinFunc=Main.BankCoins;
-            }
+            bool sendNetMsg   = Main.localPlayer.chest >-1;
 
             // create a query that creates category groups for the items in the chests,
             // then pull out the category keys into a distinct list
@@ -50,8 +38,8 @@ namespace InvisibleHand
                 for (int i=49; i>=10; i--)  // reverse through player inv
                 {
                     if ( !pInventory[i].IsBlank() && !IHPlayer.SlotLocked(i) &&
-                    catList.Contains(pInventory[i].GetCategory()) )
-                        IHUtils.MoveItemToChest(i, coinFunc, sendNetMsg);
+                        catList.Contains(pInventory[i].GetCategory()) )
+                            IHUtils.MoveItemToChest(i, sendNetMsg);
                 }//end loop
             }
             else //no locking
@@ -60,7 +48,7 @@ namespace InvisibleHand
                 {
                     // if chest contains a matching category
                     if ( !pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()) )
-                        IHUtils.MoveItemToChest(i, coinFunc, sendNetMsg);
+                        IHUtils.MoveItemToChest(i, sendNetMsg);
                 }//end loop
             }
         }
@@ -89,7 +77,7 @@ namespace InvisibleHand
 
             Item[] pInventory = Main.localPlayer.inventory;
             Item[] chestItems = Main.localPlayer.chestItems;
-            bool sendNetMsg = Main.localPlayer.chest >-1;
+            bool sendNetMsg   = Main.localPlayer.chest >-1;
 
         #region takeAll
             // if (takeAll){
@@ -130,12 +118,11 @@ namespace InvisibleHand
                 //...if item is not blank && not a full stack...
                 if (!pInventory[index].IsBlank() && pInventory[index].stack < pInventory[index].maxStack)
                 {   //...check every item in chest...
-                    // for (int j=0; j<Chest.maxItems; j++)
                     int j=-1;
                     // quit if we max out this stack or reach the end of the chest;
                     // also note that the DoCoins() call may reduce this stack to 0, so check that too
-                    while (pInventory[index].stack < pInventory[index].maxStack && ++j < Chest.maxItems &&
-                    pInventory[index].stack > 0 )
+                    while (pInventory[index].stack < pInventory[index].maxStack &&
+                            ++j < Chest.maxItems && pInventory[index].stack > 0 )
                     {   //...for a matching item stack...
                         if (!chestItems[j].IsBlank() && chestItems[j].IsTheSameAs(pInventory[index]))
                         {

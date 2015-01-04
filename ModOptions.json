@@ -56,15 +56,6 @@
             "default": true
         },
         {
-            "name": "enableShiftMove",
-            "displayName": "Enable Shift Move",
-            "type": "Boolean",
-            "notify": true,
-            "notifyOnChange": true,
-            "sync": false,
-            "default": false
-        },
-        {
             "name": "rearSort",
             "displayName": "Sort from end",
             "type": "List",

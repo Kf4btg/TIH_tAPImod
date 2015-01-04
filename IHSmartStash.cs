@@ -51,6 +51,7 @@ namespace InvisibleHand
                         IHUtils.MoveItemToChest(i, sendNetMsg);
                 }//end loop
             }
+            Recipe.FindRecipes();
         }
 
         /****************************************************
@@ -98,7 +99,7 @@ namespace InvisibleHand
                 // return;}
                 #endregion
 
-            int index=0;
+            int index;
             //for each item in inventory (including coins & hotbar)...
             for (int i=-8; i<50; i++)   //this trick from the vanilla code
             {

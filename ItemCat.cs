@@ -21,7 +21,6 @@ namespace InvisibleHand
         BODY,
         LEGS,
         ACCESSORY,
-        // HOOK,
         VANITY,
         POTION,
         CONSUME,

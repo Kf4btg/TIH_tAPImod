@@ -29,17 +29,6 @@ namespace InvisibleHand
             if (player.chest == -1) return;
             bool sendNetMsg = player.chest > -1;
 
-            // if regular chest
-            // if (player.chest > -1)
-            // {
-            //     for (int i=R_START; i >= R_END; i--) // iterate through the player's inventory in reverse
-            //     {
-            //         if (!player.inventory[i].IsBlank()) MoveItemToChest(i, Main.ChestCoins, sendNetMsg);
-            //     }
-            //     Recipe.FindRecipes(); // !ref:Main:#22640.36#
-            //     return;
-            // }
-            // //else banks
             for (int i=R_START; i >= R_END; i--)
             {
                 if (!player.inventory[i].IsBlank()) MoveItemToChest(i, sendNetMsg);
@@ -53,14 +42,13 @@ namespace InvisibleHand
         /********************************************************
         *   DoLootAll !ref:Main:#22272.00#
         */
-
         public static void DoLootAll(Player player)
         {
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
+
             bool sendNetMsg = player.chest > -1;
             Item[] container = player.chestItems;
-            // LootAll(player, player.chestItems, player.chest >= 0);
 
             for (int i=0; i<Chest.maxItems; i++)
             {
@@ -73,37 +61,14 @@ namespace InvisibleHand
                     if (sendNetMsg) SendNetMessage(i);
                 }
             }
-
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
         } // \DoLootAll()
-
-		// /********************************************************
-        // *   LootAll
-        // *   !ref:Main:#22272.00#
-        // */
-        // private static void LootAll(Player player, Item[] container, bool sendMessage)
-        // {
-        //     for (int i=0; i<Chest.maxItems; i++)
-        //     {
-        //         if (!container[i].IsBlank())
-        //         {
-        //             container[i] = player.GetItem(player.whoAmI, container[i]);
-        //
-        //             // ok I have no idea what this does but it's part of the original
-        //             // loot-all code so I added it as well.
-        //             if (sendMessage) SendNetMessage(i);
-        //         }}
-        // } // \LootAll()
     #endregion
 
-#region quickstack
+    #region quickstack
         /********************************************************
         *   DoQuickStack
         *   !ref:Main:#22476.44##22637.44#
-
-            FIXME: If there's a stack of any type of coin in the destination
-            container, ALL coins (regardless of type) will go to the container.
-            Vanilla only stacks that type. (NOTE: this appears to be a TAPI bug.)
         */
         public static void DoQuickStack(Player player)
         {
@@ -141,7 +106,7 @@ namespace InvisibleHand
                 }
             }
         }//\QuickStack()
-#endregion
+    #endregion
 
     #region helperfunctions
         /******************************************************
@@ -149,7 +114,6 @@ namespace InvisibleHand
         *    !ref:Main:#22320.00##22470.53#
         *    @param item : the item to move
         *    @param container: where to move @item
-        *    @param doCoins: either Main.ChestCoins or Main.BankCoins
         *    @param desc : whether to move @item to end of @container rather than beginning
         *
         *    @return >=0 : index in @container where @item was placed/stacked
@@ -235,10 +199,10 @@ namespace InvisibleHand
         public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
         {
             int retIdx = MoveItemP2C (
-            ref Main.localPlayer.inventory[iPlayer],                        // item in inventory
-            Main.localPlayer.chestItems,                                    // destination container
-            sendMessage,                                                    // if true, sendMessage
-            desc);                                                          // check container indices descending?
+            ref Main.localPlayer.inventory[iPlayer],    // item in inventory
+            Main.localPlayer.chestItems,                // destination container
+            sendMessage,                                // if true, sendMessage
+            desc);                                      // check container indices descending?
 
             if (retIdx > -2) // >=partial success
             {
@@ -258,9 +222,6 @@ namespace InvisibleHand
         // Returns true if itemSrc.stack is reduced to 0; false otherwise.
         // Does not check for item equality or existence of passed items;
         // that must be ensured by the calling method.
-        //
-        // @param doCoins: either Main.ChestCoins 0or Main.BankCoins
-                            (or neither, if absent)
         */
         public static bool StackMerge(ref Item itemSrc, ref Item itemDest)
         {
@@ -332,47 +293,6 @@ namespace InvisibleHand
             }
         }
     #endregion
-
-    #region oldcode
-
-        // public static bool GetItem(Item item, int itemIndex)
-        // {
-        //     //...check every item in chest...
-        //     Item[] chestItems = Main.localPlayer.chestItems;
-        //     // quit if we max out this stack or reach the end of the chest;
-        //     // also note that the DoCoins() call may reduce this stack to 0, so check that too
-        //     int j=-1;
-        //     while ( item.stack<item.maxStack && ++j<Chest.maxItems && item.stack>0 )
-        //     {   //...for a matching item stack...
-        //         if (GetItemStackChecker(chestItems, j, ref item, itemIndex, Main.localPlayer.chest>-1)) break;
-        //
-        //     }// </while>
-        // }
-        //
-        // public static bool GetItemStackChecker(Item[] chestItems, int cIndex, ref Item pItem, int pIndex, bool sendMessage)
-        // {
-        //     if (!chestItems[cIndex].IsBlank() && chestItems[cIndex].IsTheSameAs(pItem))
-        //     {
-        //         RingBell();
-        //         //...and merge it to the Player's inventory
-        //
-        //         // I *think* this ItemText.NewText command just makes the text pulse...
-        //         // I don't entirely grok how it works, but included for parity w/ vanilla
-        //         ItemText.NewText(chestItems[cIndex], StackMergeD(ref chestItems[cIndex], ref pItem));
-        //         Main.localPlayer.DoCoins(pIndex);
-        //         if (chestItems[cIndex].stack<=0)
-        //         {
-        //             chestItems[cIndex] = new Item(); //reset this item if all stack transferred
-        //             if (sendMessage) SendNetMessage(cIndex); //only for non-bank chest
-        //             return true;
-        //         }
-        //         if (sendMessage) SendNetMessage(cIndex);
-        //         return false;
-        //     }
-        // }
-
-    #endregion
-
 
     }// \class
 }

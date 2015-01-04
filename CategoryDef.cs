@@ -79,7 +79,6 @@ namespace InvisibleHand
             ItemCat.AMMO,
             ItemCat.MAGIC,
             ItemCat.SUMMON,
-            // ItemCat.HOOK,
             ItemCat.POTION,
             ItemCat.CONSUME,
             ItemCat.BAIT,
@@ -192,7 +191,6 @@ namespace InvisibleHand
             Categories.Add( ItemCat.PICK, 		item   	=> item.pick > 0);
             Categories.Add( ItemCat.AXE, 		item   	=> item.axe > 0);
             Categories.Add( ItemCat.HAMMER,		item   	=> item.hammer > 0);
-            // Categories.Add( ItemCat.HOOK,       item    => ProjDef.byType.ContainsKey(item.shoot) && (ProjDef.byType[item.shoot].hook || ProjDef.byType[item.shoot].aiStyle==7) );
             Categories.Add( ItemCat.TOOL,       item    => item.IsTool() );
             Categories.Add( ItemCat.MECH,       item    => item.mech || item.cartTrack );
             Categories.Add( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
@@ -203,7 +201,7 @@ namespace InvisibleHand
             Categories.Add( ItemCat.SUMMON,		item   	=> item.damage > 0 && item.summon);
             Categories.Add( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot])
                                                         || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
-            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && item.defense>0); //13=empty bucket
+            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && item.defense>0);
             Categories.Add( ItemCat.BODY,		item 	=> item.bodySlot != -1 && item.defense>0);
             Categories.Add( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && item.defense>0);
             Categories.Add( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
@@ -239,14 +237,8 @@ namespace InvisibleHand
             Categories.Add( ItemCat.SPECIAL,	item   	=> item.useStyle == 4 ); //Boss summon, hearts, mana crystals
             Categories.Add( ItemCat.OTHER, 		item    => true);
 
-    		// though i wanted to avoid this, I'm afraid there are some items that will need to be assigned to
-    		// categories manually, by type.  These would include:
-    			// bucket = OTHER
-    			// acorn, pumpkin seed = SEED
-    			//
-
-    		// TODO: see if possible to read some NPCdef file to figure out if an item is an NPC or an environment
-    		//		(entity or tile) drop.
+    		// TODO: see if possible to read some NPCdef file to figure out if
+    		//		 an item is an NPC or an environment (entity or tile) drop.
 
         } //end setupCategories()
 
@@ -270,7 +262,6 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.HAMMER,   new List<String> { "rare", "hammer", "type", "value"});
             // stack to sort the stackable boomerangs separately
             ItemSortRules.Add( ItemCat.MELEE,    new List<String> { "maxStack", "damage", "type", "rare", "value", "stack desc"});
-            // ItemSortRules.Add( ItemCat.HOOK,     new List<String> { "shoot" , "type"});
             ItemSortRules.Add( ItemCat.TOOL,     new List<String> { "consumable", "fishingPole", "shoot", "type", "stack desc" });
             // consumable to sort throwing weapons separately
             ItemSortRules.Add( ItemCat.MECH,     new List<String> { "cartTrack", "tileBoost", "createTile desc", "value", "type", "stack desc"});
@@ -297,7 +288,6 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.BAR,      new List<String> { "rare", "value", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.GEM,      new List<String> { "rare", "value", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.SEED,     new List<String> { "name", "type", "stack desc"});
-
             ItemSortRules.Add( ItemCat.LIGHT,    new List<String> { "createTile", "type", "name", "stack desc"});
             ItemSortRules.Add( ItemCat.CRAFT,    new List<String> { "createTile", "type", "name", "stack desc"});
             ItemSortRules.Add( ItemCat.FURNITURE,new List<String> { "createTile", "type", "name", "stack desc"});
@@ -317,5 +307,4 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.OTHER,    new List<String> { "uniqueStack", "rare", "type", "netID", "stack desc"});
         }//end setup sorting rules
     }
-
 }

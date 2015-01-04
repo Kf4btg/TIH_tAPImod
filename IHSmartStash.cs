@@ -77,41 +77,26 @@ namespace InvisibleHand
             Item[] chestItems = Main.localPlayer.chestItems;
             bool sendNetMsg   = Main.localPlayer.chest >-1;
 
-        #region takeAll
-            // if (takeAll){
-            //     //for each item in inventory (including coins, ammo, hotbar)...
-            //     for (int i=0; i<58; i++)
-            //     {
-            //         //...if item is not blank && not a full stack...
-            //         if (!pInventory[i].IsBlank() && pInventory[i].stack < pInventory[i].maxStack)
-            //         {   //...check every item in chest...
-            //             for (int j=0; j<Chest.maxItems; j++)
-            //             {   //...for a matching item...
-            //                 if (chestItems[j].IsTheSameAs(pInventory[i]))
-            //                 {   //...and move it to the Player's inventory
-            //                     chestItems[j] = Main.localPlayer.GetItem(Main.localPlayer.whoAmI, chestItems[j]);
-            //                     if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
-            //                 }
-            //             }
-            //         }
-            //     }
-            // return;}
-        #endregion
-
-            //do a first run through to fill the ammo slots
-            // for (int ak=0; ak<Chest.maxItems; ak++)
-            // {
-            //     if (!chestItems[ak].IsBlank() && chestItems[ak].ammo > 0 && !chestItems[ak].notAmmo) //if ammo
-            //     {
-            //         for (int j=54; j<58; j++)
-            //         {
-            //             if (pInventory[j].IsTheSameAs(chestItems[ak]))
-            //             chestItems[ak]=Main.localPlayer.FillAmmo(Main.localPlayer.whoAmI, chestItems[ak]);
-            //
-            //         }
-            //
-            //     }
-            // } actually forget all that
+            #region takeAll
+                // if (takeAll){
+                //     //for each item in inventory (including coins, ammo, hotbar)...
+                //     for (int i=0; i<58; i++)
+                //     {
+                //         //...if item is not blank && not a full stack...
+                //         if (!pInventory[i].IsBlank() && pInventory[i].stack < pInventory[i].maxStack)
+                //         {   //...check every item in chest...
+                //             for (int j=0; j<Chest.maxItems; j++)
+                //             {   //...for a matching item...
+                //                 if (chestItems[j].IsTheSameAs(pInventory[i]))
+                //                 {   //...and move it to the Player's inventory
+                //                     chestItems[j] = Main.localPlayer.GetItem(Main.localPlayer.whoAmI, chestItems[j]);
+                //                     if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
+                //                 }
+                //             }
+                //         }
+                //     }
+                // return;}
+                #endregion
 
             int index=0;
             //for each item in inventory (including coins & hotbar)...

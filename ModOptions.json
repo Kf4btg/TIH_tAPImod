@@ -63,7 +63,7 @@
             "notifyOnChange": true,
             "sync": false,
             "list": [
-                "Player Inventory",
+                "Inventory",
                 "Chests",
                 "Both",
                 "Disabled"
@@ -72,13 +72,13 @@
         },
         {
             "name": "reverseSort",
-            "displayName": "Reverse default sort order",
+            "displayName": "Reverse sort order",
             "type": "List",
             "notify": true,
             "notifyOnChange": true,
             "sync": false,
             "list": [
-                "Player Inventory",
+                "Inventory",
                 "Chests",
                 "Both",
                 "Disabled"

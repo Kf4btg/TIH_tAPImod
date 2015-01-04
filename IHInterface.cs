@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using TAPI;
 using TAPI.UIKit;
 using Terraria;
@@ -9,30 +10,14 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        // private Texture2D lockedIcon = null;
-
-        // public override void ModifyInterfaceLayerList(List<InterfaceLayer>list)
-        // {
-        //     if (!Main.playerInventory) return;
-        // }
-        //
-        // public InterfaceLayer lockMarkers = new InterfaceLayer.Action("InvisibleHand:lockMarkers", (layer, sb) =>
-        // {
-        //     if (!Main.playerInventory) return;
-        //
-        //
-        //
-        //
-        //     })
-
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
             if (IHBase.oLockingEnabled && slot.type == "Inventory" && IHPlayer.SlotLocked(slot.index))
             {
-                sb.Draw(IHBase.lockedIcon,                // the texture to draw
+                sb.Draw(IHBase.lockedIcon,      // the texture to draw
                             slot.pos,           // (Vector2) location in screen coords to draw sprite
                             null,               // Rectangle to specifies source texels from texture; null draws whole texture
-                            Color.Firebrick,        // color to tint sprite; color.white=full color, no tint
+                            Color.Firebrick,    // color to tint sprite; color.white=full color, no tint
                             0f,                 // angle in radians to rotate sprite around its center
                             default(Vector2),   // (Vector2) sprite origin, default=(0,0) i.e. upper left corner
                             slot.scale,         // (Vector2) scale factor
@@ -52,7 +37,7 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(slot.index); //toggle lock state
-                    Main.PlaySound(7, -1, -1, 1);
+                    IHUtils.RingBell();
                 }
             }
             return false;

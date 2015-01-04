@@ -36,9 +36,7 @@ namespace InvisibleHand
 
                 // execute the query and put the result in a list to return
                 foreach (Item i in result)
-                {
                     sortedList.Add(i);
-                }
             }
             return sortedList;
         }
@@ -130,6 +128,8 @@ namespace InvisibleHand
         *  @param rangeEnd: end index of the sort operation
         *
         *  Omitting both range arguments will sort the entire container.
+
+        FIXME: the "item-moved" sound plays even if the order doesn't change.
         */
         public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {
@@ -163,7 +163,6 @@ namespace InvisibleHand
                 getIter = x => x-1;
                 getCond = x => x >= range.Item1;
                 getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(x);
-
             }
             else 	// use incrementing iterators
             {
@@ -185,6 +184,7 @@ namespace InvisibleHand
                     // that _shouldn't_ be possible. Shouldn't. Probably.
                     while (IHPlayer.SlotLocked(getIndex(filled))) { filled++; }
                     container[getIndex(filled++)] = item.Clone();
+                    Main.PlaySound(7, -1, -1, 1);
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
@@ -200,6 +200,7 @@ namespace InvisibleHand
                 foreach ( Item item in itemSorter)
                 {
                     container[getIndex(filled++)] = item.Clone();
+                    Main.PlaySound(7, -1, -1, 1);
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
@@ -250,7 +251,6 @@ namespace InvisibleHand
                     int diff = Math.Min(item2.maxStack - item2.stack, item.stack);
                     item2.stack += diff;
                     item.stack -= diff;
-
                     if (item.IsBlank())
                     {
                         item = new Item();

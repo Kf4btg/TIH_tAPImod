@@ -10,15 +10,20 @@ using Terraria.ID;
 
 namespace InvisibleHand
 {
-    public static class ItemExtension
+    public static class IHItemExtension
     {
         public static ItemCat GetCategory(this Item item)
         {
             foreach (ItemCat catID in CategoryDef.CheckOrder)
             {
-                if (CategoryDef.Categories[catID].Invoke(item)) { return catID; }
+                if (CategoryDef.Categories[catID].Invoke(item)) return catID;
             }
             return ItemCat.OTHER;
+        }
+
+        public static bool Matches(this Item item, ItemCat isCategory)
+        {
+            return CategoryDef.Categories[isCategory].Invoke(item);
         }
 
         public static bool IsHook(this Item item)
@@ -46,7 +51,7 @@ namespace InvisibleHand
     public static class CategoryDef
     {
         // pass initial capacity as ItemCat.OTHER -- this trick should work so long as OTHER remains the last member of the Enum
-        public static readonly Dictionary<ItemCat, List<String>> ItemSortRules = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
+        public static readonly Dictionary<ItemCat, List<String>> ItemSortRules  = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
         public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories = new Dictionary<ItemCat, Func<Item, bool>>((Int32)ItemCat.OTHER+1);
 
         //the ItemCat Enum defines the actual Sort Order of the categories,
@@ -74,7 +79,6 @@ namespace InvisibleHand
             ItemCat.AMMO,
             ItemCat.MAGIC,
             ItemCat.SUMMON,
-            // ItemCat.HOOK,
             ItemCat.POTION,
             ItemCat.CONSUME,
             ItemCat.BAIT,
@@ -146,7 +150,7 @@ namespace InvisibleHand
                 TileID.WormCage, TileID.GrasshopperCage } );
 
         public static readonly
-            HashSet<int> TileGroupCrafting   = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupCrafting = new HashSet<int>( new int[] {
                 TileID.WorkBenches, TileID.Anvils, TileID.MythrilAnvil, TileID.AdamantiteForge,
                 TileID.CookingPots, TileID.Furnaces, TileID.Hellforge, TileID.Loom, TileID.Kegs,
                 TileID.Sawmill, TileID.TinkerersWorkbench, TileID.CrystalBall, TileID.Blendomatic,
@@ -156,15 +160,15 @@ namespace InvisibleHand
                 TileID.SkyMill, TileID.IceMachine, TileID.SteampunkBoiler, TileID.HoneyDispenser } ); //blergh
 
         public static readonly
-            HashSet<int> TileGroupOre        = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupOre      = new HashSet<int>( new int[] {
                 TileID.Meteorite, TileID.Obsidian, TileID.Hellstone }); //(get others by name)
 
         public static readonly
-            HashSet<int> TileGroupCoin       = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupCoin     = new HashSet<int>( new int[] {
                 TileID.CopperCoinPile, TileID.SilverCoinPile, TileID.GoldCoinPile, TileID.PlatinumCoinPile });
 
         public static readonly
-            HashSet<int> TileGroupSeed       = new HashSet<int>( new int[] {
+            HashSet<int> TileGroupSeed     = new HashSet<int>( new int[] {
                 TileID.ImmatureHerbs, TileID.Saplings /*Acorn*/, TileID.Pumpkins /*Pumpkin Seed*/ } );
                 // get the rest by EndsWith("Seeds")
 
@@ -187,7 +191,6 @@ namespace InvisibleHand
             Categories.Add( ItemCat.PICK, 		item   	=> item.pick > 0);
             Categories.Add( ItemCat.AXE, 		item   	=> item.axe > 0);
             Categories.Add( ItemCat.HAMMER,		item   	=> item.hammer > 0);
-            // Categories.Add( ItemCat.HOOK,       item    => ProjDef.byType.ContainsKey(item.shoot) && (ProjDef.byType[item.shoot].hook || ProjDef.byType[item.shoot].aiStyle==7) );
             Categories.Add( ItemCat.TOOL,       item    => item.IsTool() );
             Categories.Add( ItemCat.MECH,       item    => item.mech || item.cartTrack );
             Categories.Add( ItemCat.MELEE,		item 	=> item.damage > 0 && item.melee);
@@ -198,13 +201,13 @@ namespace InvisibleHand
             Categories.Add( ItemCat.SUMMON,		item   	=> item.damage > 0 && item.summon);
             Categories.Add( ItemCat.PET, 		item   	=> item.damage <= 0 && ((item.shoot > 0 && Main.projPet[item.shoot])
                                                         || (item.buffType > 0 && (Main.vanityPet[item.buffType] || Main.lightPet[item.buffType]))));
-            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && item.defense>0); //13=empty bucket
+            Categories.Add( ItemCat.HEAD,		item 	=> item.headSlot != -1 && item.defense>0);
             Categories.Add( ItemCat.BODY,		item 	=> item.bodySlot != -1 && item.defense>0);
             Categories.Add( ItemCat.LEGS,		item 	=> item.legSlot  != -1 && item.defense>0);
             Categories.Add( ItemCat.ACCESSORY,	item   	=> item.accessory && !item.vanity);
             Categories.Add( ItemCat.VANITY,		item 	=> (item.vanity || item.headSlot!=-1 || item.bodySlot!=-1 || item.legSlot!=-1) && item.defense==0 ); //catch the non-armor
             // for some reason, all vanilla potions have w=14, h=24. Food, ale, etc. are all different.
-            Categories.Add( ItemCat.POTION, 	item   	=> Categories[ItemCat.CONSUME].Invoke(item) && item.width==14 && item.height==24 );
+            Categories.Add( ItemCat.POTION, 	item   	=> item.Matches(ItemCat.CONSUME) && item.width==14 && item.height==24 );
             Categories.Add( ItemCat.CONSUME, 	item   	=> item.consumable && item.bait == 0 && item.damage <= 0 && item.createTile == -1
                                                         && item.tileWand == -1 && item.createWall == -1 && item.ammo == 0 && item.name != "Xmas decorations");
 
@@ -224,7 +227,7 @@ namespace InvisibleHand
             Categories.Add( ItemCat.CLUTTER, 	item   	=> TileGroupClutter.Contains(item.createTile) );
             Categories.Add( ItemCat.WOOD,       item    => ItemDef.itemGroups["g:Wood"].Contains(item) );
             Categories.Add( ItemCat.BLOCK,   	item   	=> item.createTile != -1 && item.width==12 && item.height==12 && item.value==0 );
-            Categories.Add( ItemCat.BRICK,   	item   	=> Categories[ItemCat.BLOCK].Invoke(item) && (item.name.EndsWith("Brick")
+            Categories.Add( ItemCat.BRICK,   	item   	=> item.Matches(ItemCat.BLOCK) && (item.name.EndsWith("Brick")
                                                             || item.name.EndsWith("Slab") || item.name.EndsWith("Plating")) );
 
 
@@ -234,14 +237,8 @@ namespace InvisibleHand
             Categories.Add( ItemCat.SPECIAL,	item   	=> item.useStyle == 4 ); //Boss summon, hearts, mana crystals
             Categories.Add( ItemCat.OTHER, 		item    => true);
 
-    		// though i wanted to avoid this, I'm afraid there are some items that will need to be assigned to
-    		// categories manually, by type.  These would include:
-    			// bucket = OTHER
-    			// acorn, pumpkin seed = SEED
-    			//
-
-    		// TODO: see if possible to read some NPCdef file to figure out if an item is an NPC or an environment
-    		//		(entity or tile) drop.
+    		// TODO: see if possible to read some NPCdef file to figure out if
+    		//		 an item is an NPC or an environment (entity or tile) drop.
 
         } //end setupCategories()
 
@@ -265,7 +262,6 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.HAMMER,   new List<String> { "rare", "hammer", "type", "value"});
             // stack to sort the stackable boomerangs separately
             ItemSortRules.Add( ItemCat.MELEE,    new List<String> { "maxStack", "damage", "type", "rare", "value", "stack desc"});
-            // ItemSortRules.Add( ItemCat.HOOK,     new List<String> { "shoot" , "type"});
             ItemSortRules.Add( ItemCat.TOOL,     new List<String> { "consumable", "fishingPole", "shoot", "type", "stack desc" });
             // consumable to sort throwing weapons separately
             ItemSortRules.Add( ItemCat.MECH,     new List<String> { "cartTrack", "tileBoost", "createTile desc", "value", "type", "stack desc"});
@@ -292,7 +288,6 @@ namespace InvisibleHand
             ItemSortRules.Add( ItemCat.BAR,      new List<String> { "rare", "value", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.GEM,      new List<String> { "rare", "value", "type", "stack desc"});
             ItemSortRules.Add( ItemCat.SEED,     new List<String> { "name", "type", "stack desc"});
-
             ItemSortRules.Add( ItemCat.LIGHT,    new List<String> { "createTile", "type", "name", "stack desc"});
             ItemSortRules.Add( ItemCat.CRAFT,    new List<String> { "createTile", "type", "name", "stack desc"});
             ItemSortRules.Add( ItemCat.FURNITURE,new List<String> { "createTile", "type", "name", "stack desc"});
@@ -311,15 +306,5 @@ namespace InvisibleHand
             // quest fish: uniquestack=true, rare=-11
             ItemSortRules.Add( ItemCat.OTHER,    new List<String> { "uniqueStack", "rare", "type", "netID", "stack desc"});
         }//end setup sorting rules
-
-
-
-        private static bool IsBomb(Item item)
-        {
-            //grenades, bombs, etc
-            return (ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16);
-        }
-
     }
-
 }

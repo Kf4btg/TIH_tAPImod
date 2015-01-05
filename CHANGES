@@ -1,3 +1,8 @@
+1.1.2a
+    -   Experimental implementation of a shift-left-click-to-move-item action (disabled by default)
+        -   Added because I suspected I may be having some conflicts with Shockah's mods (and I really didn't want to live without that ability...)
+        -   There are a few differences in functionality, but one noticeable addition I did make was to allow shift-moving in and out of the guide's craft-info slot.
+
 1.1.2
     -   Added Categories:
         -   Potion (separate from other consumables), Block, Brick, Wood, Tool, Special (boss summon, stat increase items), Misc_Materials (that fail to fit any other category)

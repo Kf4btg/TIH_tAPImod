@@ -59,7 +59,7 @@ namespace InvisibleHand
 
             if (slot.modBase == null && release && KState.Special.Shift.Down())
             {
-                if (Main.localPlayer.chestItems != null && !slot.MyItem.IsBlank())
+                if (Main.localPlayer.chestItems != null && !slot.MyItem.IsBlank()) //chests and banks
                 {
                     // Moving inventory item -> chest
                     if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
@@ -75,7 +75,7 @@ namespace InvisibleHand
                     }
                     return false;
                 }
-                if (Main.craftGuide)
+                if (Main.craftGuide) //the Guide's crafting info slot
                 {
                     if (Main.guideItem.IsBlank() && !slot.MyItem.IsBlank() && (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo") )
                     {
@@ -91,6 +91,26 @@ namespace InvisibleHand
                     {
                         if (ShiftToPlayer(ref slot, false))
                         Main.guideItem = new Item();
+                        Recipe.FindRecipes();
+                    }
+                    return false;
+                }
+                if (Main.reforge) //Item reforging
+                {
+                    if (Main.reforgeItem.IsBlank() && slot.type == "Inventory" && !slot.MyItem.IsBlank())
+                    {
+                        if (slot.MyItem.maxStack == 1 && Prefix.CanHavePrefix(slot.MyItem))
+                        {
+                            IHUtils.RingBell();
+                            Main.reforgeItem = slot.MyItem.Clone();
+                            slot.MyItem = new Item();
+                            Recipe.FindRecipes();
+                        }
+                    }
+                    else if (!Main.reforgeItem.IsBlank() && slot.type == "Reforge")
+                    {
+                        if (ShiftToPlayer(ref slot, false))
+                        Main.reforgeItem = new Item();
                         Recipe.FindRecipes();
                     }
                     return false;

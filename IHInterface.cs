@@ -214,14 +214,16 @@ namespace InvisibleHand
         }
         #endregion
 
-        // public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)
-        // {
-        //     if (IHBase.oLockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
-        //     {
-        //
-        //     }
-        //     return null;
-        // }
+        public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)
+        {
+            if (IHBase.oLockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
+            {
+                return false;
+                //FIXME: this just refuses to let anything _in_ to the slot.
+                //Need to find a way to restrict taking things _out_ of the slot.
+            }
+            return null;
+        }
 
     }
 }

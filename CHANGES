@@ -1,3 +1,6 @@
+1.1.2b
+    -   Added ability to shift-click items in and out of the Item Reforge slot.
+
 1.1.2a
     -   Experimental implementation of a shift-left-click-to-move-item action (disabled by default)
         -   Added because I suspected I may be having some conflicts with Shockah's mods (and I really didn't want to live without that ability...)

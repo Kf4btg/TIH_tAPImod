@@ -31,6 +31,10 @@ namespace InvisibleHand
         public override void OnLoad()
         {
             self = this;
+        }
+
+        public override void OnAllModsLoaded()
+        {
             lockedIcon = self.textures["resources/LockIndicator"];
 
             CategoryDef.Initialize();

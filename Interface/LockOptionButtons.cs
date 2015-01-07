@@ -13,7 +13,28 @@ namespace InvisibleHand
         private readonly IHToggle[] buttons = new IHToggle[3];
         private readonly Vector2[] positions = new Vector2[3];
 
+        /*****************************************************************
+        *   Create the buttons that will be used to toggle the states of
+        *   the variables controlling how the vanilla functions interact
+        *   with locked slots.
 
+            At the moment, the text (placeholder for future button textures) actually
+            shows up and can be toggled by clicking on it.
+            FIXME: Initially, the display text is the button name, rather than its corresponding
+                    active/inactive label.
+            FIXME: The default left click action still occurs when clicking on the buttons (e.g. weapon used, etc.)
+            FIXME: No visual or audible feedback when bringing the mouse to hover over the button.
+            FIXME: These should show up only when a chest is open
+            TODO: On that note, they should be moved down to the left of the chest item slots.
+            TODO: Actually test to make sure the BinBuffer saving/loading in IHPlayer works.
+            TODO: Actually implement the check for these options in the IHUtils code
+
+            FIXME: this function (this entire *class*) is an absolute mess.
+                   Get rid of those stupid arrays and fields.
+                   Which of these FlagUpdate() calls is really necessary? Isn't there still one in the IHToggle ctor?
+                   And FlagUpdate/MarkUpdate are pretty much redundant. Figure out which one to keep.
+
+        */
         public LockOptions() : base("InvisibleHand:LockOptions")
         {
             lockDA = new IHToggle("dalock", "DA", "da", null, () => {return IHPlayer.daLocked;}, () =>

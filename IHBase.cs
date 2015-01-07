@@ -38,6 +38,7 @@ namespace InvisibleHand
             lockedIcon = self.textures["resources/LockIndicator"];
 
             CategoryDef.Initialize();
+            IHInterface.Initialize();
         }
 
         public override void OptionChanged(Option option)

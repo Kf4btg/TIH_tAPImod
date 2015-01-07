@@ -1,7 +1,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System;
+
 using TAPI;
 using TAPI.UIKit;
 using Terraria;
@@ -10,6 +12,58 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
+        public LockOptions lo = new LockOptions();
+
+        public static Stack<IHUpdateable> toUpdate;
+
+        public static void Initialize(){
+            toUpdate.Push(null);
+        }
+
+        public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
+        {
+            if (Main.playerInventory)
+            {
+                InterfaceLayer.Add(list, lo, InterfaceLayer.LayerInventory, true);
+            }
+        }
+
+        public override bool PreDrawInterface(SpriteBatch sb)
+        {
+            while (toUpdate.Peek()!=null)
+            {
+                toUpdate.Pop().onUpdate(sb);
+            }
+            return true;
+        }
+
+        // public InterfaceLayer lockOptions = new InterfaceLayer.Action("InvisibleHand:lockOptions", (layer, sb) =>
+        // {
+        //     float posX = 2;
+        //     float posY = 30 + Main.inventoryBackTexture.Height;
+        //
+        //     string button = "D";
+        //     Color color = new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor);
+        //
+        //     sb.DrawString(Main.fontMouseText,
+        //                     button,
+        //                     new Vector2(posX, posY),
+        //                     color,
+        //                     0f,
+        //                     default(Vector2),
+        //                     0.9f,
+        //                     SpriteEffects.None,
+        //                     0f);
+        //
+        //
+        // });
+
+// P.heldItem.SetDefaults(ItemDef.byName["Chlorophyte Bullets"].type);
+// P.heldItem.SetDefaults(1179);
+// P.heldItem.SetDefaults(1255);
+// P.heldItem.stack=999;
+
+
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
             if (IHBase.oLockingEnabled && slot.type == "Inventory" && IHPlayer.SlotLocked(slot.index))
@@ -37,7 +91,8 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(slot.index); //toggle lock state
-                    IHUtils.RingBell();
+                    // IHUtils.RingBell();
+                    Main.PlaySound(22, -1, -1, 1); // I think this is the actual "lock" sound
                 }
             }
             return false;
@@ -48,7 +103,7 @@ namespace InvisibleHand
         *   concept. Possibly temporary, though it includes the feature of working
         *   with the craft-guide and reforge slots, which I really like.
         *
-        *   Known Issues:
+        *   Known Issues: ???
         */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)

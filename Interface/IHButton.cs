@@ -8,13 +8,15 @@ namespace InvisibleHand
 {
     public class IHButton
     {
-        public string label;
-        public readonly Texture2D? texture;
+        public readonly string name;
+        public string displayLabel;
+
+        public readonly Texture2D texture;
         public readonly Action onClick;
 
-        public IHButton(string label, Texture2D? tex, Action onClick)
+        public IHButton(string name, Texture2D tex, Action onClick)
         {
-            this.label = label;
+            this.displayLabel = this.name = name;
             this.texture = tex;
             this.onClick = onClick;
         }
@@ -23,31 +25,36 @@ namespace InvisibleHand
         {
             get
             {
-                return (texture.HasValue) ? texture.Value.Size() : Main.fontMouseText.MeasureString(label);
+                return (texture!=null) ? texture.Size() : Main.fontMouseText.MeasureString(displayLabel);
             }
         }
 
         public virtual void Draw(SpriteBatch sb, Vector2 pos)
         {
-            texture.HasValue ? sb.Draw(texture.Value, pos, Color.White) : sb.DrawString(Main.fontMouseText, label, pos, Color.White);
+            if (texture==null)
+            {
+                sb.DrawString(Main.fontMouseText, displayLabel, pos, Color.White);
+            }
+            else {
+                sb.Draw(texture, pos, Color.White);
+            }
         }
 
         public static bool Hovered(IHButton b, Vector2 pos)
         {
             return (new Rectangle((int)pos.X, (int)pos.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
         }
-
     }
 
-    public class IHToggle : IHButton
+    public class IHToggle : IHButton, IHUpdateable
     {
         // protected bool active;
         protected readonly string activeLabel, inactiveLabel;
         public readonly Action onToggle;
         public readonly Func<bool> isActive;
 
-        public IHToggle(string activeLabel, string inactiveLabel, Texture2D? tex, Func<bool> isActive, Action onToggle) :
-            base(label, tex, () => { this.onToggle(); this.changeState(); })
+        public IHToggle(string name, string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle) :
+            base(name, tex, delegate{ onToggle(); })
         {
             this.activeLabel = activeLabel;
             this.inactiveLabel = inactiveLabel;
@@ -55,23 +62,37 @@ namespace InvisibleHand
             this.onToggle = onToggle;
         }
 
-        protected void changeState()
+        public void FlagUpdate()
         {
-            // active = !active;
-            label = isActive() ? activeLabel : inactiveLabel;
+            IHInterface.toUpdate.Push(this);
+        }
+
+        public void onUpdate(SpriteBatch sb)
+        {
+            displayLabel = isActive() ? activeLabel : inactiveLabel;
         }
 
         public override void Draw(SpriteBatch sb, Vector2 pos)
         {
             Color c = isActive() ? Color.White : Color.Gray;
-            texture.HasValue ? sb.Draw(texture.Value, pos, c) : sb.DrawString(Main.fontMouseText, label, pos, c);
+            if (texture==null)
+            {
+                sb.DrawString(Main.fontMouseText, displayLabel, pos, c);
+            }
+            else {
+                sb.Draw(texture, pos, c);
+            }
+
+            if (IHButton.Hovered(this, pos))
+            {
+                if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
+            }
         }
 
         public static bool IsActive(IHToggle t)
         {
             return t.isActive();
         }
-
     }
 
 }

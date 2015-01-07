@@ -16,15 +16,22 @@ namespace InvisibleHand
         //alt functions
         public bool control_rSort,  control_sDeposit,   control_rStack;
 
-        public static bool[] lockedSlots = new bool[40]; //not the hotbar
+        private bool[] lockedSlots; // = new bool[40]; //not the hotbar
 
-        public static bool daLocked, laLocked, qsLocked;
+        public bool daLocked, laLocked, qsLocked;
 
+        public override void Initialize()
+        {
+            // MUST use "new", as tAPI derps with clearing (quote: Miraimai)
+            lockedSlots = new bool[40];
+            daLocked = laLocked = qsLocked = false;
+        }
 
         // save locked-slot state with player
         public override void Save(BinBuffer bb)
         {
-            if (!IHBase.oLockingEnabled) return;
+            // if (!IHBase.oLockingEnabled) return;
+            // let's just do it anyway
             for (int i=0; i<lockedSlots.Length; i++)
             {
                 bb.Write(lockedSlots[i]);
@@ -32,15 +39,13 @@ namespace InvisibleHand
             bb.Write(daLocked);
             bb.Write(laLocked);
             bb.Write(qsLocked);
-
-
         }
 
         //load back locked-slot state
         public override void Load(BinBuffer bb)
         {
             if (bb.IsEmpty) return;
-            lockedSlots = new bool[40];
+            // lockedSlots = new bool[40];
 
             for (int i=0; i<lockedSlots.Length; i++)
             {
@@ -51,7 +56,7 @@ namespace InvisibleHand
             laLocked=bb.ReadBool();
             qsLocked=bb.ReadBool();
 
-            // update buttons to set initial state
+            // update buttons to set initial state FIXME: NOT WORKING!!!!!
             while (IHBase.toUpdate.Peek()!=null)
             {
                 IHBase.toUpdate.Pop().Update();
@@ -87,56 +92,60 @@ namespace InvisibleHand
 
                 if (control_sort || control_rSort) // Sort inventory/chest
                 {
-                    if ( player.chestItems == null ) // no valid chest open, sort player inventory
+                    // NOTE: this used to check player.chestItems==null, but I once got a
+                    // "object reference not set to instance of object" or whatever kind of error
+                    // with that check elsewhere in the code. This should be safer and have the exact same result.
+                    if ( player.chest == -1 ) // no valid chest open, sort player inventory
                     {
+                        // control_rSort XOR oRevSortPlayer:
+                        //   this will reverse the sort IFF exactly one of these two bools is true
                         IHOrganizer.SortPlayerInv(player, control_rSort ^ IHBase.oRevSortPlayer);
                         return;
                     }
                     // else call sort on the Item[] array returned by chestItems
                     IHOrganizer.SortChest(player.chestItems, control_rSort ^ IHBase.oRevSortChest);
-                    return;
+                    // return;
                 }
 
-                if (control_clean) //Consolidate Stacks
+                else if (control_clean) //Consolidate Stacks
                 {
-                    if ( player.chestItems == null )
+                    if ( player.chest == -1 )
                     {
                         IHOrganizer.ConsolidateStacks(player.inventory, 0, 50);
                         return;
                     }
                     IHOrganizer.ConsolidateStacks(player.chestItems);
-                    return;
+                    // return;
                 }
-
-                if (control_qStack) //QuickStack
+                else if (control_qStack) //QuickStack
                 {
-                    if ( player.chestItems == null ) return;
+                    if ( player.chest == -1 ) return;
                     IHUtils.DoQuickStack(player);
-                    return;
+                    // return;
                 }
-                if (control_lootAll) //LootAll
+                else if (control_lootAll) //LootAll
                 {
-                    if ( player.chestItems == null ) return;
+                    if ( player.chest == -1 ) return;
                     IHUtils.DoLootAll(player);
-                    return;
+                    // return;
                 }
-                if (control_depositAll) //DepositAll
+                else if (control_depositAll) //DepositAll
                 {
-                    if ( player.chestItems == null ) return;
+                    if ( player.chest == -1 ) return;
                     IHUtils.DoDepositAll(player);
-                    return;
+                    // return;
                 }
-                if (control_sDeposit) //SmartDeposit
+                else if (control_sDeposit) //SmartDeposit
                 {
-                    if ( player.chestItems == null ) return;
+                    if ( player.chest == -1 ) return;
                     IHSmartStash.SmartDeposit();
-                    return;
+                    // return;
                 }
-                if (control_rStack) //SmartLoot
+                else if (control_rStack) //SmartLoot
                 {
-                    if ( player.chestItems == null ) return;
+                    if ( player.chest == -1 ) return;
                     IHSmartStash.SmartLoot();
-                    return;
+                    // return;
                 }
 
             }

@@ -19,14 +19,9 @@ namespace InvisibleHand
         *   with locked slots.
 
             At the moment, the text (placeholder for future button textures) actually
-            shows up and can be toggled by clicking on it.
-            FIXME: Initially, the display text is the button name, rather than its corresponding
-                    active/inactive label.
-            FIXME: The default left click action still occurs when clicking on the buttons (e.g. weapon used, etc.)
-            FIXME: No visual or audible feedback when bringing the mouse to hover over the button.
-            FIXME: These should show up only when a chest is open
-            TODO: On that note, they should be moved down to the left of the chest item slots.
-            TODO: Actually test to make sure the BinBuffer saving/loading in IHPlayer works.
+            shows up and can be toggled by clicking on it. Save/load w/ player works
+            FIXME: Initially, the display text is the disabled label regardles of its actual state, though the coloring is correct
+            FIXME: No visual feedback when bringing the mouse to hover over the button.
             TODO: Actually implement the check for these options in the IHUtils code
 
             FIXME: this function (this entire *class*) is an absolute mess.
@@ -37,45 +32,44 @@ namespace InvisibleHand
         */
         public LockOptions() : base("InvisibleHand:LockOptions")
         {
-            lockDA = new IHToggle("dalock", "DA", "da", null, () => {return IHPlayer.daLocked;}, () =>
+            // this should put the buttons to the left of the chest inventory
+            float posX = 73 - (Main.inventoryBackTexture.Width * Main.inventoryScale);
+            float posY = API.main.invBottom + (Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
+
+            PosDA = new Vector2(posX, posY);
+            PosLA = new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale));
+            PosQS = new Vector2(posX, 2*(Main.inventoryBackTexture.Height * Main.inventoryScale) + posY);
+
+
+            lockDA = new IHToggle("DA", "da", null, () => IHPlayer.daLocked, () => //onToggle
 //            lockDA = new IHToggle("dalock", "Deposit All Locked", "Deposit All Unlocked", null, () => {return IHPlayer.daLocked;}, () =>
             {
                 IHPlayer.daLocked=!IHPlayer.daLocked;
-                lockDA.FlagUpdate();
-            });
-            lockDA.FlagUpdate();
+                lockDA.Update();
+            }, PosDA);
+            IHBase.FlagUpdate(lockDA);
 
             buttons[0]=lockDA;
 
-            lockLA = new IHToggle("lalock", "LA", "la", null, () => {return IHPlayer.laLocked;}, () =>
+            lockLA = new IHToggle("LA", "la", null, () => IHPlayer.laLocked, () => //onToggle
             // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
             {
                 IHPlayer.laLocked=!IHPlayer.laLocked;
-                lockLA.FlagUpdate();
-            });
-            lockLA.FlagUpdate();
+                lockLA.Update();
+            }, PosLA);
+            IHBase.FlagUpdate(lockLA);
 
             buttons[1]=lockLA;
 
-            lockQS = new IHToggle("qslock", "QS", "qs", null, () => {return IHPlayer.qsLocked;}, () =>
+            lockQS = new IHToggle("QS", "qs", null, () => IHPlayer.qsLocked, () => //onToggle
             // lockQS = new IHToggle("qslock", "Quick Stack Locked", "Quick Stack Unlocked", null, () => {return IHPlayer.qsLocked;}, () =>
             {
                 IHPlayer.qsLocked=!IHPlayer.qsLocked;
-                lockQS.FlagUpdate();
-            });
-            lockQS.FlagUpdate();
+                lockQS.Update();
+            }, PosQS);
+            IHBase.FlagUpdate(lockQS);
 
             buttons[2]=lockQS;
-
-            float posX = 2;
-            float posY = 30 + Main.inventoryBackTexture.Height;
-
-            PosDA = new Vector2(posX, posY);
-            positions[0]=PosDA;
-            PosLA = new Vector2(posX, posY + Main.inventoryBackTexture.Height);
-            positions[1]=PosLA;
-            PosQS = new Vector2(posX, 2*Main.inventoryBackTexture.Height + posY);
-            positions[2]=PosQS;
 
         }
 
@@ -83,7 +77,7 @@ namespace InvisibleHand
         {
             for (int i=0; i<3; i++)
             {
-                buttons[i].Draw(sb, positions[i]);
+                buttons[i].Draw(sb);
             }
         }
     }

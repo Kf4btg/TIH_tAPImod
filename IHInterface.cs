@@ -16,20 +16,20 @@ namespace InvisibleHand
 
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
-            if (Main.playerInventory)
+            if (Main.playerInventory && Main.localPlayer.chest!=-1)
             {
                 InterfaceLayer.Add(list, lo, InterfaceLayer.LayerInventory, true);
             }
         }
 
-        public override bool PreDrawInterface(SpriteBatch sb)
-        {
-            while (IHBase.toUpdate.Peek()!=null)
-            {
-                IHBase.toUpdate.Pop().onUpdate(sb);
-            }
-            return true;
-        }
+        // public override bool PreDrawInterface(SpriteBatch sb)
+        // {
+            // while (IHBase.toUpdate.Peek()!=null)
+            // {
+            //     IHBase.toUpdate.Pop().onUpdate(sb);
+            // }
+            // return true;
+        // }
 
 
 // P.heldItem.SetDefaults(ItemDef.byName["Chlorophyte Bullets"].type);

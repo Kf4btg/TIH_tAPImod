@@ -9,16 +9,20 @@ namespace InvisibleHand
     public class IHButton
     {
         public readonly string name;
-        public string displayLabel;
-
         public readonly Texture2D texture;
         public readonly Action onClick;
 
-        public IHButton(string name, Texture2D tex, Action onClick)
+        public string displayLabel;
+        public Vector2 pos;
+        public bool isHovered;
+
+
+        public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null)
         {
             this.displayLabel = this.name = name;
             this.texture = tex;
             this.onClick = onClick;
+            this.pos = pos ?? default(Vector2);
         }
 
         public Vector2 Size
@@ -28,7 +32,7 @@ namespace InvisibleHand
             }
         }
 
-        public virtual void Draw(SpriteBatch sb, Vector2 pos)
+        public virtual void Draw(SpriteBatch sb)
         {
             if (texture==null)
             {
@@ -37,14 +41,21 @@ namespace InvisibleHand
             else {
                 sb.Draw(texture, pos, Color.White);
             }
+
+            if (IHButton.Hovered(this))
+            {
+                Main.localPlayer.mouseInterface = true;
+                if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
+            }
         }
 
-        public static bool Hovered(IHButton b, Vector2 pos)
+        public static bool Hovered(IHButton b)
         {
-            return (new Rectangle((int)pos.X, (int)pos.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
+            return (new Rectangle((int)b.pos.X, (int)b.pos.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
         }
     }
 
+    //
     public class IHToggle : IHButton, IHUpdateable
     {
         // protected bool active;
@@ -53,8 +64,10 @@ namespace InvisibleHand
         public readonly Func<bool> isActive;
         // public readonly IHToggle me;
 
-        public IHToggle(string name, string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle) :
-            base(name, tex, delegate{ onToggle(); })
+        public Color stateColor = Color.White;
+
+        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null) :
+            base(activeLabel, tex, delegate{ onToggle(); }, pos)
         {
             this.activeLabel = activeLabel;
             this.inactiveLabel = inactiveLabel;
@@ -63,34 +76,57 @@ namespace InvisibleHand
 
             // me=this;
 
-            // FlagUpdate();
         }
 
+        // public void FlagUpdate()
+        // {
+        //     // IHToggle.MarkUpdate(this);
+        //     IHBase.toUpdate.Push(this);
+        // }
 
-        public void FlagUpdate()
+        public void Update()
         {
-            IHToggle.MarkUpdate(this);
+            // displayLabel = isActive() ? activeLabel : inactiveLabel;
+            if (isActive())
+            {
+                stateColor = Color.White;
+                displayLabel = activeLabel;
+                return;
+            }
+            stateColor = Color.Gray;
+            displayLabel = inactiveLabel;
         }
+        //
+        // public void onUpdate(SpriteBatch sb)
+        // {
+        //     displayLabel = isActive() ? activeLabel : inactiveLabel;
+        // }
 
-        public void onUpdate(SpriteBatch sb)
+        public override void Draw(SpriteBatch sb)
         {
-            displayLabel = isActive() ? activeLabel : inactiveLabel;
-        }
 
-        public override void Draw(SpriteBatch sb, Vector2 pos)
-        {
-            Color c = isActive() ? Color.White : Color.Gray;
             if (texture==null)
             {
-                sb.DrawString(Main.fontMouseText, displayLabel, pos, c);
+                sb.DrawString(Main.fontMouseText, displayLabel, pos, stateColor);
             }
             else {
-                sb.Draw(texture, pos, c);
+                sb.Draw(texture, pos, stateColor);
             }
 
-            if (IHButton.Hovered(this, pos))
+            if (IHButton.Hovered(this))
             {
+                if (!isHovered)
+                {
+                    Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
+                    isHovered = true;
+                }
+
+                Main.localPlayer.mouseInterface = true;
                 if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
+            }
+            else
+            {
+                isHovered = false;
             }
         }
 
@@ -98,11 +134,11 @@ namespace InvisibleHand
         {
             return t.isActive();
         }
-
-        public static void MarkUpdate(IHToggle t)
-        {
-            IHBase.toUpdate.Push(t);
-        }
+        //
+        // public static void MarkUpdate(IHToggle t)
+        // {
+        //     IHBase.toUpdate.Push(t);
+        // }
     }
 
 }

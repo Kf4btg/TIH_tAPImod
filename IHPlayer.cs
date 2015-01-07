@@ -32,6 +32,8 @@ namespace InvisibleHand
             bb.Write(daLocked);
             bb.Write(laLocked);
             bb.Write(qsLocked);
+
+
         }
 
         //load back locked-slot state
@@ -48,6 +50,12 @@ namespace InvisibleHand
             daLocked=bb.ReadBool();
             laLocked=bb.ReadBool();
             qsLocked=bb.ReadBool();
+
+            // update buttons to set initial state
+            while (IHBase.toUpdate.Peek()!=null)
+            {
+                IHBase.toUpdate.Pop().Update();
+            }
         }
 
         public override void PreUpdate()

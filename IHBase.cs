@@ -104,6 +104,11 @@ namespace InvisibleHand
                 break;
             }
         }
+
+        public static void FlagUpdate(IHUpdateable u)
+        {
+            toUpdate.Push(u);
+        }
     }
 
 

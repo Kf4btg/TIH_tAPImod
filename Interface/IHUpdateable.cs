@@ -6,8 +6,9 @@ namespace InvisibleHand
 {
     public interface IHUpdateable
     {
-        void onUpdate(SpriteBatch sb);
+        // void onUpdate(SpriteBatch sb);
+        void Update();
 
-        void FlagUpdate();
+        // void FlagUpdate();
     }
 }

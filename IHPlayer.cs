@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework.Input;
 using TAPI;
 using Terraria;
 
-
 namespace InvisibleHand
 {
-
     public class IHPlayer : ModPlayer
     {
 
@@ -15,10 +13,13 @@ namespace InvisibleHand
 
         public bool control_qStack, control_depositAll, control_lootAll;
 
-        //alt functions 
+        //alt functions
         public bool control_rSort,  control_sDeposit,   control_rStack;
 
         public static bool[] lockedSlots = new bool[40]; //not the hotbar
+
+        public static bool daLocked, laLocked, qsLocked;
+
 
         // save locked-slot state with player
         public override void Save(BinBuffer bb)
@@ -28,6 +29,9 @@ namespace InvisibleHand
             {
                 bb.Write(lockedSlots[i]);
             }
+            bb.Write(daLocked);
+            bb.Write(laLocked);
+            bb.Write(qsLocked);
         }
 
         //load back locked-slot state
@@ -39,6 +43,9 @@ namespace InvisibleHand
             for (int i=0; i<lockedSlots.Length; i++)
             {
                 lockedSlots[i]=bb.ReadBool();
+                daLocked=bb.ReadBool();
+                laLocked=bb.ReadBool();
+                qsLocked=bb.ReadBool();
             }
         }
 

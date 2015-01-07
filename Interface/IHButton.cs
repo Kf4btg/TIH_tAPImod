@@ -8,7 +8,7 @@ namespace InvisibleHand
 {
     public class IHButton
     {
-        public readonly string label;
+        public string label;
         public readonly Texture2D? texture;
         public readonly Action onClick;
 
@@ -41,18 +41,35 @@ namespace InvisibleHand
 
     public class IHToggle : IHButton
     {
-        protected bool active;
+        // protected bool active;
+        protected readonly string activeLabel, inactiveLabel;
         public readonly Action onToggle;
+        public readonly Func<bool> isActive;
 
-        public IHToggle(string label, Texture2D? tex, Action onToggle) : base(label, tex, () => { this.onToggle(); this.active = !this.active; })
+        public IHToggle(string activeLabel, string inactiveLabel, Texture2D? tex, Func<bool> isActive, Action onToggle) :
+            base(label, tex, () => { this.onToggle(); this.changeState(); })
         {
+            this.activeLabel = activeLabel;
+            this.inactiveLabel = inactiveLabel;
+            this.isActive = isActive;
             this.onToggle = onToggle;
+        }
+
+        protected void changeState()
+        {
+            // active = !active;
+            label = isActive() ? activeLabel : inactiveLabel;
         }
 
         public override void Draw(SpriteBatch sb, Vector2 pos)
         {
-            Color c = this.active ? Color.White : Color.Gray;
+            Color c = isActive() ? Color.White : Color.Gray;
             texture.HasValue ? sb.Draw(texture.Value, pos, c) : sb.DrawString(Main.fontMouseText, label, pos, c);
+        }
+
+        public static bool IsActive(IHToggle t)
+        {
+            return t.isActive();
         }
 
     }

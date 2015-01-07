@@ -43,10 +43,11 @@ namespace InvisibleHand
             for (int i=0; i<lockedSlots.Length; i++)
             {
                 lockedSlots[i]=bb.ReadBool();
-                daLocked=bb.ReadBool();
-                laLocked=bb.ReadBool();
-                qsLocked=bb.ReadBool();
             }
+            if (bb.IsEmpty) return;
+            daLocked=bb.ReadBool();
+            laLocked=bb.ReadBool();
+            qsLocked=bb.ReadBool();
         }
 
         public override void PreUpdate()

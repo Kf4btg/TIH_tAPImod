@@ -43,7 +43,7 @@ namespace InvisibleHand
                 lockQS.FlagUpdate();
             });
             lockQS.FlagUpdate();
-            
+
             buttons[2]=lockQS;
 
             float posX = 2;

@@ -14,12 +14,6 @@ namespace InvisibleHand
     {
         public LockOptions lo = new LockOptions();
 
-        public static Stack<IHUpdateable> toUpdate;
-
-        public static void Initialize(){
-            toUpdate.Push(null);
-        }
-
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
             if (Main.playerInventory)
@@ -30,33 +24,13 @@ namespace InvisibleHand
 
         public override bool PreDrawInterface(SpriteBatch sb)
         {
-            while (toUpdate.Peek()!=null)
+            while (IHBase.toUpdate.Peek()!=null)
             {
-                toUpdate.Pop().onUpdate(sb);
+                IHBase.toUpdate.Pop().onUpdate(sb);
             }
             return true;
         }
 
-        // public InterfaceLayer lockOptions = new InterfaceLayer.Action("InvisibleHand:lockOptions", (layer, sb) =>
-        // {
-        //     float posX = 2;
-        //     float posY = 30 + Main.inventoryBackTexture.Height;
-        //
-        //     string button = "D";
-        //     Color color = new Color(Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor, Main.mouseTextColor);
-        //
-        //     sb.DrawString(Main.fontMouseText,
-        //                     button,
-        //                     new Vector2(posX, posY),
-        //                     color,
-        //                     0f,
-        //                     default(Vector2),
-        //                     0.9f,
-        //                     SpriteEffects.None,
-        //                     0f);
-        //
-        //
-        // });
 
 // P.heldItem.SetDefaults(ItemDef.byName["Chlorophyte Bullets"].type);
 // P.heldItem.SetDefaults(1179);

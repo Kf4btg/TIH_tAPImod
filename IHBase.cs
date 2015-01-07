@@ -1,5 +1,5 @@
 using System;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 using TAPI;
 using Terraria;
 using Microsoft.Xna.Framework.Input;
@@ -11,6 +11,7 @@ namespace InvisibleHand
     public class IHBase : ModBase
     {
         public static Texture2D lockedIcon;
+        public static Stack<IHUpdateable> toUpdate = new Stack<IHUpdateable>();
 
         public static Keys
             key_sort, key_cleanStacks, key_quickStack, key_depositAll, key_lootAll;
@@ -26,11 +27,12 @@ namespace InvisibleHand
         public static bool oRevSortPlayer;
         public static bool oRevSortChest;
 
-        public static ModBase self { get; private set; }
+        public static IHBase self { get; private set; }
 
         public override void OnLoad()
         {
             self = this;
+            toUpdate.Push(null); //null will mark the end of the elements needing update
         }
 
         public override void OnAllModsLoaded()
@@ -38,7 +40,6 @@ namespace InvisibleHand
             lockedIcon = self.textures["resources/LockIndicator"];
 
             CategoryDef.Initialize();
-            IHInterface.Initialize();
         }
 
         public override void OptionChanged(Option option)

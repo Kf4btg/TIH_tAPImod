@@ -23,8 +23,7 @@ namespace InvisibleHand
 
         public Vector2 Size
         {
-            get
-            {
+            get {
                 return (texture!=null) ? texture.Size() : Main.fontMouseText.MeasureString(displayLabel);
             }
         }
@@ -52,6 +51,7 @@ namespace InvisibleHand
         protected readonly string activeLabel, inactiveLabel;
         public readonly Action onToggle;
         public readonly Func<bool> isActive;
+        // public readonly IHToggle me;
 
         public IHToggle(string name, string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle) :
             base(name, tex, delegate{ onToggle(); })
@@ -60,11 +60,16 @@ namespace InvisibleHand
             this.inactiveLabel = inactiveLabel;
             this.isActive = isActive;
             this.onToggle = onToggle;
+
+            // me=this;
+
+            // FlagUpdate();
         }
+
 
         public void FlagUpdate()
         {
-            IHInterface.toUpdate.Push(this);
+            IHToggle.MarkUpdate(this);
         }
 
         public void onUpdate(SpriteBatch sb)
@@ -92,6 +97,11 @@ namespace InvisibleHand
         public static bool IsActive(IHToggle t)
         {
             return t.isActive();
+        }
+
+        public static void MarkUpdate(IHToggle t)
+        {
+            IHBase.toUpdate.Push(t);
         }
     }
 

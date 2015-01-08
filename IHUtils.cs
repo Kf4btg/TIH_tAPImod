@@ -43,6 +43,17 @@ namespace InvisibleHand
             if (player.chest == -1) return;
             bool sendNetMsg = player.chest > -1;
 
+            if (IHPlayer.ActionLocked(player, VAction.DA))
+            {
+                for (int i=R_START; i >= R_END; i--)
+                {
+                    if (IHPlayer.SlotLocked(player, i) ||  player.inventory[i].IsBlank()) continue;
+                    MoveItemToChest(i, sendNetMsg);
+                }
+                Recipe.FindRecipes(); // !ref:Main:#22640.36#
+                return;
+            }
+
             for (int i=R_START; i >= R_END; i--)
             {
                 if (!player.inventory[i].IsBlank()) MoveItemToChest(i, sendNetMsg);
@@ -87,20 +98,23 @@ namespace InvisibleHand
         public static void DoQuickStack(Player player)
         {
             if (player.chest == -1) return;
-            QuickStack(player.inventory, player.chestItems,  player.chest > -1);
+            // QuickStack(player.inventory, player.chestItems,  player.chest > -1, IHPlayer.ActionLocked(player, VAction.QS));
 
-            Recipe.FindRecipes(); // !ref:Main:#22640.36#
-        }//\DoQuickStack()
+            Item[] inventory = player.inventory;
+            Item[] container = player.chestItems;
+            bool sendMessage = player.chest > -1;
+            bool checkLocks  = IHPlayer.ActionLocked(player, VAction.QS);
 
-        private static void QuickStack(Item[] inventory, Item[] container, bool sendMessage)
-        {
+
             for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
             {                                                                                   //if chest item is not blank && not a full stack, then
                 if (!container[iC].IsBlank() && container[iC].stack < container[iC].maxStack)
                 {                                                                               //for each item in inventory (including coins, ammo, hotbar),
                     for (int iP=0; iP<58; iP++)
-                    {                                                                           //if chest item matches inv. item...
-                        if (container[iC].IsTheSameAs(inventory[iP]))
+                    {
+                        if (checkLocks && IHPlayer.SlotLocked(player, iP)) continue;            // if we're checking locks ignore the locked ones
+
+                        if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
                         {
                             RingBell();                                                         //...play "item-moved" sound and...
                                                                                                 // ...merge inv. item stack to chest item stack
@@ -119,7 +133,8 @@ namespace InvisibleHand
                     }
                 }
             }
-        }//\QuickStack()
+            Recipe.FindRecipes(); // !ref:Main:#22640.36#
+            }//\QuickStack()
     #endregion
 
         //------------------------------------------------------//

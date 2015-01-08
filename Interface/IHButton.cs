@@ -10,7 +10,8 @@ namespace InvisibleHand
     {
         public readonly string name;
         public readonly Texture2D texture;
-        public readonly Action onClick;
+
+        public Action onClick { get; protected set; }
 
         public string displayLabel;
         public Vector2 pos;
@@ -54,11 +55,11 @@ namespace InvisibleHand
         }
     }
 
+    //, IHUpdateable
     // a button with 2 states: active and inactive. OnClick() toggles between the states
-    public class IHToggle : IHButton, IHUpdateable
+    public class IHToggle : IHButton
     {
         public readonly string activeLabel, inactiveLabel;
-        // public readonly Action onToggle;
         public readonly Func<bool> IsActive;
         protected readonly Action setActive, setInactive;
 

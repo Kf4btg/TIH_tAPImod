@@ -1,25 +1,29 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using TAPI;
 using Terraria;
 
 namespace InvisibleHand
 {
+    public enum VAction { QS, DA, LA }
+
     public class IHPlayer : ModPlayer
     {
-        //because C# enums annoy me...
-        public const int VACTION_QS=0, VACTION_DA=1, VACTION_LA=2; // vanilla action IDs
-
         private bool[] lockedSlots;
 
-        private bool[] lockedActions;
+        private Dictionary<VAction,bool> LockedActions;
 
         public override void Initialize()
         {
             // MUST use "new", as tAPI derps with clearing (quote: Miraimai)
             lockedSlots = new bool[40]; //not the hotbar
 
-            lockedActions = new bool[VACTION_LA+1]; //initialize all elements to false
+            LockedActions = new Dictionary<VAction,bool>();
+            foreach (VAction aID in Enum.GetValues(typeof(VAction)))
+            {
+                LockedActions.Add(aID, false);
+            }
         }
 
         // save locked-slot state with player
@@ -31,9 +35,11 @@ namespace InvisibleHand
             {
                 bb.Write(lockedSlots[i]);
             }
-            for (int i=0; i<lockedActions.Length; i++)
+            bb.Write(LockedActions.Count);
+            foreach (KeyValuePair<VAction, bool> kvp in LockedActions)
             {
-                bb.Write(lockedActions[i]);
+                bb.Write((int)kvp.Key);
+                bb.Write(kvp.Value);
             }
         }
 
@@ -48,9 +54,14 @@ namespace InvisibleHand
                 lockedSlots[i]=bb.ReadBool();
             }
             if (bb.IsEmpty) return;
-            for (int i=0; i<lockedActions.Length; i++)
+
+            int count = bb.ReadInt();
+            for (int i=0; i<count; i++)
             {
-                lockedActions[i]=bb.ReadBool();
+                int aID = bb.ReadInt();
+                bool state = bb.ReadBool();
+                if (Enum.IsDefined(typeof(VAction), aID))
+                    LockedActions[(VAction)aID] = state;
             }
         }
 
@@ -64,7 +75,7 @@ namespace InvisibleHand
             if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && Main.localPlayer.talkNPC==-1)
             {
 
-                if (IHBase.ActionKeys["Sort"].Pressed())// || control_rSort) // Sort inventory/chest
+                if (IHBase.ActionKeys["Sort"].Pressed()) // Sort inventory/chest
                 {
                     // NOTE: this used to check player.chestItems==null, but I once got a
                     // "object reference not set to instance of object" or whatever kind of error
@@ -120,16 +131,18 @@ namespace InvisibleHand
             mp.lockedSlots[slotIndex-10]=!mp.lockedSlots[slotIndex-10];
         }
 
-        public static bool ActionLocked(Player player, int actionID)
+        public static bool ActionLocked(Player player, VAction actionID)
         {
             IHPlayer mp = player.GetSubClass<IHPlayer>();
-            return mp.lockedActions[actionID];
+            // try { // if the key isn't there (e.g. new character, etc) return false
+                return mp.LockedActions[actionID];
+            // } catch {return false;}
         }
 
-        public static void ToggleActionLock(Player p, int actionID)
+        public static void ToggleActionLock(Player p, VAction actionID)
         {
             IHPlayer mp = p.GetSubClass<IHPlayer>();
-            mp.lockedActions[actionID] = !mp.lockedActions[actionID];
+            mp.LockedActions[actionID] = !mp.LockedActions[actionID];
         }
     }
 }

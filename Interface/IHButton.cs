@@ -57,31 +57,54 @@ namespace InvisibleHand
     // a button with 2 states: active and inactive. OnClick() toggles between the states
     public class IHToggle : IHButton, IHUpdateable
     {
-        protected readonly string activeLabel, inactiveLabel;
-        public readonly Action onToggle;
-        public readonly Func<bool> isActive;
+        public readonly string activeLabel, inactiveLabel;
+        // public readonly Action onToggle;
+        public readonly Func<bool> IsActive;
+        protected readonly Action setActive, setInactive;
 
         public Color stateColor = Color.White;
 
         public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null) :
-            base(activeLabel, tex, delegate{ onToggle(); }, pos)
+            base(activeLabel, tex, null, pos)
         {
-            this.activeLabel = activeLabel;
+            this.activeLabel   = activeLabel;
             this.inactiveLabel = inactiveLabel;
-            this.isActive = isActive;
-            this.onToggle = onToggle;
+            this.IsActive      = isActive;
+            this.onClick       = () => Toggle(onToggle);
+
+            //defaults if not specified
+            this.setActive   = () => { stateColor = Color.White; displayLabel =   activeLabel; };
+            this.setInactive = () => { stateColor =  Color.Gray; displayLabel = inactiveLabel; };
+        }
+
+        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Action setActive, Action setInActive, Vector2? pos=null) :
+        base(activeLabel, tex, null, pos)
+        {
+            this.activeLabel   = activeLabel;
+            this.inactiveLabel = inactiveLabel;
+            this.IsActive      = isActive;
+            this.onClick       = () => Toggle(onToggle);
+            this.setActive     = setActive;
+            this.setInactive   = setInActive;
         }
 
         public void Update()
         {
-            if (isActive())
-            {
-                stateColor = Color.White;
-                displayLabel = activeLabel;
-                return;
-            }
-            stateColor = Color.Gray;
-            displayLabel = inactiveLabel;
+            UpdateState(IsActive());
+        }
+
+        public void UpdateState(bool isActive)
+        {
+            if (isActive)
+                setActive();
+            else
+                setInactive();
+        }
+
+        public void Toggle(Action onToggle)
+        {
+            onToggle();
+            UpdateState(IsActive());
         }
 
         public override void Draw(SpriteBatch sb)
@@ -105,9 +128,9 @@ namespace InvisibleHand
             else isHovered = false;
         }
 
-        public static bool IsActive(IHToggle t)
+        public static bool GetState(IHToggle t)
         {
-            return t.isActive();
+            return t.IsActive();
         }
     }
 }

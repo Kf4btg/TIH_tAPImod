@@ -29,15 +29,6 @@ namespace InvisibleHand
 
             Buttons = new Dictionary<VAction, IHToggle>();
 
-            // lockQS = new IHToggle("qslock", "Quick Stack Locked", "Quick Stack Unlocked", null, () => {return IHPlayer.qsLocked;}, () =>
-            Buttons[VAction.QS] = new IHToggle("QS", "qs", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.QS), () => //onToggle
-                {
-                    Main.PlaySound(22, -1, -1, 1);
-                    IHPlayer.ToggleActionLock(Main.localPlayer, VAction.QS);
-                    Buttons[VAction.QS].Update();
-                },
-                new Vector2(posX, 2*(Main.inventoryBackTexture.Height * Main.inventoryScale) + posY) );
-
             // lockDA = new IHToggle("dalock", "Deposit All Locked", "Deposit All Unlocked", null, () => {return IHPlayer.daLocked;}, () =>
             Buttons[VAction.DA] = new IHToggle("DA", "da", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.DA), () => //onToggle
                 {
@@ -47,14 +38,24 @@ namespace InvisibleHand
                 },
                 new Vector2(posX, posY) );
 
-            // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
-            Buttons[VAction.LA] =  new IHToggle("LA", "la", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.LA), () => //onToggle
+            // lockQS = new IHToggle("qslock", "Quick Stack Locked", "Quick Stack Unlocked", null, () => {return IHPlayer.qsLocked;}, () =>
+            Buttons[VAction.QS] = new IHToggle("QS", "qs", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.QS), () => //onToggle
                 {
                     Main.PlaySound(22, -1, -1, 1);
-                    IHPlayer.ToggleActionLock(Main.localPlayer, VAction.LA);
-                    Buttons[VAction.LA].Update();
+                    IHPlayer.ToggleActionLock(Main.localPlayer, VAction.QS);
+                    Buttons[VAction.QS].Update();
                 },
-                new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale)) );
+                new Vector2(posX, (Main.inventoryBackTexture.Height * Main.inventoryScale) + posY) );
+
+
+            // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
+            // Buttons[VAction.LA] =  new IHToggle("LA", "la", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.LA), () => //onToggle
+            //     {
+            //         Main.PlaySound(22, -1, -1, 1);
+            //         IHPlayer.ToggleActionLock(Main.localPlayer, VAction.LA);
+            //         Buttons[VAction.LA].Update();
+            //     },
+            //     new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale * 2)) );
 
         }
 

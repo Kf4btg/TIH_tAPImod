@@ -68,11 +68,11 @@ namespace InvisibleHand
 
             // get copies of viable items from container.
             // will need a different list if locking is enabled
-            if (!chest && IHBase.oLockingEnabled)
+            if (!chest && IHBase.ModOptions["LockingEnabled"])
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
-                    if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
+                    if (IHPlayer.SlotLocked(Main.localPlayer, i) || container[i].IsBlank()) continue;
 
                     itemList.Add(container[i].Clone());
                     count++;
@@ -142,7 +142,7 @@ namespace InvisibleHand
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
             // for clarity
-            bool checkLocks = IHBase.oLockingEnabled;
+            bool checkLocks = IHBase.ModOptions["LockingEnabled"];
 
             // get copies of the items and send them off to be sorted
             var itemSorter = OrganizeItems(GetItemCopies(container, chest, range));
@@ -151,7 +151,7 @@ namespace InvisibleHand
             if (reverse) itemSorter.Reverse(); //reverse on user request
 
             // depending on user settings, decide if we copy items to end or beginning of container
-            bool fillFromEnd = chest ? IHBase.oRearSortChest : IHBase.oRearSortPlayer;
+            bool fillFromEnd = chest ? IHBase.ModOptions["RearSortChest"] : IHBase.ModOptions["RearSortPlayer"];
 
             // set up the functions that will be used in the iterators ahead
             Func<int,int> getIndex, getIter;
@@ -162,14 +162,14 @@ namespace InvisibleHand
                 getIndex = x => range.Item2 - x;
                 getIter = x => x-1;
                 getCond = x => x >= range.Item1;
-                getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(x);
+                getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(Main.localPlayer, x);
             }
             else 	// use incrementing iterators
             {
                 getIndex = y => range.Item1 + y;
                 getIter = y => y+1;
                 getCond = y => y <= range.Item2;
-                getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
+                getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(Main.localPlayer, y);
             }
 
             int filled = 0;
@@ -182,7 +182,7 @@ namespace InvisibleHand
                     // this would throw an exception if range.Item1+filled somehow went over 49,
                     // but if the categorizer and slot-locker are functioning correctly,
                     // that _shouldn't_ be possible. Shouldn't. Probably.
-                    while (IHPlayer.SlotLocked(getIndex(filled))) { filled++; }
+                    while (IHPlayer.SlotLocked(Main.localPlayer, getIndex(filled))) { filled++; }
                     container[getIndex(filled++)] = item.Clone();
                     Main.PlaySound(7, -1, -1, 1);
                 }
@@ -190,7 +190,7 @@ namespace InvisibleHand
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
                 {
                     // find the first unlocked slot.
-                    if (IHPlayer.SlotLocked(i)) continue;
+                    if (IHPlayer.SlotLocked(Main.localPlayer, i)) continue;
 
                     container[i] = new Item();
                 }

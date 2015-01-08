@@ -11,7 +11,7 @@ namespace InvisibleHand
     {
         // protected readonly IHToggle lockDA, lockLA, lockQS;
         // private readonly IHToggle[] buttons = new IHToggle[3];
-        private readonly List<IHToggle> buttons;
+        public readonly List<IHToggle> buttons;
         internal int buttonCount;
 
         /*****************************************************************
@@ -36,44 +36,45 @@ namespace InvisibleHand
             float posY = API.main.invBottom + (Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
 
             buttons = new List<IHToggle>();
-            buttonCount = 0;
+            // buttonCount = 0;
 
-            buttons.Add(new IHToggle("DA", "da", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.DA), () => //onToggle
-//            lockDA = new IHToggle("dalock", "Deposit All Locked", "Deposit All Unlocked", null, () => {return IHPlayer.daLocked;}, () =>
-            {
-                IHPlayer.ToggleActionLock(Main.localPlayer, VAction.DA);
-                buttons[buttonCount].Update();
-            },
-            new Vector2(posX, posY)));
-
-            IHBase.FlagUpdate(buttons[buttonCount]);
-            buttonCount++;
-
-            // buttons[0]=lockDA;
-
-            buttons.Add(new IHToggle("LA", "la", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.LA), () => //onToggle
-            // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
-            {
-                IHPlayer.ToggleActionLock(Main.localPlayer, VAction.LA);
-                buttons[buttonCount].Update();
-                },
-            new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale))));
-
-            IHBase.FlagUpdate(buttons[buttonCount]);
-            buttonCount++;
-            // buttons[1]=lockLA;
-
-            buttons.Add(new IHToggle("QS", "qs", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.QS), () => //onToggle
+            buttons.Add(new IHToggle("QS", "qs", null, () => IHPlayer.ActionLocked(Main.localPlayer, IHPlayer.VACTION_QS), () => //onToggle
             // lockQS = new IHToggle("qslock", "Quick Stack Locked", "Quick Stack Unlocked", null, () => {return IHPlayer.qsLocked;}, () =>
             {
-                IHPlayer.ToggleActionLock(Main.localPlayer, VAction.QS);
-                buttons[buttonCount].Update();
+                IHPlayer.ToggleActionLock(Main.localPlayer, IHPlayer.VACTION_QS);
+                buttons[IHPlayer.VACTION_QS].Update();
                 },
             new Vector2(posX, 2*(Main.inventoryBackTexture.Height * Main.inventoryScale) + posY)));
 
-            IHBase.FlagUpdate(buttons[buttonCount]);
-            buttonCount++;
+            // IHBase.FlagUpdate(buttons[buttonCount]);
+            // buttonCount++;
             // buttons[2]=lockQS;
+
+            buttons.Add(new IHToggle("DA", "da", null, () => IHPlayer.ActionLocked(Main.localPlayer, IHPlayer.VACTION_DA), () => //onToggle
+//            lockDA = new IHToggle("dalock", "Deposit All Locked", "Deposit All Unlocked", null, () => {return IHPlayer.daLocked;}, () =>
+            {
+                IHPlayer.ToggleActionLock(Main.localPlayer, IHPlayer.VACTION_DA);
+                buttons[IHPlayer.VACTION_DA].Update();
+            },
+            new Vector2(posX, posY)));
+
+            // IHBase.FlagUpdate(buttons[buttonCount]);
+            // buttonCount++;
+
+            // buttons[0]=lockDA;
+
+            buttons.Add(new IHToggle("LA", "la", null, () => IHPlayer.ActionLocked(Main.localPlayer, IHPlayer.VACTION_LA), () => //onToggle
+            // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
+            {
+                IHPlayer.ToggleActionLock(Main.localPlayer, IHPlayer.VACTION_LA);
+                buttons[IHPlayer.VACTION_LA].Update();
+                },
+            new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale))));
+
+            // IHBase.FlagUpdate(buttons[buttonCount]);
+            buttonCount=buttons.Count;
+            // buttons[1]=lockLA;
+
 
         }
 

@@ -12,13 +12,16 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        public LockOptions lo = new LockOptions();
+        public LockOptions lockButtons = new LockOptions();
+
+        public static IHInterface self;
+        public IHInterface() : base() {self=this;}
 
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
             if (Main.playerInventory && Main.localPlayer.chest!=-1)
             {
-                InterfaceLayer.Add(list, lo, InterfaceLayer.LayerInventory, true);
+                InterfaceLayer.Add(list, lockButtons, InterfaceLayer.LayerInventory, true);
             }
         }
 

@@ -7,6 +7,8 @@ namespace InvisibleHand
 {
     public class IHPlayer : ModPlayer
     {
+        //because C# enums annoy me...
+        public const int VACTION_QS=0, VACTION_DA=1, VACTION_LA=2; // vanilla action IDs
 
         // private bool control_sort,  control_clean,
         //              control_qStack, control_depositAll, control_lootAll,
@@ -23,7 +25,7 @@ namespace InvisibleHand
             // MUST use "new", as tAPI derps with clearing (quote: Miraimai)
             lockedSlots = new bool[40];
             // daLocked = laLocked = qsLocked = false;
-            lockedActions = new bool[(int)VAction.LA+1]; //this should initialize all elements to false, right?
+            lockedActions = new bool[VACTION_LA+1]; //this should initialize all elements to false, right?
         }
 
         // save locked-slot state with player
@@ -65,10 +67,10 @@ namespace InvisibleHand
             // qsLocked=bb.ReadBool();
 
             // update buttons to set initial state FIXME: NOT WORKING!!!!!
-            foreach (IHUpdateable u in IHBase.GetUpdateables())
-            {
-                u.Update();
-            }
+            // foreach (IHUpdateable u in IHBase.GetUpdateables())
+            // {
+            //     u.Update();
+            // }
             // while (IHBase.toUpdate.Peek()!=null)
             // {
             //     IHBase.toUpdate.Pop().Update();
@@ -125,7 +127,7 @@ namespace InvisibleHand
                     // return;
                 }
 
-                else if (IHBase.ActionKeys["Clean"].Pressed()) //Consolidate Stacks
+                else if (IHBase.ActionKeys["CleanStacks"].Pressed()) //Consolidate Stacks
                 {
                     if ( player.chest == -1 )
                     {
@@ -136,15 +138,17 @@ namespace InvisibleHand
                     // return;
                 }
                 else {
-                    if ( player.chest == -1 ) return;
+                    if ( player.chest == -1 ) return; //no action w/o open container
 
-                    if (IHBase.ActionKeys["QuickStack"].Pressed()) //QuickStack
-                        KState.Special.Shift.Down() ? IHSmartStash.SmartLoot() : IHUtils.DoQuickStack(player);
-
-                    else if (IHBase.ActionKeys["DepositAll"].Pressed()) //DepositAll
-                        KState.Special.Shift.Down() ? IHSmartStash.SmartDeposit() : IHUtils.DoDepositAll(player);
-
-                    else if (IHBase.ActionKeys["LootAll"].Pressed()) //LootAll
+                    if (IHBase.ActionKeys["QuickStack"].Pressed()) {
+                        if (KState.Special.Shift.Down()) IHSmartStash.SmartLoot();
+                        else IHUtils.DoQuickStack(player);
+                    }
+                    else if (IHBase.ActionKeys["DepositAll"].Pressed()) {
+                        if (KState.Special.Shift.Down()) IHSmartStash.SmartDeposit();
+                        else IHUtils.DoDepositAll(player);
+                    }
+                    else if (IHBase.ActionKeys["LootAll"].Pressed())
                         IHUtils.DoLootAll(player);
 
                     // else if (control_sDeposit) //SmartDeposit
@@ -233,28 +237,28 @@ namespace InvisibleHand
             if (slotIndex<10 || slotIndex>49) return;
             IHPlayer mp = player.GetSubClass<IHPlayer>();
 
-            mp.lockedSlots[slotIndex-10]=!lockedSlots[slotIndex-10];
+            mp.lockedSlots[slotIndex-10]=!mp.lockedSlots[slotIndex-10];
         }
 
-        public static bool ActionLocked(Player player, VAction a)
+        public static bool ActionLocked(Player player, int actionID)
         {
             IHPlayer mp = player.GetSubClass<IHPlayer>();
-            return mp.lockedActions[(int)a];
+            return mp.lockedActions[actionID];
         }
 
-        public static void ToggleActionLock(Player p, VAction a)
+        public static void ToggleActionLock(Player p, int actionID)
         {
             IHPlayer mp = p.GetSubClass<IHPlayer>();
-            mp.lockedActions[(int)a] = !mp.lockedActions[(int)a];
+            mp.lockedActions[actionID] = !mp.lockedActions[actionID];
         }
 
     }
 
     // identifiers for the vanilla actions
-    public enum VAction
-    {
-        QS,     //Quick Stack
-        DA,     //Deposit All
-        LA      //LootAll
-    }
+    // public enum VAction
+    // {
+    //     QS,     //Quick Stack
+    //     DA,     //Deposit All
+    //     LA      //LootAll
+    // }
 }

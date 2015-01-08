@@ -11,7 +11,7 @@ namespace InvisibleHand
     public class IHBase : ModBase
     {
         public static Texture2D lockedIcon;
-        private Stack<IHUpdateable> toUpdate; // = new Stack<IHUpdateable>();
+        private static Stack<IHUpdateable> toUpdate; // = new Stack<IHUpdateable>();
 
         // private static Keys
         //     key_sort, key_cleanStacks, key_quickStack, key_depositAll, key_lootAll;
@@ -34,6 +34,7 @@ namespace InvisibleHand
             toUpdate = new Stack<IHUpdateable>();
             toUpdate.Push(null); //null will mark the end of the elements needing update
             ActionKeys = new Dictionary<String, Keys>();
+            ModOptions = new Dictionary<String, bool>();
         }
 
         public override void OnAllModsLoaded()

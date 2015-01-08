@@ -40,7 +40,7 @@ namespace InvisibleHand
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (IHBase.oLockingEnabled && slot.type == "Inventory" && IHPlayer.SlotLocked(slot.index))
+            if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(Main.localPlayer, slot.index))
             {
                 sb.Draw(IHBase.lockedIcon,      // the texture to draw
                             slot.pos,           // (Vector2) location in screen coords to draw sprite
@@ -60,11 +60,11 @@ namespace InvisibleHand
         {
             if (!KState.Special.Shift.Down()) return true;
 
-            if (IHBase.oLockingEnabled && slot.modBase == null && Main.playerInventory && release )
+            if (IHBase.ModOptions["LockingEnabled"] && slot.modBase == null && Main.playerInventory && release )
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
-                    IHPlayer.ToggleLock(slot.index); //toggle lock state
+                    IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
                     // IHUtils.RingBell();
                     Main.PlaySound(22, -1, -1, 1); // I think this is the actual "lock" sound
                 }

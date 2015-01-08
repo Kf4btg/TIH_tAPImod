@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -8,10 +9,10 @@ namespace InvisibleHand
 {
     public class LockOptions : InterfaceLayer
     {
-        protected readonly IHToggle lockDA, lockLA, lockQS;
-        private readonly Vector2 PosDA, PosLA, PosQS;
-        private readonly IHToggle[] buttons = new IHToggle[3];
-        private readonly Vector2[] positions = new Vector2[3];
+        // protected readonly IHToggle lockDA, lockLA, lockQS;
+        // private readonly IHToggle[] buttons = new IHToggle[3];
+        private readonly List<IHToggle> buttons;
+        internal int buttonCount;
 
         /*****************************************************************
         *   Create the buttons that will be used to toggle the states of
@@ -25,9 +26,7 @@ namespace InvisibleHand
             TODO: Actually implement the check for these options in the IHUtils code
 
             FIXME: this function (this entire *class*) is an absolute mess.
-                   Get rid of those stupid arrays and fields.
-                   Which of these FlagUpdate() calls is really necessary? Isn't there still one in the IHToggle ctor?
-                   And FlagUpdate/MarkUpdate are pretty much redundant. Figure out which one to keep.
+                   Get rid of those stupid arrays.
 
         */
         public LockOptions() : base("InvisibleHand:LockOptions")
@@ -36,46 +35,51 @@ namespace InvisibleHand
             float posX = 73 - (Main.inventoryBackTexture.Width * Main.inventoryScale);
             float posY = API.main.invBottom + (Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
 
-            PosDA = new Vector2(posX, posY);
-            PosLA = new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale));
-            PosQS = new Vector2(posX, 2*(Main.inventoryBackTexture.Height * Main.inventoryScale) + posY);
+            buttons = new List<IHToggle>();
+            buttonCount = 0;
 
-
-            lockDA = new IHToggle("DA", "da", null, () => IHPlayer.daLocked, () => //onToggle
+            buttons.Add(new IHToggle("DA", "da", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.DA), () => //onToggle
 //            lockDA = new IHToggle("dalock", "Deposit All Locked", "Deposit All Unlocked", null, () => {return IHPlayer.daLocked;}, () =>
             {
-                IHPlayer.daLocked=!IHPlayer.daLocked;
-                lockDA.Update();
-            }, PosDA);
-            IHBase.FlagUpdate(lockDA);
+                IHPlayer.ToggleActionLock(Main.localPlayer, VAction.DA);
+                buttons[buttonCount].Update();
+            },
+            new Vector2(posX, posY)));
 
-            buttons[0]=lockDA;
+            IHBase.FlagUpdate(buttons[buttonCount]);
+            buttonCount++;
 
-            lockLA = new IHToggle("LA", "la", null, () => IHPlayer.laLocked, () => //onToggle
+            // buttons[0]=lockDA;
+
+            buttons.Add(new IHToggle("LA", "la", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.LA), () => //onToggle
             // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
             {
-                IHPlayer.laLocked=!IHPlayer.laLocked;
-                lockLA.Update();
-            }, PosLA);
-            IHBase.FlagUpdate(lockLA);
+                IHPlayer.ToggleActionLock(Main.localPlayer, VAction.LA);
+                buttons[buttonCount].Update();
+                },
+            new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale))));
 
-            buttons[1]=lockLA;
+            IHBase.FlagUpdate(buttons[buttonCount]);
+            buttonCount++;
+            // buttons[1]=lockLA;
 
-            lockQS = new IHToggle("QS", "qs", null, () => IHPlayer.qsLocked, () => //onToggle
+            buttons.Add(new IHToggle("QS", "qs", null, () => IHPlayer.ActionLocked(Main.localPlayer, VAction.QS), () => //onToggle
             // lockQS = new IHToggle("qslock", "Quick Stack Locked", "Quick Stack Unlocked", null, () => {return IHPlayer.qsLocked;}, () =>
             {
-                IHPlayer.qsLocked=!IHPlayer.qsLocked;
-                lockQS.Update();
-            }, PosQS);
-            IHBase.FlagUpdate(lockQS);
+                IHPlayer.ToggleActionLock(Main.localPlayer, VAction.QS);
+                buttons[buttonCount].Update();
+                },
+            new Vector2(posX, 2*(Main.inventoryBackTexture.Height * Main.inventoryScale) + posY)));
 
-            buttons[2]=lockQS;
+            IHBase.FlagUpdate(buttons[buttonCount]);
+            buttonCount++;
+            // buttons[2]=lockQS;
 
         }
 
         protected override void OnDraw(SpriteBatch sb)
         {
-            for (int i=0; i<3; i++)
+            for (int i=0; i<buttonCount; i++)
             {
                 buttons[i].Draw(sb);
             }

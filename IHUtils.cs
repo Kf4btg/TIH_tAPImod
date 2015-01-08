@@ -356,8 +356,6 @@ namespace InvisibleHand
             return -1;
         }
 
-
-
         /******************************************************
         // Moves as much of itemSrc.stack to itemDest.stack as possible.
         // Returns true if itemSrc.stack is reduced to 0; false otherwise.

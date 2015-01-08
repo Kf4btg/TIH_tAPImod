@@ -9,8 +9,6 @@ namespace InvisibleHand
 {
     public class LockOptions : InterfaceLayer
     {
-        // protected readonly IHToggle lockDA, lockLA, lockQS;
-        // private readonly IHToggle[] buttons = new IHToggle[3];
         public readonly List<IHToggle> buttons;
         internal int buttonCount;
 
@@ -21,13 +19,9 @@ namespace InvisibleHand
 
             At the moment, the text (placeholder for future button textures) actually
             shows up and can be toggled by clicking on it. Save/load w/ player works
-            FIXME: Initially, the display text is the disabled label regardles of its actual state, though the coloring is correct
             FIXME: No visual feedback when bringing the mouse to hover over the button.
             TODO: Actually implement the check for these options in the IHUtils code
-
-            FIXME: this function (this entire *class*) is an absolute mess.
-                   Get rid of those stupid arrays.
-
+            TODO: This class could still use some cleanup.
         */
         public LockOptions() : base("InvisibleHand:LockOptions")
         {
@@ -36,7 +30,6 @@ namespace InvisibleHand
             float posY = API.main.invBottom + (Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
 
             buttons = new List<IHToggle>();
-            // buttonCount = 0;
 
             buttons.Add(new IHToggle("QS", "qs", null, () => IHPlayer.ActionLocked(Main.localPlayer, IHPlayer.VACTION_QS), () => //onToggle
             // lockQS = new IHToggle("qslock", "Quick Stack Locked", "Quick Stack Unlocked", null, () => {return IHPlayer.qsLocked;}, () =>
@@ -46,10 +39,6 @@ namespace InvisibleHand
                 },
             new Vector2(posX, 2*(Main.inventoryBackTexture.Height * Main.inventoryScale) + posY)));
 
-            // IHBase.FlagUpdate(buttons[buttonCount]);
-            // buttonCount++;
-            // buttons[2]=lockQS;
-
             buttons.Add(new IHToggle("DA", "da", null, () => IHPlayer.ActionLocked(Main.localPlayer, IHPlayer.VACTION_DA), () => //onToggle
 //            lockDA = new IHToggle("dalock", "Deposit All Locked", "Deposit All Unlocked", null, () => {return IHPlayer.daLocked;}, () =>
             {
@@ -57,11 +46,6 @@ namespace InvisibleHand
                 buttons[IHPlayer.VACTION_DA].Update();
             },
             new Vector2(posX, posY)));
-
-            // IHBase.FlagUpdate(buttons[buttonCount]);
-            // buttonCount++;
-
-            // buttons[0]=lockDA;
 
             buttons.Add(new IHToggle("LA", "la", null, () => IHPlayer.ActionLocked(Main.localPlayer, IHPlayer.VACTION_LA), () => //onToggle
             // lockLA = new IHToggle("lalock", "Loot All Locked", "Loot All Unlocked", null, () => {return IHPlayer.laLocked;}, () =>
@@ -71,11 +55,7 @@ namespace InvisibleHand
                 },
             new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale))));
 
-            // IHBase.FlagUpdate(buttons[buttonCount]);
             buttonCount=buttons.Count;
-            // buttons[1]=lockLA;
-
-
         }
 
         protected override void OnDraw(SpriteBatch sb)

@@ -1,3 +1,10 @@
+1.1.3
+    -   Refactored most loose option-fields into collections (e.g. Dictionaries or arrays)
+    -   Added a generic/inheritable button class and a somewhat less generic toggle-button class inheriting from the former.
+        -   Used these to create buttons that will allow the Vanilla actions (depositall, quickstack, lootall) to respect locked item-slots in some fashion.
+        -   Needed to add a ModWorld class to make sure the button states were properly initialized when the world was loaded.
+    -   Addressed issue where loading a player would sometimes load the saved locked-slot configuration from a different player.
+
 1.1.2b
     -   Added ability to shift-click items in and out of the Item Reforge slot.
 

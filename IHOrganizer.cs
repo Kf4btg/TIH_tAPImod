@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 // using System.Linq.Expressions;
 using System.Linq.Dynamic;
-// using System.Reflection;
 using TAPI;
 using Terraria;
 
@@ -223,7 +222,6 @@ namespace InvisibleHand
         {
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
-            // for (int i = range.Item1; i<=range.Item2; i++)
             for (int i = range.Item2; i>=range.Item1; i--) //iterate in reverse
             {
                 Item item = container[i];

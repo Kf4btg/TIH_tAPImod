@@ -1,9 +1,5 @@
 using System.Collections.Generic;
 using System;
-using System.Linq;
-// using System.Linq.Expressions;
-// using System.Linq.Dynamic;
-// using System.Reflection;
 using TAPI;
 using Terraria;
 using Terraria.ID;
@@ -47,7 +43,9 @@ namespace InvisibleHand
         }
     }
 
-
+    // Most everything here is ridiculously hacky and doesn't extrapolate well to mod-added items
+    // Unfortunately, I expect it's probably impossible to sufficiently generalize the item-matching logic,
+    // simply due to the way Terraria itself is coded (i.e. items/item abilities are pretty much hacked-in individually, anyway)
     public static class CategoryDef
     {
         // pass initial capacity as ItemCat.OTHER -- this trick should work so long as OTHER remains the last member of the Enum

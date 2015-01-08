@@ -25,22 +25,6 @@ namespace InvisibleHand
             }
         }
 
-        // public override bool PreDrawInterface(SpriteBatch sb)
-        // {
-            // while (IHBase.toUpdate.Peek()!=null)
-            // {
-            //     IHBase.toUpdate.Pop().onUpdate(sb);
-            // }
-            // return true;
-        // }
-
-
-// P.heldItem.SetDefaults(ItemDef.byName["Chlorophyte Bullets"].type);
-// P.heldItem.SetDefaults(1179);
-// P.heldItem.SetDefaults(1255);
-// P.heldItem.stack=999;
-
-
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
             if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(Main.localPlayer, slot.index))
@@ -68,7 +52,6 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
-                    // IHUtils.RingBell();
                     Main.PlaySound(22, -1, -1, 1); // I think this is the actual "lock" sound
                 }
             }
@@ -79,8 +62,6 @@ namespace InvisibleHand
         *   An implementation of the "Shift-click to move item between containers"
         *   concept. Possibly temporary, though it includes the feature of working
         *   with the craft-guide and reforge slots, which I really like.
-        *
-        *   Known Issues: ???
         */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)

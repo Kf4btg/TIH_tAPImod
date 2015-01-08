@@ -16,7 +16,6 @@ namespace InvisibleHand
         public Vector2 pos;
         public bool isHovered;
 
-
         public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null)
         {
             this.displayLabel = this.name = name;
@@ -55,14 +54,12 @@ namespace InvisibleHand
         }
     }
 
-    //
+    // a button with 2 states: active and inactive. OnClick() toggles between the states
     public class IHToggle : IHButton, IHUpdateable
     {
-        // protected bool active;
         protected readonly string activeLabel, inactiveLabel;
         public readonly Action onToggle;
         public readonly Func<bool> isActive;
-        // public readonly IHToggle me;
 
         public Color stateColor = Color.White;
 
@@ -73,20 +70,10 @@ namespace InvisibleHand
             this.inactiveLabel = inactiveLabel;
             this.isActive = isActive;
             this.onToggle = onToggle;
-
-            // me=this;
-
         }
-
-        // public void FlagUpdate()
-        // {
-        //     // IHToggle.MarkUpdate(this);
-        //     IHBase.toUpdate.Push(this);
-        // }
 
         public void Update()
         {
-            // displayLabel = isActive() ? activeLabel : inactiveLabel;
             if (isActive())
             {
                 stateColor = Color.White;
@@ -96,22 +83,13 @@ namespace InvisibleHand
             stateColor = Color.Gray;
             displayLabel = inactiveLabel;
         }
-        //
-        // public void onUpdate(SpriteBatch sb)
-        // {
-        //     displayLabel = isActive() ? activeLabel : inactiveLabel;
-        // }
 
         public override void Draw(SpriteBatch sb)
         {
-
             if (texture==null)
-            {
                 sb.DrawString(Main.fontMouseText, displayLabel, pos, stateColor);
-            }
-            else {
+            else
                 sb.Draw(texture, pos, stateColor);
-            }
 
             if (IHButton.Hovered(this))
             {
@@ -124,21 +102,12 @@ namespace InvisibleHand
                 Main.localPlayer.mouseInterface = true;
                 if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
             }
-            else
-            {
-                isHovered = false;
-            }
+            else isHovered = false;
         }
 
         public static bool IsActive(IHToggle t)
         {
             return t.isActive();
         }
-        //
-        // public static void MarkUpdate(IHToggle t)
-        // {
-        //     IHBase.toUpdate.Push(t);
-        // }
     }
-
 }

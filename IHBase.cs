@@ -10,13 +10,13 @@ namespace InvisibleHand
 {
     public class IHBase : ModBase
     {
-        public static Texture2D lockedIcon;
+        public static IHBase self { get; private set; }
 
         public static Dictionary<String, Keys> ActionKeys;
-
         public static Dictionary<String, bool> ModOptions;
 
-        public static IHBase self { get; private set; }
+        public static Texture2D lockedIcon;
+        public LockOptions lockOptions;
 
         public override void OnLoad()
         {
@@ -28,8 +28,8 @@ namespace InvisibleHand
         public override void OnAllModsLoaded()
         {
             lockedIcon = self.textures["resources/LockIndicator"];
-
             CategoryDef.Initialize();
+            lockOptions = new LockOptions(self);
         }
 
         public override void OptionChanged(Option option)

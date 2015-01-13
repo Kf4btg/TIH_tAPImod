@@ -7,11 +7,14 @@ namespace InvisibleHand
 {
     public class IHWorld : ModWorld
     {
+
+        // Dictionary<VAction, IHToggle> lockButtons = IHBase.self.lockOptions.Buttons;
+
         public override void Initialize()
         {
             // finding a place to do this where the buttons are actually *set correctly*
             // upon initial load has been the bitchiest of bitches.
-            foreach (KeyValuePair<VAction, IHToggle> kvp in IHInterface.self.lockButtons.Buttons)
+            foreach (KeyValuePair<VAction, IHToggle> kvp in IHBase.self.lockOptions.Buttons)
             {
                 kvp.Value.Update();
             }

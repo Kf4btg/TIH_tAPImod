@@ -12,7 +12,7 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        public LockOptions lockButtons = new LockOptions();
+        // public LockOptions lockButtons = new LockOptions();
 
         public static IHInterface self;
         public IHInterface() : base() {self=this;}
@@ -21,7 +21,7 @@ namespace InvisibleHand
         {
             if (Main.playerInventory && Main.localPlayer.chest!=-1)
             {
-                InterfaceLayer.Add(list, lockButtons, InterfaceLayer.LayerInventory, true);
+                InterfaceLayer.Add(list, IHBase.self.lockOptions, InterfaceLayer.LayerInventory, true);
             }
         }
 

@@ -30,8 +30,8 @@ namespace InvisibleHand
         //------------------------------------------------------//
 
     #region depositall
-        private const int R_START=49;   //start from end of main inventory
-        private const int R_END=10;     //don't include hotbar
+        private const int R_START = 49;   //start from end of main inventory
+        private const int R_END   = 10;     //don't include hotbar
 
         /********************************************************
         *   DoDepositAll

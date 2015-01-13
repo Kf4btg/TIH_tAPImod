@@ -1,4 +1,4 @@
-using System;
+/*using System;
 
 namespace InvisibleHand
 {
@@ -46,6 +46,7 @@ namespace InvisibleHand
         MISC_MAT,
         SPECIAL,    //Boss summoning items, heart containers, mana crystals
         OTHER
-
     }
-}
+
+
+} */

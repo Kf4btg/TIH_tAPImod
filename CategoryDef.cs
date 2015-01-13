@@ -10,7 +10,7 @@ namespace InvisibleHand
     {
         public static ItemCat GetCategory(this Item item)
         {
-            foreach (ItemCat catID in CategoryDef.CheckOrder)
+            foreach (ItemCat catID in Constants.CheckOrder)
             {
                 if (CategoryDef.Categories[catID].Invoke(item)) return catID;
             }
@@ -52,124 +52,6 @@ namespace InvisibleHand
         public static readonly Dictionary<ItemCat, List<String>> ItemSortRules  = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
         public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories = new Dictionary<ItemCat, Func<Item, bool>>((Int32)ItemCat.OTHER+1);
 
-        //the ItemCat Enum defines the actual Sort Order of the categories,
-        // but this defines in which order an item will be checked against
-        // the category matching rules. This is important due to a kind
-        // of "sieve" or "cascade" effect, where items that would have matched
-        // a certain category were instead caught by an earlier one.
-        public static readonly ItemCat[] CheckOrder =  {
-            ItemCat.COIN,
-            ItemCat.MECH,
-            ItemCat.TOOL,
-            ItemCat.PICK,
-            ItemCat.AXE,
-            ItemCat.HAMMER,
-            ItemCat.HEAD,
-            ItemCat.BODY,
-            ItemCat.LEGS,
-            ItemCat.ACCESSORY,
-            ItemCat.SPECIAL,
-            ItemCat.PET,
-            ItemCat.VANITY,
-            ItemCat.MELEE,
-            ItemCat.BOMB,
-            ItemCat.RANGED,
-            ItemCat.AMMO,
-            ItemCat.MAGIC,
-            ItemCat.SUMMON,
-            ItemCat.POTION,
-            ItemCat.CONSUME,
-            ItemCat.BAIT,
-            ItemCat.DYE,
-            ItemCat.PAINT,
-            ItemCat.ORE,
-            ItemCat.BAR,
-            ItemCat.GEM,
-            ItemCat.SEED,
-            ItemCat.CRAFT,
-            ItemCat.LIGHT,
-            ItemCat.FURNITURE,
-            ItemCat.STATUE,
-            ItemCat.WALLDECO,
-            ItemCat.BANNER,
-            ItemCat.CLUTTER,
-            ItemCat.WOOD,
-            ItemCat.BRICK,
-            ItemCat.BLOCK,
-            ItemCat.TILE,
-            ItemCat.WALL,
-            ItemCat.MISC_MAT,
-            ItemCat.OTHER
-        };
-
-        // A large number of "Tile"-type items will share a .createTile attribute with items that fulfill a similar purpose.
-        // This gives us a handy way to sort and possibly even categorize these item types.
-
-        /*************************************************************************
-        Create several hashsets to quickly check values of "item.createTile" to aid in categorization/sorting.
-        Initialize them here with an anonymous array to avoid the resizing penalty of .Add()
-        */
-        public static readonly
-            HashSet<int> TileGroupFurniture  = new HashSet<int>( new int[] {
-                TileID.ClosedDoor, TileID.Tables, TileID.Chairs, TileID.Platforms,
-                TileID.Beds, TileID.Pianos, TileID.Dressers, TileID.Benches,
-                TileID.Bathtubs, TileID.Bookcases, TileID.GrandfatherClocks,
-                TileID.Containers, TileID.PiggyBank, TileID.Signs, TileID.Safes,
-                TileID.Thrones, TileID.WoodenPlank, TileID.Mannequin, TileID.Womannequin } );
-
-        public static readonly
-            HashSet<int> TileGroupLighting   = new HashSet<int>( new int[] {
-                TileID.Torches, TileID.Candles, TileID.Chandeliers, TileID.HangingLanterns,
-                TileID.Lamps, TileID.Candelabras, TileID.Jackolanterns, TileID.ChineseLanterns,
-                TileID.SkullCandles, TileID.Campfire, TileID.FireflyinaBottle, TileID.LightningBuginaBottle, TileID.WaterCandle } );
-
-        public static readonly
-            HashSet<int> TileGroupStatue     = new HashSet<int>( new int[] {
-                TileID.Tombstones, TileID.Statues, TileID.WaterFountain,
-                TileID.AlphabetStatues, TileID.BubbleMachine } );
-
-        public static readonly
-            HashSet<int> TileGroupWallDeco   = new HashSet<int>( new int[] {
-                TileID.Painting2x3, TileID.Painting3x2, TileID.Painting3x3,
-                TileID.Painting4x3, TileID.Painting6x4 } );
-
-        public static readonly
-            HashSet<int> TileGroupClutter    = new HashSet<int>( new int[] {
-                TileID.Bottles, TileID.Bowls, TileID.BeachPiles, TileID.Books, TileID.Coral,
-                TileID.ShipInABottle, TileID.BlueJellyfishBowl, TileID.GreenJellyfishBowl,
-                TileID.PinkJellyfishBowl, TileID.SeaweedPlanter, TileID.ClayPot,
-                TileID.BunnyCage, TileID.SquirrelCage, TileID.MallardDuckCage, TileID.DuckCage,
-                TileID.BirdCage, TileID.BlueJay, TileID.CardinalCage, TileID.FishBowl,
-                TileID.SnailCage, TileID.GlowingSnailCage, TileID.MonarchButterflyJar,
-                TileID.PurpleEmperorButterflyJar, TileID.RedAdmiralButterflyJar,
-                TileID.UlyssesButterflyJar, TileID.SulphurButterflyJar, TileID.TreeNymphButterflyJar,
-                TileID.ZebraSwallowtailButterflyJar, TileID.JuliaButterflyJar, TileID.ScorpionCage,
-                TileID.BlackScorpionCage, TileID.FrogCage, TileID.MouseCage, TileID.PenguinCage,
-                TileID.WormCage, TileID.GrasshopperCage } );
-
-        public static readonly
-            HashSet<int> TileGroupCrafting = new HashSet<int>( new int[] {
-                TileID.WorkBenches, TileID.Anvils, TileID.MythrilAnvil, TileID.AdamantiteForge,
-                TileID.CookingPots, TileID.Furnaces, TileID.Hellforge, TileID.Loom, TileID.Kegs,
-                TileID.Sawmill, TileID.TinkerersWorkbench, TileID.CrystalBall, TileID.Blendomatic,
-                TileID.MeatGrinder, TileID.Extractinator, TileID.Solidifier, TileID.DyeVat,
-                TileID.ImbuingStation, TileID.Autohammer, TileID.HeavyWorkBench, TileID.BoneWelder,
-                TileID.FleshCloningVaat, TileID.GlassKiln, TileID.LihzahrdFurnace, TileID.LivingLoom,
-                TileID.SkyMill, TileID.IceMachine, TileID.SteampunkBoiler, TileID.HoneyDispenser } ); //blergh
-
-        public static readonly
-            HashSet<int> TileGroupOre      = new HashSet<int>( new int[] {
-                TileID.Meteorite, TileID.Obsidian, TileID.Hellstone }); //(get others by name)
-
-        public static readonly
-            HashSet<int> TileGroupCoin     = new HashSet<int>( new int[] {
-                TileID.CopperCoinPile, TileID.SilverCoinPile, TileID.GoldCoinPile, TileID.PlatinumCoinPile });
-
-        public static readonly
-            HashSet<int> TileGroupSeed     = new HashSet<int>( new int[] {
-                TileID.ImmatureHerbs, TileID.Saplings /*Acorn*/, TileID.Pumpkins /*Pumpkin Seed*/ } );
-                // get the rest by EndsWith("Seeds")
-
         public static void Initialize()
         {
             SetupCategories();
@@ -185,7 +67,7 @@ namespace InvisibleHand
             // who graciously did all the hard work figuring these out so I didn't have to!
             // Although I did end up editing a few to make them mutually more exclusive
             // (e.g. adding the !vanity check to the armor items)
-            Categories.Add( ItemCat.COIN,       item    => TileGroupCoin.Contains(item.createTile));
+            Categories.Add( ItemCat.COIN,       item    => Constants.TileGroupCoin.Contains(item.createTile));
             Categories.Add( ItemCat.PICK, 		item   	=> item.pick > 0);
             Categories.Add( ItemCat.AXE, 		item   	=> item.axe > 0);
             Categories.Add( ItemCat.HAMMER,		item   	=> item.hammer > 0);
@@ -212,17 +94,17 @@ namespace InvisibleHand
             Categories.Add( ItemCat.BAIT, 		item   	=> item.bait > 0 && item.consumable);
             Categories.Add( ItemCat.DYE, 		item   	=> item.dye != 0);
             Categories.Add( ItemCat.PAINT, 		item   	=> item.paint != 0);
-            Categories.Add( ItemCat.ORE, 		item   	=> item.createTile != -1 && (item.name.EndsWith("Ore") || TileGroupOre.Contains(item.createTile)) );
+            Categories.Add( ItemCat.ORE, 		item   	=> item.createTile != -1 && (item.name.EndsWith("Ore") || Constants.TileGroupOre.Contains(item.createTile)) );
             Categories.Add( ItemCat.BAR, 		item   	=> item.createTile==TileID.MetalBars );
             Categories.Add( ItemCat.GEM, 		item   	=> item.createTile==TileID.ExposedGems );
-            Categories.Add( ItemCat.SEED, 		item   	=> TileGroupSeed.Contains(item.createTile) || (item.createTile != -1 && item.name.EndsWith("Seeds") ));
-            Categories.Add( ItemCat.LIGHT, 		item   	=> TileGroupLighting.Contains(item.createTile) );
-            Categories.Add( ItemCat.CRAFT, 		item   	=> TileGroupCrafting.Contains(item.createTile) );
-            Categories.Add( ItemCat.FURNITURE, 	item   	=> TileGroupFurniture.Contains(item.createTile) );
-            Categories.Add( ItemCat.STATUE, 	item   	=> TileGroupStatue.Contains(item.createTile) );
-            Categories.Add( ItemCat.WALLDECO, 	item   	=> TileGroupWallDeco.Contains(item.createTile) );
+            Categories.Add( ItemCat.SEED, 		item   	=> Constants.TileGroupSeed.Contains(item.createTile) || (item.createTile != -1 && item.name.EndsWith("Seeds") ));
+            Categories.Add( ItemCat.LIGHT, 		item   	=> Constants.TileGroupLighting.Contains(item.createTile) );
+            Categories.Add( ItemCat.CRAFT, 		item   	=> Constants.TileGroupCrafting.Contains(item.createTile) );
+            Categories.Add( ItemCat.FURNITURE, 	item   	=> Constants.TileGroupFurniture.Contains(item.createTile) );
+            Categories.Add( ItemCat.STATUE, 	item   	=> Constants.TileGroupStatue.Contains(item.createTile) );
+            Categories.Add( ItemCat.WALLDECO, 	item   	=> Constants.TileGroupWallDeco.Contains(item.createTile) );
             Categories.Add( ItemCat.BANNER, 	item   	=> item.createTile==TileID.Banners );
-            Categories.Add( ItemCat.CLUTTER, 	item   	=> TileGroupClutter.Contains(item.createTile) );
+            Categories.Add( ItemCat.CLUTTER, 	item   	=> Constants.TileGroupClutter.Contains(item.createTile) );
             Categories.Add( ItemCat.WOOD,       item    => ItemDef.itemGroups["g:Wood"].Contains(item) );
             Categories.Add( ItemCat.BLOCK,   	item   	=> item.createTile != -1 && item.width==12 && item.height==12 && item.value==0 );
             Categories.Add( ItemCat.BRICK,   	item   	=> item.Matches(ItemCat.BLOCK) && (item.name.EndsWith("Brick")

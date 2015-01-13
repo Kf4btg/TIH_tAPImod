@@ -6,7 +6,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public enum VAction { QS, DA, LA }
 
     public class IHPlayer : ModPlayer
     {

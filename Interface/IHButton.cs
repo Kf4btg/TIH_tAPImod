@@ -154,30 +154,26 @@ namespace InvisibleHand
     // a button that changes its appearance and/or function based on an external condition
     public class IHContextButton : IHButton
     {
-        // private readonly string[] labels;
-        // private readonly Func<bool>[] contextChecks;
-        // protected readonly Action[] clickActions;
-
-        private readonly string mainStateLabel;
-        // private readonly Dictionary<string, Tuple<Func<bool>, ButtonState>> Contexts;
+        private readonly ButtonState defaultState;
+        private bool inDefaultState;
         private readonly List<Tuple<Func<bool>, ButtonState>> Contexts;
+        private readonly Action stateChooser;
+        private Func<Bool> maintainState; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
 
-        private Func<Bool> stateIsCurrent; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
+        private readonly Dictionary<string, ButtonState> States;
 
 
-        public IHContextButton(IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> bStates, Vector2? pos=null) :
-        base(bStates[0], pos)
+        public IHContextButton(ButtonState defaultState, IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> altStates, Vector2? pos=null) :
+        base(defaultState, pos)
         {
-            mainStateLabel = bStates[0].label;
+            this.defaultState = defaultState;
             Contexts = new List<Tuple<Func<bool>, ButtonState>>();
 
-            for (int i=0, i<bStates.Count; i++)
+            for (int i=0, i<altStates.Count; i++)
             {
-                // string key = bStates[i].label;
-
                 try  // does a simple matching of list indices to associate elements
                 {
-                    var cState = new Tuple<Func<bool>, ButtonState>( stateConditions[i], bStates[i] );
+                    var cState = new Tuple<Func<bool>, ButtonState>( stateConditions[i], altStates[i] );
 
                     Contexts.Add(cState);
                 }
@@ -187,16 +183,41 @@ namespace InvisibleHand
                     // Contexts.Add(key, new Tuple( () => false, new ButtonState("ERROR", null, () => { return; }) ));
                 }
             }
+            stateChooser = this.RefreshState();
+            ToDefaultState();
+        }
 
+        //for custom state-chooser
+        public IHContextButton(ButtonState defaultState, Func<IEnumerable<ButtonStates>, ButtonState> stateChooser,
+            IEnumerable<ButtonState> altStates, Vector2? pos=null) : base(defaultState, pos)
+        {
+
+        }
+
+        // for just 1 alt state
+        public IHContextButton(ButtonState defaultState, Func<bool> altCondition, ButtonState altState, Vector2? pos=null) :
+        base(defaultState, pos)
+        {
+            this.defaultState = defaultState;
+            Contexts = new List<Tuple<Func<bool>, ButtonState>>(1);
+            Contexts.Add(altCondition, altState);
+            ToDefaultState();
         }
 
         // TODO: replace these 3 fields w/ ButtonState in the base IHButton class.
         // TODO: also make use of ButtonState in IHToggle
-        public void ChangeState(ButtonState newState)
+        // public void ChangeState(ButtonState newState)
+        // {
+        //     displayLabel = newState.label;
+        //     texture = newState.texture;
+        //     onClick = newState.onClick;
+        // }
+
+        public void ToDefaultState()
         {
-            displayLabel = newState.label;
-            texture = newState.texture;
-            onClick = newState.onClick;
+            maintainState = () => false; //always check for update in default state
+            this.displayState = defaultState;
+            inDefaultState = true;
         }
 
         private void RefreshState()
@@ -205,17 +226,20 @@ namespace InvisibleHand
             {
                 if ( c.Item1.Invoke() )
                 {
-                    stateIsCurrent=c.Item1;
+                    maintainState=c.Item1;
+                    inDefaultState = false;
                     // ChangeState(c.Item2);
                     this.displayState = c.Item2; //works?
+                    return; //new state was set
                 }
             }
+            if (!inDefaultState)  ToDefaultState(); //reset to default
+
         }
 
         public override void Draw(SpriteBatch sb)
         {
-
-            if (!stateIsCurrent()) RefreshState();
+            if (!maintainState()) RefreshState();
 
             if (texture==null)
             sb.DrawString(Main.fontMouseText, displayLabel, pos, tint);
@@ -245,12 +269,12 @@ namespace InvisibleHand
         public Action onClick;
         public Color tint;      //How to tint the texture when this state is active
 
-        public ButtonState(string label, Texture2D tex, Action onClick)
+        public ButtonState(string label, Texture2D tex, Action onClick, Color tintColor)
         {
             label = label;
             texture = tex;
             onClick = onClick;
-
+            tint = tintColor;
         }
     }
 }

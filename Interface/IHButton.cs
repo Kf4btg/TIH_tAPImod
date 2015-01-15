@@ -9,37 +9,52 @@ namespace InvisibleHand
     public class IHButton
     {
         public readonly string name;
-        public readonly Texture2D texture;
 
-        public Action onClick { get; protected set; }
+        public Action onClick { get { return displayState.onClick}; protected set { (a) => displayState.onClick=a; }; }
 
-        public string displayLabel;
+
+        public ButtonState displayState;
+
+        //these for backwards-compat (Temporary)
+        public string displayLabel { get { return displayState.label}; protected set { (l) => displayState.label=l; }; };
+        public Texture2D texture { get { return displayState.texture}; protected set { (t) => displayState.texture=t; }; };
+        public Color tint { get { return displayState.tint}; protected set { (t) => displayState.tint=t; }; };
+
         public Vector2 pos;
         public bool isHovered;
 
-        public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null)
+        public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color tintColor = Color.White)
         {
-            this.displayLabel = this.name = name;
-            this.texture = tex;
-            this.onClick = onClick;
+            IHButton(new ButtonState(name, tex, onClick, tintColor), pos);
+
+            // this.texture = tex;
+            // this.onClick = onClick;
+            // this.pos = pos ?? default(Vector2);
+        }
+
+        public IHButton(ButtonState bState, Vector2? pos=null)
+        {
+            this.name = bState.label;
+            this.displayState = bState;
+            // IHButton(bState.label, bState.texture, bState.onClick, pos);
             this.pos = pos ?? default(Vector2);
         }
 
         public Vector2 Size
         {
             get {
-                return (texture!=null) ? texture.Size() : Main.fontMouseText.MeasureString(displayLabel);
+                return (displayState.texture!=null) ? displayState.texture.Size() : Main.fontMouseText.MeasureString(displayState.label);
             }
         }
 
         public virtual void Draw(SpriteBatch sb)
         {
-            if (texture==null)
+            if (displayState.texture==null)
             {
-                sb.DrawString(Main.fontMouseText, displayLabel, pos, Color.White);
+                sb.DrawString(Main.fontMouseText, displayState.displayLabel, pos, displayState.tint);
             }
             else {
-                sb.Draw(texture, pos, Color.White);
+                sb.Draw(displayState.texture, pos, displayState.tint);
             }
 
             if (IHButton.Hovered(this))
@@ -132,6 +147,110 @@ namespace InvisibleHand
         public static bool GetState(IHToggle t)
         {
             return t.IsActive();
+        }
+    }
+
+
+    // a button that changes its appearance and/or function based on an external condition
+    public class IHContextButton : IHButton
+    {
+        // private readonly string[] labels;
+        // private readonly Func<bool>[] contextChecks;
+        // protected readonly Action[] clickActions;
+
+        private readonly string mainStateLabel;
+        // private readonly Dictionary<string, Tuple<Func<bool>, ButtonState>> Contexts;
+        private readonly List<Tuple<Func<bool>, ButtonState>> Contexts;
+
+        private Func<Bool> stateIsCurrent; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
+
+
+        public IHContextButton(IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> bStates, Vector2? pos=null) :
+        base(bStates[0], pos)
+        {
+            mainStateLabel = bStates[0].label;
+            Contexts = new List<Tuple<Func<bool>, ButtonState>>();
+
+            for (int i=0, i<bStates.Count; i++)
+            {
+                // string key = bStates[i].label;
+
+                try  // does a simple matching of list indices to associate elements
+                {
+                    var cState = new Tuple<Func<bool>, ButtonState>( stateConditions[i], bStates[i] );
+
+                    Contexts.Add(cState);
+                }
+                catch // signify missing conditions without throwing an error
+                {
+                    break; //for now, just exit the loop
+                    // Contexts.Add(key, new Tuple( () => false, new ButtonState("ERROR", null, () => { return; }) ));
+                }
+            }
+
+        }
+
+        // TODO: replace these 3 fields w/ ButtonState in the base IHButton class.
+        // TODO: also make use of ButtonState in IHToggle
+        public void ChangeState(ButtonState newState)
+        {
+            displayLabel = newState.label;
+            texture = newState.texture;
+            onClick = newState.onClick;
+        }
+
+        private void RefreshState()
+        {
+            foreach (var c in Contexts)
+            {
+                if ( c.Item1.Invoke() )
+                {
+                    stateIsCurrent=c.Item1;
+                    // ChangeState(c.Item2);
+                    this.displayState = c.Item2; //works?
+                }
+            }
+        }
+
+        public override void Draw(SpriteBatch sb)
+        {
+
+            if (!stateIsCurrent()) RefreshState();
+
+            if (texture==null)
+            sb.DrawString(Main.fontMouseText, displayLabel, pos, tint);
+            else
+            sb.Draw(texture, pos, tint);
+
+            if (IHButton.Hovered(this))
+            {
+                if (!isHovered)
+                {
+                    Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
+                    isHovered = true;
+                }
+
+                Main.localPlayer.mouseInterface = true;
+                if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
+            }
+            else isHovered = false;
+        }
+
+    }
+
+    public struct ButtonState
+    {
+        public string label;
+        public Texture2D texture;
+        public Action onClick;
+        public Color tint;      //How to tint the texture when this state is active
+
+        public ButtonState(string label, Texture2D tex, Action onClick)
+        {
+            label = label;
+            texture = tex;
+            onClick = onClick;
+
         }
     }
 }

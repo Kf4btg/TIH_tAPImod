@@ -25,12 +25,12 @@ namespace InvisibleHand
         {
             // this should put the Buttons to the left of the chest inventory
             float posX = 73 - (Main.inventoryBackTexture.Width * Main.inventoryScale);
-            float posY = API.main.invBottom + (Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
+            float posY = API.main.invBottom + 4; //(Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
 
             Buttons = new Dictionary<VAction, IHToggle>();
 
-            Buttons[VAction.DA] = new IHToggle("Deposit All Locked", "Deposit All Unlocked",
-                mbase.textures["resources/btn_depositall"],
+            Buttons[VAction.DA] = new IHToggle("Deposit All (Locked)", "Deposit All (Unlocked)"),
+                mbase.textures["resources/btn_depositAll"],
                 () => IHPlayer.ActionLocked(Main.localPlayer, VAction.DA),
                 () => {
                     Main.PlaySound(22, -1, -1, 1);
@@ -39,8 +39,8 @@ namespace InvisibleHand
                 },
                 new Vector2(posX, posY) );
 
-            Buttons[VAction.QS] = new IHToggle("Quick Stack Locked", "Quick Stack Unlocked",
-                mbase.textures["resources/btn_quickstack"],
+            Buttons[VAction.QS] = new IHToggle("Quick Stack (Locked)", "Quick Stack (Unlocked)",
+                mbase.textures["resources/btn_quickStack"],
                 () => IHPlayer.ActionLocked(Main.localPlayer, VAction.QS),
                 () => {
                     Main.PlaySound(22, -1, -1, 1);

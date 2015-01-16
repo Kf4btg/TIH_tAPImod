@@ -153,14 +153,15 @@ namespace InvisibleHand
     public class IHContextButton : IHButton
     {
         // private readonly ButtonState defaultState;
-        private static readonly ButtonContext defaultContext = new ButtonContext( "Default", () => false);
+        // private static readonly ButtonContext defaultContext = new ButtonContext( "Default", () => false);
 
         private bool inDefaultState;
-        private readonly List<ButtonContext> Contexts = null;
-        private readonly Func<ButtonContext> stateChooser;
-        private Func<Bool> maintainState; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
+        // private readonly List<ButtonContext> Contexts = null;
+        // private readonly Func<ButtonContext> stateChooser;
+        // private Func<Bool> maintainState; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
 
-        private readonly Dictionary<string, ButtonState> States;
+        public readonly Dictionary<string, ButtonState> States;
+        public String currentState { get { return displayState.label; } }
 
         // private List<Tuple<KState.Special, KeyEventProvider.Event>>
         private Tuple<KState.Special, KeyEventProvider.Event> watchingKey; //just 1 for now
@@ -225,6 +226,18 @@ namespace InvisibleHand
             InitDefaultState();
         }
 
+        public IHContextButton(ButtonState defaultState, ButtonState altState, Vector2? pos=null) :
+        base(defaultState, pos)
+        {
+            States = new Dictionary<string, ButtonState>(2);
+
+            States.Add("Default", defaultState);
+            States.Add(altState.label, altState);
+            
+            this.displayState = States["Default"]; //defaultState;
+
+
+        }
         // TODO: replace these 3 fields w/ ButtonState in the base IHButton class.
         // TODO: also make use of ButtonState in IHToggle
         // public void ChangeState(ButtonState newState)
@@ -236,9 +249,9 @@ namespace InvisibleHand
 
         public void InitDefaultState()
         {
-            maintainState = () => false; //always check for update in default state
+            // maintainState = () => false; //always check for update in default state
             this.displayState = States["Default"]; //defaultState;
-            inDefaultState = true;
+            // inDefaultState = true;
         }
 
         // private void RefreshState()
@@ -285,6 +298,12 @@ namespace InvisibleHand
             displayState = States[c.stateName];
         }
 
+        public void ChangeState(String stateName)
+        {
+            if States.Contains(stateName)
+                this.displayState = States[stateName];
+        }
+
         public override void Draw(SpriteBatch sb)
         {
             if (!maintainState()) RefreshState();
@@ -306,6 +325,13 @@ namespace InvisibleHand
                 if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
             }
             else isHovered = false;
+        }
+
+        public static void UpdateState(IHButton b, String name)
+        {
+            // if b.States.Contains(name)
+            if (b.currentState!=name)
+                b.ChangeState(name);
         }
 
     }
@@ -346,25 +372,29 @@ namespace InvisibleHand
         public readonly IHButton subscriber;
         public readonly KState.Special key;
         public readonly KeyEventProvider.Event evType;
-        public readonly MethodInfo onKeyEvent;
+        public readonly Action<IHButton> onKeyEvent;
 
-        public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action h)
+        public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action<IHButton> h)
         {
             subscriber = s;
             key = k;
             evType = e;
-            onKeyEvent = TypeOf(h);
-            KeyEventProvider.Add(k,e,h);
+            onKeyEvent = h;
 
         }
 
-        //the callback
+        public void Subscribe()
+        {
+            KeyEventProvider.Add(k,e,this.OnKeyEvent);
+        }
+
+        // the callback
         public void OnKeyEvent()
         {
-            onKeyEvent.Invoke();
+            onKeyEvent(subscriber);
         }
 
-        public void UnSubscribe()
+        public void Unsubscribe()
         {
             KeyEventProvider.Remove(key, evType, onKeyEvent);
         }

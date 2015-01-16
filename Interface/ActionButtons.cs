@@ -22,10 +22,28 @@ namespace InvisibleHand
 
 
             // Func<Bool> check = () => KState.Special.Shift.Down();
-            ButtonState defState = new ButtonState("Sort",
+            ButtonState bs_sort = new ButtonState("Sort",
                 mbase.textures["resources/btn_sort"],
-                () =>  IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]),
+                () =>  Main.localPlayer.chest == -1 ?
+                    IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]) :
+                    IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]),
                 Color.White);
+
+            ButtonState bs_revSort = new ButtonState("Sort (Reverse)",
+                mbase.textures["resources/btn_sort_reverse"],
+                () =>  Main.localPlayer.chest == -1 ?
+                    IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) :
+                    IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]),
+                Color.White);
+
+
+            IHContextButton = new IHContextButton( bs_sort, bs_revSort  )
+
+
+            //need to sub/ub-sub when event received
+            KeyWatcher shiftPressed = new KeyWatcher(this.Buttons[IHAction.Sort], KState.Special.Shift, KeyEventProvider.Event.Pressed, (button) => IHButton.ChangeState(button, "Sort (Reverse)"));
+            KeyWatcher shiftReleased = new KeyWatcher((this.Buttons[IHAction.Sort], KState.Special.Shift, KeyEventProvider.Event.Pressed, (button) => IHButton.ChangeState(button, "Default"))
+
             //
             // Buttons.Add(IHAction.Sort,
             //     new IHContextButton(

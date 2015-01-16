@@ -22,36 +22,46 @@ namespace InvisibleHand
 
 
             // Func<Bool> check = () => KState.Special.Shift.Down();
-            ButtonState defState = new ButtonState("Sort Inventory",
+            ButtonState defState = new ButtonState("Sort",
                 mbase.textures["resources/btn_sort"],
-                () => { IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]); },
+                () =>  IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]),
                 Color.White);
+            //
+            // Buttons.Add(IHAction.Sort,
+            //     new IHContextButton(
+            //         new ButtonState(mbase.textures["resources/btn_sort"],
+            //             () =>  IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]), Color.White),
+            //         () => KState.Special.Shift.Down(),
+            //         new ButtonState(mbase.textures["resources/btn_sort_reverse"],
+            //             () =>
+            //             ))
+            //     ))
 
-            List<Func<Bool>> stateChecks = new List<Func<Bool>>() {
-                    () => KState.Special.Shift.Down() && Main.localPlayer.chest != -1,
-                    () => Main.localPlayer.chest != -1,
-                    () => KState.Special.Shift.Down()
-            };
+            // List<Func<bool>> stateChecks = new List<Func<bool>> {
+            //         () => KState.Special.Shift.Down() && Main.localPlayer.chest != -1,
+            //         () => Main.localPlayer.chest != -1,
+            //         () => KState.Special.Shift.Down()
+            // };
 
-            List<ButtonState> altStates = new List<ButtonState>() {
-                new ButtonState("Sort Chest (Reverse)",
-                    mbase.textures["resources/btn_sort_reverse"],
-                    () => { IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]); },
-                    Color.White),
+            // List<ButtonState> altStates = new List<ButtonState> {
+            //     new ButtonState("Sort Chest (Reverse)",
+            //         mbase.textures["resources/btn_sort_reverse"],
+            //         () =>  IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]),
+            //         Color.White),
+            //
+            //     new ButtonState("Sort Chest",
+            //         mbase.textures["resources/btn_sort"],
+            //         () =>  IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]),
+            //         Color.White),
+            //
+            //     new ButtonState("Sort Inventory (Reverse)",
+            //         mbase.textures["resources/btn_sort_reverse"],
+            //         () =>  IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) ,
+            //         Color.White)
+            // };
 
-                new ButtonState("Sort Chest",
-                    mbase.textures["resources/btn_sort"],
-                    () => { IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]); },
-                    Color.White),
-
-                new ButtonState("Sort Inventory (Reverse)",
-                    mbase.textures["resources/btn_sort_reverse"],
-                    () => { IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]); },
-                    Color.White)
-            };
-
-            Buttons.Add(IHAction.Sort, new IHContextButton(
-                defState, stateChecks, altStates, new Vector2(posX, posY) ));
+            // Buttons.Add(IHAction.Sort, new IHContextButton(
+            //     defState, stateChecks, altStates, new Vector2(posX, posY) ));
 
             // Buttons.Add(IHAction.Sort, new IHButton("Sort",
             //     mbase.textures["resources/btn_sort"],
@@ -64,11 +74,11 @@ namespace InvisibleHand
             //     },
             //     new Vector2(posX, posY) ));
 
-            var stateChooser = () => {
-                return Main.localPlayer.chest == -1 ?
-                    ( KState.Special.Shift.Down() ? "Sort Chest (Reverse)" : "Sort Chest" ) :
-                    ( KState.Special.Shift.Down() ? "Sort Inventory (Reverse)" : "Default");
-            }
+            // Func<string> stateChooser = () => {
+            //     if ( Main.localPlayer.chest == -1 )
+            //         return KState.Special.Shift.Down() ? new ButtonState("Sort Chest (Reverse)" : "Sort Chest";
+            //     return KState.Special.Shift.Down() ? "Sort Inventory (Reverse)" : "Default";
+            // };
 
 
             // Buttons.Add(IHAction.SmartDep, new IHButton("Smart Deposit",

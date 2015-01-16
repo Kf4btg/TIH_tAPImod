@@ -10,15 +10,15 @@ namespace InvisibleHand
     {
         public readonly string name;
 
-        public Action onClick { get { return displayState.onClick}; protected set { (a) => displayState.onClick=a; }; }
+        public Action onClick { get { return displayState.onClick;} protected set { (a) => displayState.onClick=a; } }
 
 
         public ButtonState displayState;
 
         //these for backwards-compat (Temporary)
-        public string displayLabel { get { return displayState.label}; protected set { (l) => displayState.label=l; }; };
-        public Texture2D texture { get { return displayState.texture}; protected set { (t) => displayState.texture=t; }; };
-        public Color tint { get { return displayState.tint}; protected set { (t) => displayState.tint=t; }; };
+        public string displayLabel { get { return displayState.label;} protected set { (l) => displayState.label=l; } }
+        public Texture2D texture { get { return displayState.texture;} protected set { (t) => displayState.texture=t; } }
+        public Color tint { get { return displayState.tint;} protected set { (t) => displayState.tint=t; } }
 
         public Vector2 pos;
         public bool isHovered;
@@ -151,31 +151,36 @@ namespace InvisibleHand
     }
 
 
-    // a button that changes its appearance and/or function based on an external condition
+    // a button that dynamically changes its appearance and/or function based on an external condition
     public class IHContextButton : IHButton
     {
-        private readonly ButtonState defaultState;
+        // private readonly ButtonState defaultState;
+        private static readonly ButtonContext defaultContext = new ButtonContext( "Default", () => false);
+
         private bool inDefaultState;
-        private readonly List<Tuple<Func<bool>, ButtonState>> Contexts;
-        private readonly Action stateChooser;
+        private readonly List<ButtonContext> Contexts = null;
+        private readonly Func<ButtonContext> stateChooser;
         private Func<Bool> maintainState; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
 
         private readonly Dictionary<string, ButtonState> States;
 
-
         public IHContextButton(ButtonState defaultState, IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> altStates, Vector2? pos=null) :
         base(defaultState, pos)
         {
-            this.defaultState = defaultState;
-            Contexts = new List<Tuple<Func<bool>, ButtonState>>();
+            // this.defaultState = defaultState;
+            States = new Dictionary<string, ButtonState>();
+            Contexts = new List<ButtonContext>();
 
-            for (int i=0, i<altStates.Count; i++)
+            States.Add(IHContextButton.defaultContext);
+            // defaultContext = new Tuple ( () => false, "Default")
+
+            for (int i=0; i<altStates.Count; i++)
             {
                 try  // does a simple matching of list indices to associate elements
                 {
-                    var cState = new Tuple<Func<bool>, ButtonState>( stateConditions[i], altStates[i] );
-
+                    var cState = new ButtonContext( altStates[i].label, stateConditions[i]  );
                     Contexts.Add(cState);
+                    States.Add(altStates[i].label, altStates[i]);
                 }
                 catch // signify missing conditions without throwing an error
                 {
@@ -183,25 +188,40 @@ namespace InvisibleHand
                     // Contexts.Add(key, new Tuple( () => false, new ButtonState("ERROR", null, () => { return; }) ));
                 }
             }
-            stateChooser = this.RefreshState();
-            ToDefaultState();
+            stateChooser = this.GetState;
+            InitDefaultState();
         }
 
         //for custom state-chooser
-        public IHContextButton(ButtonState defaultState, Func<IEnumerable<ButtonStates>, ButtonState> stateChooser,
+        public IHContextButton(ButtonState defaultState, Func<String> stateChooser,
             IEnumerable<ButtonState> altStates, Vector2? pos=null) : base(defaultState, pos)
         {
+            States = new Dictionary<string, ButtonState>();
+            States.Add(IHContextButton.defaultContext);
 
+            foreach (var s in altStates)
+            {
+                States.Add(s.label, s);
+            }
+
+            stateChooser = stateChooser;
+            InitDefaultState();
         }
 
         // for just 1 alt state
         public IHContextButton(ButtonState defaultState, Func<bool> altCondition, ButtonState altState, Vector2? pos=null) :
         base(defaultState, pos)
         {
-            this.defaultState = defaultState;
-            Contexts = new List<Tuple<Func<bool>, ButtonState>>(1);
-            Contexts.Add(altCondition, altState);
-            ToDefaultState();
+            // this.defaultState = defaultState;
+            Contexts = new List<ButtonContext>(1);
+            States = new Dictionary<string, ButtonState>(2);
+
+            States.Add(IHContextButton.defaultContext);
+            States.Add(altState.label, altState);
+
+            Contexts.Add( new ButtonContext(altState.label, altCondition));
+            stateChooser = this.GetState;
+            InitDefaultState();
         }
 
         // TODO: replace these 3 fields w/ ButtonState in the base IHButton class.
@@ -213,28 +233,55 @@ namespace InvisibleHand
         //     onClick = newState.onClick;
         // }
 
-        public void ToDefaultState()
+        public void InitDefaultState()
         {
             maintainState = () => false; //always check for update in default state
-            this.displayState = defaultState;
+            this.displayState = States["Default"]; //defaultState;
             inDefaultState = true;
+        }
+
+        // private void RefreshState()
+        // {
+        //     foreach (var c in Contexts)
+        //     {
+        //         if ( c.Item1.Invoke() )
+        //         {
+        //             maintainState=c.Item1;
+        //             inDefaultState = false;
+        //             // ChangeState(c.Item2);
+        //             this.displayState = c.Item2; //works?
+        //             return; //new state was set
+        //         }
+        //     }
+        //     if (!inDefaultState)  ToDefaultState(); //reset to default
+        // }
+
+        private ButtonContext GetState()
+        {
+            foreach (var c in Contexts)
+            {
+                if ( c.isCurrent() )
+                {
+                    inDefaultState = false;
+                    return c;
+                    // ChangeState(c.Item2);
+                    // this.displayState = c.Item2; //works?
+                    // return; //new state was set
+                }
+            }
+            if (!inDefaultState)
+            {
+                inDefaultState = true;
+                return IHContextButton.defaultContext; //reset to default
+            }
         }
 
         private void RefreshState()
         {
-            foreach (var c in Contexts)
-            {
-                if ( c.Item1.Invoke() )
-                {
-                    maintainState=c.Item1;
-                    inDefaultState = false;
-                    // ChangeState(c.Item2);
-                    this.displayState = c.Item2; //works?
-                    return; //new state was set
-                }
-            }
-            if (!inDefaultState)  ToDefaultState(); //reset to default
+            var c = stateChooser();
 
+            maintainState = c.isCurrent;
+            displayState = States[c.stateName];
         }
 
         public override void Draw(SpriteBatch sb)
@@ -275,6 +322,19 @@ namespace InvisibleHand
             texture = tex;
             onClick = onClick;
             tint = tintColor;
+        }
+    }
+
+    // the Tuple syntax was wearing on me
+    public struct ButtonContext
+    {
+        public String stateName;
+        public Func<bool> isCurrent;
+
+        public ButtonContext(String sn, Func<bool> ic)
+        {
+            stateName = sn;
+            isCurrent = ic;
         }
     }
 }

@@ -22,6 +22,8 @@ namespace InvisibleHand
             if (Main.playerInventory && Main.localPlayer.chest!=-1)
             {
                 InterfaceLayer.Add(list, IHBase.self.lockOptions, InterfaceLayer.LayerInventory, true);
+
+                IHBase.KEP.UpdateSubscribers();
             }
         }
 

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Reflection;
 using TAPI;
 using Terraria;
 
@@ -339,4 +340,34 @@ namespace InvisibleHand
             watchKey = wk;
         }
     }
+
+    public class KeyWatcher
+    {
+        public readonly IHButton subscriber;
+        public readonly KState.Special key;
+        public readonly KeyEventProvider.Event evType;
+        public readonly MethodInfo onKeyEvent;
+
+        public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action h)
+        {
+            subscriber = s;
+            key = k;
+            evType = e;
+            onKeyEvent = TypeOf(h);
+            KeyEventProvider.Add(k,e,h);
+
+        }
+
+        //the callback
+        public void OnKeyEvent()
+        {
+            onKeyEvent.Invoke();
+        }
+
+        public void UnSubscribe()
+        {
+            KeyEventProvider.Remove(key, evType, onKeyEvent);
+        }
+    }
+
 }

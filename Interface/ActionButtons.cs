@@ -134,6 +134,27 @@ namespace InvisibleHand
 
     }
 
+    // public class SortButton : IHButton
+    // {
+    //
+    //     public Texture2D tex = IHBase.self.textures["btn_sort"];
+    //     public String label = "Sort";
+    //
+    //     public void OnClick()
+    //     {
+    //         if ( Main.localPlayer.chest == -1 ) // no valid chest open, sort player inventory
+    //             IHOrganizer.SortPlayerInv(Main.localPlayer, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortPlayer"]);
+    //         else
+    //             IHOrganizer.SortChest(Main.localPlayer.chestItems, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
+    //     }
+    //
+    //
+    //     public SortButton()
+    //     {
+    //
+    //     }
+    // }
+
     // public class IHActionAlts : InterfaceLayer
     // {
     //

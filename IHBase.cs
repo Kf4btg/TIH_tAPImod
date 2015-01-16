@@ -16,6 +16,8 @@ namespace InvisibleHand
         public static Dictionary<String, bool> ModOptions;
 
         public static Texture2D lockedIcon;
+        public static KeyEventProvider KEP;
+
         public LockOptions lockOptions;
 
         public override void OnLoad()
@@ -23,6 +25,8 @@ namespace InvisibleHand
             self = this;
             ActionKeys = new Dictionary<String, Keys>();
             ModOptions = new Dictionary<String, bool>();
+            KEP = new KeyEventProvider();
+
         }
 
         public override void OnAllModsLoaded()

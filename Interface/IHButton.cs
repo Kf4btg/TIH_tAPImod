@@ -9,19 +9,17 @@ namespace InvisibleHand
     public class IHButton
     {
         public readonly string name;
-
-        public Action onClick { get { return displayState.onClick;} protected set { (a) => displayState.onClick=a; } }
-
-
         public ButtonState displayState;
-
-        //these for backwards-compat (Temporary)
-        public string displayLabel { get { return displayState.label;} protected set { (l) => displayState.label=l; } }
-        public Texture2D texture { get { return displayState.texture;} protected set { (t) => displayState.texture=t; } }
-        public Color tint { get { return displayState.tint;} protected set { (t) => displayState.tint=t; } }
 
         public Vector2 pos;
         public bool isHovered;
+
+        //these for backwards-compat (Temporary?)
+        public Action onClick       { get { return displayState.onClick;}   protected set { (a) => displayState.onClick=a; } }
+        public string displayLabel  { get { return displayState.label;}     protected set { (l) => displayState.label=l; } }
+        public Texture2D texture    { get { return displayState.texture;}   protected set { (t) => displayState.texture=t; } }
+        public Color tint           { get { return displayState.tint;}      protected set { (t) => displayState.tint=t; } }
+
 
         public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color tintColor = Color.White)
         {
@@ -36,7 +34,6 @@ namespace InvisibleHand
         {
             this.name = bState.label;
             this.displayState = bState;
-            // IHButton(bState.label, bState.texture, bState.onClick, pos);
             this.pos = pos ?? default(Vector2);
         }
 
@@ -163,6 +160,9 @@ namespace InvisibleHand
         private Func<Bool> maintainState; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
 
         private readonly Dictionary<string, ButtonState> States;
+
+        // private List<Tuple<KState.Special, KeyEventProvider.Event>>
+        private Tuple<KState.Special, KeyEventProvider.Event> watchingKey; //just 1 for now
 
         public IHContextButton(ButtonState defaultState, IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> altStates, Vector2? pos=null) :
         base(defaultState, pos)
@@ -325,16 +325,18 @@ namespace InvisibleHand
         }
     }
 
-    // the Tuple syntax was wearing on me
-    public struct ButtonContext
+    public class ButtonContext
     {
         public String stateName;
         public Func<bool> isCurrent;
+        public Tuple<KState.Special, KeyEventProvider.Event> watchKey;
 
-        public ButtonContext(String sn, Func<bool> ic)
+
+        public ButtonContext(String sn, Func<bool> ic, Tuple<KState.Special, KeyEventProvider.Event> wk=null)
         {
             stateName = sn;
             isCurrent = ic;
+            watchKey = wk;
         }
     }
 }

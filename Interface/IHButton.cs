@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Reflection;
+using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -9,31 +9,29 @@ namespace InvisibleHand
 {
     public class IHButton
     {
-        public readonly string name;
-        public ButtonState displayState;
+        public readonly string Name;
 
         public Vector2 pos;
         public bool isHovered;
 
+        public ButtonState displayState { get; protected set; }
         //these for backwards-compat (Temporary?)
-        public Action onClick       { get { return displayState.onClick;}   protected set { (a) => displayState.onClick=a; } }
-        public string displayLabel  { get { return displayState.label;}     protected set { (l) => displayState.label=l; } }
-        public Texture2D texture    { get { return displayState.texture;}   protected set { (t) => displayState.texture=t; } }
-        public Color tint           { get { return displayState.tint;}      protected set { (t) => displayState.tint=t; } }
+        public Action onClick       { get { return displayState.onClick;}   protected set { displayState.onClick=value; } }
+        public string displayLabel  { get { return displayState.label;}     protected set { displayState.label=value; } }
+        public Texture2D texture    { get { return displayState.texture;}   protected set { displayState.texture=value; } }
+        public Color tint           { get { return displayState.tint;}      protected set { displayState.tint=value; } }
 
 
         public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color tintColor = Color.White)
         {
-            IHButton(new ButtonState(name, tex, onClick, tintColor), pos);
-
-            // this.texture = tex;
-            // this.onClick = onClick;
-            // this.pos = pos ?? default(Vector2);
+            this.Name = name;
+            this.displayState = new ButtonState(name, tex, onClick, tintColor);
+            this.pos = pos ?? default(Vector2);
         }
 
         public IHButton(ButtonState bState, Vector2? pos=null)
         {
-            this.name = bState.label;
+            this.Name = bState.label;
             this.displayState = bState;
             this.pos = pos ?? default(Vector2);
         }
@@ -48,18 +46,22 @@ namespace InvisibleHand
         public virtual void Draw(SpriteBatch sb)
         {
             if (displayState.texture==null)
-            {
-                sb.DrawString(Main.fontMouseText, displayState.displayLabel, pos, displayState.tint);
-            }
-            else {
+                sb.DrawString(Main.fontMouseText, displayState.label, pos, displayState.tint);
+            else
                 sb.Draw(displayState.texture, pos, displayState.tint);
-            }
 
             if (IHButton.Hovered(this))
             {
+                if (!isHovered)
+                {
+                    Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
+                    isHovered = true;
+                }
+
                 Main.localPlayer.mouseInterface = true;
                 if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
             }
+            else isHovered = false;
         }
 
         public static bool Hovered(IHButton b)
@@ -148,255 +150,177 @@ namespace InvisibleHand
         }
     }
 
+    /*this is what IHToggle should have *actually* been.  A toggle button doesn't have states. I suppose that what I really want is a button derived from the state-less toggle button or just IHButton that sets its appearance from isActive;
+    */
+    public class IHSwitch : IHButton
+    {
+        public readonly ButtonState ActiveState;
+        public readonly ButtonState InactiveState;
+
+        public readonly Func<bool> IsActive;
+        public readonly Action Switch;
+
+        //defaultish
+        public IHSwitch(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action switchAction, Vector2? pos=null) : base(activeLabel, tex, DoSwitch, pos)
+        {
+            this.IsActive = isActive;
+            this.Switch = switchAction;
+
+            this.ActiveState = new ButtonState(activeLabel, tex, DoSwitch );
+            this.InactiveState = new ButtonState(inactiveLabel, tex, DoSwitch, Color.Gray );
+        }
+
+        public IHSwitch(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive, Action switchAction, Vector2? pos = null) : base(activeState, pos)
+        {
+            this.IsActive = isActive;
+            this.Switch = switchAction;
+
+            this.InactiveState = inactiveState;
+            this.ActiveState = activeState;
+
+        }
+
+        public void DoSwitch()
+        {
+            Switch();
+            displayState = IsActive() ? ActiveState : InactiveState;
+        }
+
+        // call this from ModWorld
+        public void Init()
+        {
+            displayState = IsActive() ? ActiveState : InactiveState;
+        }
+    }
 
     // a button that dynamically changes its appearance and/or function based on an external condition
     public class IHContextButton : IHButton
     {
-        // private readonly ButtonState defaultState;
-        // private static readonly ButtonContext defaultContext = new ButtonContext( "Default", () => false);
-
-        private bool inDefaultState;
-        // private readonly List<ButtonContext> Contexts = null;
-        // private readonly Func<ButtonContext> stateChooser;
-        // private Func<Bool> maintainState; //set to the most recently true state Condition; checked each "onDraw" call to see if it still applies.
-
         public readonly Dictionary<string, ButtonState> States;
-        public String currentState { get { return displayState.label; } }
+        public String CurrentState { get { return displayState.label; } }
 
-        // private List<Tuple<KState.Special, KeyEventProvider.Event>>
-        private Tuple<KState.Special, KeyEventProvider.Event> watchingKey; //just 1 for now
+        // private Dictionary<String, KeyWatcher> watchedKeys;
+        private KeyWatcher[] keySwitch; //well this is cheesy
 
-        public IHContextButton(ButtonState defaultState, IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> altStates, Vector2? pos=null) :
-        base(defaultState, pos)
-        {
-            // this.defaultState = defaultState;
-            States = new Dictionary<string, ButtonState>();
-            Contexts = new List<ButtonContext>();
-
-            States.Add(IHContextButton.defaultContext);
-            // defaultContext = new Tuple ( () => false, "Default")
-
-            for (int i=0; i<altStates.Count; i++)
-            {
-                try  // does a simple matching of list indices to associate elements
-                {
-                    var cState = new ButtonContext( altStates[i].label, stateConditions[i]  );
-                    Contexts.Add(cState);
-                    States.Add(altStates[i].label, altStates[i]);
-                }
-                catch // signify missing conditions without throwing an error
-                {
-                    break; //for now, just exit the loop
-                    // Contexts.Add(key, new Tuple( () => false, new ButtonState("ERROR", null, () => { return; }) ));
-                }
-            }
-            stateChooser = this.GetState;
-            InitDefaultState();
-        }
-
-        //for custom state-chooser
-        public IHContextButton(ButtonState defaultState, Func<String> stateChooser,
-            IEnumerable<ButtonState> altStates, Vector2? pos=null) : base(defaultState, pos)
-        {
-            States = new Dictionary<string, ButtonState>();
-            States.Add(IHContextButton.defaultContext);
-
-            foreach (var s in altStates)
-            {
-                States.Add(s.label, s);
-            }
-
-            stateChooser = stateChooser;
-            InitDefaultState();
-        }
+        // public IHContextButton(ButtonState defaultState, IEnumerable<Func<bool>> stateConditions, IEnumerable<ButtonState> altStates, Vector2? pos=null) :
+        // base(defaultState, pos)
 
         // for just 1 alt state
-        public IHContextButton(ButtonState defaultState, Func<bool> altCondition, ButtonState altState, Vector2? pos=null) :
-        base(defaultState, pos)
-        {
-            // this.defaultState = defaultState;
-            Contexts = new List<ButtonContext>(1);
-            States = new Dictionary<string, ButtonState>(2);
-
-            States.Add(IHContextButton.defaultContext);
-            States.Add(altState.label, altState);
-
-            Contexts.Add( new ButtonContext(altState.label, altCondition));
-            stateChooser = this.GetState;
-            InitDefaultState();
-        }
-
-        public IHContextButton(ButtonState defaultState, ButtonState altState, Vector2? pos=null) :
+        public IHContextButton(ButtonState defaultState, ButtonState altState, KState.Special? watchedKey=null, Vector2? pos=null) :
         base(defaultState, pos)
         {
             States = new Dictionary<string, ButtonState>(2);
 
             States.Add("Default", defaultState);
             States.Add(altState.label, altState);
-            
+
             this.displayState = States["Default"]; //defaultState;
 
+            if (watchedKey!=null)
+            {
+                KState.Special watchKey = watchedKey.Value;
+                keySwitch = new KeyWatcher[2];
+                keySwitch[0] = new KeyWatcher(watchKey, KeyEventProvider.Event.Released, () => {
+                    ChangeState("Default");
+                    keySwitch[0].Unsubscribe();
+                    keySwitch[1].Subscribe();
+                    });
 
+                keySwitch[1] = new KeyWatcher(watchKey, KeyEventProvider.Event.Pressed,  () => {
+                    ChangeState(altState);
+                    keySwitch[1].Unsubscribe();
+                    keySwitch[0].Subscribe();
+                    });
+
+                keySwitch[1].Subscribe();
+            }
         }
-        // TODO: replace these 3 fields w/ ButtonState in the base IHButton class.
+
+        // protected KeyWatcher RegisterKeyWatcher(String bindState, KState.Special watchKey)
+        // {
+        //     // return new KeyWatcher(watchKey, KeyEventProvider.Event.Pressed,  () => { ChangeState(bindState); watchedKeys["Default"].Unsubscribe();} ));
+        //     return new KeyWatcher(watchKey, KeyEventProvider.Event.Pressed,  () => { ChangeState(bindState); keySwitch[0].Unsubscribe();} ));
+        //
+        //     // KeyWatcher kw2 = new KeyWatcher(watchKey, KeyEventProvider.Event.Released, () => ChangeState("Default"));
+        //
+        // }
+
         // TODO: also make use of ButtonState in IHToggle
-        // public void ChangeState(ButtonState newState)
-        // {
-        //     displayLabel = newState.label;
-        //     texture = newState.texture;
-        //     onClick = newState.onClick;
-        // }
-
-        public void InitDefaultState()
-        {
-            // maintainState = () => false; //always check for update in default state
-            this.displayState = States["Default"]; //defaultState;
-            // inDefaultState = true;
-        }
-
-        // private void RefreshState()
-        // {
-        //     foreach (var c in Contexts)
-        //     {
-        //         if ( c.Item1.Invoke() )
-        //         {
-        //             maintainState=c.Item1;
-        //             inDefaultState = false;
-        //             // ChangeState(c.Item2);
-        //             this.displayState = c.Item2; //works?
-        //             return; //new state was set
-        //         }
-        //     }
-        //     if (!inDefaultState)  ToDefaultState(); //reset to default
-        // }
-
-        private ButtonContext GetState()
-        {
-            foreach (var c in Contexts)
-            {
-                if ( c.isCurrent() )
-                {
-                    inDefaultState = false;
-                    return c;
-                    // ChangeState(c.Item2);
-                    // this.displayState = c.Item2; //works?
-                    // return; //new state was set
-                }
-            }
-            if (!inDefaultState)
-            {
-                inDefaultState = true;
-                return IHContextButton.defaultContext; //reset to default
-            }
-        }
-
-        private void RefreshState()
-        {
-            var c = stateChooser();
-
-            maintainState = c.isCurrent;
-            displayState = States[c.stateName];
-        }
 
         public void ChangeState(String stateName)
         {
-            if States.Contains(stateName)
-                this.displayState = States[stateName];
+            if (States.ContainsKey(stateName))
+                displayState = States[stateName];
         }
 
-        public override void Draw(SpriteBatch sb)
+        private void ChangeState(ButtonState newState)
         {
-            if (!maintainState()) RefreshState();
-
-            if (texture==null)
-            sb.DrawString(Main.fontMouseText, displayLabel, pos, tint);
-            else
-            sb.Draw(texture, pos, tint);
-
-            if (IHButton.Hovered(this))
-            {
-                if (!isHovered)
-                {
-                    Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
-                    isHovered = true;
-                }
-
-                Main.localPlayer.mouseInterface = true;
-                if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
-            }
-            else isHovered = false;
-        }
-
-        public static void UpdateState(IHButton b, String name)
-        {
-            // if b.States.Contains(name)
-            if (b.currentState!=name)
-                b.ChangeState(name);
+            displayState = newState;
         }
 
     }
 
-    public struct ButtonState
+    public class ButtonState
     {
         public string label;
         public Texture2D texture;
         public Action onClick;
         public Color tint;      //How to tint the texture when this state is active
 
-        public ButtonState(string label, Texture2D tex, Action onClick, Color tintColor)
+        public ButtonState(string label, Texture2D tex, Action onClick, Color tintColor = Color.White)
         {
-            label = label;
-            texture = tex;
-            onClick = onClick;
-            tint = tintColor;
+            this.label = label;
+            this.texture = tex;
+            this.onClick = onClick;
+            this.tint = tintColor;
         }
     }
 
-    public class ButtonContext
-    {
-        public String stateName;
-        public Func<bool> isCurrent;
-        public Tuple<KState.Special, KeyEventProvider.Event> watchKey;
-
-
-        public ButtonContext(String sn, Func<bool> ic, Tuple<KState.Special, KeyEventProvider.Event> wk=null)
-        {
-            stateName = sn;
-            isCurrent = ic;
-            watchKey = wk;
-        }
-    }
+    // public class ButtonContext
+    // {
+    //     public String stateName;
+    //     public Func<bool> isCurrent;
+    //     public Tuple<KState.Special, KeyEventProvider.Event> watchKey;
+    //
+    //
+    //     public ButtonContext(String sn, Func<bool> ic, Tuple<KState.Special, KeyEventProvider.Event> wk=null)
+    //     {
+    //         stateName = sn;
+    //         isCurrent = ic;
+    //         watchKey = wk;
+    //     }
+    // }
 
     public class KeyWatcher
     {
-        public readonly IHButton subscriber;
-        public readonly KState.Special key;
-        public readonly KeyEventProvider.Event evType;
-        public readonly Action<IHButton> onKeyEvent;
+        // public readonly IHButton subscriber;
+        private readonly KState.Special key;
+        private readonly KeyEventProvider.Event evType;
+        private readonly Action onKeyEvent;
 
-        public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action<IHButton> h)
+        // public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action<IHButton> h)
+        public KeyWatcher(KState.Special k, KeyEventProvider.Event e, Action h)
         {
-            subscriber = s;
+            // subscriber = s;
             key = k;
             evType = e;
             onKeyEvent = h;
-
         }
 
         public void Subscribe()
         {
-            KeyEventProvider.Add(k,e,this.OnKeyEvent);
+            KeyEventProvider[key].Add( evType, onKeyEvent);
         }
 
         // the callback
-        public void OnKeyEvent()
-        {
-            onKeyEvent(subscriber);
-        }
+        // public void OnKeyEvent()
+        // {
+        //     onKeyEvent(subscriber);
+        // }
 
         public void Unsubscribe()
         {
-            KeyEventProvider.Remove(key, evType, onKeyEvent);
+            KeyEventProvider[key].Remove( evType, onKeyEvent);
         }
     }
 

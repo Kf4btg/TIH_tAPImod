@@ -43,7 +43,7 @@ namespace InvisibleHand
             if (player.chest == -1) return;
             bool sendNetMsg = player.chest > -1;
 
-            if (IHPlayer.ActionLocked(player, VAction.DA))
+            if (IHPlayer.ActionLocked(player, IHAction.DA))
             {
                 for (int i=R_START; i >= R_END; i--)
                 {
@@ -103,7 +103,7 @@ namespace InvisibleHand
             Item[] inventory = player.inventory;
             Item[] container = player.chestItems;
             bool sendMessage = player.chest > -1;
-            bool checkLocks  = IHPlayer.ActionLocked(player, VAction.QS);
+            bool checkLocks  = IHPlayer.ActionLocked(player, IHAction.QS);
 
 
             for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.

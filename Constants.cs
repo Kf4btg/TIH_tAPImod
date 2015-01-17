@@ -6,9 +6,9 @@ using Terraria.ID;
 
 namespace InvisibleHand
 {
-    public enum VAction { QS, DA, LA }
+    // public enum VAction {  }
 
-    public enum IHAction { Sort, Stack, Deposit, Refill }
+    public enum IHAction { QS, DA, LA, Sort, Stack, Deposit, Refill }
 
     public enum ItemCat
     {

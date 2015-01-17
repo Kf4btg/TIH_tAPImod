@@ -14,9 +14,9 @@ namespace InvisibleHand
         {
             // finding a place to do this where the buttons are actually *set correctly*
             // upon initial load has been the bitchiest of bitches.
-            foreach (KeyValuePair<VAction, IHToggle> kvp in IHBase.self.lockOptions.Buttons)
+            foreach (KeyValuePair<IHAction, IHSwitch> kvp in IHBase.self.lockOptions.Buttons)
             {
-                kvp.Value.Update();
+                kvp.Value.Init();
             }
         }
     }

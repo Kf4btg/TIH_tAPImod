@@ -11,15 +11,15 @@ namespace InvisibleHand
     {
         private bool[] lockedSlots;
 
-        private Dictionary<VAction,bool> LockedActions;
+        private Dictionary<IHAction,bool> LockedActions;
 
         public override void Initialize()
         {
             // MUST use "new", as tAPI derps with clearing (quote: Miraimai)
             lockedSlots = new bool[40]; //not the hotbar
 
-            LockedActions = new Dictionary<VAction,bool>();
-            foreach (VAction aID in Enum.GetValues(typeof(VAction)))
+            LockedActions = new Dictionary<IHAction,bool>();
+            foreach (IHAction aID in Enum.GetValues(typeof(IHAction)))
             {
                 LockedActions.Add(aID, false);
             }
@@ -35,7 +35,7 @@ namespace InvisibleHand
                 bb.Write(lockedSlots[i]);
             }
             bb.Write(LockedActions.Count);
-            foreach (KeyValuePair<VAction, bool> kvp in LockedActions)
+            foreach (KeyValuePair<IHAction, bool> kvp in LockedActions)
             {
                 bb.Write((int)kvp.Key);
                 bb.Write(kvp.Value);
@@ -59,8 +59,8 @@ namespace InvisibleHand
             {
                 int aID = bb.ReadInt();
                 bool state = bb.ReadBool();
-                if (Enum.IsDefined(typeof(VAction), aID))
-                    LockedActions[(VAction)aID] = state;
+                if (Enum.IsDefined(typeof(IHAction), aID))
+                    LockedActions[(IHAction)aID] = state;
             }
         }
 
@@ -130,7 +130,7 @@ namespace InvisibleHand
             mp.lockedSlots[slotIndex-10]=!mp.lockedSlots[slotIndex-10];
         }
 
-        public static bool ActionLocked(Player player, VAction actionID)
+        public static bool ActionLocked(Player player, IHAction actionID)
         {
             IHPlayer mp = player.GetSubClass<IHPlayer>();
             // try { // if the key isn't there (e.g. new character, etc) return false
@@ -138,7 +138,7 @@ namespace InvisibleHand
             // } catch {return false;}
         }
 
-        public static void ToggleActionLock(Player p, VAction actionID)
+        public static void ToggleActionLock(Player p, IHAction actionID)
         {
             IHPlayer mp = p.GetSubClass<IHPlayer>();
             mp.LockedActions[actionID] = !mp.LockedActions[actionID];

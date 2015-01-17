@@ -7,9 +7,9 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public class LockOptions : InterfaceLayer
+    public class LockOptions : ButtonLayer
     {
-        public readonly Dictionary<VAction, IHToggle> Buttons;
+        // public readonly Dictionary<VAction, IHSwitch> Buttons;
 
         /*****************************************************************
         *   Create the Buttons that will be used to toggle the states of
@@ -21,31 +21,31 @@ namespace InvisibleHand
             FIXME: No visual feedback when bringing the mouse to hover over the button.
             TODO: This class could still use some cleanup.
         */
-        public LockOptions(ModBase mbase) : base("InvisibleHand:LockOptions")
+        public LockOptions(ModBase mbase) : base("LockOptions")
         {
             // this should put the Buttons to the left of the chest inventory
             float posX = 73 - (Main.inventoryBackTexture.Width * Main.inventoryScale);
             float posY = API.main.invBottom + 4; //(Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
 
-            Buttons = new Dictionary<VAction, IHToggle>();
+            // Buttons = new Dictionary<VAction, IHSwitch>();
 
-            Buttons[VAction.DA] = new IHToggle("Deposit All (Locked)", "Deposit All (Unlocked)"),
+            Buttons[IHAction.DA] = new IHSwitch("Deposit All (Locked)", "Deposit All (Unlocked)",
                 mbase.textures["resources/btn_depositAll"],
-                () => IHPlayer.ActionLocked(Main.localPlayer, VAction.DA),
+                () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA),
                 () => {
-                    Main.PlaySound(22, -1, -1, 1);
-                    IHPlayer.ToggleActionLock(Main.localPlayer, VAction.DA);
-                    Buttons[VAction.DA].Update();
+                    Main.PlaySound(22, -1, -1, 1); //lock sound
+                    IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);
+                    // Buttons[VAction.DA].Update();
                 },
                 new Vector2(posX, posY) );
 
-            Buttons[VAction.QS] = new IHToggle("Quick Stack (Locked)", "Quick Stack (Unlocked)",
+            Buttons[IHAction.QS] = new IHSwitch("Quick Stack (Locked)", "Quick Stack (Unlocked)",
                 mbase.textures["resources/btn_quickStack"],
-                () => IHPlayer.ActionLocked(Main.localPlayer, VAction.QS),
+                () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS),
                 () => {
                     Main.PlaySound(22, -1, -1, 1);
-                    IHPlayer.ToggleActionLock(Main.localPlayer, VAction.QS);
-                    Buttons[VAction.QS].Update();
+                    IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);
+                    // Buttons[VAction.QS].Update();
                 },
                 new Vector2(posX, (Main.inventoryBackTexture.Height * Main.inventoryScale) + posY) );
 
@@ -60,12 +60,12 @@ namespace InvisibleHand
             //     new Vector2(posX, posY + (Main.inventoryBackTexture.Height * Main.inventoryScale * 2)) );
         }
 
-        protected override void OnDraw(SpriteBatch sb)
-        {
-            foreach (KeyValuePair<VAction, IHToggle> kvp in Buttons)
-            {
-                kvp.Value.Draw(sb);
-            }
-        }
+        // protected override void OnDraw(SpriteBatch sb)
+        // {
+        //     foreach (KeyValuePair<VAction, IHButton> kvp in Buttons)
+        //     {
+        //         kvp.Value.Draw(sb);
+        //     }
+        // }
     }
 }

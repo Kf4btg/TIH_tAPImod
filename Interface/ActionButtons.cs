@@ -7,42 +7,42 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public class IHActionButtons : InterfaceLayer
+    public class ActionButtons : ButtonLayer
     {
-        public readonly Dictionary<IHAction, IHButton> Buttons;
+        // public readonly Dictionary<IHAction, IHButton> Buttons;
 
-        public IHActionButtons(ModBase mbase) : base("InvisibleHand:IHActionButtons")
+        public ActionButtons(ModBase mbase) : base("ActionButtons")
         {
             // this should put the Buttons to the left of the chest inventory
             float posX = 73 - (Main.inventoryBackTexture.Width * Main.inventoryScale);
             float posY = API.main.invBottom + (Main.inventoryBackTexture.Height * Main.inventoryScale)/2;
 
-            Buttons = new Dictionary<IHAction, IHButton>();
+            // Buttons = new Dictionary<IHAction, IHButton>();
 
 
 
             // Func<Bool> check = () => KState.Special.Shift.Down();
-            ButtonState bs_sort = new ButtonState("Sort",
-                mbase.textures["resources/btn_sort"],
-                () =>  Main.localPlayer.chest == -1 ?
-                    IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]) :
-                    IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]),
-                Color.White);
+            // ButtonState bs_sort = new ButtonState("Sort",
+            //     mbase.textures["resources/btn_sort"],
+            //     () =>  Main.localPlayer.chest == -1 ?
+            //         IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]) :
+            //         IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]),
+            //     Color.White);
+            //
+            // ButtonState bs_revSort = new ButtonState("Sort (Reverse)",
+            //     mbase.textures["resources/btn_sort_reverse"],
+            //     () =>  Main.localPlayer.chest == -1 ?
+            //         IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) :
+            //         IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]),
+            //     Color.White);
 
-            ButtonState bs_revSort = new ButtonState("Sort (Reverse)",
-                mbase.textures["resources/btn_sort_reverse"],
-                () =>  Main.localPlayer.chest == -1 ?
-                    IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) :
-                    IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]),
-                Color.White);
 
-
-            IHContextButton = new IHContextButton( bs_sort, bs_revSort  )
+            // IHContextButton sB = new IHContextButton( bs_sort, bs_revSort  );
 
 
             //need to sub/ub-sub when event received
-            KeyWatcher shiftPressed = new KeyWatcher(this.Buttons[IHAction.Sort], KState.Special.Shift, KeyEventProvider.Event.Pressed, (button) => IHButton.ChangeState(button, "Sort (Reverse)"));
-            KeyWatcher shiftReleased = new KeyWatcher((this.Buttons[IHAction.Sort], KState.Special.Shift, KeyEventProvider.Event.Pressed, (button) => IHButton.ChangeState(button, "Default"))
+            // KeyWatcher shiftPressed = new KeyWatcher(this.Buttons[IHAction.Sort], KState.Special.Shift, KeyEventProvider.Event.Pressed, (button) => IHButton.ChangeState(button, "Sort (Reverse)"));
+            // KeyWatcher shiftReleased = new KeyWatcher((this.Buttons[IHAction.Sort], KState.Special.Shift, KeyEventProvider.Event.Pressed, (button) => IHButton.ChangeState(button, "Default"));
 
             //
             // Buttons.Add(IHAction.Sort,
@@ -142,13 +142,13 @@ namespace InvisibleHand
         }
 
 
-        protected override void OnDraw(SpriteBatch sb)
-        {
-            foreach (KeyValuePair<IHAction, IHButton> kvp in Buttons)
-            {
-                kvp.Value.Draw(sb);
-            }
-        }
+        // protected override void OnDraw(SpriteBatch sb)
+        // {
+        //     foreach (KeyValuePair<IHAction, IHButton> kvp in Buttons)
+        //     {
+        //         kvp.Value.Draw(sb);
+        //     }
+        // }
 
     }
 

@@ -23,7 +23,7 @@ namespace InvisibleHand
             {
                 InterfaceLayer.Add(list, IHBase.self.lockOptions, InterfaceLayer.LayerInventory, true);
 
-                IHBase.KEP.UpdateSubscribers();
+                IHBase.KEP[KState.Special.Shift].UpdateSubscribers();
             }
         }
 

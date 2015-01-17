@@ -16,67 +16,174 @@ namespace InvisibleHand
             Released
         }
 
-        // public Dictionary<KState.Special,List<Action>> Subscribers;
-        public Dictionary<KeyEventProvider.Event, List<Action>> shiftSubscribers;
-        // public Dictionary<String, List<Action>> CtrlSubscribers;
-        // public Dictionary<String, List<Action>> AltSubscribers;
-        // public Dictionary<String, List<Action>> AnySubscribers;
+        // tracker
+        // private int subscriberCount;
+        public int Count { get
+            {
+                int count = 0;
 
+                if (activeProviders != null)
+                    foreach (var kvp in activeProviders)
+                        count+=kvp.Value.Count;
 
+                if (specialProviders != null)
+                    foreach (var kvp in specialProviders)
+                        count+=kvp.Value.Count;
+
+                return count;
+            }}
+
+        //lists of key-specific providers
+        private Dictionary< Keys,           Provider > activeProviders;
+        private Dictionary< KState.Special, Provider > specialProviders;
+
+        // initializer
         public KeyEventProvider()
         {
-            shiftSubscribers = new Dictionary<KeyEventProvider.Event, List<Action>>();
-
-            shiftSubscribers.Add(KeyEventProvider.Event.Pressed, new List<Action>());
-            shiftSubscribers.Add(KeyEventProvider.Event.Released, new List<Action>());
-            // Subscribers.Add(KState.Special.Ctrl, new List<Action>());
-            // Subscribers.Add(KState.Special.Alt, new List<Action>());
-            // Subscribers.Add(KState.Special.Any, new List<Action>());
-
+            activeProviders = null;
+            specialProviders = null;
         }
 
-        public void Add(KState.Special key, KeyEventProvider.Event ev, Action handler)
+        //indexers
+        public Provider this[Keys key]
         {
-            switch(key)
+            get { return activeProviders[key]; }
+            //private set { AddProvider(key); }
+        }
+
+        public Provider this[KState.Special key]
+        {
+            get { return specialProviders[key]; }
+            //set { AddProvider(value); }
+        }
+
+        // add new Providers
+        public void AddProvider(Keys key)
+        {
+            if (activeProviders == null) activeProviders = new Dictionary<Keys, Provider>();
+            if (!activeProviders.ContainsKey(key))
+                activeProviders.Add(key, new KeysProvider(key));
+        }
+
+        public void AddProvider(KState.Special key)
+        {
+            if (specialProviders == null) specialProviders = new Dictionary<KState.Special, Provider>();
+            if (!specialProviders.ContainsKey(key))
+                specialProviders.Add(key, new SpecialProvider(key));
+        }
+
+        //getters
+        private Provider GetProvider(Keys key)
+        {
+            if (activeProviders == null || !activeProviders.ContainsKey(key))
+                AddProvider(key);
+
+            return activeProviders[key];
+        }
+
+        private Provider GetProvider(KState.Special key)
+        {
+            if (specialProviders == null || !specialProviders.ContainsKey(key))
+                AddProvider(key);
+
+            return specialProviders[key];
+        }
+
+
+        public void UpdateAll()
+        {
+            // if (subscriberCount<1) return;
+
+            if (activeProviders != null) {
+                foreach (var kvp in activeProviders)
+                    { kvp.Value.UpdateSubscribers(); }}
+
+            if (specialProviders != null) {
+                foreach (var kvp in specialProviders)
+                    { kvp.Value.UpdateSubscribers(); }}
+        }
+
+
+
+        public abstract class Provider
+        {
+            protected int subscriberCount;
+            public int Count { get { return subscriberCount; }}
+
+            protected Dictionary<KeyEventProvider.Event, List<Action>> subscribers;
+
+            public Provider()
             {
-                case KState.Special.Shift:
-                    shiftSubscribers[ev].Add(handler);
-                    break;
+                subscribers = new Dictionary<KeyEventProvider.Event, List<Action>>();
+
+                subscribers.Add(KeyEventProvider.Event.Pressed, new List<Action>());
+                subscribers.Add(KeyEventProvider.Event.Released, new List<Action>());
+            }
+
+            public virtual void Add(KeyEventProvider.Event ev, Action handler)
+            {
+                subscribers[ev].Add(handler);
+                subscriberCount++;
+            }
+
+            public virtual void Remove(KeyEventProvider.Event ev, Action handler)
+            {
+                subscribers[ev].Remove(handler);
+                subscriberCount--;
+            }
+
+            //call this from one of the "Updates-every-frame" hooks to send events to listeners (e.g. buttons) on a key change
+            public abstract void UpdateSubscribers();
+
+        }
+
+        public class KeysProvider : Provider
+        {
+            private readonly Keys _key;
+
+            public KeysProvider(Keys key) : base()
+            {
+                _key = key;
+            }
+
+            public override void UpdateSubscribers()
+
+            {
+                if (subscriberCount < 1) return;
+
+                if (_key.Pressed())
+                    foreach (Action handler in subscribers[KeyEventProvider.Event.Pressed] )
+                        handler();
+
+                if (_key.Released())
+                    foreach (Action handler in subscribers[KeyEventProvider.Event.Released] )
+                        handler();
             }
         }
 
-        public void Remove(KState.Special key, KeyEventProvider.Event ev, Action handler)
+        public class SpecialProvider : Provider
         {
-            switch(key)
-            {
-                case KState.Special.Shift:
-                    shiftSubscribers[ev].Remove(handler);
-                break;
-            }
-        }
-        
-        //call this from one of the "Updates-every-frame" hooks to send events to listeners (e.g. buttons) on a key change
-        public void UpdateSubscribers()
-        {
-            // foreach (var kvp in shiftSubscribers)
-            // {
+            private readonly KState.Special _key;
 
-            if (KState.Special.Shift.Pressed())
+            public SpecialProvider(KState.Special key) : base()
             {
-                foreach (Action handler in shiftSubscribers[KeyEventProvider.Event.Pressed] )
-                {
-                    handler();
-                }
+                _key = key;
             }
-            if (KState.Special.Shift.Released())
+
+            public override void UpdateSubscribers()
             {
-                foreach (Action handler in shiftSubscribers[KeyEventProvider.Event.Released] )
-                {
-                    handler();
-                }
+                if (subscriberCount < 1) return;
+
+                if (_key.Pressed())
+                    foreach (Action handler in subscribers[KeyEventProvider.Event.Pressed] )
+                        handler();
+
+                if (_key.Released())
+                    foreach (Action handler in subscribers[KeyEventProvider.Event.Released] )
+                        handler();
             }
-            // }
         }
+
     }
 
 }

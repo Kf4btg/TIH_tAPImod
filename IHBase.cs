@@ -25,7 +25,9 @@ namespace InvisibleHand
             self = this;
             ActionKeys = new Dictionary<String, Keys>();
             ModOptions = new Dictionary<String, bool>();
+
             KEP = new KeyEventProvider();
+            KEP.AddProvider(KState.Special.Shift);
 
         }
 

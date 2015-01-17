@@ -186,4 +186,37 @@ namespace InvisibleHand
 
     }
 
+    public class KeyWatcher
+    {
+        // public readonly IHButton subscriber;
+        private readonly KState.Special key;
+        private readonly KeyEventProvider.Event evType;
+        private readonly Action onKeyEvent;
+
+        // public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action<IHButton> h)
+        public KeyWatcher(KState.Special k, KeyEventProvider.Event e, Action h)
+        {
+            // subscriber = s;
+            key = k;
+            evType = e;
+            onKeyEvent = h;
+        }
+
+        public void Subscribe()
+        {
+            KeyEventProvider[key].Add(evType, onKeyEvent);
+        }
+
+        // the callback
+        // public void OnKeyEvent()
+        // {
+        //     onKeyEvent(subscriber);
+        // }
+
+        public void Unsubscribe()
+        {
+            KeyEventProvider[key].Remove( evType, onKeyEvent);
+        }
+    }
+
 }

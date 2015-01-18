@@ -17,6 +17,7 @@ namespace InvisibleHand
         public ButtonState displayState { get; protected set; }
         //these for backwards-compat (Temporary?)
         public Action onClick       { get { return displayState.onClick;}   protected set { displayState.onClick=value; } }
+        public Action onRightClick  { get { return displayState.onRightClick;}   protected set { displayState.onRightClick=value; } }
         public string displayLabel  { get { return displayState.label;}     protected set { displayState.label=value; } }
         public Texture2D texture    { get { return displayState.texture;}   protected set { displayState.texture=value; } }
         public Color tint           { get { return displayState.tint;}      protected set { displayState.tint=value; } }
@@ -34,10 +35,18 @@ namespace InvisibleHand
             this.pos = pos ?? default(Vector2);
         }
 
+        //simple button w/ no right-click
         public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color? tintColor = null)
         {
             this.Name = name;
-            this.displayState = new ButtonState(name, tex, onClick, tintColor ?? Color.White);
+            this.displayState = new ButtonState(name, tex, onClick, null, tintColor ?? Color.White);
+            this.pos = pos ?? default(Vector2);
+        }
+
+        public IHButton(string name, Texture2D tex, Action onClick, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
+        {
+            this.Name = name;
+            this.displayState = new ButtonState(name, tex, onClick, onRightClick, tintColor ?? Color.White);
             this.pos = pos ?? default(Vector2);
         }
 
@@ -70,6 +79,7 @@ namespace InvisibleHand
 
                 Main.localPlayer.mouseInterface = true;
                 if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
+                if (Main.mouseRight && Main.mouseRightRelease && onRightClick!=null) onRightClick();
             }
             else isHovered = false;
         }
@@ -94,17 +104,16 @@ namespace InvisibleHand
         private readonly Action makeActive;
         private readonly Action makeInactive;
 
-        //defaultish - make the *
+        //defaultish - gray out the inactive state, change the label
         public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null) : base(pos)
         {
             IsActive = isActive;
             OnToggle = onToggle;
 
             ActiveState = new ButtonState(activeLabel, tex, DoToggle );
-            InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, Color.Gray );
+            InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, null, Color.Gray );
 
             displayState = ActiveState;
-
         }
 
         public IHToggle(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive, Vector2? pos = null) : base(pos)
@@ -228,6 +237,7 @@ namespace InvisibleHand
         public string label;
         public Texture2D texture;
         public Action onClick;
+        public Action onRightClick;
         public Color tint;      //How to tint the texture when this state is active
 
         public ButtonState()
@@ -235,14 +245,16 @@ namespace InvisibleHand
             label = "Button";
             texture = null;
             onClick = null;
+            onRightClick = null;
             tint = Color.White;
         }
 
-        public ButtonState(string label, Texture2D tex, Action onClick, Color? tintColor = null)
+        public ButtonState(string label, Texture2D tex, Action onClick, Action onRightClick=null, Color? tintColor = null)
         {
             this.label = label;
             this.texture = tex;
             this.onClick = onClick;
+            this.onRightClick = onRightClick;
             this.tint = tintColor ?? Color.White;
         }
     }

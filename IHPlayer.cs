@@ -43,7 +43,6 @@ namespace InvisibleHand
         }
 
         //load back locked-slot state
-        // FIXME: sometimes this seems to load a different player's info
         public override void Load(BinBuffer bb)
         {
             if (bb.IsEmpty) return;

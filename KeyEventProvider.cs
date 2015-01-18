@@ -16,21 +16,21 @@ namespace InvisibleHand
         }
 
         //lists of key-specific providers
-        private ConcurrentDictionary< Keys,           Provider > activeProviders;
+        // private ConcurrentDictionary< Keys,           Provider > activeProviders;
         private ConcurrentDictionary< KState.Special, Provider > specialProviders;
 
         // initializer
         public KeyEventProvider()
         {
-            activeProviders  = new ConcurrentDictionary<Keys, Provider>();
+            // activeProviders  = new ConcurrentDictionary<Keys, Provider>();
             specialProviders = new ConcurrentDictionary<KState.Special, Provider>();
         }
 
         //indexers
-        public Provider this[Keys key]
-        {
-            get { return activeProviders.GetOrAdd(key, new KeysProvider(key)); }
-        }
+        // public Provider this[Keys key]
+        // {
+        //     get { return activeProviders.GetOrAdd(key, new KeysProvider(key)); }
+        // }
 
         public Provider this[KState.Special key]
         {
@@ -38,11 +38,11 @@ namespace InvisibleHand
         }
 
         // add new Providers
-        public void AddProvider(Keys key)
-        {
-            // if (activeProviders == null) activeProviders = new ConcurrentDictionary<Keys, Provider>();
-            activeProviders.TryAdd(key, new KeysProvider(key));
-        }
+        // public void AddProvider(Keys key)
+        // {
+        //     // if (activeProviders == null) activeProviders = new ConcurrentDictionary<Keys, Provider>();
+        //     activeProviders.TryAdd(key, new KeysProvider(key));
+        // }
 
         public void AddProvider(KState.Special key)
         {
@@ -52,13 +52,12 @@ namespace InvisibleHand
 
         public void UpdateAll()
         {
-            if (activeProviders != null) {
-                foreach (var kvp in activeProviders)
-                    { kvp.Value.UpdateSubscribers(); }}
+            // if (activeProviders != null) {
+            //     foreach (var kvp in activeProviders)
+            //         { kvp.Value.UpdateSubscribers(); }}
 
-            if (specialProviders != null) {
                 foreach (var kvp in specialProviders)
-                    { kvp.Value.UpdateSubscribers(); }}
+                    { kvp.Value.UpdateSubscribers(); }
         }
 
         public abstract class Provider
@@ -89,31 +88,31 @@ namespace InvisibleHand
             public abstract void UpdateSubscribers();
         }
 
-        public class KeysProvider : Provider
-        {
-            private readonly Keys _key;
-
-            public KeysProvider(Keys key) : base()
-            {
-                _key = key;
-            }
-
-            public override void UpdateSubscribers()
-            {
-                Action handler;
-                if (_key.Pressed())
-                    while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
-                        subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler);
-                        handler();
-                    }
-
-                if (_key.Released())
-                    while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
-                        subscribers[KeyEventProvider.Event.Released].TryTake(out handler);
-                        handler();
-                    }
-            }
-        }
+        // public class KeysProvider : Provider
+        // {
+        //     private readonly Keys _key;
+        //
+        //     public KeysProvider(Keys key) : base()
+        //     {
+        //         _key = key;
+        //     }
+        //
+        //     public override void UpdateSubscribers()
+        //     {
+        //         Action handler;
+        //         if (_key.Pressed())
+        //             while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
+        //                 subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler);
+        //                 handler();
+        //             }
+        //
+        //         if (_key.Released())
+        //             while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
+        //                 subscribers[KeyEventProvider.Event.Released].TryTake(out handler);
+        //                 handler();
+        //             }
+        //     }
+        // }
 
         public class SpecialProvider : Provider
         {
@@ -127,17 +126,19 @@ namespace InvisibleHand
             public override void UpdateSubscribers()
             {
                 Action handler;
-                if (_key.Pressed() && _key.Down()){
-                while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
-                    if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler))
-                        handler();
-                }}
+                if (_key.Pressed())
+                {
+                    while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
+                        if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
+                    }
+                }
 
-                if (_key.Released() && _key.Up()){
-                while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
-                    if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler))
-                        handler();
-                }}
+                else if (_key.Released())
+                {
+                    while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
+                        if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
+                    }
+                }
             }
         }
     }

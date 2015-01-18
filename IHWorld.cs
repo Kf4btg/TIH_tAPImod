@@ -16,7 +16,6 @@ namespace InvisibleHand
             // upon initial load has beensdjnkdsjnklsakjnasdfjk
             foreach (KeyValuePair<IHAction, IHButton> kvp in IHBase.self.lockOptions.Buttons)
             {
-
                 ((IHToggle)kvp.Value).Init();
             }
         }

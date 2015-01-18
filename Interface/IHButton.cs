@@ -171,12 +171,14 @@ namespace InvisibleHand
                 KState.Special watchKey = watchedKey.Value;
                 keySwitch = new KeyWatcher[2];
 
+                // in default, going to alt
                 keySwitch[1] = new KeyWatcher(watchKey, KeyEventProvider.Event.Pressed,  () => {
                     SetState(altState);
                     // keySwitch[1].Unsubscribe(); //this happens automatically with a concurrent bag
                     keySwitch[0].Subscribe();
                     });
 
+                // in alt, going to default
                 keySwitch[0] = new KeyWatcher(watchKey, KeyEventProvider.Event.Released, () => {
                     SetState(defaultState);
                     // keySwitch[0].Unsubscribe();

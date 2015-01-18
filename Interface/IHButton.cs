@@ -173,13 +173,13 @@ namespace InvisibleHand
 
                 keySwitch[1] = new KeyWatcher(watchKey, KeyEventProvider.Event.Pressed,  () => {
                     SetState(altState);
-                    keySwitch[1].Unsubscribe();
+                    // keySwitch[1].Unsubscribe(); //this happens automatically with a concurrent bag
                     keySwitch[0].Subscribe();
                     });
 
                 keySwitch[0] = new KeyWatcher(watchKey, KeyEventProvider.Event.Released, () => {
                     SetState(defaultState);
-                    keySwitch[0].Unsubscribe();
+                    // keySwitch[0].Unsubscribe();
                     keySwitch[1].Subscribe();
                     });
 

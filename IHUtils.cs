@@ -37,6 +37,10 @@ namespace InvisibleHand
         *   DoDepositAll
         // !ref:Main:#22314.0#
         */
+        public static void DoDepositAll()
+        {
+            DoDepositAll(Main.localPlayer);
+        }
         public static void DoDepositAll(Player player)
         {
             //this shouldn't happen if method is called correctly
@@ -67,6 +71,10 @@ namespace InvisibleHand
         /********************************************************
         *   DoLootAll !ref:Main:#22272.00#
         */
+        public static void DoLootAll()
+        {
+            DoLootAll(Main.localPlayer);
+        }
         public static void DoLootAll(Player player)
         {
             //this shouldn't happen if method is called correctly
@@ -95,6 +103,11 @@ namespace InvisibleHand
         *   DoQuickStack
         *   !ref:Main:#22476.44##22637.44#
         */
+
+        public static void DoQuickStack()
+        {
+            DoQuickStack(Main.localPlayer);
+        }
         public static void DoQuickStack(Player player)
         {
             if (player.chest == -1) return;

@@ -20,7 +20,7 @@ namespace InvisibleHand
             ButtonState bsD = new ButtonState("Sort", mbase.textures["resources/btn_sort"],
             () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]));
 
-                //altState
+            //altState
             ButtonState bsA = new ButtonState("Sort (Reverse)", mbase.textures["resources/btn_sort_reverse"],
             () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]));
 
@@ -41,8 +41,8 @@ namespace InvisibleHand
     {
         // public readonly Dictionary<IHAction, IHButton> Buttons;
 
-        /*if this is true (will likely be a mod-option), replace the text buttons to the right of chests with my multifunctional icons*/
-        // public bool replaceVanilla;
+        /*if this is true (will likely be a mod-option), replace the text buttons to the right of chests with multifunctional icons*/
+        public bool replaceVanilla;
 
         public ChestButtons(ModBase mbase) : base("ChestButtons")
         {
@@ -61,27 +61,96 @@ namespace InvisibleHand
             ButtonState bsA = new ButtonState("Sort Chest (Reverse)", mbase.textures["resources/btn_sort_reverse"],
             () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]));
 
-            Buttons.Add(IHAction.Sort, new IHContextButton(bsD, bsA, KState.Special.Shift));
+            Buttons.Add(IHAction.Sort, new ButtonBase(new IHContextButton(bsD, bsA, KState.Special.Shift, new Vector2(posX,posY))));
 
-            // --Create Refill Button-- //
+            if (replaceVanilla){}
+            else{
 
+            // --Create Refill/QuickStack Button-- //
+
+            //restock is simple single-state button
             bsD = new ButtonState();
-            bsD.label = "Refill";
+            bsD.label = "Quick Restock";
             bsD.texture = mbase.textures["resources/btn_quickRefill"];
             bsD.onClick = IHSmartStash.SmartLoot;
 
-            Buttons.Add(IHAction.Refill, new IHButton(bsD, new Vector2(posX, posY)));
+            //create button
+            IHButton QRbutton =new IHButton(bsD, new Vector2(posX, posY));
 
-            // --Create Smart Deposit Button-- //
+            //add it as the default context to a new ButtonBase
+            Buttons.Add(IHAction.Refill, new ButtonBase(QRButton));
+
+            //quickstack will be 2-state toggle button (locked/unlocked)
+            // that toggles on right click
+
+            // create default unlocked state, setup name and texture
+            bsA = new ButtonState();
+            bsA.label = "Quick Stack (Unlocked)";
+            bsA.texture = mbase.textures["resources/btn_quickStack"];
+            // bsA.onClick = () => IHUtils.DoQuickStack();
+            // bsA.onRightClick = () => {
+            //     Main.PlaySound(22, -1, -1, 1); //lock sound
+            //     IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); }
+
+            // create locked state, setup name and texture
+            ButtonState bsL = new ButtonState();
+            bsL.label = "Quick Stack (Locked)";
+            bsL.texture = mbase.textures["resources/btn_quickStack_locked"];
+
+            // being a toggle, onClick (the quickstack action) and
+            // onRightClick (the state-toggle action) will be the same
+            bsL.onClick = bsA.onClick = IHUtils.DoQuickStack;
+            bsL.onRightClick = bsA.onRightClick = () => {
+                Main.PlaySound(22, -1, -1, 1); //lock sound
+                IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); }
+
+            // create the button, setting its state from ActionLocked()
+            IHToggle QSbutton = new IHToggle(bsA, bsL,
+                () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), //IsActive()
+                new Vector2(posX, posY), true);
+
+            //now create keywatchers to toggle the button from restock to quickstack when Shift is pressed
+            Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, QRButton, QSButton);
+
+            // --Create SmartStash/DepositAll Button-- //
 
             bsD = new ButtonState();
             bsD.label = "Smart Deposit";
             bsD.texture = mbase.textures["resources/btn_smartDeposit"];
             bsD.onClick = IHSmartStash.SmartDeposit;
 
-            Buttons.Add(IHAction.Deposit, new IHButton(bsD, new Vector2(posX, posY)));
+            IHButton SDbutton = new IHButton(bsD, new Vector2(posX, posY));
 
+            Buttons.Add(IHAction.Deposit, new ButtonBase(SDbutton));
 
+            bsA = new ButtonState();
+            bsA.label = "Deposit All (Unlocked)";
+            bsA.texture = mbase.textures["resources/btn_depositAll"];
+
+            bsL = new ButtonState();
+            bsL.label = "Deposit All (Locked)";
+            bsL.texture = mbase.textures["resources/btn_depositAll_locked"];
+
+            bsL.onClick = bsA.onClick = IHUtils.DoDepositAll;
+            bsL.onRightClick = bsA.onRightClick = () => {
+                Main.PlaySound(22, -1, -1, 1); //lock sound
+                IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); }
+
+            IHToggle DAbutton = new IHToggle(bsA, bsL,
+                () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA), //IsActive()
+                null, true); //can leave the position null since the position for this button has already been established
+
+            //create keywatchers
+            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, SDbutton, DAbutton);
+
+            // --Create LootAll Button-- //
+
+            bsD = new ButtonState();
+            bsD.label = "Loot All";
+            bsD.texture = mbase.textures["resources/btn_lootAll"];
+            bsD.onClick = IHUtils.DoLootAll;
+
+            Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
 
 
             // if (replaceVanilla)
@@ -99,7 +168,7 @@ namespace InvisibleHand
             //         IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]);} );
             // }
 
-        }
+        }}
 
 
         // protected override void OnDraw(SpriteBatch sb)

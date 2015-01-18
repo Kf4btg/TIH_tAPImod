@@ -16,11 +16,11 @@ namespace InvisibleHand
 
         public ButtonState displayState { get; protected set; }
         //these for backwards-compat (Temporary?)
-        public Action onClick       { get { return displayState.onClick;}   protected set { displayState.onClick=value; } }
-        public Action onRightClick  { get { return displayState.onRightClick;}   protected set { displayState.onRightClick=value; } }
-        public string displayLabel  { get { return displayState.label;}     protected set { displayState.label=value; } }
-        public Texture2D texture    { get { return displayState.texture;}   protected set { displayState.texture=value; } }
-        public Color tint           { get { return displayState.tint;}      protected set { displayState.tint=value; } }
+        public Action onClick       { get { return displayState.onClick;}       protected set { displayState.onClick=value; } }
+        public Action onRightClick  { get { return displayState.onRightClick;}  protected set { displayState.onRightClick=value; } }
+        public string displayLabel  { get { return displayState.label;}         protected set { displayState.label=value; } }
+        public Texture2D texture    { get { return displayState.texture;}       protected set { displayState.texture=value; } }
+        public Color tint           { get { return displayState.tint;}          protected set { displayState.tint=value; } }
 
         public Vector2 Size
         {
@@ -84,6 +84,11 @@ namespace InvisibleHand
             else isHovered = false;
         }
 
+        public virtual bool OnDraw(SpriteBatch sb, Vector2 position)
+        {
+            return true;
+        }
+
         public static bool Hovered(IHButton b)
         {
             return (new Rectangle((int)b.pos.X, (int)b.pos.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
@@ -105,26 +110,38 @@ namespace InvisibleHand
         private readonly Action makeInactive;
 
         //defaultish - gray out the inactive state, change the label
-        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null) : base(pos)
+        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(pos)
         {
             IsActive = isActive;
             OnToggle = onToggle;
 
-            ActiveState = new ButtonState(activeLabel, tex, DoToggle );
-            InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, null, Color.Gray );
-
+            if (toggleOnRightClick){
+                ActiveState = new ButtonState(activeLabel, tex, () => {}, DoToggle );
+                InactiveState = new ButtonState(inactiveLabel, tex, () => {}, DoToggle, Color.Gray );
+            } else {
+                ActiveState = new ButtonState(activeLabel, tex, DoToggle );
+                InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, null, Color.Gray );
+            }
             displayState = ActiveState;
         }
 
-        public IHToggle(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive, Vector2? pos = null) : base(pos)
+        public IHToggle(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive, Vector2? pos = null, bool toggleOnRightClick = false) : base(pos)
         {
             IsActive = isActive;
 
-            makeActive   = inactiveState.onClick;
-            makeInactive = activeState.onClick;
+            if (toggleOnRightClick){
+                makeActive   = inactiveState.onRightClick;
+                makeInactive = activeState.onRightClick;
 
-            activeState.onClick   = DoSwitch;
-            inactiveState.onClick = DoSwitch;
+                activeState.onRightClick   = DoSwitch;
+                inactiveState.onRightClick = DoSwitch;
+            } else {
+                makeActive   = inactiveState.onClick;
+                makeInactive = activeState.onClick;
+
+                activeState.onClick   = DoSwitch;
+                inactiveState.onClick = DoSwitch;
+            }
 
             ActiveState   = activeState;
             InactiveState = inactiveState;

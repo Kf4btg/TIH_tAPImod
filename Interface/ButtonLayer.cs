@@ -10,16 +10,16 @@ namespace InvisibleHand
 {
     public abstract class ButtonLayer : InterfaceLayer
     {
-        public readonly Dictionary<IHAction, IHButton> Buttons;
+        public readonly Dictionary<IHAction, ButtonBase> Buttons;
 
         protected ButtonLayer(string name) : base("InvisibleHand:" + name)
         {
-            Buttons = new Dictionary<IHAction, IHButton>();
+            Buttons = new Dictionary<IHAction, ButtonBase>();
         }
 
         protected override void OnDraw(SpriteBatch sb)
         {
-            foreach (KeyValuePair<IHAction, IHButton> kvp in Buttons)
+            foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
             {
                 kvp.Value.Draw(sb);
             }

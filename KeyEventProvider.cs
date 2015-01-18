@@ -47,13 +47,15 @@ namespace InvisibleHand
         //indexers
         public Provider this[Keys key]
         {
-            get { return activeProviders[key]; }
+            get { return GetProvider(key); }
+            // get { return activeProviders[key]; }
             //private set { AddProvider(key); }
         }
 
         public Provider this[KState.Special key]
         {
-            get { return specialProviders[key]; }
+            get { return GetProvider(key); }
+            // get { return specialProviders[key]; }
             //set { AddProvider(value); }
         }
 
@@ -112,7 +114,7 @@ namespace InvisibleHand
 
             protected Dictionary<KeyEventProvider.Event, List<Action>> subscribers;
 
-            public Provider()
+            protected Provider()
             {
                 subscribers = new Dictionary<KeyEventProvider.Event, List<Action>>();
 
@@ -183,20 +185,17 @@ namespace InvisibleHand
                         handler();
             }
         }
-
     }
 
+    //only accepts KState.Special at the moment
     public class KeyWatcher
     {
-        // public readonly IHButton subscriber;
         private readonly KState.Special key;
         private readonly KeyEventProvider.Event evType;
         private readonly Action onKeyEvent;
 
-        // public KeyWatcher(IHButton s, KState.Special k, KeyEventProvider.Event e, Action<IHButton> h)
         public KeyWatcher(KState.Special k, KeyEventProvider.Event e, Action h)
         {
-            // subscriber = s;
             key = k;
             evType = e;
             onKeyEvent = h;
@@ -204,18 +203,12 @@ namespace InvisibleHand
 
         public void Subscribe()
         {
-            KeyEventProvider[key].Add(evType, onKeyEvent);
+            IHBase.KEP[key].Add(evType, onKeyEvent);
         }
-
-        // the callback
-        // public void OnKeyEvent()
-        // {
-        //     onKeyEvent(subscriber);
-        // }
 
         public void Unsubscribe()
         {
-            KeyEventProvider[key].Remove( evType, onKeyEvent);
+            IHBase.KEP[key].Remove( evType, onKeyEvent);
         }
     }
 

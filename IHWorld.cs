@@ -13,10 +13,11 @@ namespace InvisibleHand
         public override void Initialize()
         {
             // finding a place to do this where the buttons are actually *set correctly*
-            // upon initial load has been the bitchiest of bitches.
-            foreach (KeyValuePair<IHAction, IHSwitch> kvp in IHBase.self.lockOptions.Buttons)
+            // upon initial load has beensdjnkdsjnklsakjnasdfjk
+            foreach (KeyValuePair<IHAction, IHButton> kvp in IHBase.self.lockOptions.Buttons)
             {
-                kvp.Value.Init();
+
+                ((IHToggle)kvp.Value).Init();
             }
         }
     }

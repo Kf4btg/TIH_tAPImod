@@ -12,7 +12,7 @@ namespace InvisibleHand
     {
         public readonly Dictionary<IHAction, IHButton> Buttons;
 
-        public ButtonLayer(string name) : base("InvisibleHand:" + name)
+        protected ButtonLayer(string name) : base("InvisibleHand:" + name)
         {
             Buttons = new Dictionary<IHAction, IHButton>();
         }

@@ -19,12 +19,19 @@ namespace InvisibleHand
 
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
-            if (Main.playerInventory && Main.localPlayer.chest!=-1)
+            if (Main.playerInventory)
             {
-                InterfaceLayer.Add(list, IHBase.self.lockOptions, InterfaceLayer.LayerInventory, true);
-
-                IHBase.KEP[KState.Special.Shift].UpdateSubscribers();
+                if (Main.localPlayer.chest!=-1)
+                    InterfaceLayer.Add(list, IHBase.self.lockOptions, InterfaceLayer.LayerInventory, true);
+                else
+                    InterfaceLayer.Add(list, IHBase.self.invButtons, InterfaceLayer.LayerInventory, true);
             }
+        }
+
+        public override bool PreDrawInventory(SpriteBatch sb)
+        {
+            IHBase.KEP[KState.Special.Shift].UpdateSubscribers();
+            return true;
         }
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)

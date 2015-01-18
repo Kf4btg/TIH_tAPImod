@@ -34,10 +34,10 @@ namespace InvisibleHand
             this.pos = pos ?? default(Vector2);
         }
 
-        public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color tintColor = Color.White)
+        public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color? tintColor = null)
         {
             this.Name = name;
-            this.displayState = new ButtonState(name, tex, onClick, tintColor);
+            this.displayState = new ButtonState(name, tex, onClick, tintColor ?? Color.White);
             this.pos = pos ?? default(Vector2);
         }
 
@@ -95,18 +95,21 @@ namespace InvisibleHand
         private readonly Action makeInactive;
 
         //defaultish - make the *
-        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null) : base(activeLabel, tex, DoToggle, pos)
+        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive, Action onToggle, Vector2? pos=null) : base(pos)
         {
-            this.IsActive = isActive;
-            this.OnToggle = onToggle;
+            IsActive = isActive;
+            OnToggle = onToggle;
 
-            this.ActiveState = new ButtonState(activeLabel, tex, DoToggle );
-            this.InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, Color.Gray );
+            ActiveState = new ButtonState(activeLabel, tex, DoToggle );
+            InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, Color.Gray );
+
+            displayState = ActiveState;
+
         }
 
         public IHToggle(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive, Vector2? pos = null) : base(pos)
         {
-            this.IsActive = isActive;
+            IsActive = isActive;
 
             makeActive   = inactiveState.onClick;
             makeInactive = activeState.onClick;
@@ -117,7 +120,7 @@ namespace InvisibleHand
             ActiveState   = activeState;
             InactiveState = inactiveState;
 
-            displayState = activeState; //just to make sure nothing is null
+            displayState = ActiveState; //just to make sure nothing is null
         }
 
         public void DoToggle()
@@ -233,12 +236,12 @@ namespace InvisibleHand
             tint = Color.White;
         }
 
-        public ButtonState(string label, Texture2D tex, Action onClick, Color tintColor = Color.White)
+        public ButtonState(string label, Texture2D tex, Action onClick, Color? tintColor = null)
         {
             this.label = label;
             this.texture = tex;
             this.onClick = onClick;
-            this.tint = tintColor;
+            this.tint = tintColor ?? Color.White;
         }
     }
 

@@ -19,6 +19,7 @@ namespace InvisibleHand
         public static KeyEventProvider KEP;
 
         public LockOptions lockOptions;
+        public InventoryButtons invButtons;
 
         public override void OnLoad()
         {
@@ -27,7 +28,7 @@ namespace InvisibleHand
             ModOptions = new Dictionary<String, bool>();
 
             KEP = new KeyEventProvider();
-            KEP.AddProvider(KState.Special.Shift);
+            // KEP.AddProvider(KState.Special.Shift);
 
         }
 
@@ -36,6 +37,7 @@ namespace InvisibleHand
             lockedIcon = self.textures["resources/LockIndicator"];
             CategoryDef.Initialize();
             lockOptions = new LockOptions(self);
+            invButtons = new InventoryButtons(self);
         }
 
         public override void OptionChanged(Option option)

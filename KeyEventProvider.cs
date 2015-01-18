@@ -148,7 +148,10 @@ namespace InvisibleHand
     {
         private readonly KState.Special key;
         private readonly KeyEventProvider.Event evType;
-        private readonly Action onKeyEvent;
+        private Action onKeyEvent;
+
+        // allows for setting (just once!) after the watcher is created
+        public Action OnKeyEvent { set { if (onKeyEvent==null) onKeyEvent = value; } }
 
         public KeyWatcher(KState.Special k, KeyEventProvider.Event e, Action h)
         {

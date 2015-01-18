@@ -30,6 +30,11 @@ namespace InvisibleHand
         // will be set at construction
         public readonly Vector2 Position;
         public readonly Vector2 Size;
+        public readonly Rectangle ButtonArea;
+
+        // private float scale = Main.inventoryScale;
+        private float scale = 1;
+        public float Scale { get { return scale; } }
 
         // defines the current appearance and functionality of the button
         private IHButton currentContext;
@@ -38,32 +43,36 @@ namespace InvisibleHand
         public ButtonBase(IHButton defaultContext)
         {
             DefaultContext = currentContext = defaultContext;
+            Name = defaultContext.displayLabel;
             Position = defaultContext.pos;
             Size = defaultContext.Size;
+
+            ButtonArea = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
         }
 
         // switch to a new context
         public void ChangeContext(IHButton newContext)
         {
-            this.currentContext = newContext;
+            currentContext = newContext;
         }
 
         // set up key-event-subscibers that will toggle b/t 2 contexts
         public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
         {
-            KeyWatcher kw1, kw2;
+            // KeyWatcher kw1;
 
-            KeyWatcher kw1 = new KeyWatcher(key, KeyEventProvider.Pressed,
+            KeyWatcher kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
+
+            KeyWatcher kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
             () => {
                 ChangeContext(context2);
                 kw2.Subscribe();
                 } );
 
-            KeyWatcher kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Released,
-            () => {
+            kw2.OnKeyEvent = () => {
                 ChangeContext(context1);
                 kw1.Subscribe();
-                } );
+                };
 
             kw1.Subscribe();
         }
@@ -71,7 +80,8 @@ namespace InvisibleHand
         // returns true if mouse currently over the button space
         public bool IsHovered()
         {
-            return (new Rectangle((int)b.Position.X, (int)b.Position.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
+            // return (new Rectangle((int)b.Position.X, (int)b.Position.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
+            return ButtonArea.Contains(Main.mouseX, Main.mouseY);
         }
 
         // for determining when the mouse moves on and off the button
@@ -83,7 +93,7 @@ namespace InvisibleHand
             // if the context doesn't override this default draw function
             if (currentContext.OnDraw(sb, Position))
             {
-                sb.DrawIHButton(currentContext, Position);
+                sb.DrawIHButton(this, currentContext.displayState);
 
             //     if (currentContext.texture==null)
             //     sb.DrawString(Main.fontMouseText, displayState.label, Position, displayState.tint);
@@ -96,13 +106,28 @@ namespace InvisibleHand
                     {
                         Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
                         wasHovered = true;
+                        scale *= 1.1f;
                     }
 
                     Main.localPlayer.mouseInterface = true;
+                    DrawTooltip(0,0);
                     if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
                     if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
                 }
-                else wasHovered = false;
+                else if (wasHovered)
+                {
+                    wasHovered = false;
+                    scale = 1;
+                }
+            }
+        }
+
+        public void DrawTooltip(int rare, byte diff)
+        {
+            //only draw if displaying texture
+            if (currentContext.texture!=null) {
+                API.main.MouseText(currentContext.displayLabel, rare, diff);
+                Main.mouseText = true;
             }
         }
 
@@ -110,12 +135,12 @@ namespace InvisibleHand
 
     public static class SBExtensions
     {
-        public static void DrawIHButton(this SpriteBatch sb, IHButton button, Vector2 pos)
+        public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
         {
-            if (button.texture==null)
-                sb.DrawString(Main.fontMouseText, button.label, pos, button.tint);
+            if (state.texture==null)
+                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint);
             else
-                sb.Draw(button.texture, pos, button.tint);
+                sb.Draw(state.texture, bBase.Position, null, state.tint, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
     }
 }

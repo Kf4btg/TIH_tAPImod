@@ -18,8 +18,9 @@ namespace InvisibleHand
         public static Texture2D lockedIcon;
         public static KeyEventProvider KEP;
 
-        public LockOptions lockOptions;
+        // public LockOptions lockOptions;
         public InventoryButtons invButtons;
+        public ChestButtons chestButtons;
 
         public override void OnLoad()
         {
@@ -36,8 +37,9 @@ namespace InvisibleHand
         {
             lockedIcon = self.textures["resources/LockIndicator"];
             CategoryDef.Initialize();
-            lockOptions = new LockOptions(self);
+            // lockOptions = new LockOptions(self);
             invButtons = new InventoryButtons(self);
+            chestButtons = new ChestButtons(self);
         }
 
         public override void OptionChanged(Option option)

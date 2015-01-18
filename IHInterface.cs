@@ -22,7 +22,7 @@ namespace InvisibleHand
             if (Main.playerInventory)
             {
                 if (Main.localPlayer.chest!=-1)
-                    InterfaceLayer.Add(list, IHBase.self.lockOptions, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.self.chestButtons, InterfaceLayer.LayerInventory, true);
                 else
                     InterfaceLayer.Add(list, IHBase.self.invButtons, InterfaceLayer.LayerInventory, true);
             }

@@ -17,7 +17,7 @@ namespace InvisibleHand
 
             //let's try to put these above the coins/ammo slot, instead. Should be less intrusive.
             float posX = 496;
-            float posY = 40;
+            float posY = 32;
 
             /** --Create Sort Button-- **/
             //default state
@@ -84,6 +84,7 @@ namespace InvisibleHand
 
         #region refill_quickstack
             // --Create Refill/QuickStack Button-- //
+            posY += (Main.inventoryBackTexture.Height);
 
             //restock is simple single-state button
             bsD = new ButtonState();
@@ -92,7 +93,6 @@ namespace InvisibleHand
             bsD.onClick = IHSmartStash.SmartLoot;
 
             //create button
-            posY += (Main.inventoryBackTexture.Height);
             IHButton QRbutton = new IHButton(bsD, new Vector2(posX, posY));
 
             //add it as the default context to a new ButtonBase
@@ -142,7 +142,7 @@ namespace InvisibleHand
 
             bsA = new ButtonState();
             bsA.label = "Deposit All (Unlocked)";
-            bsA.texture = mbase.textures["resources/btn_depositAll"];
+            bsA.texture = mbase.textures["resources/btn_deposit"];
 
             bsL = new ButtonState();
             bsL.label = "Deposit All (Locked)";
@@ -163,14 +163,14 @@ namespace InvisibleHand
 
         #region loot_all_button
             // --Create LootAll Button-- //
-            posY += (Main.inventoryBackTexture.Height);
-
-            bsD = new ButtonState();
-            bsD.label = "Loot All";
-            bsD.texture = mbase.textures["resources/btn_loot"];
-            bsD.onClick = IHUtils.DoLootAll;
-
-            Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
+            // posY += (Main.inventoryBackTexture.Height);
+            //
+            // bsD = new ButtonState();
+            // bsD.label = "Loot All";
+            // bsD.texture = mbase.textures["resources/btn_loot"];
+            // bsD.onClick = IHUtils.DoLootAll;
+            //
+            // Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
         #endregion
 
 

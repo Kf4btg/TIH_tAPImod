@@ -18,7 +18,6 @@ namespace InvisibleHand
         public static Texture2D lockedIcon;
         public static KeyEventProvider KEP;
 
-        // public LockOptions lockOptions;
         public InventoryButtons invButtons;
         public ChestButtons chestButtons;
 
@@ -28,17 +27,20 @@ namespace InvisibleHand
             ActionKeys = new Dictionary<String, Keys>();
             ModOptions = new Dictionary<String, bool>();
 
+            // this should prevent dictionary-key exceptions if mod-options page not visited
+            foreach (Option o in options)
+            {
+                OptionChanged(o);
+            }
             KEP = new KeyEventProvider();
-            // KEP.AddProvider(KState.Special.Shift);
-
         }
 
         public override void OnAllModsLoaded()
         {
             lockedIcon = self.textures["resources/LockIndicator"];
             CategoryDef.Initialize();
-            // lockOptions = new LockOptions(self);
-            invButtons = new InventoryButtons(self);
+
+            invButtons   = new InventoryButtons(self);
             chestButtons = new ChestButtons(self);
         }
 
@@ -46,15 +48,12 @@ namespace InvisibleHand
         {
             switch(option.name)
             {
-                case "sort":        ActionKeys["Sort"]        = (Keys)option.Value;
-                    break;
-                case "cleanStacks": ActionKeys["CleanStacks"] = (Keys)option.Value;
-                    break;
-                case "quickStack":  ActionKeys["QuickStack"]  = (Keys)option.Value;
-                    break;
-                case "depositAll":  ActionKeys["DepositAll"]  = (Keys)option.Value;
-                    break;
-                case "lootAll":     ActionKeys["LootAll"]     = (Keys)option.Value;
+                case "sort":        //ActionKeys["Sort"]        = (Keys)option.Value;
+                case "cleanStacks": //ActionKeys["CleanStacks"] = (Keys)option.Value;
+                case "quickStack":  //ActionKeys["QuickStack"]  = (Keys)option.Value;
+                case "depositAll":  //ActionKeys["DepositAll"]  = (Keys)option.Value;
+                case "lootAll":     //ActionKeys["LootAll"]     = (Keys)option.Value;
+                    ActionKeys[option.name] = (Keys)option.Value;
                     break;
 
                 case "enableLocking":

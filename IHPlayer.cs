@@ -73,7 +73,7 @@ namespace InvisibleHand
             if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && Main.localPlayer.talkNPC==-1)
             {
 
-                if (IHBase.ActionKeys["Sort"].Pressed()) // Sort inventory/chest
+                if (IHBase.ActionKeys["sort"].Pressed()) // Sort inventory/chest
                 {
                     // NOTE: this used to check player.chestItems==null, but I once got a
                     // "object reference not set to instance of object" or whatever kind of error
@@ -89,7 +89,7 @@ namespace InvisibleHand
                     IHOrganizer.SortChest(player.chestItems, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
                 }
 
-                else if (IHBase.ActionKeys["CleanStacks"].Pressed()) //Consolidate Stacks
+                else if (IHBase.ActionKeys["cleanStacks"].Pressed()) //Consolidate Stacks
                 {
                     if ( player.chest == -1 )
                     {
@@ -101,15 +101,15 @@ namespace InvisibleHand
                 else {
                     if ( player.chest == -1 ) return; //no action w/o open container
 
-                    if (IHBase.ActionKeys["QuickStack"].Pressed()) {
+                    if (IHBase.ActionKeys["quickStack"].Pressed()) {
                         if (KState.Special.Shift.Down()) IHSmartStash.SmartLoot();
                         else IHUtils.DoQuickStack(player);
                     }
-                    else if (IHBase.ActionKeys["DepositAll"].Pressed()) {
+                    else if (IHBase.ActionKeys["depositAll"].Pressed()) {
                         if (KState.Special.Shift.Down()) IHSmartStash.SmartDeposit();
                         else IHUtils.DoDepositAll(player);
                     }
-                    else if (IHBase.ActionKeys["LootAll"].Pressed())
+                    else if (IHBase.ActionKeys["lootAll"].Pressed())
                         IHUtils.DoLootAll(player);
                 }
             }

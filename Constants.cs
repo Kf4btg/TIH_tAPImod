@@ -58,6 +58,10 @@ namespace InvisibleHand
 
     public static class Constants
     {
+        //pulled from Main.DrawInventory  !ref:Main:#22137.0#
+        public const float CHEST_INVENTORY_SCALE = 0.755f;
+
+
         //the ItemCat Enum defines the actual Sort Order of the categories,
         // but this defines in which order an item will be checked against
         // the category matching rules. This is important due to a kind

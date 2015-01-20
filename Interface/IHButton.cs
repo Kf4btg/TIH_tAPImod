@@ -84,7 +84,7 @@ namespace InvisibleHand
             else isHovered = false;
         }
 
-        public virtual bool OnDraw(SpriteBatch sb, Vector2 position)
+        public virtual bool OnDraw(SpriteBatch sb, ButtonBase bBase)
         {
             return true;
         }

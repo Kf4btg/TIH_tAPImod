@@ -14,7 +14,7 @@ namespace InvisibleHand
     {
         // public LockOptions lockButtons = new LockOptions();
 
-        public static IHInterface self;
+        public static IHInterface self { get; private set; }
         public IHInterface() : base() {self=this;}
 
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)

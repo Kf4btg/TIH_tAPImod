@@ -33,8 +33,23 @@ namespace InvisibleHand
         public readonly Rectangle ButtonArea;
 
         // private float scale = Main.inventoryScale;
-        private float scale = 1;
-        public float Scale { get { return scale; } }
+        public const float SCALE_FULL = 1.0f;
+        private float scale = ButtonBase.SCALE_FULL;
+        public float Scale { get { return scale; } set { scale = value < 0.5f ? 0.5f : value; } }
+
+        // affects the alpha component of the current tint
+        public const float ALPHA_DIMMED = 0.65f;
+        private float alphaMult = ButtonBase.ALPHA_DIMMED;
+        public float Alpha { get { return alphaMult; } }
+        // public Color Tint { get {
+        //     // return new Color(   (int)((float)currentContext.tint.R * alphaMult),
+        //     //                     (int)((float)currentContext.tint.G * alphaMult),
+        //     //                     (int)((float)currentContext.tint.B * alphaMult),
+        //     //                     (int)((float)currentContext.tint.A * alphaMult)
+        //     //                 );
+        //
+        //     return currentContext.tint * alphaMult;
+        //                     }}
 
         // defines the current appearance and functionality of the button
         private IHButton currentContext;
@@ -59,8 +74,7 @@ namespace InvisibleHand
         // set up key-event-subscibers that will toggle b/t 2 contexts
         public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
         {
-            // KeyWatcher kw1;
-
+            //have to initialize this to prevent compile-time error in kw1 declaration
             KeyWatcher kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
 
             KeyWatcher kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
@@ -69,13 +83,18 @@ namespace InvisibleHand
                 kw2.Subscribe();
                 } );
 
+            // assign kw2 onkeyevent
             kw2.OnKeyEvent = () => {
                 ChangeContext(context1);
                 kw1.Subscribe();
                 };
 
+            // subscribe to default watcher
             kw1.Subscribe();
         }
+
+        // for determining when the mouse moves on and off the button
+        private bool wasHovered;
 
         // returns true if mouse currently over the button space
         public bool IsHovered()
@@ -84,14 +103,26 @@ namespace InvisibleHand
             return ButtonArea.Contains(Main.mouseX, Main.mouseY);
         }
 
-        // for determining when the mouse moves on and off the button
-        private bool wasHovered;
+        public void OnMouseEnter()
+        {
+            Main.PlaySound(12); // "mouse-over" sound
+            wasHovered = true;
+            // scale *= 1.1f;
+            alphaMult = 1.0f;
+        }
+
+        public void OnMouseLeave()
+        {
+            wasHovered = false;
+            // scale = 1;
+            alphaMult = ButtonBase.ALPHA_DIMMED;
+        }
 
         //hooks into the current context's onDraw function
         public void Draw(SpriteBatch sb)
         {
             // if the context doesn't override this default draw function
-            if (currentContext.OnDraw(sb, Position))
+            if (currentContext.OnDraw(sb, this))
             {
                 sb.DrawIHButton(this, currentContext.displayState);
 
@@ -102,26 +133,20 @@ namespace InvisibleHand
 
                 if (IsHovered())
                 {
-                    if (!wasHovered)
-                    {
-                        Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
-                        wasHovered = true;
-                        scale *= 1.1f;
-                    }
+                    if (!wasHovered) { OnMouseEnter(); }
 
                     Main.localPlayer.mouseInterface = true;
                     DrawTooltip(0,0);
                     if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
                     if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
                 }
-                else if (wasHovered)
-                {
-                    wasHovered = false;
-                    scale = 1;
-                }
+                else if (wasHovered) { OnMouseLeave(); }
             }
         }
 
+        // rare affects the color of the text (0 is default);
+        // I'm not quite sure what diff does...
+        // FIXME: currently displays _under_ the chest item slots
         public void DrawTooltip(int rare, byte diff)
         {
             //only draw if displaying texture
@@ -130,7 +155,6 @@ namespace InvisibleHand
                 Main.mouseText = true;
             }
         }
-
     }
 
     public static class SBExtensions
@@ -138,9 +162,9 @@ namespace InvisibleHand
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
         {
             if (state.texture==null)
-                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint);
+                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint*bBase.Alpha);
             else
-                sb.Draw(state.texture, bBase.Position, null, state.tint, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+                sb.Draw(state.texture, bBase.Position, null, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
     }
 }

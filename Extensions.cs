@@ -68,31 +68,80 @@ namespace InvisibleHand
 
         // get the color of whatever is behind the given point, pulled from the backbuffer
         // FIXME: this doesn't work... It Always returns transparent White??
+        // public static Color GetColorBehind(this Point p)
+        // {
+        //     var backBufferData = new Texture2D(
+        //     API.main.GraphicsDevice,
+        //     API.main.GraphicsDevice.PresentationParameters.BackBufferWidth,
+        //     API.main.GraphicsDevice.PresentationParameters.BackBufferHeight);
+        //
+        //     var retrievedColor = new Color[1];
+        //     backBufferData.GetData<Color>(0, new Rectangle(p.X,p.Y,1,1), retrievedColor, 0, 1);
+        //     backBufferData.Dispose();
+        //
+        //     return retrievedColor[0];
+        // }
+
         public static Color GetColorBehind(this Point p)
         {
-            var backBufferData = new Texture2D(
-            API.main.GraphicsDevice,
-            API.main.GraphicsDevice.PresentationParameters.BackBufferWidth,
-            API.main.GraphicsDevice.PresentationParameters.BackBufferHeight);
+            var pTile = new TilePoint(p);
 
-            var retrievedColor = new Color[1];
-            backBufferData.GetData<Color>(0, new Rectangle(p.X,p.Y,1,1), retrievedColor, 0, 1);
-            backBufferData.Dispose();
+            Color lighting = Lighting.GetColor(pTile.X, pTile.Y);
 
-            return retrievedColor[0];
+            return lighting;
+        }
+
+        public static Color GetColorBehind(this TilePoint pTile)
+        {
+            // var pTile = new TilePoint(p);
+
+            Color lighting = Lighting.GetColor(pTile.X, pTile.Y);
+
+            return lighting;
         }
 
         // public static byte fullColor = (byte)255;
-        public static void Invert(this Color c)
+        public static Color Invert(this Color c)
         {
-            // return new Color(fullColor-c.R, fullColor-c.G, fullColor-c.B, c.A);
+            return new Color(255-c.R, 255-c.G, 255-c.B, 255);
 
-            c.R=(byte)(255-c.R);
-            c.G=(byte)(255-c.G);
-            c.B=(byte)(255-c.B); //, c.A);
+            // c.R=(byte)(255-c.R);
+            // c.G=(byte)(255-c.G);
+            // c.B=(byte)(255-c.B); //, c.A);
         }
     #endregion
 
+    }
+
+    public struct TilePoint
+    {
+        public int X;
+        public int Y;
+
+        public TilePoint(int x, int y)
+        {
+            X=x;
+            Y=y;
+        }
+
+        public TilePoint(Vector2 coords)
+        {
+            X=(int)(coords.X/16);
+            Y=(int)(coords.Y/16);
+        }
+
+        public TilePoint(Point screenPoint)
+        {
+            // X=(int)(Main.screenPosition.X/16 + (float)screenPoint.X/16);
+            // Y=(int)(Main.screenPosition.Y/16 + (float)screenPoint.Y/16);
+            X=(int)(API.main.firstTileX + (float)screenPoint.X/16);
+            Y=(int)(API.main.firstTileY + (float)screenPoint.Y/16);
+        }
+
+        public static int ConvertToTileCoords(int num)
+        {
+            return (int)((float)num/16);
+        }
     }
 
 }

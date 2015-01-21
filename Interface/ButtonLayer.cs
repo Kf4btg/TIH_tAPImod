@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using TAPI;
+using Terraria;
 
 namespace InvisibleHand
 {
@@ -49,9 +50,10 @@ namespace InvisibleHand
 
         private void _onDrawOverrideColor(SpriteBatch sbc)
         {
-            Color oc = FrameCenter.GetColorBehind();
-            oc.A=(byte)255;
-            oc.Invert();
+            Color oc = FrameCenter.GetColorBehind().Invert();
+            // sbc.DrawString(Main.fontMouseText, FrameCenter.ToString(), new Vector2((float)FrameCenter.X, (float)FrameCenter.Y), Color.White);
+            // oc.A=(byte)255;
+            // oc.Invert();
             foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
             {
                 kvp.Value.Draw(sbc, oc);

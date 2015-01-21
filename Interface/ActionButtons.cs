@@ -1,7 +1,5 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -11,7 +9,7 @@ namespace InvisibleHand
     public class InventoryButtons : ButtonLayer
     {
         private float posX = 496;
-        private const float posY = 32; //doesn't change
+        private const float posY = 28; //doesn't change
 
         public InventoryButtons(ModBase mbase) : base("InventoryButtons")
         {
@@ -26,23 +24,23 @@ namespace InvisibleHand
 
             /** --Create Sort Button-- **/
             //default state
-            ButtonState bsD = new ButtonState("Sort", mbase.textures["resources/btn_sort"],
+            var bsD = new ButtonState("Sort", mbase.textures["resources/btn_sort"],
             () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]), null,
             Main.inventoryBack);
 
             //altState
-            ButtonState bsA = new ButtonState("Sort (Reverse)", mbase.textures["resources/btn_sort_reverse"],
+            var bsA = new ButtonState("Sort (Reverse)", mbase.textures["resources/btn_sort_reverse"],
             () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]), null,
             Main.inventoryBack);
 
             Buttons.Add(    IHAction.Sort,
-                            new ButtonBase(
+                            new ButtonBase( this,
                                 new IHContextButton(
                                     bsD,
                                     bsA,
                                     KState.Special.Shift,
                                     new Vector2(posX, posY)
-                                )
+                                ), true
                             )
                         );
 
@@ -54,11 +52,12 @@ namespace InvisibleHand
             bsD = new ButtonState("Clean Stacks", mbase.textures["resources/btn_clean"],
             () => IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50));
 
-            Buttons.Add(IHAction.Stack, new ButtonBase(new IHButton(bsD, new Vector2(posX, posY))));
+            Buttons.Add(IHAction.Stack, new ButtonBase(this, new IHButton(bsD, new Vector2(posX, posY)),true));
 
             //try making it a bit bigger?
-            Buttons[IHAction.Stack].Scale = 1.1f;
+            // Buttons[IHAction.Stack].Scale = 1.1f;
 
+            UpdateFrame(true);
         }
     }
 
@@ -90,9 +89,6 @@ namespace InvisibleHand
 
             */
 
-
-
-
             // this should put the Buttons to the left of the chest inventory
             // float posX = 73 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE);
             // float posY = API.main.invBottom + 4;
@@ -102,14 +98,14 @@ namespace InvisibleHand
             // --Create Sort Button-- //
             posX = 453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE); //leftmost
             //default state
-            ButtonState bsD = new ButtonState("Sort Chest", mbase.textures["resources/btn_sort"],
+            var bsD = new ButtonState("Sort Chest", mbase.textures["resources/btn_sort"],
                 () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]));
 
             //altState
-            ButtonState bsA = new ButtonState("Sort Chest (Reverse)", mbase.textures["resources/btn_sort_reverse"],
+            var bsA = new ButtonState("Sort Chest (Reverse)", mbase.textures["resources/btn_sort_reverse"],
             () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]));
 
-            Buttons.Add(IHAction.Sort, new ButtonBase(new IHContextButton(bsD, bsA, KState.Special.Shift, new Vector2(posX,posY))));
+            Buttons.Add(IHAction.Sort, new ButtonBase(this, new IHContextButton(bsD, bsA, KState.Special.Shift, new Vector2(posX,posY)),true));
         #endregion
 
             // if (replaceVanilla){}
@@ -127,10 +123,10 @@ namespace InvisibleHand
             bsD.onClick = IHSmartStash.SmartLoot;
 
             //create button
-            IHButton QRbutton = new IHButton(bsD, new Vector2(posX, posY));
+            var QRbutton = new IHButton(bsD, new Vector2(posX, posY));
 
             //add it as the default context to a new ButtonBase
-            Buttons.Add(IHAction.Refill, new ButtonBase(QRbutton));
+            Buttons.Add(IHAction.Refill, new ButtonBase(this, QRbutton, true));
 
             //quickstack will be 2-state toggle button (locked/unlocked)
             // that toggles on right click
@@ -141,7 +137,7 @@ namespace InvisibleHand
             bsA.texture = mbase.textures["resources/btn_stack"];
 
             // create locked state, setup name and texture
-            ButtonState bsL = new ButtonState();
+            var bsL = new ButtonState();
             bsL.label = "Quick Stack (Locked)";
             bsL.texture = mbase.textures["resources/btn_stack"];
 
@@ -153,9 +149,9 @@ namespace InvisibleHand
                 IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); };
 
             // create the button, setting its state from ActionLocked()
-            IHToggle QSbutton = new IHToggle(bsA, bsL,
+            var QSbutton = new IHToggle(bsA, bsL,
                 () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), //IsActive()
-                new Vector2(posX, posY), true);
+                null, true); //can leave the position null since the position for this button has already been established
 
             //now create keywatchers to toggle the button from restock to quickstack when Shift is pressed
             Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, QRbutton, QSbutton);
@@ -172,9 +168,9 @@ namespace InvisibleHand
             bsD.texture = mbase.textures["resources/btn_smart_deposit"];
             bsD.onClick = IHSmartStash.SmartDeposit;
 
-            IHButton SDbutton = new IHButton(bsD, new Vector2(posX, posY));
+            var SDbutton = new IHButton(bsD, new Vector2(posX, posY));
 
-            Buttons.Add(IHAction.Deposit, new ButtonBase(SDbutton));
+            Buttons.Add(IHAction.Deposit, new ButtonBase(this, SDbutton, true));
 
             bsA = new ButtonState();
             bsA.label = "Deposit All (Unlocked)";
@@ -189,7 +185,7 @@ namespace InvisibleHand
                 Main.PlaySound(22); //lock sound
                 IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); };
 
-            IHToggle DAbutton = new IHToggle(bsA, bsL,
+            var DAbutton = new IHToggle(bsA, bsL,
                 () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA), //IsActive()
                 null, true); //can leave the position null since the position for this button has already been established
 
@@ -208,24 +204,8 @@ namespace InvisibleHand
             //
             // Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
         #endregion
-
-
-            // if (replaceVanilla)
-            // {
-            //     /// --Create Deposit Button-- ///
-            //     bsD = new ButtonState("DepositAll", mbase.textures["resources/btn_depositAll"],
-            //     () => { Main.localPlayer.chest == -1 ?
-            //         IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]) :
-            //         IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]);} );
-            //
-            //         //altState
-            //     bsA = new ButtonState("SmartDeposit", mbase.textures["resources/btn_smartDeposit"],
-            //     () => { Main.localPlayer.chest == -1 ?
-            //         IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) :
-            //         IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]);} );
-            // }
-
         // }
+        UpdateFrame(true);
         }
 
     }

@@ -12,8 +12,6 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        // public LockOptions lockButtons = new LockOptions();
-
         public static IHInterface self { get; private set; }
         public IHInterface() : base() {self=this;}
 
@@ -61,7 +59,7 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
-                    Main.PlaySound(22, -1, -1, 1); // I think this is the actual "lock" sound
+                    Main.PlaySound(22); // I think this is the actual "lock" sound
                 }
             }
             return false;

@@ -6,43 +6,6 @@ using Terraria.ID;
 
 namespace InvisibleHand
 {
-    public static class IHItemExtension
-    {
-        public static ItemCat GetCategory(this Item item)
-        {
-            foreach (ItemCat catID in Constants.CheckOrder)
-            {
-                if (CategoryDef.Categories[catID].Invoke(item)) return catID;
-            }
-            return ItemCat.OTHER;
-        }
-
-        public static bool Matches(this Item item, ItemCat isCategory)
-        {
-            return CategoryDef.Categories[isCategory].Invoke(item);
-        }
-
-        public static bool IsHook(this Item item)
-        {
-            return ProjDef.byType.ContainsKey(item.shoot) && (ProjDef.byType[item.shoot].hook || ProjDef.byType[item.shoot].aiStyle==7);
-        }
-
-        public static bool IsBomb(this Item item)
-        {            //grenades, bombs, etc
-            return ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16;
-        }
-
-        public static bool IsTool(this Item item)
-        {
-            return item.createTile == TileID.Rope || item.createTile == TileID.Chain || item.name.EndsWith("Bucket") ||
-            item.fishingPole > 1 || item.tileWand != -1 || item.IsHook() || ItemDef.autoSelect["Glowstick"].Contains(item.type) ||
-            item.type == 1991 || item.type == 50 || item.type == 1326 || ItemDef.autoSelect["Flaregun"].Contains(item.type) ||
-            item.name.Contains("Paintbrush") || item.name.Contains("Paint Roller") || item.name.Contains("Paint Scraper") ||
-            (item.type >= 1543 && item.type <= 1545);
-            //bucket, bug net, magic mirror, rod of discord, spectre paint tools
-        }
-    }
-
     // Most everything here is ridiculously hacky and doesn't extrapolate well to mod-added items
     // Unfortunately, I expect it's probably impossible to sufficiently generalize the item-matching logic,
     // simply due to the way Terraria itself is coded (i.e. items/item abilities are pretty much hacked-in individually, anyway)

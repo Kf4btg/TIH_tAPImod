@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -21,6 +21,7 @@ namespace InvisibleHand
     {
         // a _unique_ name that can identify this button
         public readonly string Name;
+        private readonly ButtonLayer container;
 
         //this defines the location and size of this button
         // even if other buttons have differently-sized textures/strings,
@@ -30,7 +31,8 @@ namespace InvisibleHand
         // will be set at construction
         public readonly Vector2 Position;
         public readonly Vector2 Size;
-        public readonly Rectangle ButtonArea;
+        public readonly Rectangle ButtonBounds;
+        private readonly Point center;
 
         // private float scale = Main.inventoryScale;
         public const float SCALE_FULL = 1.0f;
@@ -41,6 +43,12 @@ namespace InvisibleHand
         public const float ALPHA_DIMMED = 0.65f;
         private float alphaMult = ButtonBase.ALPHA_DIMMED;
         public float Alpha { get { return alphaMult; } }
+
+        // this option can override the tint Color of the current context and instead invert the color behind the button
+        private bool useBGColor;
+        // public Color Tint { get {
+        //     return useBGColor ? center.GetColorBehind().Invert() : currentContext.tint;
+        //     } }
         // public Color Tint { get {
         //     // return new Color(   (int)((float)currentContext.tint.R * alphaMult),
         //     //                     (int)((float)currentContext.tint.G * alphaMult),
@@ -55,14 +63,17 @@ namespace InvisibleHand
         private IHButton currentContext;
 
         // other contexts must be added later
-        public ButtonBase(IHButton defaultContext)
+        public ButtonBase(ButtonLayer container, IHButton defaultContext, bool tintUsingBGColor=false)
         {
+            this.container = container;
             DefaultContext = currentContext = defaultContext;
             Name = defaultContext.displayLabel;
             Position = defaultContext.pos;
             Size = defaultContext.Size;
+            useBGColor = tintUsingBGColor;
 
-            ButtonArea = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+            ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+            center = ButtonBounds.Center;
         }
 
         // switch to a new context
@@ -75,9 +86,9 @@ namespace InvisibleHand
         public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
         {
             //have to initialize this to prevent compile-time error in kw1 declaration
-            KeyWatcher kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
+            var kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
 
-            KeyWatcher kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
+            var kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
             () => {
                 ChangeContext(context2);
                 kw2.Subscribe();
@@ -100,11 +111,13 @@ namespace InvisibleHand
         public bool IsHovered()
         {
             // return (new Rectangle((int)b.Position.X, (int)b.Position.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
-            return ButtonArea.Contains(Main.mouseX, Main.mouseY);
+            return ButtonBounds.Contains(Main.mouseX, Main.mouseY);
         }
 
         public void OnMouseEnter()
         {
+            //if (currentContext.OnMouseEnter(this))  //future hook?
+
             Main.PlaySound(12); // "mouse-over" sound
             wasHovered = true;
             // scale *= 1.1f;
@@ -113,35 +126,50 @@ namespace InvisibleHand
 
         public void OnMouseLeave()
         {
+            //if (currentContext.OnMouseLeave(this))  //future hook?
+
             wasHovered = false;
             // scale = 1;
             alphaMult = ButtonBase.ALPHA_DIMMED;
         }
 
+        public void OnHover()
+        {
+            //if (currentContext.OnHover(this))  //future hook?
+            Main.localPlayer.mouseInterface = true;
+            DrawTooltip(0,0);
+            if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
+            if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
+        }
+
+        public void Draw(SpriteBatch sb, Color overrideColor)
+        {
+            sb.DrawIHButton(this, currentContext.displayState, overrideColor);
+
+            if (IsHovered())
+            {
+                if (!wasHovered) { OnMouseEnter(); }
+                OnHover();
+            }
+            else if (wasHovered) { OnMouseLeave(); }
+        }
+
         //hooks into the current context's onDraw function
         public void Draw(SpriteBatch sb)
         {
+            /** Disable this hook until something actually uses it... **/
             // if the context doesn't override this default draw function
-            if (currentContext.OnDraw(sb, this))
-            {
+            // if (currentContext.OnDraw(sb, this))
+            // {
                 sb.DrawIHButton(this, currentContext.displayState);
-
-            //     if (currentContext.texture==null)
-            //     sb.DrawString(Main.fontMouseText, displayState.label, Position, displayState.tint);
-            //     else
-            //     sb.Draw(displayState.texture, pos, displayState.tint);
 
                 if (IsHovered())
                 {
                     if (!wasHovered) { OnMouseEnter(); }
-
-                    Main.localPlayer.mouseInterface = true;
-                    DrawTooltip(0,0);
-                    if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
-                    if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
+                    OnHover();
                 }
                 else if (wasHovered) { OnMouseLeave(); }
-            }
+            // }
         }
 
         // rare affects the color of the text (0 is default);
@@ -157,14 +185,4 @@ namespace InvisibleHand
         }
     }
 
-    public static class SBExtensions
-    {
-        public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
-        {
-            if (state.texture==null)
-                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint*bBase.Alpha);
-            else
-                sb.Draw(state.texture, bBase.Position, null, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
-        }
-    }
 }

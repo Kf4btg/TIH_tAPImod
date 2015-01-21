@@ -53,29 +53,43 @@ namespace InvisibleHand
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
         {
             if (state.texture==null)
-                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, bBase.Tint*bBase.Alpha);
+                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint*bBase.Alpha);
             else
-                sb.Draw(state.texture, bBase.Position, null, bBase.Tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+                sb.Draw(state.texture, bBase.Position, null, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+        }
+
+        public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
+        {
+            if (state.texture==null)
+            sb.DrawString(Main.fontMouseText, state.label, bBase.Position, overrideColor*bBase.Alpha);
+            else
+            sb.Draw(state.texture, bBase.Position, null, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
 
         // get the color of whatever is behind the given point, pulled from the backbuffer
+        // FIXME: this doesn't work... It Always returns transparent White??
         public static Color GetColorBehind(this Point p)
         {
             var backBufferData = new Texture2D(
-            GraphicsDevice,
-            GraphicsDevice.PresentationParameters.BackBufferWidth,
-            GraphicsDevice.PresentationParameters.BackBufferHeight);
+            API.main.GraphicsDevice,
+            API.main.GraphicsDevice.PresentationParameters.BackBufferWidth,
+            API.main.GraphicsDevice.PresentationParameters.BackBufferHeight);
 
             var retrievedColor = new Color[1];
             backBufferData.GetData<Color>(0, new Rectangle(p.X,p.Y,1,1), retrievedColor, 0, 1);
+            backBufferData.Dispose();
 
             return retrievedColor[0];
         }
 
-        public static byte fullColor = (byte)255;
-        public static Color Invert(this Color c)
+        // public static byte fullColor = (byte)255;
+        public static void Invert(this Color c)
         {
-            return new Color(fullColor-c.R, fullColor-c.G, fullColor-c.B, c.A);
+            // return new Color(fullColor-c.R, fullColor-c.G, fullColor-c.B, c.A);
+
+            c.R=(byte)(255-c.R);
+            c.G=(byte)(255-c.G);
+            c.B=(byte)(255-c.B); //, c.A);
         }
     #endregion
 

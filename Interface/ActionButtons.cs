@@ -40,7 +40,7 @@ namespace InvisibleHand
                                     bsA,
                                     KState.Special.Shift,
                                     new Vector2(posX, posY)
-                                ), true
+                                )
                             )
                         );
 
@@ -52,12 +52,12 @@ namespace InvisibleHand
             bsD = new ButtonState("Clean Stacks", mbase.textures["resources/btn_clean"],
             () => IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50));
 
-            Buttons.Add(IHAction.Stack, new ButtonBase(this, new IHButton(bsD, new Vector2(posX, posY)),true));
+            Buttons.Add(IHAction.Stack, new ButtonBase(this, new IHButton(bsD, new Vector2(posX, posY))));
 
             //try making it a bit bigger?
             // Buttons[IHAction.Stack].Scale = 1.1f;
 
-            UpdateFrame(true);
+            UpdateFrame();
         }
     }
 
@@ -105,7 +105,7 @@ namespace InvisibleHand
             var bsA = new ButtonState("Sort Chest (Reverse)", mbase.textures["resources/btn_sort_reverse"],
             () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]));
 
-            Buttons.Add(IHAction.Sort, new ButtonBase(this, new IHContextButton(bsD, bsA, KState.Special.Shift, new Vector2(posX,posY)),true));
+            Buttons.Add(IHAction.Sort, new ButtonBase(this, new IHContextButton(bsD, bsA, KState.Special.Shift, new Vector2(posX,posY))));
         #endregion
 
             // if (replaceVanilla){}
@@ -126,7 +126,7 @@ namespace InvisibleHand
             var QRbutton = new IHButton(bsD, new Vector2(posX, posY));
 
             //add it as the default context to a new ButtonBase
-            Buttons.Add(IHAction.Refill, new ButtonBase(this, QRbutton, true));
+            Buttons.Add(IHAction.Refill, new ButtonBase(this, QRbutton));
 
             //quickstack will be 2-state toggle button (locked/unlocked)
             // that toggles on right click
@@ -170,7 +170,7 @@ namespace InvisibleHand
 
             var SDbutton = new IHButton(bsD, new Vector2(posX, posY));
 
-            Buttons.Add(IHAction.Deposit, new ButtonBase(this, SDbutton, true));
+            Buttons.Add(IHAction.Deposit, new ButtonBase(this, SDbutton));
 
             bsA = new ButtonState();
             bsA.label = "Deposit All (Unlocked)";
@@ -205,7 +205,7 @@ namespace InvisibleHand
             // Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
         #endregion
         // }
-        UpdateFrame(true);
+        UpdateFrame();
         }
 
     }

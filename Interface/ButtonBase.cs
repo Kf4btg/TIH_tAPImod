@@ -16,6 +16,8 @@ namespace InvisibleHand
         ButtonContexts (which define what the button _can_ do) that in turn contain
         ButtonStates (which define what the button _actually_ does).  All of these
         can be swapped out and around to create some fairly dynamic interactivity.
+
+        TODO: stop duplicating all the code from UIComponent et al...
     */
     public class ButtonBase
     {
@@ -32,7 +34,7 @@ namespace InvisibleHand
         public readonly Vector2 Position;
         public readonly Vector2 Size;
         public readonly Rectangle ButtonBounds;
-        private readonly Point center;
+        // private readonly Point center;
 
         // private float scale = Main.inventoryScale;
         public const float SCALE_FULL = 1.0f;
@@ -45,7 +47,7 @@ namespace InvisibleHand
         public float Alpha { get { return alphaMult; } }
 
         // this option can override the tint Color of the current context and instead invert the color behind the button
-        private bool useBGColor;
+        // private bool useBGColor;
         // public Color Tint { get {
         //     return useBGColor ? center.GetColorBehind().Invert() : currentContext.tint;
         //     } }
@@ -63,17 +65,16 @@ namespace InvisibleHand
         private IHButton currentContext;
 
         // other contexts must be added later
-        public ButtonBase(ButtonLayer container, IHButton defaultContext, bool tintUsingBGColor=false)
+        public ButtonBase(ButtonLayer container, IHButton defaultContext)
         {
             this.container = container;
             DefaultContext = currentContext = defaultContext;
             Name = defaultContext.displayLabel;
             Position = defaultContext.pos;
             Size = defaultContext.Size;
-            useBGColor = tintUsingBGColor;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
-            center = ButtonBounds.Center;
+            // center = ButtonBounds.Center;
         }
 
         // switch to a new context

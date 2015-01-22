@@ -24,19 +24,20 @@ namespace InvisibleHand
             onDraw=_onDraw;
         }
 
-
-        protected void UpdateFrame(bool useInvertedBGColor=false)
+        //nope
+        // protected void UpdateFrame(bool useInvertedBGColor=false)
+        protected void UpdateFrame()
         {
             foreach (var kvp in Buttons)
             {
                 ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
             }
 
-            if (!ButtonFrame.IsEmpty && useInvertedBGColor)
-            {
-                onDraw=_onDrawOverrideColor;
-                FrameCenter = ButtonFrame.Center;
-            }
+            // if (!ButtonFrame.IsEmpty && useInvertedBGColor)
+            // {
+            //     onDraw=_onDrawOverrideColor;
+            //     FrameCenter = ButtonFrame.Center;
+            // }
         }
 
 
@@ -48,20 +49,26 @@ namespace InvisibleHand
             }
         }
 
-        private void _onDrawOverrideColor(SpriteBatch sbc)
-        {
-            Color oc = FrameCenter.GetColorBehind().Invert();
-            // sbc.DrawString(Main.fontMouseText, FrameCenter.ToString(), new Vector2((float)FrameCenter.X, (float)FrameCenter.Y), Color.White);
-            // oc.A=(byte)255;
-            // oc.Invert();
-            foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
-            {
-                kvp.Value.Draw(sbc, oc);
-            }
-        }
+        // private void _onDrawOverrideColor(SpriteBatch sbc)
+        // {
+        //     // Color oc = FrameCenter.GetColorBehind().Invert();
+        //     // sbc.DrawString(Main.fontMouseText, FrameCenter.ToString(), new Vector2((float)FrameCenter.X, (float)FrameCenter.Y), Color.White);
+        //     // oc.A=(byte)255;
+        //     // oc.Invert();
+        //     sbc.End();
+        //     sbc.Begin(SpriteSortMode.Deferred, Constants.InverseBlendState);
+        //
+        //     foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+        //     {
+        //         kvp.Value.Draw(sbc);
+        //     }
+        //     sbc.End();
+        //     sbc.Begin();//reset
+        // }
 
         protected override void OnDraw(SpriteBatch sb)
         {
+            if (!parentLayer.visible) return;
             onDraw(sb);
             // foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
             // {

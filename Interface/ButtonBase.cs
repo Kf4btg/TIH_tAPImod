@@ -23,7 +23,7 @@ namespace InvisibleHand
     {
         // a _unique_ name that can identify this button
         public readonly string Name;
-        private readonly ButtonLayer container;
+        // private readonly ButtonLayer container;
 
         //this defines the location and size of this button
         // even if other buttons have differently-sized textures/strings,
@@ -36,38 +36,23 @@ namespace InvisibleHand
         public readonly Rectangle ButtonBounds;
         // private readonly Point center;
 
-        // private float scale = Main.inventoryScale;
         public const float SCALE_FULL = 1.0f;
         private float scale = ButtonBase.SCALE_FULL;
         public float Scale { get { return scale; } set { scale = value < 0.5f ? 0.5f : value; } }
 
         // affects the alpha component of the current tint
-        public const float ALPHA_DIMMED = 0.65f;
-        private float alphaMult = ButtonBase.ALPHA_DIMMED;
-        public float Alpha { get { return alphaMult; } }
-
-        // this option can override the tint Color of the current context and instead invert the color behind the button
-        // private bool useBGColor;
-        // public Color Tint { get {
-        //     return useBGColor ? center.GetColorBehind().Invert() : currentContext.tint;
-        //     } }
-        // public Color Tint { get {
-        //     // return new Color(   (int)((float)currentContext.tint.R * alphaMult),
-        //     //                     (int)((float)currentContext.tint.G * alphaMult),
-        //     //                     (int)((float)currentContext.tint.B * alphaMult),
-        //     //                     (int)((float)currentContext.tint.A * alphaMult)
-        //     //                 );
-        //
-        //     return currentContext.tint * alphaMult;
-        //                     }}
+        private float alphaBase = 0.65f;
+        private float alphaMult = 0.65f; 
+        // gets current alpha, sets current and base alpha
+        public float Alpha { get { return alphaMult; } set { alphaMult = alphaBase = value; }}
 
         // defines the current appearance and functionality of the button
         private IHButton currentContext;
 
-        // other contexts must be added later
+        // change contexts externally using ChangeContext()
         public ButtonBase(ButtonLayer container, IHButton defaultContext)
         {
-            this.container = container;
+            // this.container = container;
             DefaultContext = currentContext = defaultContext;
             Name = defaultContext.displayLabel;
             Position = defaultContext.pos;
@@ -131,7 +116,8 @@ namespace InvisibleHand
 
             wasHovered = false;
             // scale = 1;
-            alphaMult = ButtonBase.ALPHA_DIMMED;
+            // alphaMult = ButtonBase.ALPHA_DIMMED;
+            alphaMult = alphaBase;
         }
 
         public void OnHover()
@@ -185,5 +171,4 @@ namespace InvisibleHand
             }
         }
     }
-
 }

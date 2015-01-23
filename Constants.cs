@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using TAPI;
-using Terraria;
+using Microsoft.Xna.Framework;
+// using TAPI;
+// using Terraria;
 using Terraria.ID;
 
 namespace InvisibleHand
@@ -61,6 +62,10 @@ namespace InvisibleHand
         //pulled from Main.DrawInventory  !ref:Main:#22137.0#
         public const float CHEST_INVENTORY_SCALE = 0.755f;
 
+        public static readonly Color InvSlotColor   = new Color(63,65,151,255);  //bluish
+        public static readonly Color ChestSlotColor = new Color(104,52,52,255);  //reddish
+        public static readonly Color BankSlotColor  = new Color(130,62,102,255); //pinkish
+        public static readonly Color EquipSlotColor = new Color(50,106,46,255); //greenish
 
         //the ItemCat Enum defines the actual Sort Order of the categories,
         // but this defines in which order an item will be checked against

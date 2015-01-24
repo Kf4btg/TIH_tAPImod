@@ -67,6 +67,12 @@ namespace InvisibleHand
         public static readonly Color BankSlotColor  = new Color(130,62,102,255); //pinkish
         public static readonly Color EquipSlotColor = new Color(50,106,46,255); //greenish
 
+        //width and height of button
+        public const int ButtonW = 32;
+        public const int ButtonH = 32;
+
+        public static readonly Dictionary<string, int> ButtonGridIndex;
+
         //the ItemCat Enum defines the actual Sort Order of the categories,
         // but this defines in which order an item will be checked against
         // the category matching rules. This is important due to a kind
@@ -184,5 +190,21 @@ namespace InvisibleHand
         HashSet<int> TileGroupSeed     = new HashSet<int>( new int[] {
             TileID.ImmatureHerbs, TileID.Saplings /*Acorn*/, TileID.Pumpkins /*Pumpkin Seed*/ } );
             // get the rest by EndsWith("Seeds")
+
+
+        static Constants()
+        {
+            ButtonGridIndex = new Dictionary<string,int>(0);
+            ButtonGridIndex.Add("Sort",0);
+            ButtonGridIndex.Add("Sort (Reverse)",1);
+            ButtonGridIndex.Add("Loot All",2);
+            ButtonGridIndex.Add("Deposit All",3);
+            ButtonGridIndex.Add("Smart Deposit",4);
+            ButtonGridIndex.Add("Clean Stacks",5);
+            ButtonGridIndex.Add("Quick Stack",6);
+            ButtonGridIndex.Add("Quick Restock",7);
+
+
+        }
     }
 }

@@ -22,6 +22,8 @@ namespace InvisibleHand
         public Texture2D texture    { get { return displayState.texture;}       protected set { displayState.texture=value; } }
         public Color tint           { get { return displayState.tint;}          protected set { displayState.tint=value; } }
 
+
+
         public Vector2 Size
         {
             get {
@@ -36,17 +38,17 @@ namespace InvisibleHand
         }
 
         //simple button w/ no right-click
-        public IHButton(string name, Texture2D tex, Action onClick, Vector2? pos=null, Color? tintColor = null)
+        public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Vector2? pos=null, Color? tintColor = null)
         {
             this.Name = name;
-            this.displayState = new ButtonState(name, tex, onClick, null, tintColor ?? Color.White);
+            this.displayState = new ButtonState(name, tex, source, onClick, null, tintColor ?? Color.White);
             this.pos = pos ?? default(Vector2);
         }
 
-        public IHButton(string name, Texture2D tex, Action onClick, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
+        public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
         {
             this.Name = name;
-            this.displayState = new ButtonState(name, tex, onClick, onRightClick, tintColor ?? Color.White);
+            this.displayState = new ButtonState(name, tex, source, onClick, onRightClick, tintColor ?? Color.White);
             this.pos = pos ?? default(Vector2);
         }
 
@@ -60,6 +62,16 @@ namespace InvisibleHand
         protected virtual void SetState(ButtonState newState)
         {
             displayState = newState;
+        }
+
+        public virtual bool OnMouseEnter(ButtonBase bBase)
+        {
+            if (displayState.onMouseEnter!=null) return displayState.onMouseEnter(bBase);
+        }
+
+        public virtual bool OnMouseLeave(ButtonBase bBase)
+        {
+            if (displayState.onMouseLeave!=null) return displayState.onMouseLeave(bBase);
         }
 
         public virtual void Draw(SpriteBatch sb)
@@ -116,11 +128,11 @@ namespace InvisibleHand
             OnToggle = onToggle;
 
             if (toggleOnRightClick){
-                ActiveState = new ButtonState(activeLabel, tex, () => {}, DoToggle );
-                InactiveState = new ButtonState(inactiveLabel, tex, () => {}, DoToggle, Color.Gray );
+                ActiveState   = new ButtonState(activeLabel,   tex, null, () => {}, DoToggle );
+                InactiveState = new ButtonState(inactiveLabel, tex, null, () => {}, DoToggle, Color.Gray );
             } else {
-                ActiveState = new ButtonState(activeLabel, tex, DoToggle );
-                InactiveState = new ButtonState(inactiveLabel, tex, DoToggle, null, Color.Gray );
+                ActiveState   = new ButtonState(activeLabel,   tex, null, DoToggle );
+                InactiveState = new ButtonState(inactiveLabel, tex, null, DoToggle, null, Color.Gray );
             }
             displayState = ActiveState;
         }
@@ -130,17 +142,17 @@ namespace InvisibleHand
             IsActive = isActive;
 
             if (toggleOnRightClick){
-                makeActive   = inactiveState.onRightClick;
-                makeInactive = activeState.onRightClick;
+                makeActive                 = inactiveState.onRightClick;
+                makeInactive               = activeState.onRightClick;
 
                 activeState.onRightClick   = DoSwitch;
                 inactiveState.onRightClick = DoSwitch;
             } else {
-                makeActive   = inactiveState.onClick;
-                makeInactive = activeState.onClick;
+                makeActive                 = inactiveState.onClick;
+                makeInactive               = activeState.onClick;
 
-                activeState.onClick   = DoSwitch;
-                inactiveState.onClick = DoSwitch;
+                activeState.onClick        = DoSwitch;
+                inactiveState.onClick      = DoSwitch;
             }
 
             ActiveState   = activeState;
@@ -253,27 +265,67 @@ namespace InvisibleHand
     {
         public string label;
         public Texture2D texture;
+        public Rectangle? sourceRect;
         public Action onClick;
         public Action onRightClick;
+        public Func<ButtonBase,bool> onMouseEnter;
+        public Func<ButtonBase,bool> onMouseLeave;
         public Color tint;      //How to tint the texture when this state is active
 
         public ButtonState()
         {
-            label = "Button";
-            texture = null;
-            onClick = null;
+            label        = "Button";
+            texture      = null;
+            sourceRect   = null;
+            onClick      = null;
             onRightClick = null;
-            tint = Color.White;
+            onMouseEnter = null;
+            onMouseLeave = null;
+            tint         = Color.White;
         }
 
-        public ButtonState(string label, Texture2D tex, Action onClick, Action onRightClick=null, Color? tintColor = null)
+        public ButtonState(string label, Texture2D tex=null, Rectangle? sourceRect=null, Action onClick=null, Action onRightClick=null, Color? tintColor = null)
         {
-            this.label = label;
-            this.texture = tex;
-            this.onClick = onClick;
+            this.label        = label;
+            this.texture      = tex;
+            this.sourceRect   = sourceRect;
+            this.onClick      = onClick;
             this.onRightClick = onRightClick;
-            this.tint = tintColor ?? Color.White;
+            this.onMouseEnter = null;
+            this.onMouseLeave = null;
+            this.tint         = tintColor ?? Color.White;
         }
+
+        public void SetSourceRect(int x, int y, int w, int h)
+        {
+            sourceRect = new Rectangle(x,y,w,h);
+        }
+
+        public ButtonState Duplicate()
+        {
+            var bsNew          = new ButtonState();
+            bsNew.label        = label;
+            bsNew.texture      = texture;
+            bsNew.sourceRect   = sourceRect;
+            bsNew.onClick      = onClick;
+            bsNew.onRightClick = onRightClick;
+            bsNew.tint         = tint;
+            bsNew.onMouseEnter = onMouseEnter;
+            bsNew.onMouseLeave = onMouseLeave;
+        }
+
+        public void CopyFrom(ButtonState bsCopy)
+        {
+            label        = bsCopy.label;
+            texture      = bsCopy.texture;
+            sourceRect   = bsCopy.sourceRect;
+            onClick      = bsCopy.onClick;
+            onRightClick = bsCopy.onRightClick;
+            tint         = bsCopy.tint;
+            onMouseEnter = bsCopy.onMouseEnter;
+            onMouseLeave = bsCopy.onMouseLeave;
+        }
+
     }
 
     // public class ButtonContext

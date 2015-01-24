@@ -42,12 +42,15 @@ namespace InvisibleHand
 
         // affects the alpha component of the current tint
         private float alphaBase = 0.65f;
-        private float alphaMult = 0.65f; 
+        private float alphaMult = 0.65f;
         // gets current alpha, sets current and base alpha
         public float Alpha { get { return alphaMult; } set { alphaMult = alphaBase = value; }}
 
         // defines the current appearance and functionality of the button
         private IHButton currentContext;
+        public IHButton CurrentContext { get { return currentContext; } }
+        public ButtonState CurrentState { get { return currentContext.displayState; } }
+
 
         // change contexts externally using ChangeContext()
         public ButtonBase(ButtonLayer container, IHButton defaultContext)
@@ -102,12 +105,15 @@ namespace InvisibleHand
 
         public void OnMouseEnter()
         {
-            //if (currentContext.OnMouseEnter(this))  //future hook?
+            if (currentContext.OnMouseEnter(this))
+            {
+                Main.PlaySound(12); // "mouse-over" sound
+                wasHovered = true;
+                // scale *= 1.1f;
+                alphaMult = 1.0f;
+            }
 
-            Main.PlaySound(12); // "mouse-over" sound
-            wasHovered = true;
-            // scale *= 1.1f;
-            alphaMult = 1.0f;
+
         }
 
         public void OnMouseLeave()

@@ -16,6 +16,7 @@ namespace InvisibleHand
         public static Dictionary<String, bool> ModOptions;
 
         public static Texture2D lockedIcon;
+        public readonly Texture2D ButtonGrid;
         public static KeyEventProvider KEP;
 
         public InventoryButtons invButtons;
@@ -38,10 +39,11 @@ namespace InvisibleHand
         public override void OnAllModsLoaded()
         {
             lockedIcon = self.textures["resources/LockIndicator"];
+            ButtonGrid = textures["resources/ButtonGrid"];
             CategoryDef.Initialize();
 
-            invButtons   = new InventoryButtons(self);
-            chestButtons = new ChestButtons(self);
+            invButtons   = new InventoryButtons();
+            chestButtons = new ChestButtons();
         }
 
         public override void OptionChanged(Option option)

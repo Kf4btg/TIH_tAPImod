@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Xna.Framework;
 using TAPI;
 using TAPI.UIKit;
 using Terraria;
@@ -460,6 +461,32 @@ namespace InvisibleHand
             }
         }
     #endregion
+
+    #region misc
+
+        public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
+        {
+            return active ?
+            new Rectangle(Constants.ButtonW+2,(Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH) : //mouse-over
+            new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
+        }
+
+        public static Rectangle? GetSourceRect(string action, bool active=false)
+        {
+            String key = action;
+
+            if (action.Contains("Chest")){
+                if (action.Contains("Reverse")) key = "Sort (Reverse)";
+                else key = "Sort";
+            }
+            else if (action.StartsWith("Quick Stack")) key = "Quick Stack";
+            else if (action.StartsWith("Deposit")) key = "Deposit All";
+
+            return RectFromGridIndex( Constants.ButtonGridIndex[key], active );
+        }
+
+    #endregion
+
 
     }// \class
 }

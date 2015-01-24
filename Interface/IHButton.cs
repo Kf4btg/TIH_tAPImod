@@ -27,7 +27,9 @@ namespace InvisibleHand
         public Vector2 Size
         {
             get {
-                return (displayState.texture!=null) ? displayState.texture.Size() : Main.fontMouseText.MeasureString(displayState.label);
+                return (displayState.texture!=null) ?
+                (displayState.sourceRect.HasValue ? displayState.sourceRect.Value.Size() : displayState.texture.Size()) : 
+                Main.fontMouseText.MeasureString(displayState.label);
             }
         }
 
@@ -67,11 +69,13 @@ namespace InvisibleHand
         public virtual bool OnMouseEnter(ButtonBase bBase)
         {
             if (displayState.onMouseEnter!=null) return displayState.onMouseEnter(bBase);
+            return true;
         }
 
         public virtual bool OnMouseLeave(ButtonBase bBase)
         {
             if (displayState.onMouseLeave!=null) return displayState.onMouseLeave(bBase);
+            return true;
         }
 
         public virtual void Draw(SpriteBatch sb)
@@ -312,6 +316,8 @@ namespace InvisibleHand
             bsNew.tint         = tint;
             bsNew.onMouseEnter = onMouseEnter;
             bsNew.onMouseLeave = onMouseLeave;
+
+            return bsNew;
         }
 
         public void CopyFrom(ButtonState bsCopy)

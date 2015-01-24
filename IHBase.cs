@@ -16,7 +16,7 @@ namespace InvisibleHand
         public static Dictionary<String, bool> ModOptions;
 
         public static Texture2D lockedIcon;
-        public readonly Texture2D ButtonGrid;
+        public static Texture2D ButtonGrid { get; private set; }
         public static KeyEventProvider KEP;
 
         public InventoryButtons invButtons;

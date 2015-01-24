@@ -69,11 +69,11 @@ namespace InvisibleHand
             Rects.Add(label,IHUtils.GetSourceRect(label)); //inactive appearance
             MRects.Add(label, IHUtils.GetSourceRect(label,true)); //mouse-over
 
-            States[label].texture      = IHBase.self.ButtonGrid;
+            States[label].texture      = IHBase.ButtonGrid;
             States[label].sourceRect   = Rects[label];
-            States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
-            States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
-            States[label].tint         = btnTint;
+            States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
+            States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
+            // States[label].tint         = btnTint;
         }
     }
 
@@ -235,11 +235,11 @@ namespace InvisibleHand
             Rects.Add(label,  IHUtils.GetSourceRect(label)); //inactive appearance
             MRects.Add(label, IHUtils.GetSourceRect(label,true)); //mouse-over
 
-            States[label].texture      = IHBase.self.ButtonGrid;
+            States[label].texture      = IHBase.ButtonGrid;
             States[label].sourceRect   = Rects[label];
-            States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
-            States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
-            States[label].tint         = btnTint;
+            States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
+            States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
+            // States[label].tint         = btnTint;
         }
 
     }

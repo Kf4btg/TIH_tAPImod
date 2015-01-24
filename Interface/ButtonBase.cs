@@ -105,11 +105,11 @@ namespace InvisibleHand
 
         public void OnMouseEnter()
         {
+            Main.PlaySound(12); // "mouse-over" sound
+            wasHovered = true;
+
             if (currentContext.OnMouseEnter(this))
             {
-                Main.PlaySound(12); // "mouse-over" sound
-                wasHovered = true;
-                // scale *= 1.1f;
                 alphaMult = 1.0f;
             }
 
@@ -118,12 +118,9 @@ namespace InvisibleHand
 
         public void OnMouseLeave()
         {
-            //if (currentContext.OnMouseLeave(this))  //future hook?
-
             wasHovered = false;
-            // scale = 1;
-            // alphaMult = ButtonBase.ALPHA_DIMMED;
-            alphaMult = alphaBase;
+            if (currentContext.OnMouseLeave(this))
+                alphaMult = alphaBase;
         }
 
         public void OnHover()

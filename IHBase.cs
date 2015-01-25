@@ -17,6 +17,7 @@ namespace InvisibleHand
 
         public static Texture2D lockedIcon;
         public static Texture2D ButtonGrid { get; private set; }
+        public static Texture2D ButtonBG { get; private set; }
         public static KeyEventProvider KEP;
 
         public InventoryButtons invButtons;
@@ -40,6 +41,7 @@ namespace InvisibleHand
         {
             lockedIcon = self.textures["resources/LockIndicator"];
             ButtonGrid = textures["resources/ButtonGrid"];
+            ButtonBG = textures["resources/button_bg"];
             CategoryDef.Initialize();
 
             invButtons   = new InventoryButtons();

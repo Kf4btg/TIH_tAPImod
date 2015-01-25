@@ -66,10 +66,17 @@ namespace InvisibleHand
             sb.Draw(state.texture, bBase.Position, state.sourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
 
+        public static void DrawButtonBG(this SpriteBatch sb, ButtonBase bb, Texture2D bgTex, Color bgColor)
+        {
+            sb.Draw(bgTex, bb.Position, null, bgColor*bb.Alpha, 0f, default(Vector2), bb.Scale, SpriteEffects.None, 0f);
+        }
+
 
 
     #endregion
 
+    #region colorandpointstuff
+    /*
         public static Color Invert(this Color c)
         {
             return new Color(255-c.R, 255-c.G, 255-c.B, 255);
@@ -103,24 +110,10 @@ namespace InvisibleHand
                 Color lighting = Lighting.GetColor(pTile.X, pTile.Y);
                 float scale = (float)(lighting.R+lighting.G+lighting.B)/3/255;
 
-                // float[] scale = new float[] {
-                //     (float)lighting.R/255,
-                //     (float)lighting.G/255,
-                //     (float)lighting.B/255};
-                //
-                // mColor.R*=(byte)(float)(lighting.R/255);
-                // mColor.G*=(byte)(float)(lighting.G/255);
-                // mColor.B*=(byte)(float)(lighting.B/255);
                 mColor*=scale;
-                // return new Color((byte)(mColor.R*scale[0]), (byte)(mColor.G*scale[1]), (byte)(texColor[0].B*scale[2]), 255);
             }
             return mColor;
         }
-        // public static Color Restrict(this Color oldColor, float lower, float higher=1.0f)
-        // {
-        //     return oldColor;
-        // }
-
     }
 
     public struct TilePoint
@@ -150,18 +143,15 @@ namespace InvisibleHand
         {
             scrX=screenPoint.X;
             scrY=screenPoint.Y;
-            // X=(int)(Main.screenPosition.X/16 + (float)screenPoint.X/16);
-            // Y=(int)(Main.screenPosition.Y/16 + (float)screenPoint.Y/16);
-            // X=(int)(API.main.firstTileX + (float)screenPoint.X/16);
             X=ConvertToTileCoords(screenPoint.X, true);
             Y=ConvertToTileCoords(screenPoint.Y, false);
-            // Y=(int)(API.main.firstTileY + (float)screenPoint.Y/16);
         }
 
         public static int ConvertToTileCoords(int num, bool onXaxis)
         {
             return onXaxis ? (int)(API.main.firstTileX + (float)num/16) : (int)(API.main.firstTileY + (float)num/16);
-        }
+        }*/
     }
+    #endregion
 
 }

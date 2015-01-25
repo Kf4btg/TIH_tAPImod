@@ -17,7 +17,7 @@ namespace InvisibleHand
         private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
         private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>();
         private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
-        private readonly Color btnTint = Constants.EquipSlotColor;
+        private readonly Color bgColor = Constants.InvSlotColor*0.8f;
 
         public InventoryButtons() : base("InventoryButtons")
         {
@@ -59,7 +59,7 @@ namespace InvisibleHand
 
             Buttons.Add(IHAction.Stack, new ButtonBase(this, new IHButton(States[label], new Vector2(posX, posY))));
 
-            UpdateFrame();
+            // UpdateFrame();
         }
 
         private void SetUpStateBasics(String label)
@@ -75,6 +75,21 @@ namespace InvisibleHand
             States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
             // States[label].tint         = btnTint;
         }
+
+        protected override void OnDraw(SpriteBatch sb)
+        {
+            if (!parentLayer.visible) return;
+            // foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+            // {
+            //     sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
+            // }
+
+            foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+            {
+                sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
+                kvp.Value.Draw(sb);
+            }
+        }
     }
 
     public class ChestButtons : ButtonLayer
@@ -88,7 +103,7 @@ namespace InvisibleHand
         private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
         private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>();
         private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
-        private readonly Color btnTint = Constants.EquipSlotColor;
+        private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
         public ChestButtons() : base("ChestButtons")
         {
@@ -204,7 +219,7 @@ namespace InvisibleHand
             // Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
         #endregion
         // }
-        UpdateFrame();
+        // UpdateFrame();
 
         #region calcs
             /*
@@ -240,6 +255,21 @@ namespace InvisibleHand
             States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
             States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
             // States[label].tint         = btnTint;
+        }
+
+        protected override void OnDraw(SpriteBatch sb)
+        {
+            if (!parentLayer.visible) return;
+            // foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+            // {
+            //     sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
+            // }
+
+            foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+            {
+                sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
+                kvp.Value.Draw(sb);
+            }
         }
 
     }

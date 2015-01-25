@@ -35,6 +35,8 @@ namespace InvisibleHand
         public readonly Vector2 Size;
         public readonly Rectangle ButtonBounds;
         // private readonly Point center;
+        // for determining when the mouse moves on and off the button
+        private bool isHovered;
 
         public const float SCALE_FULL = 1.0f;
         private float scale = ButtonBase.SCALE_FULL;
@@ -68,7 +70,13 @@ namespace InvisibleHand
         // switch to a new context
         public void ChangeContext(IHButton newContext)
         {
+            //set previous context un-hovered, hover new one:
+            if (isHovered) {
+                currentContext.OnMouseLeave(this);
+                newContext.OnMouseEnter(this);
+            }
             currentContext = newContext;
+
         }
 
         // set up key-event-subscibers that will toggle b/t 2 contexts
@@ -93,8 +101,7 @@ namespace InvisibleHand
             kw1.Subscribe();
         }
 
-        // for determining when the mouse moves on and off the button
-        private bool wasHovered;
+
 
         // returns true if mouse currently over the button space
         public bool IsHovered()
@@ -106,19 +113,17 @@ namespace InvisibleHand
         public void OnMouseEnter()
         {
             Main.PlaySound(12); // "mouse-over" sound
-            wasHovered = true;
+            isHovered = true;
 
             if (currentContext.OnMouseEnter(this))
             {
                 alphaMult = 1.0f;
             }
-
-
         }
 
         public void OnMouseLeave()
         {
-            wasHovered = false;
+            isHovered = false;
             if (currentContext.OnMouseLeave(this))
                 alphaMult = alphaBase;
         }
@@ -138,10 +143,10 @@ namespace InvisibleHand
 
             if (IsHovered())
             {
-                if (!wasHovered) { OnMouseEnter(); }
+                if (!isHovered) { OnMouseEnter(); }
                 OnHover();
             }
-            else if (wasHovered) { OnMouseLeave(); }
+            else if (isHovered) { OnMouseLeave(); }
         }
 
         //hooks into the current context's onDraw function
@@ -155,10 +160,10 @@ namespace InvisibleHand
 
                 if (IsHovered())
                 {
-                    if (!wasHovered) { OnMouseEnter(); }
+                    if (!isHovered) { OnMouseEnter(); }
                     OnHover();
                 }
-                else if (wasHovered) { OnMouseLeave(); }
+                else if (isHovered) { OnMouseLeave(); }
             // }
         }
 

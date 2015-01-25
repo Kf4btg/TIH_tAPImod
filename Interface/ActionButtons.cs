@@ -71,8 +71,8 @@ namespace InvisibleHand
 
             States[label].texture      = IHBase.ButtonGrid;
             States[label].sourceRect   = Rects[label];
-            States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
-            States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
+            States[label].onMouseEnter = bb => { States[label].sourceRect = MRects[label]; return true;};
+            States[label].onMouseLeave = bb => { States[label].sourceRect = Rects[label]; return true;};
             // States[label].tint         = btnTint;
         }
 
@@ -170,6 +170,9 @@ namespace InvisibleHand
                 null, true);
 
             //now create keywatchers to toggle the button from restock to quickstack when Shift is pressed
+            //FIXME: shifting states while hovering the button displays the buttons's non-mouseover texture
+            //until the mouse is moved off of and back on to the button.
+            //FIXME: likewise, this leaves the previous state in its mouseover appearance until re-moused.
             Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, QRbutton, QSbutton);
 
             // --Create SmartStash/DepositAll Button-- //
@@ -252,8 +255,8 @@ namespace InvisibleHand
 
             States[label].texture      = IHBase.ButtonGrid;
             States[label].sourceRect   = Rects[label];
-            States[label].onMouseEnter = bb => { bb.CurrentState.sourceRect = MRects[label]; return true;};
-            States[label].onMouseLeave = bb => { bb.CurrentState.sourceRect = Rects[label]; return true;};
+            States[label].onMouseEnter = bb => { States[label].sourceRect = MRects[label]; return true;};
+            States[label].onMouseLeave = bb => { States[label].sourceRect = Rects[label]; return true;};
             // States[label].tint         = btnTint;
         }
 

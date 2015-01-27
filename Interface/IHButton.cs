@@ -84,6 +84,10 @@ namespace InvisibleHand
             return true;
         }
 
+        //this is just here to enable the IHToggle Update(init) function from ModWorld; better solution later.
+        public virtual void OnUpdate()
+        {       }
+
         public virtual void Draw(SpriteBatch sb)
         {
             if (displayState.texture==null)
@@ -195,9 +199,9 @@ namespace InvisibleHand
         }
 
         // call from ModWorld
-        public void Init()
+        public override void OnUpdate()
         {
-            displayState = IsActive() ? ActiveState : InactiveState;
+            SetState(IsActive() ? ActiveState : InactiveState);
         }
     }
 

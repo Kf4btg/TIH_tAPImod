@@ -5,7 +5,6 @@ using Terraria;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace InvisibleHand
 {
     public class IHBase : ModBase
@@ -41,8 +40,8 @@ namespace InvisibleHand
             }
             KEP = new KeyEventProvider();
 
-            ButtonRepo = new Dictionary<IHAction, IHButton>();
-            ButtonUpdates = new Stack<IHAction>();
+            ButtonRepo = new Dictionary<String, IHButton>();
+            ButtonUpdates = new Stack<String>();
         }
 
         public override void OnAllModsLoaded()
@@ -52,9 +51,8 @@ namespace InvisibleHand
             ButtonBG = textures["resources/button_bg"];
             CategoryDef.Initialize();
 
-            invButtons   = new InventoryButtons(ButtonRepo);
-            chestButtons = new ChestButtons(ButtonRepo);
-            ButtonRepo.Trim();
+            invButtons   = new InventoryButtons(this);
+            chestButtons = new ChestButtons(this);
         }
 
         public override void OptionChanged(Option option)

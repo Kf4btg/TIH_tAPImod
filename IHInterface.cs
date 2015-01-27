@@ -28,7 +28,7 @@ namespace InvisibleHand
 
         public override bool PreDrawInventory(SpriteBatch sb)
         {
-            IHBase.KEP[KState.Special.Shift].UpdateSubscribers();
+            IHBase.KEP.Update();
             return true;
         }
 

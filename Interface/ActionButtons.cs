@@ -21,10 +21,6 @@ namespace InvisibleHand
 
         private readonly Color bgColor = Constants.InvSlotColor*0.8f; //make the bg translucent even at max button alpha
 
-        /**
-         * @param contextRepo - passed from the mod base, and will hold a list of all button contexts
-         * keyed by their primary name (which should be unique).
-         */
         public InventoryButtons(IHBase mbase) : base("InventoryButtons")
         {
             /*
@@ -70,18 +66,23 @@ namespace InvisibleHand
             // UpdateFrame();
         }
 
+        /*************************************************************************
+         * Consolidate the operations that are similar for every new button state
+         */
         private void SetUpStateBasics(String label)
         {
-            States.Add(label, new ButtonState(label));
-
             Rects.Add(label,IHUtils.GetSourceRect(label)); //inactive appearance
             MRects.Add(label, IHUtils.GetSourceRect(label,true)); //mouse-over
 
-            States[label].texture      = IHBase.ButtonGrid;
-            States[label].sourceRect   = Rects[label];
-            States[label].onMouseEnter = bb => { States[label].sourceRect = MRects[label]; return true;};
-            States[label].onMouseLeave = bb => { States[label].sourceRect = Rects[label]; return true;};
+            var bState = new ButtonState(label);
+
+            bState.texture      = IHBase.ButtonGrid;
+            bState.sourceRect   = Rects[label];
+            bState.onMouseEnter = bb => { bState.sourceRect = MRects[label]; return true;};
+            bState.onMouseLeave = bb => { bState.sourceRect = Rects[label]; return true;};
             // States[label].tint         = btnTint;
+
+            States.Add(label, bState);
         }
 
         protected override void OnDraw(SpriteBatch sb)
@@ -108,112 +109,138 @@ namespace InvisibleHand
         private float posX; // = 453 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE);
         private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4; //doesn't change
 
-        private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
-        private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>();
-        private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
+        //just use this index internally...
+        private readonly string[] label = {
+            "Sort Chest",               //0
+            "Sort Chest (Reverse)",     //1
+            "Restock",                  //2
+            "Quick Stack",              //3
+            "Quick Stack (Locked)",     //4
+            "Smart Deposit",            //5
+            "Deposit All",              //6
+            "Deposit All (Locked)"      //7
+        };
+
+        // private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
+        private readonly ButtonState[] States = new ButtonState[8];
+        // private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>();
+        private readonly Rectangle?[] Rects = new Rectangle?[8];
+        // private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
+        private readonly Rectangle?[] MRects = new Rectangle?[8];
+
         private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
         public ChestButtons(IHBase mbase) : base("ChestButtons")
         {
 
-            // --Create Sort Button-- //
+            //*******************************//
+            // --Create Sort Chest Button--  //
+            //*******************************//
             posX = 453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE); //leftmost
 
-            String label   = "Sort Chest";
-            SetUpStateBasics(label);
-            States[label].onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]);
+            // String label   = "Sort Chest";
+            SetUpStateBasics(0);
+            States[0].onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]);
 
-            label   = "Sort Chest (Reverse)";
-            SetUpStateBasics(label);
-            States[label].onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]);
+            // label   = "Sort Chest (Reverse)";
+            SetUpStateBasics(1);
+            States[1].onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]);
 
-            Buttons.Add(IHAction.Sort, new ButtonBase(this,
-                new IHDynamicButton(
-                    States["Sort Chest"], States["Sort Chest (Reverse)"],
-                    KState.Special.Shift,
-                    new Vector2(posX,posY))
-                ));
+            mbase.ButtonRepo.Add(label[0],  new IHDynamicButton(
+               States[0], States[1],
+               KState.Special.Shift,
+               new Vector2(posX,posY)) );
+
+
+            Buttons.Add(IHAction.Sort, new ButtonBase(this, mbase.ButtonRepo[label[0]]));
 
 
             // if (replaceVanilla){}
             // else{
 
-            // --Create Refill/QuickStack Button-- //
+            //*******************************//
+            // Create Refill/QuickStack Button //
+            //*******************************//
             posX = 453 - (2*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE);
 
-            label   = "Quick Restock";
-            SetUpStateBasics(label);
-            States[label].onClick = IHSmartStash.SmartLoot;
+            // label   = "Quick Restock";
+            SetUpStateBasics(2);
+            States[2].onClick = IHSmartStash.SmartLoot;
 
             //create button
-            var QRbutton = new IHButton(States[label], new Vector2(posX, posY));
+            mbase.ButtonRepo[label[2]] = new IHButton(States[2], new Vector2(posX, posY));
+            // mbase.ButtonRepo.Add(label, new IHButton(States[label], new Vector2(posX, posY)) );
 
-            Buttons.Add(IHAction.Refill, new ButtonBase(this, QRbutton));
+            Buttons.Add(IHAction.Refill, new ButtonBase(this, mbase.ButtonRepo[label[2]]));
 
             //quickstack will be 2-state toggle button (locked/unlocked) that toggles on right click
 
             // create default unlocked state
-            label = "Quick Stack (Unlocked)";
-            SetUpStateBasics(label);
+            // label = "Quick Stack";
+            SetUpStateBasics(3);
 
-            States[label].onClick = IHUtils.DoQuickStack;
-            States[label].onRightClick = () => {
+            States[3].onClick = IHUtils.DoQuickStack;
+            States[3].onRightClick = () => {
                 Main.PlaySound(22); //lock sound
                 IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); };
 
             // create locked state
-            label = "Quick Stack (Locked)";
-            SetUpStateBasics(label);
+            // label = "Quick Stack (Locked)";
+            SetUpStateBasics(4);
 
-            States[label].onClick      = States["Quick Stack (Unlocked)"].onClick;
-            States[label].onRightClick = States["Quick Stack (Unlocked)"].onRightClick;
+            States[4].onClick      = States[3].onClick;
+            States[4].onRightClick = States[3].onRightClick;
 
             // create the button, setting its state from ActionLocked()
             //can leave the position null since the position for this button has already been established
-
-            var QSbutton = new IHToggle(
-                States["Quick Stack (Unlocked)"],
-                States["Quick Stack (Locked)"],
+            mbase.ButtonRepo[label[3]] = new IHToggle(
+                States[3],
+                States[4],
                 () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), //IsActive()
-                null, true);
+                null, //pos=null
+                true); //toggleOnRightClick=true
+            mbase.ButtonUpdates.Push(label[3]);
 
             //now create keywatchers to toggle the button from restock to quickstack when Shift is pressed
             //FIXME: shifting states while hovering the button displays the buttons's non-mouseover texture
             //until the mouse is moved off of and back on to the button.
             //FIXME: likewise, this leaves the previous state in its mouseover appearance until re-moused.
-            Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, QRbutton, QSbutton);
+            Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, mbase.ButtonRepo[label[2]], mbase.ButtonRepo[label[3]]);
 
-            // --Create SmartStash/DepositAll Button-- //
+            //******************************************//
+            // --Create SmartStash/DepositAll Button--  //
+            //******************************************//
             posX = 453 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE); //right beside trash
 
-            label   = "Smart Deposit";
-            SetUpStateBasics(label);
-            States[label].onClick = IHSmartStash.SmartDeposit;
+            // label   = "Smart Deposit";
+            SetUpStateBasics(5);
+            States[5].onClick = IHSmartStash.SmartDeposit;
 
-            var SDbutton = new IHButton(States[label], new Vector2(posX, posY));
-            Buttons.Add(IHAction.Deposit, new ButtonBase(this, SDbutton));
+            mbase.ButtonRepo[label[5]] = new IHButton(States[5], new Vector2(posX, posY));
+            Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[label[5]]));
 
             //deposit all
-            label   = "Deposit All (Unlocked)";
-            SetUpStateBasics(label);
-            States[label].onClick = IHUtils.DoDepositAll;
-            States[label].onRightClick = () => {
+            // label   = "Deposit All (Unlocked)";
+            SetUpStateBasics(6);
+            States[6].onClick = IHUtils.DoDepositAll;
+            States[6].onRightClick = () => {
                 Main.PlaySound(22); //lock sound
                 IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); };
 
             //locked
-            label   = "Deposit All (Locked)";
-            SetUpStateBasics(label);
+            // label   = "Deposit All (Locked)";
+            SetUpStateBasics(7);
 
-            States[label].onClick      = States["Deposit All (Unlocked)"].onClick;
-            States[label].onRightClick = States["Deposit All (Unlocked)"].onRightClick;
+            States[7].onClick      = States[6].onClick;
+            States[7].onRightClick = States[6].onRightClick;
 
-            var DAbutton = new IHToggle(States["Deposit All (Unlocked)"], States["Deposit All (Locked)"],
+            mbase.ButtonRepo[label[6]] = new IHToggle(States[6], States[7],
                 () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA), //IsActive()
                 null, true);
+            mbase.ButtonUpdates.Push(label[6]);
 
             //create keywatchers
-            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, SDbutton, DAbutton);
+            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, mbase.ButtonRepo[label[5]], mbase.ButtonRepo[label[6]]);
 
             //increase base alpha of chest buttons
             Buttons[IHAction.Deposit].Alpha = Buttons[IHAction.Refill].Alpha = Buttons[IHAction.Sort].Alpha = 0.8f;
@@ -254,20 +281,28 @@ namespace InvisibleHand
 
         }
 
-        private void SetUpStateBasics(String label)
+        /*************************************************************************
+         * Consolidate the operations that are similar for every new button state
+         */
+        private void SetUpStateBasics(int index)
         {
-            States.Add(label, new ButtonState(label));
+            Rects[index] = IHUtils.GetSourceRect(label[index]); //inactive appearance
+            MRects[index] = IHUtils.GetSourceRect(label[index]); //mouse-over
 
-            Rects.Add(label,  IHUtils.GetSourceRect(label)); //inactive appearance
-            MRects.Add(label, IHUtils.GetSourceRect(label,true)); //mouse-over
+            var bState = new ButtonState(label[index]);
 
-            States[label].texture      = IHBase.ButtonGrid;
-            States[label].sourceRect   = Rects[label];
-            States[label].onMouseEnter = bb => { States[label].sourceRect = MRects[label]; return true;};
-            States[label].onMouseLeave = bb => { States[label].sourceRect = Rects[label]; return true;};
+            bState.texture      = IHBase.ButtonGrid;
+            bState.sourceRect   = Rects[index];
+            bState.onMouseEnter = bb => { bState.sourceRect = MRects[index]; return true;};
+            bState.onMouseLeave = bb => { bState.sourceRect = Rects[index]; return true;};
             // States[label].tint         = btnTint;
+
+            States[index] = bState;
         }
 
+        /*************************************************************************
+         * Draw each button in this layer (bg first, then button)
+         */
         protected override void OnDraw(SpriteBatch sb)
         {
             if (!parentLayer.visible) return;

@@ -202,7 +202,7 @@ namespace InvisibleHand
             ButtonGridIndex.Add("Smart Deposit",4);
             ButtonGridIndex.Add("Clean Stacks",5);
             ButtonGridIndex.Add("Quick Stack",6);
-            ButtonGridIndex.Add("Quick Restock",7);
+            ButtonGridIndex.Add("Restock",7);
 
 
         }

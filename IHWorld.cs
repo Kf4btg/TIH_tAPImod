@@ -16,7 +16,7 @@ namespace InvisibleHand
             // upon initial load has beensdjnkdsjnklsakjnasdfjk
             foreach (String btn in IHBase.self.ButtonUpdates)
             {
-                IHBase.ButtonRepo[btn].Update();
+                IHBase.self.ButtonRepo[btn].OnUpdate();
             }
         }
     }

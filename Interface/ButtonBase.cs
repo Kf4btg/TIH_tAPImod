@@ -101,8 +101,6 @@ namespace InvisibleHand
             kw1.Subscribe();
         }
 
-
-
         // returns true if mouse currently over the button space
         public bool IsHovered()
         {

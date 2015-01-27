@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Concurrent;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 
 using TAPI;
@@ -16,14 +16,16 @@ namespace InvisibleHand
         }
 
         //lists of key-specific providers
-        // private ConcurrentDictionary< Keys,           Provider > activeProviders;
-        private ConcurrentDictionary< KState.Special, Provider > specialProviders;
+        // private ConcurrentDictionary< Keys,           Notifier > activeProviders;
+        private ConcurrentDictionary< KState.Special, Notifier > specialProviders;
+        private Dictionary< KState.Special, bool > spPrevState;
 
         // initializer
         public KeyEventProvider()
         {
             // activeProviders  = new ConcurrentDictionary<Keys, Provider>();
-            specialProviders = new ConcurrentDictionary<KState.Special, Provider>();
+            specialProviders = new ConcurrentDictionary<KState.Special, Notifier>();
+            spPrevState = new Dictionary<KState.Special, bool>();
         }
 
         //indexers
@@ -32,9 +34,9 @@ namespace InvisibleHand
         //     get { return activeProviders.GetOrAdd(key, new KeysProvider(key)); }
         // }
 
-        public Provider this[KState.Special key]
+        public Notifier this[KState.Special key]
         {
-            get { return specialProviders.GetOrAdd(key, new SpecialProvider(key)); }
+            get { return specialProviders.GetOrAdd(key, new Notifier()); }
         }
 
         // add new Providers
@@ -47,24 +49,33 @@ namespace InvisibleHand
         public void AddProvider(KState.Special key)
         {
             // if (specialProviders == null) specialProviders = new ConcurrentDictionary<KState.Special, Provider>();
-            specialProviders.TryAdd(key, new SpecialProvider(key));
+            // specialProviders.TryAdd(key, new SpecialProvider(key));
+            specialProviders.TryAdd(key, new Notifier());
         }
 
-        public void UpdateAll()
+        //call this from one of the "Updates-every-frame" hooks to send events to listeners (e.g. buttons) on a key change
+        public void Update()
         {
             // if (activeProviders != null) {
             //     foreach (var kvp in activeProviders)
             //         { kvp.Value.UpdateSubscribers(); }}
 
-                foreach (var kvp in specialProviders)
-                    { kvp.Value.UpdateSubscribers(); }
+            bool wasPressed;
+            bool isPressed;
+            foreach (var kvp in specialProviders)
+                {
+                    isPressed = kvp.Key.Down();
+                    spPrevState.TryGetValue(kvp.Key, out wasPressed);
+                    if (wasPressed!=isPressed) kvp.Value.NotifySubscribers(isPressed); //only update on change (pressed/released)
+                    spPrevState[kvp.Key]=isPressed;
+                }
         }
 
-        public abstract class Provider
+        public class Notifier
         {
             protected ConcurrentDictionary<KeyEventProvider.Event, ConcurrentBag<Action>> subscribers;
 
-            protected Provider()
+            public Notifier()
             {
                 subscribers = new ConcurrentDictionary<KeyEventProvider.Event, ConcurrentBag<Action>>();
 
@@ -84,8 +95,24 @@ namespace InvisibleHand
             //
             // }
 
-            //call this from one of the "Updates-every-frame" hooks to send events to listeners (e.g. buttons) on a key change
-            public abstract void UpdateSubscribers();
+            //@param keyPressed will be true if the key has changed from up to down, false if down to up
+            public virtual void NotifySubscribers(bool keyPressed)
+            {
+                Action handler;
+                    if (keyPressed)
+                    {
+                        while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
+                            if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
+                        }
+                    }
+
+                    else
+                    {
+                        while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
+                            if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
+                        }
+                    }
+            }
         }
 
         // public class KeysProvider : Provider
@@ -114,33 +141,35 @@ namespace InvisibleHand
         //     }
         // }
 
-        public class SpecialProvider : Provider
-        {
-            private readonly KState.Special _key;
-
-            public SpecialProvider(KState.Special key) : base()
-            {
-                _key = key;
-            }
-
-            public override void UpdateSubscribers()
-            {
-                Action handler;
-                if (_key.Pressed())
-                {
-                    while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
-                        if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
-                    }
-                }
-
-                else if (_key.Released())
-                {
-                    while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
-                        if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
-                    }
-                }
-            }
-        }
+        // public class SpecialProvider : Provider
+        // {
+        //     private readonly KState.Special _key;
+        //     private bool _down;
+        //
+        //     public SpecialProvider(KState.Special key) : base()
+        //     {
+        //         _key = key;
+        //         _down = false;
+        //     }
+        //
+        //     public override void UpdateSubscribers(bool keyPressed)
+        //     {
+        //         Action handler;
+        //             if (_key.Pressed())
+        //             {
+        //                 while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
+        //                     if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
+        //                 }
+        //             }
+        //
+        //             else if (_key.Released())
+        //             {
+        //                 while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
+        //                     if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
+        //                 }
+        //             }
+        //     }
+        // }
     }
 
     //only accepts KState.Special at the moment

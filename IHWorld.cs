@@ -14,10 +14,10 @@ namespace InvisibleHand
         {
             // finding a place to do this where the buttons are actually *set correctly*
             // upon initial load has beensdjnkdsjnklsakjnasdfjk
-            // foreach (KeyValuePair<IHAction, IHButton> kvp in IHBase.self.lockOptions.Buttons)
-            // {
-            //     ((IHToggle)kvp.Value).Init();
-            // }
+            foreach (String btn in IHBase.self.ButtonUpdates)
+            {
+                IHBase.ButtonRepo[btn].Update();
+            }
         }
     }
 }

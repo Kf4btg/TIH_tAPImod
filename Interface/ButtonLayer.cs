@@ -11,6 +11,9 @@ namespace InvisibleHand
     {
         public readonly Dictionary<IHAction, ButtonBase> Buttons;
 
+        //this will contain ALL the possible button-contexts, even those grouped onto a single base
+        public readonly Dictionary<IHAction, IHButton> Contexts;
+
         // public Rectangle ButtonFrame { get; protected set;}
         // public Point FrameCenter { get; private set;}
 

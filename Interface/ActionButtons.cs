@@ -14,12 +14,18 @@ namespace InvisibleHand
         private float posX = 496;
         private const float posY = 28; //doesn't change
 
+        // these dictionaries are all keyed on the state's label
         private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
-        private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>();
-        private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
-        private readonly Color bgColor = Constants.InvSlotColor*0.8f;
+        private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>(); // source rectangle for the button's inactive appearance
+        private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>(); // source rect for mouseover appearance
 
-        public InventoryButtons() : base("InventoryButtons")
+        private readonly Color bgColor = Constants.InvSlotColor*0.8f; //make the bg translucent even at max button alpha
+
+        /**
+         * @param contextRepo - passed from the mod base, and will hold a list of all button contexts
+         * keyed by their primary name (which should be unique).
+         */
+        public InventoryButtons(IHBase mbase) : base("InventoryButtons")
         {
             /*
             Main.inventoryScale=0.85)
@@ -37,16 +43,16 @@ namespace InvisibleHand
 
             States[label].onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]);
 
-            Buttons.Add(    IHAction.Sort,
-                            new ButtonBase( this,
-                                new IHContextButton(
-                                    States["Sort"],
-                                    States["Sort (Reverse)"],
-                                    KState.Special.Shift,
-                                    new Vector2(posX, posY)
-                                )
-                            )
-                        );
+            mbase.ButtonRepo.Add("Sort",
+                new IHDynamicButton(
+                    States["Sort"],
+                    States["Sort (Reverse)"],
+                    KState.Special.Shift,
+                    new Vector2(posX, posY)
+                    ) );
+
+            Buttons.Add(IHAction.Sort,
+                        new ButtonBase(this, mbase.ButtonRepo["Sort"]) );
 
             /** --Create Stack Button-- **/
 
@@ -57,7 +63,9 @@ namespace InvisibleHand
 
             States[label].onClick = () => IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50);
 
-            Buttons.Add(IHAction.Stack, new ButtonBase(this, new IHButton(States[label], new Vector2(posX, posY))));
+            mbase.ButtonRepo.Add(label,  new IHButton(States[label], new Vector2(posX, posY)) );
+
+            Buttons.Add(IHAction.Stack, new ButtonBase(this,mbase.ButtonRepo[label]));
 
             // UpdateFrame();
         }
@@ -105,7 +113,7 @@ namespace InvisibleHand
         private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
         private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
-        public ChestButtons() : base("ChestButtons")
+        public ChestButtons(IHBase mbase) : base("ChestButtons")
         {
 
             // --Create Sort Button-- //
@@ -120,7 +128,7 @@ namespace InvisibleHand
             States[label].onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]);
 
             Buttons.Add(IHAction.Sort, new ButtonBase(this,
-                new IHContextButton(
+                new IHDynamicButton(
                     States["Sort Chest"], States["Sort Chest (Reverse)"],
                     KState.Special.Shift,
                     new Vector2(posX,posY))

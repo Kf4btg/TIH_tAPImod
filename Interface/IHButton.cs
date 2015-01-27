@@ -7,6 +7,14 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    /**
+    * These are the "Contexts" in the ButtonBase Class. They define how a button interacts with
+    * ButtonStates (which contain the actual user-facing details of the button like
+    * texture, name, and click-action).
+    * IDEA: Consider removing the derived states (Toggle/Dynamic) and add methods like
+    * e.g. IHButton.MakeToggle() to add that feature to a base IHButton.  This will,
+    * I think, remove some of the confusing complexity of the state->context->base hierarchy.
+    */
     public class IHButton
     {
         public readonly string Name;
@@ -22,13 +30,11 @@ namespace InvisibleHand
         public Texture2D texture    { get { return displayState.texture;}       protected set { displayState.texture=value; } }
         public Color tint           { get { return displayState.tint;}          protected set { displayState.tint=value; } }
 
-
-
         public Vector2 Size
         {
             get {
                 return (displayState.texture!=null) ?
-                (displayState.sourceRect.HasValue ? displayState.sourceRect.Value.Size() : displayState.texture.Size()) : 
+                (displayState.sourceRect.HasValue ? displayState.sourceRect.Value.Size() : displayState.texture.Size()) :
                 Main.fontMouseText.MeasureString(displayState.label);
             }
         }
@@ -46,7 +52,7 @@ namespace InvisibleHand
             this.displayState = new ButtonState(name, tex, source, onClick, null, tintColor ?? Color.White);
             this.pos = pos ?? default(Vector2);
         }
-
+        //with right click
         public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
         {
             this.Name = name;
@@ -171,6 +177,10 @@ namespace InvisibleHand
             SetState(IsActive() ? ActiveState : InactiveState);
         }
 
+        //rather than just doing something like: activeState.onClick = setState(inActiveState)
+        //I prefer to have it actually check the state of the game parameter it affects,
+        //in order to avoid issues from race-conditions or some possible other action
+        // that changed said paramater.
         public void DoSwitch()
         {
             if (IsActive())
@@ -192,7 +202,7 @@ namespace InvisibleHand
     }
 
     // a button that dynamically changes its appearance and/or function based on an external condition (as opposed to changing on user-click like IHToggle)
-    public class IHContextButton : IHButton
+    public class IHDynamicButton : IHButton
     {
         private readonly ButtonState defaultState;
         private readonly ButtonState altState;
@@ -200,7 +210,7 @@ namespace InvisibleHand
 
         private readonly KeyWatcher[] keySwitch; //well this is cheesy
 
-        public IHContextButton(ButtonState defaultState, ButtonState altState, KState.Special? watchedKey=null, Vector2? pos=null) :
+        public IHDynamicButton(ButtonState defaultState, ButtonState altState, KState.Special? watchedKey=null, Vector2? pos=null) :
         base(defaultState, pos)
         {
             this.defaultState = defaultState;

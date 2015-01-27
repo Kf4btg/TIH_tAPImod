@@ -23,6 +23,11 @@ namespace InvisibleHand
         public InventoryButtons invButtons;
         public ChestButtons chestButtons;
 
+        //keep track of ALL existing button contexts here.
+        public Dictionary<String, IHButton> ButtonRepo;
+        // and here's the ids of those that need a state-update (probably just the toggles)
+        public Stack<String> ButtonUpdates;
+
         public override void OnLoad()
         {
             self = this;
@@ -35,6 +40,9 @@ namespace InvisibleHand
                 OptionChanged(o);
             }
             KEP = new KeyEventProvider();
+
+            ButtonRepo = new Dictionary<IHAction, IHButton>();
+            ButtonUpdates = new Stack<IHAction>();
         }
 
         public override void OnAllModsLoaded()
@@ -44,8 +52,9 @@ namespace InvisibleHand
             ButtonBG = textures["resources/button_bg"];
             CategoryDef.Initialize();
 
-            invButtons   = new InventoryButtons();
-            chestButtons = new ChestButtons();
+            invButtons   = new InventoryButtons(ButtonRepo);
+            chestButtons = new ChestButtons(ButtonRepo);
+            ButtonRepo.Trim();
         }
 
         public override void OptionChanged(Option option)

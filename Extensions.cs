@@ -71,6 +71,12 @@ namespace InvisibleHand
             sb.Draw(bgTex, bb.Position, null, bgColor*bb.Alpha, 0f, default(Vector2), bb.Scale, SpriteEffects.None, 0f);
         }
 
+        public static bool IsHovered(this Rectangle frame)
+        {
+            return frame.Contains(Main.mouseX, Main.mouseY);
+        }
+
+
 
 
     #endregion

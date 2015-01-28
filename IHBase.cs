@@ -19,8 +19,8 @@ namespace InvisibleHand
         public static Texture2D ButtonBG { get; private set; }
         public static KeyEventProvider KEP;
 
-        public InventoryButtons invButtons;
-        public ChestButtons chestButtons;
+        public ButtonLayer invButtons;
+        public ButtonLayer chestButtons;
 
         //keep track of ALL existing button contexts here.
         public Dictionary<String, IHButton> ButtonRepo;
@@ -47,12 +47,13 @@ namespace InvisibleHand
         public override void OnAllModsLoaded()
         {
             lockedIcon = self.textures["resources/LockIndicator"];
-            ButtonGrid = textures["resources/ButtonGrid"];
-            ButtonBG = textures["resources/button_bg"];
+
             CategoryDef.Initialize();
 
-            invButtons   = new InventoryButtons(this);
-            chestButtons = new ChestButtons(this);
+            ButtonGrid   = textures["resources/ButtonGrid"];
+            ButtonBG     = textures["resources/button_bg"];
+            invButtons   = ButtonMaker.GetButtons("Inventory");
+            chestButtons = ButtonMaker.GetButtons("Chest");
         }
 
         public override void OptionChanged(Option option)

@@ -129,7 +129,6 @@ namespace InvisibleHand
         public void OnHover()
         {
             //if (currentContext.OnHover(this))  //future hook?
-            Main.localPlayer.mouseInterface = true;
             DrawTooltip(0,0);
             if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
             if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();

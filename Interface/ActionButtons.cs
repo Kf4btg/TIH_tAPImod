@@ -62,8 +62,6 @@ namespace InvisibleHand
             mbase.ButtonRepo.Add(label,  new IHButton(States[label], new Vector2(posX, posY)) );
 
             Buttons.Add(IHAction.Stack, new ButtonBase(this,mbase.ButtonRepo[label]));
-
-            // UpdateFrame();
         }
 
         /*************************************************************************
@@ -80,19 +78,15 @@ namespace InvisibleHand
             bState.sourceRect   = Rects[label];
             bState.onMouseEnter = bb => { bState.sourceRect = MRects[label]; return true;};
             bState.onMouseLeave = bb => { bState.sourceRect = Rects[label]; return true;};
-            // States[label].tint         = btnTint;
 
             States.Add(label, bState);
         }
 
-        protected override void OnDraw(SpriteBatch sb)
+        /*************************************************************************
+         * Draw each button in this layer (bg first, then button)
+         */
+        protected override void DrawButtons(SpriteBatch sb)
         {
-            if (!parentLayer.visible) return;
-            // foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
-            // {
-            //     sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
-            // }
-
             foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
             {
                 sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
@@ -121,18 +115,14 @@ namespace InvisibleHand
             "Deposit All (Locked)"      //7
         };
 
-        // private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
         private readonly ButtonState[] States = new ButtonState[8];
-        // private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>();
-        private readonly Rectangle?[] Rects = new Rectangle?[8];
-        // private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>();
-        private readonly Rectangle?[] MRects = new Rectangle?[8];
+        private readonly Rectangle?[] Rects   = new Rectangle?[8];
+        private readonly Rectangle?[] MRects  = new Rectangle?[8];
 
         private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
         public ChestButtons(IHBase mbase) : base("ChestButtons")
         {
-
             //*******************************//
             // --Create Sort Chest Button--  //
             //*******************************//
@@ -151,16 +141,14 @@ namespace InvisibleHand
                KState.Special.Shift,
                new Vector2(posX,posY)) );
 
-
             Buttons.Add(IHAction.Sort, new ButtonBase(this, mbase.ButtonRepo[label[0]]));
-
 
             // if (replaceVanilla){}
             // else{
 
-            //*******************************//
+            //*********************************//
             // Create Refill/QuickStack Button //
-            //*******************************//
+            //*********************************//
             posX = 453 - (2*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE);
 
             // label   = "Quick Restock";
@@ -257,7 +245,6 @@ namespace InvisibleHand
             // Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
         #endregion
         // }
-        // UpdateFrame();
 
         #region calcs
             /*
@@ -287,7 +274,7 @@ namespace InvisibleHand
         private void SetUpStateBasics(int index)
         {
             Rects[index] = IHUtils.GetSourceRect(label[index]); //inactive appearance
-            MRects[index] = IHUtils.GetSourceRect(label[index]); //mouse-over
+            MRects[index] = IHUtils.GetSourceRect(label[index], true); //mouse-over
 
             var bState = new ButtonState(label[index]);
 
@@ -303,14 +290,8 @@ namespace InvisibleHand
         /*************************************************************************
          * Draw each button in this layer (bg first, then button)
          */
-        protected override void OnDraw(SpriteBatch sb)
+        protected override void DrawButtons(SpriteBatch sb)
         {
-            if (!parentLayer.visible) return;
-            // foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
-            // {
-            //     sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
-            // }
-
             foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
             {
                 sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);

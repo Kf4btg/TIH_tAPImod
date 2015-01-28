@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using TAPI;
-// using Terraria;
+using Terraria;
 
 namespace InvisibleHand
 {
@@ -11,33 +11,64 @@ namespace InvisibleHand
     {
         public readonly Dictionary<IHAction, ButtonBase> Buttons;
 
-        // public Rectangle ButtonFrame { get; protected set;}
+        public Rectangle ButtonFrame { get; protected set;}  //use this to determine MouseInterface
+        public bool IsHovered { get { return ButtonFrame.Contains(Main.mouseX, Main.mouseY); } }
         // public Point FrameCenter { get; private set;}
 
-        protected ButtonLayer(string name) : base("InvisibleHand:" + name)
+
+        protected ButtonLayer(string name) : base(IHBase.self.mod.InternalName + name)
         {
             Buttons = new Dictionary<IHAction, ButtonBase>();
-            // ButtonFrame = Rectangle.Empty;
+            ButtonFrame = Rectangle.Empty;
             // FrameCenter = Point.Zero;
         }
 
-        // protected void UpdateFrame()
-        // {
-        //     foreach (var kvp in Buttons)
-        //     {
-        //         ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
-        //     }
-        //     if (!ButtonFrame.IsEmpty) FrameCenter = ButtonFrame.Center;
-        //
-        // }
-
-        protected override void OnDraw(SpriteBatch sb)
+        internal void UpdateFrame()
         {
-            if (!parentLayer.visible) return;
+            foreach (var kvp in Buttons)
+            {
+                ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
+            }
+            // if (!ButtonFrame.IsEmpty) FrameCenter = ButtonFrame.Center;
+
+        }
+
+        protected virtual void DrawButtons(SpriteBatch sb)
+        {
             foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
             {
                 kvp.Value.Draw(sb);
             }
+        }
+
+        protected override void OnDraw(SpriteBatch sb)
+        {
+            if (!parentLayer.visible) return;
+            Main.localPlayer.mouseInterface = IsHovered;
+            DrawButtons(sb);
+        }
+    }
+
+    // The Button Factory (tm)
+    public static class ButtonMaker
+    {
+        public static ButtonLayer GetButtons(String type)
+        {
+            ButtonLayer btns;
+            switch(type)
+            {
+                case "Inventory":
+                    btns = new InventoryButtons(IHBase.self);
+                    break;
+                case "Chest":
+                    btns = new ChestButtons(IHBase.self);
+                    break;
+                default:
+                    throw new ArgumentException("Invalid ButtonLayer type \"" + type + "\"; valid types are \"Inventory\" and \"Chest\".");
+            }
+
+            btns.UpdateFrame();
+            return btns;
         }
     }
 

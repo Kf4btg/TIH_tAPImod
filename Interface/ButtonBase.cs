@@ -30,13 +30,23 @@ namespace InvisibleHand
         // the button will not move from the coordinates defined here.
         public readonly IHButton DefaultContext;
 
+        // defines the current appearance and functionality of the button
+        private IHButton currentContext;
+        public IHButton CurrentContext { get { return currentContext; } }
+        public ButtonState CurrentState { get { return currentContext.displayState; } }
+
+        //and here's our choices
+        private Dictionary<String, IHButton> contexts; //welp.
+
         // will be set at construction
         public readonly Vector2 Position;
         public readonly Vector2 Size;
         public readonly Rectangle ButtonBounds;
+        public bool IsHovered { get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); } }
+
         // private readonly Point center;
         // for determining when the mouse moves on and off the button
-        private bool isHovered;
+        private bool hasMouseFocus;
 
         public const float SCALE_FULL = 1.0f;
         private float scale = ButtonBase.SCALE_FULL;
@@ -48,18 +58,17 @@ namespace InvisibleHand
         // gets current alpha, sets current and base alpha
         public float Alpha { get { return alphaMult; } set { alphaMult = alphaBase = value; }}
 
-        // defines the current appearance and functionality of the button
-        private IHButton currentContext;
-        public IHButton CurrentContext { get { return currentContext; } }
-        public ButtonState CurrentState { get { return currentContext.displayState; } }
-
-
-        // change contexts externally using ChangeContext()
-        public ButtonBase(ButtonLayer container, IHButton defaultContext)
+        /**
+         * Construct the ButtonBase with just the reference to its default Context.
+         * Add more contexts with Add
+         */
+        public ButtonBase(IHButton defaultContext)
         {
-            // this.container = container;
+            contexts = new Dictionary<String, IHButton>();
+            contexts.Add(defaultContext.Name, defaultContext);
+
             DefaultContext = currentContext = defaultContext;
-            Name = defaultContext.displayLabel;
+            Name = defaultContext.Name;
             Position = defaultContext.pos;
             Size = defaultContext.Size;
 
@@ -67,22 +76,40 @@ namespace InvisibleHand
             // center = ButtonBounds.Center;
         }
 
+        public void Add(IHButton newContext)
+        {
+            if (!contexts.ContainsKey(newContext.Name)) contexts.Add(newContext.Name, newContext);
+        }
+
+        // this makes sure we don't switch to a context not associated with this button
+        public void ChangeContext(String newContext)
+        {
+            if (contexts.ContainsKey(newContext)) ChangeContext(contexts[newContext]);
+        }
+
         // switch to a new context
-        public void ChangeContext(IHButton newContext)
+        // TODO: go through all inactive contexts and make sure they are in non-mouse-over state
+        private void ChangeContext(IHButton newContext)
         {
             //set previous context un-hovered, hover new one:
-            if (isHovered) {
+            if (hasMouseFocus) {
                 currentContext.OnMouseLeave(this);
                 newContext.OnMouseEnter(this);
             }
             currentContext = newContext;
-
         }
 
-        // set up key-event-subscibers that will toggle b/t 2 contexts
-        public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
+
+        public void RegisterKeyToggle(KState.Special key, String context1, String context2)
         {
-            //have to initialize this to prevent compile-time error in kw1 declaration
+            if (contexts.ContainsKey(context1) && contexts.ContainsKey(context2))
+                RegisterKeyToggle(key, contexts[context1], contexts[context2]);
+        }
+
+        // set up key-event-subscribers that will toggle btw 2 contexts
+        private void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
+        {
+            //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
             var kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
 
             var kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
@@ -101,17 +128,10 @@ namespace InvisibleHand
             kw1.Subscribe();
         }
 
-        // returns true if mouse currently over the button space
-        public bool IsHovered()
-        {
-            // return (new Rectangle((int)b.Position.X, (int)b.Position.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
-            return ButtonBounds.Contains(Main.mouseX, Main.mouseY);
-        }
-
         public void OnMouseEnter()
         {
             Main.PlaySound(12); // "mouse-over" sound
-            isHovered = true;
+            hasMouseFocus = true;
 
             if (currentContext.OnMouseEnter(this))
             {
@@ -121,7 +141,7 @@ namespace InvisibleHand
 
         public void OnMouseLeave()
         {
-            isHovered = false;
+            hasMouseFocus = false;
             if (currentContext.OnMouseLeave(this))
                 alphaMult = alphaBase;
         }
@@ -129,7 +149,7 @@ namespace InvisibleHand
         public void OnHover()
         {
             //if (currentContext.OnHover(this))  //future hook?
-            DrawTooltip(0,0);
+            DrawTooltip();
             if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
             if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
         }
@@ -138,12 +158,12 @@ namespace InvisibleHand
         {
             sb.DrawIHButton(this, currentContext.displayState, overrideColor);
 
-            if (IsHovered())
+            if (IsHovered)
             {
-                if (!isHovered) { OnMouseEnter(); }
+                if (!hasMouseFocus) { OnMouseEnter(); }
                 OnHover();
             }
-            else if (isHovered) { OnMouseLeave(); }
+            else if (hasMouseFocus) { OnMouseLeave(); }
         }
 
         //hooks into the current context's onDraw function
@@ -155,19 +175,19 @@ namespace InvisibleHand
             // {
                 sb.DrawIHButton(this, currentContext.displayState);
 
-                if (IsHovered())
+                if (IsHovered)
                 {
-                    if (!isHovered) { OnMouseEnter(); }
+                    if (!hasMouseFocus) { OnMouseEnter(); }
                     OnHover();
                 }
-                else if (isHovered) { OnMouseLeave(); }
+                else if (hasMouseFocus) { OnMouseLeave(); }
             // }
         }
 
         // rare affects the color of the text (0 is default);
         // I'm not quite sure what diff does...
         // FIXME: currently displays _under_ the chest item slots
-        public void DrawTooltip(int rare, byte diff)
+        public void DrawTooltip(int rare=0, byte diff=0)
         {
             //only draw if displaying texture
             if (currentContext.texture!=null) {

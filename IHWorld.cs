@@ -7,9 +7,6 @@ namespace InvisibleHand
 {
     public class IHWorld : ModWorld
     {
-
-        // Dictionary<VAction, IHToggle> lockButtons = IHBase.self.lockOptions.Buttons;
-
         public override void Initialize()
         {
             // finding a place to do this where the buttons are actually *set correctly*

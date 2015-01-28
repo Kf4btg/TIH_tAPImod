@@ -48,7 +48,7 @@ namespace InvisibleHand
                     ) );
 
             Buttons.Add(IHAction.Sort,
-                        new ButtonBase(this, mbase.ButtonRepo["Sort"]) );
+                        new ButtonBase(mbase.ButtonRepo["Sort"]) );
 
             /** --Create Stack Button-- **/
 
@@ -61,7 +61,7 @@ namespace InvisibleHand
 
             mbase.ButtonRepo.Add(label,  new IHButton(States[label], new Vector2(posX, posY)) );
 
-            Buttons.Add(IHAction.Stack, new ButtonBase(this,mbase.ButtonRepo[label]));
+            Buttons.Add(IHAction.Stack, new ButtonBase(mbase.ButtonRepo[label]));
         }
 
         /*************************************************************************
@@ -141,7 +141,7 @@ namespace InvisibleHand
                KState.Special.Shift,
                new Vector2(posX,posY)) );
 
-            Buttons.Add(IHAction.Sort, new ButtonBase(this, mbase.ButtonRepo[label[0]]));
+            Buttons.Add(IHAction.Sort, new ButtonBase(mbase.ButtonRepo[label[0]]));
 
             // if (replaceVanilla){}
             // else{
@@ -159,7 +159,7 @@ namespace InvisibleHand
             mbase.ButtonRepo[label[2]] = new IHButton(States[2], new Vector2(posX, posY));
             // mbase.ButtonRepo.Add(label, new IHButton(States[label], new Vector2(posX, posY)) );
 
-            Buttons.Add(IHAction.Refill, new ButtonBase(this, mbase.ButtonRepo[label[2]]));
+            Buttons.Add(IHAction.Refill, new ButtonBase(mbase.ButtonRepo[label[2]]));
 
             //quickstack will be 2-state toggle button (locked/unlocked) that toggles on right click
 
@@ -205,7 +205,7 @@ namespace InvisibleHand
             States[5].onClick = IHSmartStash.SmartDeposit;
 
             mbase.ButtonRepo[label[5]] = new IHButton(States[5], new Vector2(posX, posY));
-            Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[label[5]]));
+            Buttons.Add(IHAction.Deposit, new ButtonBase(mbase.ButtonRepo[label[5]]));
 
             //deposit all
             // label   = "Deposit All (Unlocked)";

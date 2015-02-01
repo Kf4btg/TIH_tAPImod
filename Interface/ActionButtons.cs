@@ -75,9 +75,12 @@ namespace InvisibleHand
             var bState = new ButtonState(label);
 
             bState.texture      = IHBase.ButtonGrid;
-            bState.sourceRect   = Rects[label];
-            bState.onMouseEnter = bb => { bState.sourceRect = MRects[label]; return true;};
-            bState.onMouseLeave = bb => { bState.sourceRect = Rects[label]; return true;};
+            bState.texSource.Main   = Rects[label];
+            bState.texSource.Alt    = MRects[label];
+
+            //this should no longer be necessary now that SourceRect is being set dynamically in ButtonBase
+            // bState.onMouseEnter = bb => { bState.texSource = MRects[label]; return true;};
+            // bState.onMouseLeave = bb => { bState.texSource = Rects[label]; return true;};
 
             States.Add(label, bState);
         }
@@ -279,9 +282,10 @@ namespace InvisibleHand
             var bState = new ButtonState(label[index]);
 
             bState.texture      = IHBase.ButtonGrid;
-            bState.sourceRect   = Rects[index];
-            bState.onMouseEnter = bb => { bState.sourceRect = MRects[index]; return true;};
-            bState.onMouseLeave = bb => { bState.sourceRect = Rects[index]; return true;};
+            bState.texSource.Main   = Rects[index];
+            bState.texSource.Alt    = MRects[index];
+            // bState.onMouseEnter = bb => { bState.texSource = MRects[index]; return true;};
+            // bState.onMouseLeave = bb => { bState.texSource = Rects[index]; return true;};
             // States[label].tint         = btnTint;
 
             States[index] = bState;

@@ -15,6 +15,11 @@ namespace InvisibleHand
         public bool IsHovered { get { return ButtonFrame.Contains(Main.mouseX, Main.mouseY); } }
         // public Point FrameCenter { get; private set;}
 
+        protected float opacity_inactive = 0.45f;
+        protected float opacity_active = 1.0f;
+
+        //TODO: have this fade in/out?
+        public float LayerOpacity { get; private set; } }
 
         protected ButtonLayer(string name) : base(IHBase.self.mod.InternalName + name)
         {
@@ -44,12 +49,21 @@ namespace InvisibleHand
         protected override void OnDraw(SpriteBatch sb)
         {
             if (!parentLayer.visible) return;
-            Main.localPlayer.mouseInterface = IsHovered;
+
+            LayerOpacity=opacity_inactive;
+            if (IsHovered)
+            {
+                Main.localPlayer.mouseInterface = true;
+                LayerOpacity=opacity_active;
+            }
             DrawButtons(sb);
         }
     }
 
     // The Button Factory (tm)
+    // Use this to get instances of the button-layer types rather than
+    // directly calling their constructor.  This ensures that the layer
+    // frame will be properly updated.
     public static class ButtonMaker
     {
         public static ButtonLayer GetButtons(String type)

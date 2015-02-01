@@ -23,7 +23,8 @@ namespace InvisibleHand
     {
         // a _unique_ name that can identify this button
         public readonly string Name;
-        // private readonly ButtonLayer container;
+
+        public readonly ButtonLayer Container;
 
         //this defines the location and size of this button
         // even if other buttons have differently-sized textures/strings,
@@ -55,15 +56,23 @@ namespace InvisibleHand
         // affects the alpha component of the current tint
         private float alphaBase = 0.65f;
         private float alphaMult = 0.65f;
-        // gets current alpha, sets current and base alpha
-        public float Alpha { get { return alphaMult; } set { alphaMult = alphaBase = value; }}
+        // gets current alpha (modified by container opacity), sets current and base alpha values
+        public float Alpha { get { return alphaMult*Container.LayerOpacity; } set { alphaMult = alphaBase = value; }}
+
+        //this will actively set the Source Texels based on whether or not the mouse is currently over this button.
+        // If both rects are null, then the entire texture will be drawn as per default
+        // This should hopefully solve the issue of incorrect display states when toggling contexts w/ Shift
+        public Rectangle? SourceRect { get { return hasMouseFocus ? currentContext.ActiveRect : currentContext.InactiveRect; }}
+
 
         /**
          * Construct the ButtonBase with just the reference to its default Context.
          * Add more contexts with Add
          */
-        public ButtonBase(IHButton defaultContext)
+        public ButtonBase(ButtonLayer container, IHButton defaultContext)
         {
+            Container = container;
+
             contexts = new Dictionary<String, IHButton>();
             contexts.Add(defaultContext.Name, defaultContext);
 
@@ -88,17 +97,15 @@ namespace InvisibleHand
         }
 
         // switch to a new context
-        // TODO: go through all inactive contexts and make sure they are in non-mouse-over state
         private void ChangeContext(IHButton newContext)
         {
             //set previous context un-hovered, hover new one:
-            if (hasMouseFocus) {
-                currentContext.OnMouseLeave(this);
-                newContext.OnMouseEnter(this);
-            }
+            // if (hasMouseFocus) {
+            //     currentContext.OnMouseLeave(this);
+            //     newContext.OnMouseEnter(this);
+            // }
             currentContext = newContext;
         }
-
 
         public void RegisterKeyToggle(KState.Special key, String context1, String context2)
         {
@@ -131,7 +138,7 @@ namespace InvisibleHand
         public void OnMouseEnter()
         {
             Main.PlaySound(12); // "mouse-over" sound
-            hasMouseFocus = true;
+            // hasMouseFocus = true;
 
             if (currentContext.OnMouseEnter(this))
             {
@@ -141,7 +148,7 @@ namespace InvisibleHand
 
         public void OnMouseLeave()
         {
-            hasMouseFocus = false;
+            // hasMouseFocus = false;
             if (currentContext.OnMouseLeave(this))
                 alphaMult = alphaBase;
         }
@@ -152,18 +159,6 @@ namespace InvisibleHand
             DrawTooltip();
             if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
             if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
-        }
-
-        public void Draw(SpriteBatch sb, Color overrideColor)
-        {
-            sb.DrawIHButton(this, currentContext.displayState, overrideColor);
-
-            if (IsHovered)
-            {
-                if (!hasMouseFocus) { OnMouseEnter(); }
-                OnHover();
-            }
-            else if (hasMouseFocus) { OnMouseLeave(); }
         }
 
         //hooks into the current context's onDraw function
@@ -177,10 +172,12 @@ namespace InvisibleHand
 
                 if (IsHovered)
                 {
-                    if (!hasMouseFocus) { OnMouseEnter(); }
+                    if (!hasMouseFocus) { hasMouseFocus=true; OnMouseEnter(); }
                     OnHover();
+                    return;
                 }
-                else if (hasMouseFocus) { OnMouseLeave(); }
+                if (hasMouseFocus) { OnMouseLeave(); }
+                hasMouseFocus=false;
             // }
         }
 

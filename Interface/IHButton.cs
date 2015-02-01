@@ -28,13 +28,16 @@ namespace InvisibleHand
         public Action onRightClick  { get { return displayState.onRightClick;}  protected set { displayState.onRightClick=value; } }
         public string displayLabel  { get { return displayState.label;}         protected set { displayState.label=value; } }
         public Texture2D texture    { get { return displayState.texture;}       protected set { displayState.texture=value; } }
+
+        public Rectangle? ActiveRect   { get { return displayState.texSource.Alt;}}
+        public Rectangle? InactiveRect { get { return displayState.texSource.Main;}}
         public Color tint           { get { return displayState.tint;}          protected set { displayState.tint=value; } }
 
         public Vector2 Size
         {
             get {
                 return (displayState.texture!=null) ?
-                (displayState.sourceRect.HasValue ? displayState.sourceRect.Value.Size() : displayState.texture.Size()) :
+                    (InactiveRect.HasValue ? InactiveRect.Value.Size() : displayState.texture.Size()) :
                 Main.fontMouseText.MeasureString(displayState.label);
             }
         }
@@ -46,20 +49,21 @@ namespace InvisibleHand
         }
 
         //simple button w/ no right-click
-        public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Vector2? pos=null, Color? tintColor = null)
-        {
-            this.Name = name;
-            this.displayState = new ButtonState(name, tex, source, onClick, null, tintColor ?? Color.White);
-            this.pos = pos ?? default(Vector2);
-        }
-        //with right click
-        public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
-        {
-            this.Name = name;
-            this.displayState = new ButtonState(name, tex, source, onClick, onRightClick, tintColor ?? Color.White);
-            this.pos = pos ?? default(Vector2);
-        }
+        // public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Vector2? pos=null, Color? tintColor = null)
+        // {
+        //     this.Name = name;
+        //     this.displayState = new ButtonState(name, tex, source, onClick, null, tintColor ?? Color.White);
+        //     this.pos = pos ?? default(Vector2);
+        // }
+        // //with right click
+        // public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
+        // {
+        //     this.Name = name;
+        //     this.displayState = new ButtonState(name, tex, source, onClick, onRightClick, tintColor ?? Color.White);
+        //     this.pos = pos ?? default(Vector2);
+        // }
 
+        //require a pre-constructed state
         public IHButton(ButtonState bState, Vector2? pos=null)
         {
             this.Name = bState.label;
@@ -279,7 +283,7 @@ namespace InvisibleHand
     }
 
 */
-    
+
 
     // public class ButtonContext
     // {

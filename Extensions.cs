@@ -55,15 +55,15 @@ namespace InvisibleHand
             if (state.texture==null)
                 sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint*bBase.Alpha);
             else
-                sb.Draw(state.texture, bBase.Position, state.sourceRect, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+                sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
 
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
         {
             if (state.texture==null)
-            sb.DrawString(Main.fontMouseText, state.label, bBase.Position, overrideColor*bBase.Alpha);
+                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, overrideColor*bBase.Alpha);
             else
-            sb.Draw(state.texture, bBase.Position, state.sourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+                sb.Draw(state.texture, bBase.Position, bBase.SourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
 
         public static void DrawButtonBG(this SpriteBatch sb, ButtonBase bb, Texture2D bgTex, Color bgColor)

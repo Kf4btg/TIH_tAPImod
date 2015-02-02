@@ -56,26 +56,32 @@ namespace InvisibleHand
             DisplayState = newState;
         }
 
-        public virtual bool OnMouseEnter(ButtonBase bBase)
-        {
-            if (DisplayState.onMouseEnter!=null) return DisplayState.onMouseEnter(bBase);
-            return true;
-        }
-
-        public virtual bool OnMouseLeave(ButtonBase bBase)
-        {
-            if (DisplayState.onMouseLeave!=null) return DisplayState.onMouseLeave(bBase);
-            return true;
-        }
-
         //this is just here to enable the IHToggle Update(init) function from ModWorld; better solution later.
         public virtual void OnUpdate()
         {       }
 
-        public virtual bool OnDraw(SpriteBatch sb, ButtonBase bBase)
+    #region hooks
+        public virtual bool OnMouseEnter(ButtonBase bBase)
         {
-            return true;
+            return DisplayState.onMouseEnter==null || DisplayState.onMouseEnter(bBase);
         }
+
+        public virtual bool OnMouseLeave(ButtonBase bBase)
+        {
+            return DisplayState.onMouseLeave==null || DisplayState.onMouseLeave(bBase);
+        }
+
+        public virtual bool PreDraw(SpriteBatch sb, ButtonBase bBase)
+        {
+            return DisplayState.PreDraw==null || DisplayState.PreDraw(sb, bBase);
+        }
+
+        public virtual void PostDraw(SpriteBatch sb, ButtonBase bBase)
+        {
+            if (DisplayState.PostDraw!=null) DisplayState.PostDraw(sb, bBase);
+        }
+
+    #endregion
     }
 
     // This is basically an "On/Off" switch - has an active and an

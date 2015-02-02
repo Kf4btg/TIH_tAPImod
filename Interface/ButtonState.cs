@@ -26,6 +26,9 @@ namespace InvisibleHand
         public Func<ButtonBase,bool> onMouseEnter;
         public Func<ButtonBase,bool> onMouseLeave;
 
+        public Func<SpriteBatch, ButtonBase, bool> PreDraw;
+        public Action<SpriteBatch, ButtonBase> PostDraw;
+
         public Color tint;
 
         public ButtonState()

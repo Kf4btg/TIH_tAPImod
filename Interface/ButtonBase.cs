@@ -50,8 +50,8 @@ namespace InvisibleHand
         public float Scale { get { return scale; } set { scale = value < 0.5f ? 0.5f : value; } }
 
         // affects the alpha component of the current tint
-        private float alphaBase = 0.65f;
-        private float alphaMult = 0.65f;
+        private float alphaBase = 0.85f;
+        private float alphaMult = 0.85f;
         // gets current alpha (modified by container opacity), sets current and base alpha values
         public float Alpha { get { return alphaMult*Container.LayerOpacity; } set { alphaMult = alphaBase = value; }}
 
@@ -142,11 +142,14 @@ namespace InvisibleHand
                 {
                     if (!hasMouseFocus) { hasMouseFocus=true; OnMouseEnter(); }
                     OnHover();
+
+                    currentContext.PostDraw(sb, this);
                     return;
                 }
                 if (hasMouseFocus) { OnMouseLeave(); }
                 hasMouseFocus=false;
             // }
+            currentContext.PostDraw(sb, this);
         }
 
         // rare affects the color of the text (0 is default);

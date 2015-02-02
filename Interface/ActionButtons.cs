@@ -94,6 +94,9 @@ namespace InvisibleHand
         private float posX;
         private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4;
 
+        //position offset for the "locked" icon on QS/DA
+        private readonly Vector2 lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2), -(float)(int)((float)Constants.ButtonH/2));
+
         //just use this index internally...
         private readonly string[] label = {
             "Sort Chest",               //0
@@ -164,6 +167,10 @@ namespace InvisibleHand
             States[4].onClick      = States[3].onClick;
             States[4].onRightClick = States[3].onRightClick;
 
+            //draw the lock icon
+            States[4].PostDraw =
+                (sb, bBase) => sb.Draw(IHBase.lockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha);
+
             // create the button, setting its state from ActionLocked()
             mbase.ButtonRepo[label[3]] = new IHToggle(
                 States[3],
@@ -201,6 +208,9 @@ namespace InvisibleHand
 
             States[7].onClick      = States[6].onClick;
             States[7].onRightClick = States[6].onRightClick;
+
+            States[7].PostDraw =
+                (sb, bBase) => sb.Draw(IHBase.lockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha);
 
             mbase.ButtonRepo[label[6]] = new IHToggle(States[6], States[7],
                 () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA), //IsActive()

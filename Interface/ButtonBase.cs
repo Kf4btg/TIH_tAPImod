@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -34,10 +34,10 @@ namespace InvisibleHand
         // defines the current appearance and functionality of the button
         private IHButton currentContext;
         public IHButton CurrentContext { get { return currentContext; } }
-        public ButtonState CurrentState { get { return currentContext.displayState; } }
+        public ButtonState CurrentState { get { return currentContext.DisplayState; } }
 
         //and here's our choices
-        private Dictionary<String, IHButton> contexts; //welp.
+        // private Dictionary<String, IHButton> contexts; //welp.
 
         // will be set at construction
         public readonly Vector2 Position;
@@ -73,8 +73,8 @@ namespace InvisibleHand
         {
             Container = container;
 
-            contexts = new Dictionary<String, IHButton>();
-            contexts.Add(defaultContext.Name, defaultContext);
+            // contexts = new Dictionary<String, IHButton>();
+            // contexts.Add(defaultContext.Name, defaultContext);
 
             DefaultContext = currentContext = defaultContext;
             Name = defaultContext.Name;
@@ -85,19 +85,19 @@ namespace InvisibleHand
             // center = ButtonBounds.Center;
         }
 
-        public void Add(IHButton newContext)
-        {
-            if (!contexts.ContainsKey(newContext.Name)) contexts.Add(newContext.Name, newContext);
-        }
+        // public void Add(IHButton newContext)
+        // {
+        //     if (!contexts.ContainsKey(newContext.Name)) contexts.Add(newContext.Name, newContext);
+        // }
 
         // this makes sure we don't switch to a context not associated with this button
-        public void ChangeContext(String newContext)
-        {
-            if (contexts.ContainsKey(newContext)) ChangeContext(contexts[newContext]);
-        }
+        // public void ChangeContext(String newContext)
+        // {
+        //     if (contexts.ContainsKey(newContext)) ChangeContext(contexts[newContext]);
+        // }
 
         // switch to a new context
-        private void ChangeContext(IHButton newContext)
+        public void ChangeContext(IHButton newContext)
         {
             //set previous context un-hovered, hover new one:
             // if (hasMouseFocus) {
@@ -109,12 +109,11 @@ namespace InvisibleHand
 
         public void RegisterKeyToggle(KState.Special key, String context1, String context2)
         {
-            if (contexts.ContainsKey(context1) && contexts.ContainsKey(context2))
-                RegisterKeyToggle(key, contexts[context1], contexts[context2]);
+            RegisterKeyToggle(key, IHBase.self.ButtonRepo[context1], IHBase.self.ButtonRepo[context2]);
         }
 
         // set up key-event-subscribers that will toggle btw 2 contexts
-        private void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
+        public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
         {
             //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
             var kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
@@ -157,8 +156,8 @@ namespace InvisibleHand
         {
             //if (currentContext.OnHover(this))  //future hook?
             DrawTooltip();
-            if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.onClick();
-            if (Main.mouseRight && Main.mouseRightRelease && currentContext.onRightClick!=null) currentContext.onRightClick();
+            if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.OnClick();
+            if (Main.mouseRight && Main.mouseRightRelease && currentContext.OnRightClick!=null) currentContext.OnRightClick();
         }
 
         //hooks into the current context's onDraw function
@@ -168,7 +167,7 @@ namespace InvisibleHand
             // if the context doesn't override this default draw function
             // if (currentContext.OnDraw(sb, this))
             // {
-                sb.DrawIHButton(this, currentContext.displayState);
+                sb.DrawIHButton(this, currentContext.DisplayState);
 
                 if (IsHovered)
                 {
@@ -187,8 +186,8 @@ namespace InvisibleHand
         public void DrawTooltip(int rare=0, byte diff=0)
         {
             //only draw if displaying texture
-            if (currentContext.texture!=null) {
-                API.main.MouseText(currentContext.displayLabel, rare, diff);
+            if (currentContext.Texture!=null) {
+                API.main.MouseText(currentContext.Label, rare, diff);
                 Main.mouseText = true;
             }
         }

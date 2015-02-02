@@ -10,54 +10,42 @@ namespace InvisibleHand
     {
         public string label;
         public Texture2D texture;
-        // public Rectangle? sourceRect;
-        // public Rectangle? altSourceRect;
-        public TexSources texSource;
+
+        public Rectangle? defaultTexels;  //texture source rectangle for base, non-mouseover appearance
+        public Rectangle? altTexels;    //texture source rect for mouseover appearance
+
         public Action onClick;
         public Action onRightClick;
+
         public Func<ButtonBase,bool> onMouseEnter;
         public Func<ButtonBase,bool> onMouseLeave;
+
         public Color tint;      //How to tint the texture when this state is active
-
-
 
         public ButtonState()
         {
-            label        = "Button";
-            texture      = null;
-            // sourceRect   = null;
-            // altSourceRect= null;
-            // texSource  = null;    --this is unnecessary
-            onClick      = null;
-            onRightClick = null;
-            onMouseEnter = null;
-            onMouseLeave = null;
-            tint         = Color.White;
+            label         = "Button";
+            texture       = null;
+            altTexels     = null;
+            defaultTexels = null;
+            onClick       = null;
+            onRightClick  = null;
+            onMouseEnter  = null;
+            onMouseLeave  = null;
+            tint          = Color.White;
         }
 
-        public ButtonState(string label, Texture2D tex=null, Rectangle? sourceRect=null, Action onClick=null, Action onRightClick=null, Color? tintColor = null)
+        public ButtonState(string label, Texture2D tex=null, Rectangle? defaultTexels=null, Action onClick=null, Action onRightClick=null, Color? tintColor = null)
         {
-            this.label        = label;
-            this.texture      = tex;
-            // this.sourceRect   = sourceRect;
-            // this.altSourceRect=null;
-            texSource.Main = sourceRect;
-            this.onClick      = onClick;
-            this.onRightClick = onRightClick;
-            this.onMouseEnter = null;
-            this.onMouseLeave = null;
-            this.tint         = tintColor ?? Color.White;
-        }
-
-        public void SetSourceRect(int x, int y, int w, int h)
-        {
-            // sourceRect = new Rectangle(x,y,w,h);
-            texSource.Main = new Rectangle(x,y,w,h);
-        }
-
-        public void SetAltSourceRect(int x, int y, int w, int h)
-        {
-            texSource.Alt = new Rectangle(x,y,w,h);
+            this.label         = label;
+            this.texture       = tex;
+            this.defaultTexels = defaultTexels;
+            this.altTexels     = null;
+            this.onClick       = onClick;
+            this.onRightClick  = onRightClick;
+            this.onMouseEnter  = null;
+            this.onMouseLeave  = null;
+            this.tint          = tintColor ?? Color.White;
         }
 
         public ButtonState Duplicate()
@@ -65,9 +53,8 @@ namespace InvisibleHand
             var bsNew          = new ButtonState();
             bsNew.label        = label;
             bsNew.texture      = texture;
-            // bsNew.sourceRect   = sourceRect;
-            // bsNew.altSourceRect= altSourceRect;
-            bsNew.texSource = texSource;
+            bsNew.altTexels    = altTexels;
+            bsNew.defaultTexels= defaultTexels;
             bsNew.onClick      = onClick;
             bsNew.onRightClick = onRightClick;
             bsNew.tint         = tint;
@@ -81,27 +68,13 @@ namespace InvisibleHand
         {
             label        = bsCopy.label;
             texture      = bsCopy.texture;
-            // sourceRect   = bsCopy.sourceRect;
-            // altSourceRect= bsCopy.altSourceRect;
-            texSource = bsCopy.texSource;
+            altTexels    = bsCopy.altTexels;
+            defaultTexels= bsCopy.defaultTexels;
             onClick      = bsCopy.onClick;
             onRightClick = bsCopy.onRightClick;
             tint         = bsCopy.tint;
             onMouseEnter = bsCopy.onMouseEnter;
             onMouseLeave = bsCopy.onMouseLeave;
         }
-
-        /**
-         * Data Structures
-         */
-        public struct TexSources
-        {
-            //immutable once set
-            public Rectangle? Main { get;
-                set { if (!this.Main.HasValue) this.Main=value; } }
-            public Rectangle? Alt { get;
-                set { if (!this.Alt.HasValue) this.Alt=value; } }
-        }
-
     }
 }

@@ -48,7 +48,7 @@ namespace InvisibleHand
                     ) );
 
             Buttons.Add(IHAction.Sort,
-                        new ButtonBase(mbase.ButtonRepo["Sort"]) );
+                        new ButtonBase(this, mbase.ButtonRepo["Sort"]) );
 
             /** --Create Stack Button-- **/
 
@@ -61,7 +61,7 @@ namespace InvisibleHand
 
             mbase.ButtonRepo.Add(label,  new IHButton(States[label], new Vector2(posX, posY)) );
 
-            Buttons.Add(IHAction.Stack, new ButtonBase(mbase.ButtonRepo[label]));
+            Buttons.Add(IHAction.Stack, new ButtonBase(this,mbase.ButtonRepo[label]));
         }
 
         /*************************************************************************
@@ -75,8 +75,8 @@ namespace InvisibleHand
             var bState = new ButtonState(label);
 
             bState.texture      = IHBase.ButtonGrid;
-            bState.texSource.Main   = Rects[label];
-            bState.texSource.Alt    = MRects[label];
+            bState.defaultTexels   = Rects[label];
+            bState.altTexels    = MRects[label];
 
             //this should no longer be necessary now that SourceRect is being set dynamically in ButtonBase
             // bState.onMouseEnter = bb => { bState.texSource = MRects[label]; return true;};
@@ -144,7 +144,7 @@ namespace InvisibleHand
                KState.Special.Shift,
                new Vector2(posX,posY)) );
 
-            Buttons.Add(IHAction.Sort, new ButtonBase(mbase.ButtonRepo[label[0]]));
+            Buttons.Add(IHAction.Sort, new ButtonBase(this, mbase.ButtonRepo[label[0]]));
 
             // if (replaceVanilla){}
             // else{
@@ -162,7 +162,7 @@ namespace InvisibleHand
             mbase.ButtonRepo[label[2]] = new IHButton(States[2], new Vector2(posX, posY));
             // mbase.ButtonRepo.Add(label, new IHButton(States[label], new Vector2(posX, posY)) );
 
-            Buttons.Add(IHAction.Refill, new ButtonBase(mbase.ButtonRepo[label[2]]));
+            Buttons.Add(IHAction.Refill, new ButtonBase(this, mbase.ButtonRepo[label[2]]));
 
             //quickstack will be 2-state toggle button (locked/unlocked) that toggles on right click
 
@@ -196,7 +196,7 @@ namespace InvisibleHand
             //FIXME: shifting states while hovering the button displays the buttons's non-mouseover texture
             //until the mouse is moved off of and back on to the button.
             //FIXME: likewise, this leaves the previous state in its mouseover appearance until re-moused.
-            Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, mbase.ButtonRepo[label[2]], mbase.ButtonRepo[label[3]]);
+            Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, label[2], label[3]);
 
             //******************************************//
             // --Create SmartStash/DepositAll Button--  //
@@ -208,7 +208,7 @@ namespace InvisibleHand
             States[5].onClick = IHSmartStash.SmartDeposit;
 
             mbase.ButtonRepo[label[5]] = new IHButton(States[5], new Vector2(posX, posY));
-            Buttons.Add(IHAction.Deposit, new ButtonBase(mbase.ButtonRepo[label[5]]));
+            Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[label[5]]));
 
             //deposit all
             // label   = "Deposit All (Unlocked)";
@@ -231,7 +231,7 @@ namespace InvisibleHand
             mbase.ButtonUpdates.Push(label[6]);
 
             //create keywatchers
-            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, mbase.ButtonRepo[label[5]], mbase.ButtonRepo[label[6]]);
+            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, label[5], label[6]);
 
             //increase base alpha of chest buttons
             Buttons[IHAction.Deposit].Alpha = Buttons[IHAction.Refill].Alpha = Buttons[IHAction.Sort].Alpha = 0.8f;
@@ -282,8 +282,8 @@ namespace InvisibleHand
             var bState = new ButtonState(label[index]);
 
             bState.texture      = IHBase.ButtonGrid;
-            bState.texSource.Main   = Rects[index];
-            bState.texSource.Alt    = MRects[index];
+            bState.defaultTexels   = Rects[index];
+            bState.altTexels    = MRects[index];
             // bState.onMouseEnter = bb => { bState.texSource = MRects[index]; return true;};
             // bState.onMouseLeave = bb => { bState.texSource = Rects[index]; return true;};
             // States[label].tint         = btnTint;

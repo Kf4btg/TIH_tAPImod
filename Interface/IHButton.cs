@@ -20,31 +20,31 @@ namespace InvisibleHand
         public readonly string Name;
 
         public Vector2 pos;
-        public bool isHovered;
+        // public bool isHovered;
 
-        public ButtonState displayState { get; protected set; }
+        public ButtonState DisplayState { get; protected set; }
         //these for backwards-compat (Temporary?)
-        public Action onClick       { get { return displayState.onClick;}       protected set { displayState.onClick=value; } }
-        public Action onRightClick  { get { return displayState.onRightClick;}  protected set { displayState.onRightClick=value; } }
-        public string displayLabel  { get { return displayState.label;}         protected set { displayState.label=value; } }
-        public Texture2D texture    { get { return displayState.texture;}       protected set { displayState.texture=value; } }
+        public Action OnClick       { get { return DisplayState.onClick;}       }// protected set { DisplayState.onClick=value; } }
+        public Action OnRightClick  { get { return DisplayState.onRightClick;}  }//protected set { DisplayState.onRightClick=value; } }
+        public string Label         { get { return DisplayState.label;}         }//protected set { DisplayState.label=value; } }
+        public Texture2D Texture    { get { return DisplayState.texture;}       }//protected set { DisplayState.texture=value; } }
+        public Color Tint           { get { return DisplayState.tint;}          }//protected set { DisplayState.tint=value; } }
 
-        public Rectangle? ActiveRect   { get { return displayState.texSource.Alt;}}
-        public Rectangle? InactiveRect { get { return displayState.texSource.Main;}}
-        public Color tint           { get { return displayState.tint;}          protected set { displayState.tint=value; } }
+        public Rectangle? InactiveRect { get { return DisplayState.defaultTexels;}}
+        public Rectangle? ActiveRect   { get { return DisplayState.altTexels;}}
 
         public Vector2 Size
         {
             get {
-                return (displayState.texture!=null) ?
-                    (InactiveRect.HasValue ? InactiveRect.Value.Size() : displayState.texture.Size()) :
-                Main.fontMouseText.MeasureString(displayState.label);
+                return (Texture!=null) ?
+                    (InactiveRect.HasValue ? InactiveRect.Value.Size() : Texture.Size()) :
+                Main.fontMouseText.MeasureString(Label);
             }
         }
 
         public IHButton(Vector2? pos=null)
         {
-            this.displayState = new ButtonState();
+            this.DisplayState = new ButtonState();
             this.pos = pos ?? default(Vector2);
         }
 
@@ -52,14 +52,14 @@ namespace InvisibleHand
         // public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Vector2? pos=null, Color? tintColor = null)
         // {
         //     this.Name = name;
-        //     this.displayState = new ButtonState(name, tex, source, onClick, null, tintColor ?? Color.White);
+        //     this.DisplayState = new ButtonState(name, tex, source, onClick, null, tintColor ?? Color.White);
         //     this.pos = pos ?? default(Vector2);
         // }
         // //with right click
         // public IHButton(string name, Texture2D tex, Action onClick, Rectangle? source, Action onRightClick=null, Vector2? pos=null, Color? tintColor = null)
         // {
         //     this.Name = name;
-        //     this.displayState = new ButtonState(name, tex, source, onClick, onRightClick, tintColor ?? Color.White);
+        //     this.DisplayState = new ButtonState(name, tex, source, onClick, onRightClick, tintColor ?? Color.White);
         //     this.pos = pos ?? default(Vector2);
         // }
 
@@ -67,24 +67,24 @@ namespace InvisibleHand
         public IHButton(ButtonState bState, Vector2? pos=null)
         {
             this.Name = bState.label;
-            this.displayState = bState;
+            this.DisplayState = bState;
             this.pos = pos ?? default(Vector2);
         }
 
         protected virtual void SetState(ButtonState newState)
         {
-            displayState = newState;
+            DisplayState = newState;
         }
 
         public virtual bool OnMouseEnter(ButtonBase bBase)
         {
-            if (displayState.onMouseEnter!=null) return displayState.onMouseEnter(bBase);
+            if (DisplayState.onMouseEnter!=null) return DisplayState.onMouseEnter(bBase);
             return true;
         }
 
         public virtual bool OnMouseLeave(ButtonBase bBase)
         {
-            if (displayState.onMouseLeave!=null) return displayState.onMouseLeave(bBase);
+            if (DisplayState.onMouseLeave!=null) return DisplayState.onMouseLeave(bBase);
             return true;
         }
 
@@ -92,36 +92,31 @@ namespace InvisibleHand
         public virtual void OnUpdate()
         {       }
 
-        public virtual void Draw(SpriteBatch sb)
-        {
-            if (displayState.texture==null)
-                sb.DrawString(Main.fontMouseText, displayState.label, pos, displayState.tint);
-            else
-                sb.Draw(displayState.texture, pos, displayState.tint);
-
-            if (IHButton.Hovered(this))
-            {
-                if (!isHovered)
-                {
-                    Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
-                    isHovered = true;
-                }
-
-                Main.localPlayer.mouseInterface = true;
-                if (Main.mouseLeft && Main.mouseLeftRelease) onClick();
-                if (Main.mouseRight && Main.mouseRightRelease && onRightClick!=null) onRightClick();
-            }
-            else isHovered = false;
-        }
+        // public virtual void Draw(SpriteBatch sb)
+        // {
+        //     if (DisplayState.texture==null)
+        //         sb.DrawString(Main.fontMouseText, Label, pos, Tint);
+        //     else
+        //         sb.Draw(Texture, pos, Tint);
+        //
+        //     if (IHButton.Hovered(this))
+        //     {
+        //         if (!isHovered)
+        //         {
+        //             Main.PlaySound(12, -1, -1, 1); // "mouse-over" sound
+        //             isHovered = true;
+        //         }
+        //
+        //         Main.localPlayer.mouseInterface = true;
+        //         if (Main.mouseLeft && Main.mouseLeftRelease) OnClick();
+        //         if (Main.mouseRight && Main.mouseRightRelease && OnRightClick!=null) OnRightClick();
+        //     }
+        //     else isHovered = false;
+        // }
 
         public virtual bool OnDraw(SpriteBatch sb, ButtonBase bBase)
         {
             return true;
-        }
-
-        public static bool Hovered(IHButton b)
-        {
-            return (new Rectangle((int)b.pos.X, (int)b.pos.Y, (int)b.Size.X, (int)b.Size.Y).Contains(Main.mouseX, Main.mouseY));
         }
     }
 
@@ -152,7 +147,7 @@ namespace InvisibleHand
                 ActiveState   = new ButtonState(activeLabel,   tex, null, DoToggle );
                 InactiveState = new ButtonState(inactiveLabel, tex, null, DoToggle, null, Color.Gray );
             }
-            displayState = ActiveState;
+            DisplayState = ActiveState;
         }
 
         public IHToggle(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive, Vector2? pos = null, bool toggleOnRightClick = false) : base(pos)
@@ -176,7 +171,7 @@ namespace InvisibleHand
             ActiveState   = activeState;
             InactiveState = inactiveState;
 
-            displayState = ActiveState; //just to make sure nothing is null
+            DisplayState  = ActiveState; //just to make sure nothing is null
         }
 
         public void DoToggle()
@@ -214,7 +209,7 @@ namespace InvisibleHand
     {
         private readonly ButtonState defaultState;
         private readonly ButtonState altState;
-        // public String CurrentState { get { return displayState.label; } }
+        // public String CurrentState { get { return DisplayState.label; } }
 
         private readonly KeyWatcher[] keySwitch; //well this is cheesy
 
@@ -224,7 +219,7 @@ namespace InvisibleHand
             this.defaultState = defaultState;
             this.altState     = altState;
 
-            this.displayState = defaultState;
+            this.DisplayState = defaultState;
 
             if (watchedKey!=null)
             {
@@ -283,23 +278,5 @@ namespace InvisibleHand
     }
 
 */
-
-
-    // public class ButtonContext
-    // {
-    //     public String stateName;
-    //     public Func<bool> isCurrent;
-    //     public Tuple<KState.Special, KeyEventProvider.Event> watchKey;
-    //
-    //
-    //     public ButtonContext(String sn, Func<bool> ic, Tuple<KState.Special, KeyEventProvider.Event> wk=null)
-    //     {
-    //         stateName = sn;
-    //         isCurrent = ic;
-    //         watchKey = wk;
-    //     }
-    // }
-
-
 
 }

@@ -19,9 +19,9 @@ namespace InvisibleHand
         protected float opacity_active = 1.0f;
 
         //TODO: have this fade in/out?
-        public float LayerOpacity { get; private set; } }
+        public float LayerOpacity { get; private set; } 
 
-        protected ButtonLayer(string name) : base(IHBase.self.mod.InternalName + name)
+        protected ButtonLayer(string name) : base(IHBase.self.mod.InternalName + ":" + name)
         {
             Buttons = new Dictionary<IHAction, ButtonBase>();
             ButtonFrame = Rectangle.Empty;

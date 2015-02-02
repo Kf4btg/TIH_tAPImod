@@ -59,7 +59,7 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
-                    Main.PlaySound(22); // I think this is the actual "lock" sound
+                    Main.PlaySound(22); // the actual "lock" sound
                 }
             }
             return false;
@@ -136,15 +136,5 @@ namespace InvisibleHand
             }
             return true;
         }
-
-        // public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)
-        // {
-        //     if (IHBase.oLockingEnabled && slot.type == "Inventory" && slot.index >=10 && IHPlayer.SlotLocked(slot.index))
-        //     {
-        //
-        //     }
-        //     return null;
-        // }
-
     }
 }

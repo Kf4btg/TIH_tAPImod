@@ -10,22 +10,19 @@ namespace InvisibleHand
 
     public class InventoryButtons : ButtonLayer
     {
-        //let's try to put these above the coins/ammo slot, instead. Should be less intrusive.
+        //put these above the coins/ammo slot to be less intrusive.
         private float posX = 496;
-        private const float posY = 28; //doesn't change
+        private const float posY = 28; //maintain height
 
         // these dictionaries are all keyed on the state's label
         private readonly Dictionary<String,ButtonState> States = new Dictionary<String,ButtonState>();
         private readonly Dictionary<String,Rectangle?> Rects   = new Dictionary<String,Rectangle?>(); // source rectangle for the button's inactive appearance
         private readonly Dictionary<String,Rectangle?> MRects  = new Dictionary<String,Rectangle?>(); // source rect for mouseover appearance
 
-        private readonly Color bgColor = Constants.InvSlotColor*0.8f; //make the bg translucent even at max button alpha
+        private readonly Color bgColor = Constants.InvSlotColor*0.8f; //make the bg translucent even at max button opacity
 
         public InventoryButtons(IHBase mbase) : base("InventoryButtons")
         {
-            /*
-            Main.inventoryScale=0.85)
-            */
             /** --Create Sort Button-- **/
             //default state
             String label = "Sort";
@@ -33,7 +30,6 @@ namespace InvisibleHand
             States[label].onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]);
 
             //altState
-
             label = "Sort (Reverse)";
             SetUpStateBasics(label);
 
@@ -51,7 +47,6 @@ namespace InvisibleHand
                         new ButtonBase(this, mbase.ButtonRepo["Sort"]) );
 
             /** --Create Stack Button-- **/
-
             posX = 532;
 
             label = "Clean Stacks";
@@ -74,13 +69,9 @@ namespace InvisibleHand
 
             var bState = new ButtonState(label);
 
-            bState.texture      = IHBase.ButtonGrid;
-            bState.defaultTexels   = Rects[label];
-            bState.altTexels    = MRects[label];
-
-            //this should no longer be necessary now that SourceRect is being set dynamically in ButtonBase
-            // bState.onMouseEnter = bb => { bState.texSource = MRects[label]; return true;};
-            // bState.onMouseLeave = bb => { bState.texSource = Rects[label]; return true;};
+            bState.texture       = IHBase.ButtonGrid;
+            bState.defaultTexels = Rects[label];
+            bState.altTexels     = MRects[label];
 
             States.Add(label, bState);
         }
@@ -100,11 +91,8 @@ namespace InvisibleHand
 
     public class ChestButtons : ButtonLayer
     {
-        /*if this is true (will likely be a mod-option), replace the text buttons to the right of chests with multifunctional icons*/
-        // public readonly bool replaceVanilla = false;
-
-        private float posX; // = 453 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE);
-        private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4; //doesn't change
+        private float posX;
+        private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4;
 
         //just use this index internally...
         private readonly string[] label = {
@@ -131,7 +119,7 @@ namespace InvisibleHand
             //*******************************//
             posX = 453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE); //leftmost
 
-            // String label   = "Sort Chest";
+            //  label   = "Sort Chest";
             SetUpStateBasics(0);
             States[0].onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]);
 
@@ -146,9 +134,6 @@ namespace InvisibleHand
 
             Buttons.Add(IHAction.Sort, new ButtonBase(this, mbase.ButtonRepo[label[0]]));
 
-            // if (replaceVanilla){}
-            // else{
-
             //*********************************//
             // Create Refill/QuickStack Button //
             //*********************************//
@@ -158,18 +143,15 @@ namespace InvisibleHand
             SetUpStateBasics(2);
             States[2].onClick = IHSmartStash.SmartLoot;
 
-            //create button
             mbase.ButtonRepo[label[2]] = new IHButton(States[2], new Vector2(posX, posY));
-            // mbase.ButtonRepo.Add(label, new IHButton(States[label], new Vector2(posX, posY)) );
 
             Buttons.Add(IHAction.Refill, new ButtonBase(this, mbase.ButtonRepo[label[2]]));
 
-            //quickstack will be 2-state toggle button (locked/unlocked) that toggles on right click
-
-            // create default unlocked state
             // label = "Quick Stack";
             SetUpStateBasics(3);
 
+            //quickstack is 2-state toggle button (locked/unlocked) that toggles on right click
+            // create default unlocked state
             States[3].onClick = IHUtils.DoQuickStack;
             States[3].onRightClick = () => {
                 Main.PlaySound(22); //lock sound
@@ -183,19 +165,16 @@ namespace InvisibleHand
             States[4].onRightClick = States[3].onRightClick;
 
             // create the button, setting its state from ActionLocked()
-            //can leave the position null since the position for this button has already been established
             mbase.ButtonRepo[label[3]] = new IHToggle(
                 States[3],
                 States[4],
                 () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), //IsActive()
-                null, //pos=null
+                null, //can leave position null since position for this button has already been set
                 true); //toggleOnRightClick=true
-            mbase.ButtonUpdates.Push(label[3]);
+
+            mbase.ButtonUpdates.Push(label[3]); //set it's state to be initialized on World Load
 
             //now create keywatchers to toggle the button from restock to quickstack when Shift is pressed
-            //FIXME: shifting states while hovering the button displays the buttons's non-mouseover texture
-            //until the mouse is moved off of and back on to the button.
-            //FIXME: likewise, this leaves the previous state in its mouseover appearance until re-moused.
             Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, label[2], label[3]);
 
             //******************************************//
@@ -210,7 +189,6 @@ namespace InvisibleHand
             mbase.ButtonRepo[label[5]] = new IHButton(States[5], new Vector2(posX, posY));
             Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[label[5]]));
 
-            //deposit all
             // label   = "Deposit All (Unlocked)";
             SetUpStateBasics(6);
             States[6].onClick = IHUtils.DoDepositAll;
@@ -218,7 +196,6 @@ namespace InvisibleHand
                 Main.PlaySound(22); //lock sound
                 IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); };
 
-            //locked
             // label   = "Deposit All (Locked)";
             SetUpStateBasics(7);
 
@@ -233,42 +210,8 @@ namespace InvisibleHand
             //create keywatchers
             Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, label[5], label[6]);
 
-            //increase base alpha of chest buttons
-            Buttons[IHAction.Deposit].Alpha = Buttons[IHAction.Refill].Alpha = Buttons[IHAction.Sort].Alpha = 0.8f;
-
-        #region loot_all_button
-            // --Create LootAll Button-- //
-            // posY += (Main.inventoryBackTexture.Height);
-            //
-            // bsD = new ButtonState();
-            // bsD.label = "Loot All";
-            // bsD.texture = mbase.textures["resources/btn_loot"];
-            // bsD.onClick = IHUtils.DoLootAll;
-            //
-            // Buttons.Add(IHAction.LA, new ButtonBase( new IHButton(bsD, new Vector2(posX, posY))));
-        #endregion
-        // }
-
-        #region calcs
-            /*
-            (all the following multiplied by Main.inventoryScale=0.755)
-            chest slots begin at X=73px, Y=Main.invBottom
-            Chest slots take up 56x56px
-            chest inventory width = 560px
-            chest inv height = 224 px
-            bottom of chest slots = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE)
-
-            trash.X = 448+5   = 453
-            trash.Y = 258+168 = 426
-
-            Positions (right->left from trash location)
-            Button1 = ( 453-56, 426 ) = (397,426)
-            Button2 = ( 397-56, 426 ) = (341,426)
-            Button3 = ...
-
-            */
-        #endregion
-
+            //increase base alpha of chest buttons TODO: test if this is still necessary
+            // Buttons[IHAction.Deposit].Alpha = Buttons[IHAction.Refill].Alpha = Buttons[IHAction.Sort].Alpha = 0.8f;
         }
 
         /*************************************************************************
@@ -281,12 +224,9 @@ namespace InvisibleHand
 
             var bState = new ButtonState(label[index]);
 
-            bState.texture      = IHBase.ButtonGrid;
-            bState.defaultTexels   = Rects[index];
-            bState.altTexels    = MRects[index];
-            // bState.onMouseEnter = bb => { bState.texSource = MRects[index]; return true;};
-            // bState.onMouseLeave = bb => { bState.texSource = Rects[index]; return true;};
-            // States[label].tint         = btnTint;
+            bState.texture       = IHBase.ButtonGrid;
+            bState.defaultTexels = Rects[index];
+            bState.altTexels     = MRects[index];
 
             States[index] = bState;
         }
@@ -302,6 +242,5 @@ namespace InvisibleHand
                 kvp.Value.Draw(sb);
             }
         }
-
     }
 }

@@ -5,10 +5,8 @@ using TAPI;
 using Terraria;
 using Terraria.ID;
 
-
 namespace InvisibleHand
 {
-
     public static class IHExtensions
     {
 
@@ -33,7 +31,7 @@ namespace InvisibleHand
         }
 
         public static bool IsBomb(this Item item)
-        {            //grenades, bombs, etc
+        {   //grenades, bombs, etc
             return ProjDef.byType.ContainsKey(item.shoot) && ProjDef.byType[item.shoot].aiStyle==16;
         }
 
@@ -76,88 +74,7 @@ namespace InvisibleHand
             return frame.Contains(Main.mouseX, Main.mouseY);
         }
 
-
-
-
     #endregion
 
-    #region colorandpointstuff
-    /*
-        public static Color Invert(this Color c)
-        {
-            return new Color(255-c.R, 255-c.G, 255-c.B, 255);
-        }
-
-        public static Color Rotate(this Color c)
-        {
-            return new Color(c.B, c.R, c.G, 255);
-        }
-
-        public static Color GetMapColor(this Point p, bool applyLighting=false)
-        {
-            return GetMapColor(new TilePoint(p), applyLighting);
-        }
-
-        public static Color GetMapColor(this TilePoint pTile, bool applyLighting=false)
-        {
-            Color mColor;
-            try
-            {
-                //this is sometimes null
-                Main.map[pTile.X,pTile.Y].getColor(out mColor, pTile.Y);
-            }
-            catch
-            {
-                mColor = Color.White;
-            }
-
-            if (applyLighting)
-            {
-                Color lighting = Lighting.GetColor(pTile.X, pTile.Y);
-                float scale = (float)(lighting.R+lighting.G+lighting.B)/3/255;
-
-                mColor*=scale;
-            }
-            return mColor;
-        }
     }
-
-    public struct TilePoint
-    {
-        public int X;
-        public int Y;
-
-        public int scrX;
-        public int scrY;
-
-        public TilePoint(int x, int y)
-        {
-            X=x;
-            Y=y;
-
-            scrX = (x - API.main.firstTileX)*16;
-            scrY = (y - API.main.firstTileY)*16;
-        }
-
-        // public TilePoint(Vector2 coords)
-        // {
-        //     X=(int)(coords.X/16);
-        //     Y=(int)(coords.Y/16);
-        // }
-
-        public TilePoint(Point screenPoint)
-        {
-            scrX=screenPoint.X;
-            scrY=screenPoint.Y;
-            X=ConvertToTileCoords(screenPoint.X, true);
-            Y=ConvertToTileCoords(screenPoint.Y, false);
-        }
-
-        public static int ConvertToTileCoords(int num, bool onXaxis)
-        {
-            return onXaxis ? (int)(API.main.firstTileX + (float)num/16) : (int)(API.main.firstTileY + (float)num/16);
-        }*/
-    }
-    #endregion
-
 }

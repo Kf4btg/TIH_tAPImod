@@ -15,7 +15,7 @@ namespace InvisibleHand
 
         public override void Initialize()
         {
-            // MUST use "new", as tAPI derps with clearing (quote: Miraimai)
+            // MUST use "new", as tAPI derps with clearing (quoth: Miraimai)
             lockedSlots = new bool[40]; //not the hotbar
 
             LockedActions = new Dictionary<IHAction,bool>();
@@ -72,7 +72,6 @@ namespace InvisibleHand
                 // not talking to an npc
             if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && Main.localPlayer.talkNPC==-1)
             {
-
                 if (IHBase.ActionKeys["sort"].Pressed()) // Sort inventory/chest
                 {
                     // NOTE: this used to check player.chestItems==null, but I once got a
@@ -80,7 +79,7 @@ namespace InvisibleHand
                     // with that check elsewhere in the code. This should be safer and have the exact same result.
                     if ( player.chest == -1 ) // no valid chest open, sort player inventory
                     {
-                        // control_rSort XOR oRevSortPlayer:
+                        // shift-pressed XOR Reverse-sort-mod-option:
                         //   this will reverse the sort IFF exactly one of these two bools is true
                         IHOrganizer.SortPlayerInv(player, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortPlayer"]);
                         return;
@@ -132,9 +131,7 @@ namespace InvisibleHand
         public static bool ActionLocked(Player player, IHAction actionID)
         {
             IHPlayer mp = player.GetSubClass<IHPlayer>();
-            // try { // if the key isn't there (e.g. new character, etc) return false
                 return mp.LockedActions[actionID];
-            // } catch {return false;}
         }
 
         public static void ToggleActionLock(Player p, IHAction actionID)

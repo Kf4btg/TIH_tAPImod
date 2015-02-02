@@ -22,15 +22,15 @@ namespace InvisibleHand
             Item[] chestItems = Main.localPlayer.chestItems;
             bool sendNetMsg   = Main.localPlayer.chest >-1;
 
-            // create a query that creates category groups for the items in the chests,
-            // then pull out the category keys into a distinct list
+            // define a query that creates category groups for the items in the chests,
+            // then pulls out the category keys into a distinct list
             List<ItemCat> catList =
                     (from item in chestItems
                         where !item.IsBlank()
                         group item by item.GetCategory() into catGroup
                         from cat in catGroup
-                        select catGroup.Key).Distinct()
-                        .ToList();
+                        select catGroup.Key).Distinct() //no duplicates
+                        .ToList(); //store the query results
 
             if (IHBase.ModOptions["LockingEnabled"]) //slot locking on
             {
@@ -61,14 +61,7 @@ namespace InvisibleHand
         *   QuickStack and LootAll methods.
         *   Also based a fair bit on Player.GetItem()
         *   !ref:Player:#4497.00#
-        *
-        *   @param takeAll : original implementation of this would take ALL stacks
-        *       of a matching item from the chest if even one <max stack was present
-        *       in the player's inventory. Leaving this functionality in place as a
-        *       possible future option.
-
         */
-        // public static void SmartLoot(bool takeAll = false)
         public static void SmartLoot()
         {
             if (Main.localPlayer.chest == -1) return;
@@ -76,27 +69,6 @@ namespace InvisibleHand
             Item[] pInventory = Main.localPlayer.inventory;
             Item[] chestItems = Main.localPlayer.chestItems;
             bool sendNetMsg   = Main.localPlayer.chest >-1;
-
-            #region takeAll
-                // if (takeAll){
-                //     //for each item in inventory (including coins, ammo, hotbar)...
-                //     for (int i=0; i<58; i++)
-                //     {
-                //         //...if item is not blank && not a full stack...
-                //         if (!pInventory[i].IsBlank() && pInventory[i].stack < pInventory[i].maxStack)
-                //         {   //...check every item in chest...
-                //             for (int j=0; j<Chest.maxItems; j++)
-                //             {   //...for a matching item...
-                //                 if (chestItems[j].IsTheSameAs(pInventory[i]))
-                //                 {   //...and move it to the Player's inventory
-                //                     chestItems[j] = Main.localPlayer.GetItem(Main.localPlayer.whoAmI, chestItems[j]);
-                //                     if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
-                //                 }
-                //             }
-                //         }
-                //     }
-                // return;}
-                #endregion
 
             int index;
             //for each item in inventory (including coins & hotbar)...

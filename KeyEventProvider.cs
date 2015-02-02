@@ -16,7 +16,9 @@ namespace InvisibleHand
         }
 
         //lists of key-specific providers
-        // private ConcurrentDictionary< Keys,           Notifier > activeProviders;
+        // private ConcurrentDictionary< Keys, Notifier > activeProviders;
+        // private Dictionary< Keys, bool > acPrevState;
+
         private ConcurrentDictionary< KState.Special, Notifier > specialProviders;
         private Dictionary< KState.Special, bool > spPrevState;
 
@@ -42,14 +44,11 @@ namespace InvisibleHand
         // add new Providers
         // public void AddProvider(Keys key)
         // {
-        //     // if (activeProviders == null) activeProviders = new ConcurrentDictionary<Keys, Provider>();
-        //     activeProviders.TryAdd(key, new KeysProvider(key));
+        //     activeProviders.TryAdd(key, new Notifier());
         // }
 
         public void AddProvider(KState.Special key)
         {
-            // if (specialProviders == null) specialProviders = new ConcurrentDictionary<KState.Special, Provider>();
-            // specialProviders.TryAdd(key, new SpecialProvider(key));
             specialProviders.TryAdd(key, new Notifier());
         }
 
@@ -88,88 +87,25 @@ namespace InvisibleHand
                     subscribers[ev].Add(handler);
             }
 
-            // public virtual void Remove(KeyEventProvider.Event ev, Action handler)
-            // {
-            //         subscribers[ev].TryTake(out handler);
-            //         subscriberCount--;
-            //
-            // }
-
             //@param keyPressed will be true if the key has changed from up to down, false if down to up
             public virtual void NotifySubscribers(bool keyPressed)
             {
                 Action handler;
-                    if (keyPressed)
-                    {
-                        while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
-                            if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
-                        }
+                if (keyPressed)
+                {
+                    while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
+                        if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
                     }
+                }
 
-                    else
-                    {
-                        while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
-                            if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
-                        }
+                else
+                {
+                    while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
+                        if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
                     }
+                }
             }
         }
-
-        // public class KeysProvider : Provider
-        // {
-        //     private readonly Keys _key;
-        //
-        //     public KeysProvider(Keys key) : base()
-        //     {
-        //         _key = key;
-        //     }
-        //
-        //     public override void UpdateSubscribers()
-        //     {
-        //         Action handler;
-        //         if (_key.Pressed())
-        //             while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
-        //                 subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler);
-        //                 handler();
-        //             }
-        //
-        //         if (_key.Released())
-        //             while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
-        //                 subscribers[KeyEventProvider.Event.Released].TryTake(out handler);
-        //                 handler();
-        //             }
-        //     }
-        // }
-
-        // public class SpecialProvider : Provider
-        // {
-        //     private readonly KState.Special _key;
-        //     private bool _down;
-        //
-        //     public SpecialProvider(KState.Special key) : base()
-        //     {
-        //         _key = key;
-        //         _down = false;
-        //     }
-        //
-        //     public override void UpdateSubscribers(bool keyPressed)
-        //     {
-        //         Action handler;
-        //             if (_key.Pressed())
-        //             {
-        //                 while (!subscribers[KeyEventProvider.Event.Pressed].IsEmpty ){
-        //                     if (subscribers[KeyEventProvider.Event.Pressed].TryTake(out handler)) handler();
-        //                 }
-        //             }
-        //
-        //             else if (_key.Released())
-        //             {
-        //                 while (!subscribers[KeyEventProvider.Event.Released].IsEmpty ){
-        //                     if (subscribers[KeyEventProvider.Event.Released].TryTake(out handler)) handler();
-        //                 }
-        //             }
-        //     }
-        // }
     }
 
     //only accepts KState.Special at the moment
@@ -180,7 +116,8 @@ namespace InvisibleHand
         private Action onKeyEvent;
 
         // allows for setting (just once!) after the watcher is created
-        public Action OnKeyEvent { set { if (onKeyEvent==null) onKeyEvent = value; } }
+        public Action OnKeyEvent {
+            set { if (onKeyEvent==null) onKeyEvent = value; } }
 
         public KeyWatcher(KState.Special k, KeyEventProvider.Event e, Action h)
         {
@@ -194,7 +131,7 @@ namespace InvisibleHand
             IHBase.KEP[key].Add(evType, onKeyEvent);
         }
 
-        // public void Unsubscribe()
+        // public void Unsubscribe()  // done automatically due to ConcurrentBag
         // {
         //     IHBase.KEP[key].Remove( evType, onKeyEvent);
         // }

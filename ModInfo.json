@@ -3,6 +3,6 @@
     "displayName"  : "The Invisible Hand",
     "author"       : "wuli1986",
     "icon"         : "IHicon",
-    "version"      : "1.2.0-rc1+tr14a",
+    "version"      : "1.2.0-rc2+tr14a",
     "info"         : "Inventory management for the organizationally-\nchallenged. Configure keys and other settings in the mod options.\n Press Sort key to sort inventory or open chest.\n Shift+right-click slot in inventory to lock it.\n Shift+Sort key reverses sort.\n Shift+Deposit-All key for Smart Deposit.\n Shift+Quickstack key for Reverse Stack."
 }

@@ -11,23 +11,21 @@ namespace InvisibleHand
     {
         // !ref:Main:#22215.29##22643.29#
         // The methods here are pretty much just cleaned up and somewhat
-        // refactored versions of the vanilla code. It really surprised
-        // me that these weren't given function-calls in the original code...
+        // refactored versions of the vanilla code (which did not wrap
+        // these functionalities in method-calls, but rather placed
+        // them inline with the DrawInventory code).
 
-        // Overall, these don't interact or rely much on the rest of the mod.
-        // TODO: make them recognize locked slots in some fashion.
 
         //------------------------------------------------------//
-        //-----------CALLABLES FOR VANILLA FUNCTIONS------------//
+        //------------CALLABLES FOR VANILLA ACTIONS-------------//
         //------------------------------------------------------//
         //  Call these methods to perform the action(s)         //
-        //  associated with their GUI-dependent vanilla         //
-        //  counterparts.                                       //
+        //  associated with their vanilla counterparts.         //
         //------------------------------------------------------//
         //  Members:                                            //
-        //      DoDepositAll(Player)                            //
-        //      DoLootAll(Player)                               //
-        //      DoQuickStack(Player)                            //
+        //      DoDepositAll()                                  //
+        //      DoLootAll()                                     //
+        //      DoQuickStack()                                  //
         //------------------------------------------------------//
 
     #region depositall
@@ -96,7 +94,7 @@ namespace InvisibleHand
                 }
             }
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
-        } // \DoLootAll()
+        }
     #endregion
 
     #region quickstack
@@ -104,7 +102,6 @@ namespace InvisibleHand
         *   DoQuickStack
         *   !ref:Main:#22476.44##22637.44#
         */
-
         public static void DoQuickStack()
         {
             DoQuickStack(Main.localPlayer);
@@ -112,7 +109,6 @@ namespace InvisibleHand
         public static void DoQuickStack(Player player)
         {
             if (player.chest == -1) return;
-            // QuickStack(player.inventory, player.chestItems,  player.chest > -1, IHPlayer.ActionLocked(player, VAction.QS));
 
             Item[] inventory = player.inventory;
             Item[] container = player.chestItems;
@@ -148,7 +144,7 @@ namespace InvisibleHand
                 }
             }
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
-            }//\QuickStack()
+        }
     #endregion
 
         //------------------------------------------------------//
@@ -167,10 +163,9 @@ namespace InvisibleHand
         //------------------------------------------------------//
 
         /**************************************************************
+        *   move item from player inventory slot to chest
         *   returns true if item moved/itemstack emptied
         */
-
-        // move item from player inventory slot to chest
         public static bool ShiftToChest(ref ItemSlot slot)
         {
             bool sendMessage = Main.localPlayer.chest > -1;
@@ -223,25 +218,27 @@ namespace InvisibleHand
                 return (slot.MyItem.IsBlank());
             }
 
-            // ShiftToPlayer returns true if original item ends up empty
+            // reminder: ShiftToPlayer returns true if original item ends up empty
             if (cItem.Matches(ItemCat.AMMO)) {
-                //ammo goes top-to-bottom
-                if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) return true;
+                if (cItem.maxStack > 1
+                && cItem.stack==cItem.maxStack
+                && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) //ammo goes top-to-bottom
+                    return true;
             }
 
             // if it's a stackable item and the stack is *full*, just shift it.
             else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
                 if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //try hotbar first, ascending order (vanilla parity)
-                ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //the other slots, descending
+                ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //then the other slots, descending
             }
 
             //if all of the above failed, then we have no empty slots.
-            // Let's save some work and get traditional:
+            // Let's save some work and go traditional:
             slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
             return (slot.MyItem.IsBlank());
         }
 
-        // attempts to move an item to an empty slot
+        // attempts to move an item to an empty slot (returns success status)
         private static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
         {
             int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
@@ -259,7 +256,6 @@ namespace InvisibleHand
             }
             return false;
         }
-
 
     #region helperfunctions
 
@@ -279,14 +275,12 @@ namespace InvisibleHand
 
         /********************************************************
         *   MoveItemToChest
-        @param iPlayer : index of the item in inventory
-        @param sendMessage : should ==true if regular chest, false for banks
-        @param desc : whether to place item towards end of chest rather than beginning
-
-        @return : True if item was (entirely) removed from source; otherwise false.
+        *    @param iPlayer : index of the item in inventory
+        *    @param sendMessage : should ==true if regular chest, false for banks
+        *    @param desc : whether to place item towards end of chest rather than beginning
+        *
+        *    @return : True if item was (entirely) removed from inventory; otherwise false.
         */
-
-        // player main inventory->chest/bank
         public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
         {
             int retIdx = MoveItemP2C (
@@ -298,7 +292,7 @@ namespace InvisibleHand
             if (retIdx > -2) // >=partial success
             {
                 RingBell();
-                if (retIdx > -1) // =full success
+                if (retIdx > -1) // =full success!
                 {
                     Main.localPlayer.inventory[iPlayer] = new Item();
                     if (sendMessage) SendNetMessage(retIdx);
@@ -316,11 +310,10 @@ namespace InvisibleHand
         *    @param desc : whether to move @item to end of @container rather than beginning
         *
         *    @return >=0 : index in @container where @item was placed/stacked
-        *             -1 : some stacked was moved, but some remains in @item
+        *             -1 : some stack was moved, but some still remains in @item
         *             -2 : failed to move @item in any fashion (stack value unchanged)
         *             -3 : @item was passed as blank
         */
-
         //for player->chest
         public static int MoveItemP2C(ref Item item, Item[] container, bool sendMessage=true, bool desc = false)
         {
@@ -347,9 +340,10 @@ namespace InvisibleHand
         }
 
         /********************************************************
-        *   Helper Helpers?
+        *   Helper Helpers? - functions used in the above helper methods
         */
-        // @return: >=0 if move succeeded; -1 if failed
+
+        // @return: >=0 (index) if move succeeded; -1 if failed
         public static int MoveToFirstEmpty(Item item, Item[] dest, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
         {
             for (int i=iStart; iCheck(i); i=iNext(i)) //!ref:Main:#22416.00#
@@ -363,14 +357,14 @@ namespace InvisibleHand
             return -1;
         }
 
-        // @return: >=0 if entire stack moved; -1 if failed to move or some remains
+        // @return: >=0 (index) if entire stack moved; -1 if failed to move or some remains
         public static int TryStackMerge(ref Item item, Item[] dest, bool sendMessage, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
         {
             //search inventory for matching non-maxed stacks
             for (int i=iStart; iCheck(i); i=iNext(i))
             {
                 Item item2 = dest[i];
-                // found a non-empty slot containing a < full stack of the same item type
+                // found a non-empty slot containing a not-full stack of the same item type
                 if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
                 {
                     if (StackMerge(ref item, dest, i)) return i;  //if item's stack was reduced to 0
@@ -381,7 +375,7 @@ namespace InvisibleHand
                     }
                     if (sendMessage) SendNetMessage(i); //still have to send this apparently
                 }
-            } // if we don't return in this loop, there is still some stack remaining
+            } // if we manage to exit this loop, there is still some stack remaining:
             return -1;
         }
 
@@ -396,21 +390,22 @@ namespace InvisibleHand
             int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
             itemDest.stack += diff;
             itemSrc.stack  -= diff;
-            // return true to indicate stack has been emptied
+            // return true if stack has been emptied
             return itemSrc.IsBlank();
         }
 
+        // takes the entire destination container as a parameter so as to check coin stacks
         public static bool StackMerge(ref Item itemSrc, Item[] dest, int dIndex )
         {
             int diff = Math.Min(dest[dIndex].maxStack - dest[dIndex].stack, itemSrc.stack);
             dest[dIndex].stack += diff;
             itemSrc.stack  -= diff;
             DoContainerCoins(dest, dIndex);
-            // return true to indicate stack has been emptied
+            // return true if stack has been emptied
             return itemSrc.IsBlank();
         }
 
-        //this one returns the amount transferred
+        // as the first StackMerge above, but returns the amount transferred
         public static int StackMergeD(ref Item itemSrc, ref Item itemDest)
         {
             int diff = Math.Min(itemDest.maxStack - itemDest.stack, itemSrc.stack);
@@ -427,16 +422,17 @@ namespace InvisibleHand
         */
         public static void DoContainerCoins(Item[] container, int i)
         {
+            // stack contains 100 items && item matches copper/silver/gold item-type id
             if (container[i].stack == 100 && (container[i].type == 71 || container[i].type == 72 || container[i].type == 73))
             {
-                container[i].SetDefaults(container[i].type + 1);
+                container[i].SetDefaults(container[i].type + 1); //replace stack with 1 coin of next-higher type
                 for (int j = 0; j < container.Length; j++)
-                {
+                {   // search the rest of the container for more coins of this type and move it there if found.
                     if (container[j].IsTheSameAs(container[i]) && j != i && container[j].type == container[i].type && container[j].stack < container[j].maxStack)
                     {
                         container[j].stack++;
                         container[i] = new Item();
-                        DoContainerCoins(container, j);
+                        DoContainerCoins(container, j); //recursive call as move may have maxed new stack
                     }
                 }
             }
@@ -445,6 +441,7 @@ namespace InvisibleHand
         /**********************************************************
         *   Wrapper functions
         */
+
         //plays the "item moved" sound
         public static void RingBell(int o1 = -1, int o2 = -1, int o3 = 1)
         {
@@ -462,31 +459,38 @@ namespace InvisibleHand
         }
     #endregion
 
-    #region misc
+    #region gui_stuff
 
+        /*************************************************
+        *	 Unrelated to any of the above, these methods assist in the GUI/buttons part of the mod.
+        */
+
+        // get source texels based on an index (defined in Constants class).
+        // the "+2" is due to the 2-pixel gap between the button faces in the grid png
         public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
         {
             return active ?
-            new Rectangle(Constants.ButtonW+2,(Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH) : //mouse-over
-            new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
+                new Rectangle(Constants.ButtonW+2,(Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH) : //mouse-over
+                new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
         }
 
+        //Get source Texels for the button based on its name (i.e. what @action it performs)
+        // @param active - false = default/inactive button appearance;
+        //                  true = focused/mouseover/active appearance
         public static Rectangle? GetSourceRect(string action, bool active=false)
         {
             String key = action;
 
-            if (action.Contains("Chest")){
-                if (action.Contains("Reverse")) key = "Sort (Reverse)";
-                else key = "Sort";
-            }
-            else if (action.StartsWith("Quick Stack")) key = "Quick Stack";
+            if (action.Contains("Chest"))
+                key = action.Contains("Reverse") ? "Sort (Reverse)" : "Sort";
+
+            else if (action.StartsWith("Quick")) key = "Quick Stack";
             else if (action.StartsWith("Deposit")) key = "Deposit All";
 
             return RectFromGridIndex( Constants.ButtonGridIndex[key], active );
         }
 
     #endregion
-
 
     }// \class
 }

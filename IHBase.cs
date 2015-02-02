@@ -24,7 +24,7 @@ namespace InvisibleHand
 
         //keep track of ALL existing button contexts here.
         public Dictionary<String, IHButton> ButtonRepo;
-        // and here's the ids of those that need a state-update (probably just the toggles)
+        //the ids of those that need a state-update:
         public Stack<String> ButtonUpdates;
 
         public override void OnLoad()
@@ -38,9 +38,9 @@ namespace InvisibleHand
             {
                 OptionChanged(o);
             }
-            KEP = new KeyEventProvider();
 
-            ButtonRepo = new Dictionary<String, IHButton>();
+            KEP           = new KeyEventProvider();
+            ButtonRepo    = new Dictionary<String, IHButton>();
             ButtonUpdates = new Stack<String>();
         }
 
@@ -60,11 +60,11 @@ namespace InvisibleHand
         {
             switch(option.name)
             {
-                case "sort":        //ActionKeys["Sort"]        = (Keys)option.Value;
-                case "cleanStacks": //ActionKeys["CleanStacks"] = (Keys)option.Value;
-                case "quickStack":  //ActionKeys["QuickStack"]  = (Keys)option.Value;
-                case "depositAll":  //ActionKeys["DepositAll"]  = (Keys)option.Value;
-                case "lootAll":     //ActionKeys["LootAll"]     = (Keys)option.Value;
+                case "sort":
+                case "cleanStacks":
+                case "quickStack":
+                case "depositAll":
+                case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
                     break;
 
@@ -91,6 +91,7 @@ namespace InvisibleHand
                             break;
                     }
                     break;
+
                 case "reverseSort":
                     switch ((String)option.Value)
                     {
@@ -109,7 +110,7 @@ namespace InvisibleHand
                             ModOptions["ReverseSortPlayer"] = ModOptions["ReverseSortChest"] = false;
                             break;
                     }
-                    break;
+                break;
             }
         }
     }

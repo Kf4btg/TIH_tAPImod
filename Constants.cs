@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-// using TAPI;
-// using Terraria;
 using Terraria.ID;
 
 namespace InvisibleHand
 {
-    // public enum VAction {  }
-
     public enum IHAction { QS, DA, LA, Sort, Stack, Deposit, Refill }
 
     public enum ItemCat
@@ -61,6 +57,7 @@ namespace InvisibleHand
     {
         //pulled from Main.DrawInventory  !ref:Main:#22137.0#
         public const float CHEST_INVENTORY_SCALE = 0.755f;
+        public const float PLAYER_INVENTORY_SCALE = 0.85f;
 
         public static readonly Color InvSlotColor   = new Color(63,65,151,255);  //bluish
         public static readonly Color ChestSlotColor = new Color(104,52,52,255);  //reddish
@@ -125,7 +122,6 @@ namespace InvisibleHand
 
         // A large number of "Tile"-type items will share a .createTile attribute with items that fulfill a similar purpose.
         // This gives us a handy way to sort and possibly even categorize these item types.
-
         /*************************************************************************
         Create several hashsets to quickly check values of "item.createTile" to aid in categorization/sorting.
         Initialize them here with an anonymous array to avoid the resizing penalty of .Add()
@@ -191,10 +187,10 @@ namespace InvisibleHand
             TileID.ImmatureHerbs, TileID.Saplings /*Acorn*/, TileID.Pumpkins /*Pumpkin Seed*/ } );
             // get the rest by EndsWith("Seeds")
 
-
         static Constants()
         {
-            ButtonGridIndex = new Dictionary<string,int>(0);
+            // Make getting a button's texture (texels) easier
+            ButtonGridIndex = new Dictionary<string,int>(8);
             ButtonGridIndex.Add("Sort",0);
             ButtonGridIndex.Add("Sort (Reverse)",1);
             ButtonGridIndex.Add("Loot All",2);
@@ -203,8 +199,6 @@ namespace InvisibleHand
             ButtonGridIndex.Add("Clean Stacks",5);
             ButtonGridIndex.Add("Quick Stack",6);
             ButtonGridIndex.Add("Restock",7);
-
-
         }
     }
 }

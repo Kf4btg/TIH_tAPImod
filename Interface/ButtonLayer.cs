@@ -13,19 +13,17 @@ namespace InvisibleHand
 
         public Rectangle ButtonFrame { get; protected set;}  //use this to determine MouseInterface
         public bool IsHovered { get { return ButtonFrame.Contains(Main.mouseX, Main.mouseY); } }
-        // public Point FrameCenter { get; private set;}
 
         protected float opacity_inactive = 0.45f;
         protected float opacity_active = 1.0f;
 
         //TODO: have this fade in/out?
-        public float LayerOpacity { get; private set; } 
+        public float LayerOpacity { get; private set; }
 
         protected ButtonLayer(string name) : base(IHBase.self.mod.InternalName + ":" + name)
         {
             Buttons = new Dictionary<IHAction, ButtonBase>();
             ButtonFrame = Rectangle.Empty;
-            // FrameCenter = Point.Zero;
         }
 
         internal void UpdateFrame()
@@ -34,8 +32,6 @@ namespace InvisibleHand
             {
                 ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
             }
-            // if (!ButtonFrame.IsEmpty) FrameCenter = ButtonFrame.Center;
-
         }
 
         protected virtual void DrawButtons(SpriteBatch sb)
@@ -80,10 +76,8 @@ namespace InvisibleHand
                 default:
                     throw new ArgumentException("Invalid ButtonLayer type \"" + type + "\"; valid types are \"Inventory\" and \"Chest\".");
             }
-
             btns.UpdateFrame();
             return btns;
         }
     }
-
 }

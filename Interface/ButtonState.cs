@@ -6,6 +6,12 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    /**
+    * 	This class holds all the technical details (appearance, function, etc.) of a specific button
+    * 	implementation. This does not define "a button" in this project, though, as a single conceptual button
+    * 	(as it appears to the player) can exhibit different states depending on various circumstances.
+    * 	TODO: make the constructors more thorough and/or more standardized
+    */
     public class ButtonState
     {
         public string label;
@@ -20,7 +26,7 @@ namespace InvisibleHand
         public Func<ButtonBase,bool> onMouseEnter;
         public Func<ButtonBase,bool> onMouseLeave;
 
-        public Color tint;      //How to tint the texture when this state is active
+        public Color tint;
 
         public ButtonState()
         {

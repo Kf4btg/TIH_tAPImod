@@ -1,36 +1,47 @@
 using System;
-// using System.Collections.Generic;
+using System.Collections.Generic;
 using TAPI;
 using Terraria;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 
-
 namespace InvisibleHand
 {
     public class IHBase : ModBase
     {
+        public static IHBase self { get; private set; }
+
+        public static Dictionary<String, Keys> ActionKeys;
+        public static Dictionary<String, bool> ModOptions;
+
         public static Texture2D lockedIcon;
+        public static Texture2D ButtonGrid { get; private set; }
+        public static Texture2D ButtonBG { get; private set; }
+        public static KeyEventProvider KEP;
 
-        public static Keys
-            key_sort, key_cleanStacks, key_quickStack, key_depositAll, key_lootAll;
+        public ButtonLayer invButtons;
+        public ButtonLayer chestButtons;
 
-        public static bool oLockingEnabled;
-
-        /* Whether to place items at end of inventory or beginning
-            when sorting. */
-        public static bool oRearSortPlayer;
-        public static bool oRearSortChest;
-
-        //default sort = reversed ?
-        public static bool oRevSortPlayer;
-        public static bool oRevSortChest;
-
-        public static ModBase self { get; private set; }
+        //keep track of ALL existing button contexts here.
+        public Dictionary<String, IHButton> ButtonRepo;
+        // and here's the ids of those that need a state-update (probably just the toggles)
+        public Stack<String> ButtonUpdates;
 
         public override void OnLoad()
         {
             self = this;
+            ActionKeys = new Dictionary<String, Keys>();
+            ModOptions = new Dictionary<String, bool>();
+
+            // this should prevent dictionary-key exceptions if mod-options page not visited
+            foreach (Option o in options)
+            {
+                OptionChanged(o);
+            }
+            KEP = new KeyEventProvider();
+
+            ButtonRepo = new Dictionary<String, IHButton>();
+            ButtonUpdates = new Stack<String>();
         }
 
         public override void OnAllModsLoaded()
@@ -38,46 +49,45 @@ namespace InvisibleHand
             lockedIcon = self.textures["resources/LockIndicator"];
 
             CategoryDef.Initialize();
+
+            ButtonGrid   = textures["resources/ButtonGrid"];
+            ButtonBG     = textures["resources/button_bg"];
+            invButtons   = ButtonMaker.GetButtons("Inventory");
+            chestButtons = ButtonMaker.GetButtons("Chest");
         }
 
         public override void OptionChanged(Option option)
         {
             switch(option.name)
             {
-                case "sort":
-                    key_sort = (Keys)option.Value;
+                case "sort":        //ActionKeys["Sort"]        = (Keys)option.Value;
+                case "cleanStacks": //ActionKeys["CleanStacks"] = (Keys)option.Value;
+                case "quickStack":  //ActionKeys["QuickStack"]  = (Keys)option.Value;
+                case "depositAll":  //ActionKeys["DepositAll"]  = (Keys)option.Value;
+                case "lootAll":     //ActionKeys["LootAll"]     = (Keys)option.Value;
+                    ActionKeys[option.name] = (Keys)option.Value;
                     break;
-                case "cleanStacks":
-                    key_cleanStacks = (Keys)option.Value;
-                    break;
-                case "quickStack":
-                    key_quickStack = (Keys)option.Value;
-                    break;
-                case "depositAll":
-                    key_depositAll = (Keys)option.Value;
-                    break;
-                case "lootAll":
-                    key_lootAll = (Keys)option.Value;
-                    break;
+
                 case "enableLocking":
-                    oLockingEnabled = (bool)option.Value;
+                    ModOptions["LockingEnabled"] = (bool)option.Value;
                     break;
+
                 case "rearSort":
                     switch ((String)option.Value)
                     {
                         case "Inventory":
-                            oRearSortPlayer = true;
-                            oRearSortChest  = false;
+                            ModOptions["RearSortPlayer"] = true;
+                            ModOptions["RearSortChest"]  = false;
                             break;
                         case "Chests":
-                            oRearSortPlayer = false;
-                            oRearSortChest  = true;
+                            ModOptions["RearSortPlayer"] = false;
+                            ModOptions["RearSortChest"]  = true;
                             break;
                         case "Both":
-                            oRearSortPlayer = oRearSortChest = true;
+                            ModOptions["RearSortPlayer"] = ModOptions["RearSortChest"] = true;
                             break;
                         case "Disabled":
-                            oRearSortPlayer = oRearSortChest = false;
+                            ModOptions["RearSortPlayer"] = ModOptions["RearSortChest"] = false;
                             break;
                     }
                     break;
@@ -85,24 +95,22 @@ namespace InvisibleHand
                     switch ((String)option.Value)
                     {
                         case "Inventory":
-                            oRevSortPlayer = true;
-                            oRevSortChest  = false;
+                            ModOptions["ReverseSortPlayer"] = true;
+                            ModOptions["ReverseSortChest"]  = false;
                             break;
                         case "Chests":
-                            oRevSortPlayer = false;
-                            oRevSortChest  = true;
+                            ModOptions["ReverseSortPlayer"] = false;
+                            ModOptions["ReverseSortChest"]  = true;
                             break;
                         case "Both":
-                            oRevSortPlayer = oRevSortChest = true;
+                            ModOptions["ReverseSortPlayer"] = ModOptions["ReverseSortChest"] = true;
                             break;
                         case "Disabled":
-                            oRevSortPlayer = oRevSortChest = false;
+                            ModOptions["ReverseSortPlayer"] = ModOptions["ReverseSortChest"] = false;
                             break;
                     }
-                break;
+                    break;
             }
         }
     }
-
-
 }

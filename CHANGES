@@ -1,3 +1,24 @@
+1.2.0-rc1
+    -   First complete-ish version of buttons for sort/stack/restock/smart-deposit. Includes ability to lock down slots from being affected by QuickStack/Deposit All.
+    -   How to use:
+        -   Mouse-over the buttons to get a tooltip of what each button is/does. Some buttons will only show up when a chest is open.
+        -   Click button.
+        -   Done.
+        -   Ok, there's more.  Holding Shift will change the appearance and function of some buttons:
+            -   Sort -> Reverse Sort
+            -   Restock -> QuickStack.  Left click to use, but right click to toggle whether or not locked slots will be affected by the action.
+            -   Smart Deposit -> Deposit All.  Same deal as QuickStack; left-click to use, right-click to lock.
+    -   Known Issues:
+        -   The Vanilla QS/DA buttons are NOT affected by the locking function; only the extra ways added by this mod (keybind, new button) will respect this setting. It may be impossible (short of duplicating an _enormous_ chunk of Terraria's code--or having a tAPI dev add some hooks in those places), to inject the necessary checks into the vanilla functionality.  I'm looking into whether it'd be possible to just replace/override the buttons altogether, either with my own buttons or, perhaps, some that look exactly the same.
+        -   The tooltips are currently drawn _under_ any other UI elements they happen to cross (usually item slots or other buttons).  I...have no idea why. I have some wild guesses as to why, but they're definitely not near developed or substantiated enough to call ideas. This one may take some investigation, and it's been on the bottom of the fix-me list since it doesn't really affect functionality.
+
+1.1.3
+    -   Refactored most loose option-fields into collections (e.g. Dictionaries or arrays)
+    -   Added a generic/inheritable button class and a somewhat less generic toggle-button class inheriting from the former.
+        -   Used these to create buttons that will allow the Vanilla actions (depositall, quickstack, lootall) to respect locked item-slots in some fashion.
+        -   Needed to add a ModWorld class to make sure the button states were properly initialized when the world was loaded.
+    -   Addressed issue where loading a player would sometimes load the saved locked-slot configuration from a different player.
+
 1.1.2b
     -   Added ability to shift-click items in and out of the Item Reforge slot.
 

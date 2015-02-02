@@ -1,5 +1,7 @@
 using System;
+using Microsoft.Xna.Framework;
 using TAPI;
+using TAPI.UIKit;
 using Terraria;
 
 namespace InvisibleHand
@@ -15,19 +17,47 @@ namespace InvisibleHand
         // Overall, these don't interact or rely much on the rest of the mod.
         // TODO: make them recognize locked slots in some fashion.
 
+        //------------------------------------------------------//
+        //-----------CALLABLES FOR VANILLA FUNCTIONS------------//
+        //------------------------------------------------------//
+        //  Call these methods to perform the action(s)         //
+        //  associated with their GUI-dependent vanilla         //
+        //  counterparts.                                       //
+        //------------------------------------------------------//
+        //  Members:                                            //
+        //      DoDepositAll(Player)                            //
+        //      DoLootAll(Player)                               //
+        //      DoQuickStack(Player)                            //
+        //------------------------------------------------------//
+
     #region depositall
-        private const int R_START=49;   //start from end of main inventory
-        private const int R_END=10;     //don't include hotbar
+        private const int R_START = 49;   //start from end of main inventory
+        private const int R_END   = 10;     //don't include hotbar
 
         /********************************************************
         *   DoDepositAll
         // !ref:Main:#22314.0#
         */
+        public static void DoDepositAll()
+        {
+            DoDepositAll(Main.localPlayer);
+        }
         public static void DoDepositAll(Player player)
         {
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
             bool sendNetMsg = player.chest > -1;
+
+            if (IHPlayer.ActionLocked(player, IHAction.DA))
+            {
+                for (int i=R_START; i >= R_END; i--)
+                {
+                    if (IHPlayer.SlotLocked(player, i) ||  player.inventory[i].IsBlank()) continue;
+                    MoveItemToChest(i, sendNetMsg);
+                }
+                Recipe.FindRecipes(); // !ref:Main:#22640.36#
+                return;
+            }
 
             for (int i=R_START; i >= R_END; i--)
             {
@@ -42,6 +72,10 @@ namespace InvisibleHand
         /********************************************************
         *   DoLootAll !ref:Main:#22272.00#
         */
+        public static void DoLootAll()
+        {
+            DoLootAll(Main.localPlayer);
+        }
         public static void DoLootAll(Player player)
         {
             //this shouldn't happen if method is called correctly
@@ -70,23 +104,31 @@ namespace InvisibleHand
         *   DoQuickStack
         *   !ref:Main:#22476.44##22637.44#
         */
+
+        public static void DoQuickStack()
+        {
+            DoQuickStack(Main.localPlayer);
+        }
         public static void DoQuickStack(Player player)
         {
             if (player.chest == -1) return;
-            QuickStack(player.inventory, player.chestItems,  player.chest > -1);
+            // QuickStack(player.inventory, player.chestItems,  player.chest > -1, IHPlayer.ActionLocked(player, VAction.QS));
 
-            Recipe.FindRecipes(); // !ref:Main:#22640.36#
-        }//\DoQuickStack()
+            Item[] inventory = player.inventory;
+            Item[] container = player.chestItems;
+            bool sendMessage = player.chest > -1;
+            bool checkLocks  = IHPlayer.ActionLocked(player, IHAction.QS);
 
-        private static void QuickStack(Item[] inventory, Item[] container, bool sendMessage)
-        {
+
             for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
             {                                                                                   //if chest item is not blank && not a full stack, then
                 if (!container[iC].IsBlank() && container[iC].stack < container[iC].maxStack)
                 {                                                                               //for each item in inventory (including coins, ammo, hotbar),
                     for (int iP=0; iP<58; iP++)
-                    {                                                                           //if chest item matches inv. item...
-                        if (container[iC].IsTheSameAs(inventory[iP]))
+                    {
+                        if (checkLocks && IHPlayer.SlotLocked(player, iP)) continue;            // if we're checking locks ignore the locked ones
+
+                        if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
                         {
                             RingBell();                                                         //...play "item-moved" sound and...
                                                                                                 // ...merge inv. item stack to chest item stack
@@ -105,10 +147,167 @@ namespace InvisibleHand
                     }
                 }
             }
-        }//\QuickStack()
+            Recipe.FindRecipes(); // !ref:Main:#22640.36#
+            }//\QuickStack()
     #endregion
 
+        //------------------------------------------------------//
+        //-----------CALLABLES FOR ITEM SLOT ACTIONS------------//
+        //------------------------------------------------------//
+        //  These methods are intended for use when             //
+        //  "shifting" the item contained in an ItemSlot to a   //
+        //  different container, as via the capability bound to //
+        //  Shift+Right-click in IHInterface.                   //
+        //------------------------------------------------------//
+        //  Members:                                            //
+        //    bool ShiftToChest(ref ItemSlot)                   //
+        //    bool ShiftToPlayer(ref ItemSlot, bool)            //
+        //    bool ShiftToPlayer(ref ItemSlot, int, int,        //
+        //          bool, bool)                                 //
+        //------------------------------------------------------//
+
+        /**************************************************************
+        *   returns true if item moved/itemstack emptied
+        */
+
+        // move item from player inventory slot to chest
+        public static bool ShiftToChest(ref ItemSlot slot)
+        {
+            bool sendMessage = Main.localPlayer.chest > -1;
+
+            Item pItem = slot.MyItem;
+
+            int retIdx = -1;
+            if (pItem.stack == pItem.maxStack) //move non-stackable items or full stacks to empty slot.
+            {
+                retIdx = MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
+                new Func<int,bool>( i => i<Chest.maxItems ),
+                new Func<int,int> ( i => i+1 ) );
+            }
+
+            // if we didn't find an empty slot...
+            if (retIdx < 0)
+            {
+                if (pItem.maxStack == 1) return false; //we can't stack it, so we already know there's no place for it.
+
+                retIdx = MoveItemP2C(ref pItem, Main.localPlayer.chestItems, sendMessage);
+
+                if (retIdx < 0)
+                {
+                    if (retIdx == -1)  // partial success (stack amt changed), but we don't want to reset the item.
+                    {
+                        RingBell();
+                        Recipe.FindRecipes();
+                    }
+                    return false;
+                }
+            }
+            //else, success!
+            RingBell();
+            slot.MyItem = new Item();
+            if (sendMessage) SendNetMessage(retIdx);
+            return true;
+        }
+
+        // MoveChestSlotItem - moves item from chest/guide slot to player inventory
+        public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
+        {
+            //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
+            Item cItem = slot.MyItem;
+
+            if (cItem.IsBlank()) return false;
+
+            if (cItem.Matches(ItemCat.COIN)) {
+                // don't bother with "shifting", just move it as usual
+                slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
+                return (slot.MyItem.IsBlank());
+            }
+
+            // ShiftToPlayer returns true if original item ends up empty
+            if (cItem.Matches(ItemCat.AMMO)) {
+                //ammo goes top-to-bottom
+                if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) return true;
+            }
+
+            // if it's a stackable item and the stack is *full*, just shift it.
+            else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
+                if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //try hotbar first, ascending order (vanilla parity)
+                ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //the other slots, descending
+            }
+
+            //if all of the above failed, then we have no empty slots.
+            // Let's save some work and get traditional:
+            slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
+            return (slot.MyItem.IsBlank());
+        }
+
+        // attempts to move an item to an empty slot
+        private static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
+        {
+            int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
+
+            if (desc) { iStart =  ixStop; iCheck = i => i >= ixStart; iNext = i => i-1; }
+            else      { iStart = ixStart; iCheck = i => i <=  ixStop; iNext = i => i+1; }
+
+            int retIdx = MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
+            if (retIdx >= 0)
+            {
+                RingBell();
+                slot.MyItem = new Item();
+                if (sendMessage) SendNetMessage(retIdx);
+                return true;
+            }
+            return false;
+        }
+
+
     #region helperfunctions
+
+        //------------------------------------------------------//
+        //--------------------HELPER METHODS--------------------//
+        //------------------------------------------------------//
+        //  Common pieces of the callables broken down into     //
+        //  smaller functions.                                  //
+        //------------------------------------------------------//
+        //  Members:                                            //
+        //    int MoveItemP2C(ref Item, Item[], bool, bool)     //
+        //    int MoveToFirstEmpty(Item, Item[], int,           //
+        //          Func<int,bool>, Func<bool,bool>)            //
+        //    int TryStackMerge(ref Item, Item[], bool, int,    //
+        //          Func<int,bool>, Func<bool,bool>)            //
+        //------------------------------------------------------//
+
+        /********************************************************
+        *   MoveItemToChest
+        @param iPlayer : index of the item in inventory
+        @param sendMessage : should ==true if regular chest, false for banks
+        @param desc : whether to place item towards end of chest rather than beginning
+
+        @return : True if item was (entirely) removed from source; otherwise false.
+        */
+
+        // player main inventory->chest/bank
+        public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
+        {
+            int retIdx = MoveItemP2C (
+            ref Main.localPlayer.inventory[iPlayer],    // item in inventory
+            Main.localPlayer.chestItems,                // destination container
+            sendMessage,                                // if true, sendMessage
+            desc);                                      // check container indices descending?
+
+            if (retIdx > -2) // >=partial success
+            {
+                RingBell();
+                if (retIdx > -1) // =full success
+                {
+                    Main.localPlayer.inventory[iPlayer] = new Item();
+                    if (sendMessage) SendNetMessage(retIdx);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         /******************************************************
         *   MoveItem - moves a single item to a different container
         *    !ref:Main:#22320.00##22470.53#
@@ -117,9 +316,9 @@ namespace InvisibleHand
         *    @param desc : whether to move @item to end of @container rather than beginning
         *
         *    @return >=0 : index in @container where @item was placed/stacked
-                      -1 : some stacked was moved, but some remains in @item
-                      -2 : failed to move @item in any fashion (stack value unchanged)
-                      -3 : @item was passed as blank
+        *             -1 : some stacked was moved, but some remains in @item
+        *             -2 : failed to move @item in any fashion (stack value unchanged)
+        *             -3 : @item was passed as blank
         */
 
         //for player->chest
@@ -184,37 +383,6 @@ namespace InvisibleHand
                 }
             } // if we don't return in this loop, there is still some stack remaining
             return -1;
-        }
-
-        /********************************************************
-        *   MoveItemToChest
-            @param iPlayer : index of the item in source
-            @param sendMessage : should ==true if regular chest, false for banks
-            @param desc : whether to place item towards end of @dest rather than beginning
-
-            @return : True if item was (entirely) removed from source; otherwise false.
-        */
-
-        // player main inventory->chest/bank
-        public static bool MoveItemToChest(int iPlayer, bool sendMessage, bool desc = false)
-        {
-            int retIdx = MoveItemP2C (
-            ref Main.localPlayer.inventory[iPlayer],    // item in inventory
-            Main.localPlayer.chestItems,                // destination container
-            sendMessage,                                // if true, sendMessage
-            desc);                                      // check container indices descending?
-
-            if (retIdx > -2) // >=partial success
-            {
-                RingBell();
-                if (retIdx > -1) // =full success
-                {
-                    Main.localPlayer.inventory[iPlayer] = new Item();
-                    if (sendMessage) SendNetMessage(retIdx);
-                    return true;
-                }
-            }
-            return false;
         }
 
         /******************************************************
@@ -293,6 +461,32 @@ namespace InvisibleHand
             }
         }
     #endregion
+
+    #region misc
+
+        public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
+        {
+            return active ?
+            new Rectangle(Constants.ButtonW+2,(Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH) : //mouse-over
+            new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
+        }
+
+        public static Rectangle? GetSourceRect(string action, bool active=false)
+        {
+            String key = action;
+
+            if (action.Contains("Chest")){
+                if (action.Contains("Reverse")) key = "Sort (Reverse)";
+                else key = "Sort";
+            }
+            else if (action.StartsWith("Quick Stack")) key = "Quick Stack";
+            else if (action.StartsWith("Deposit")) key = "Deposit All";
+
+            return RectFromGridIndex( Constants.ButtonGridIndex[key], active );
+        }
+
+    #endregion
+
 
     }// \class
 }

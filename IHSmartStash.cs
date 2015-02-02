@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-// using System.Linq.Dynamic;
 using TAPI;
 using Terraria;
 
@@ -33,11 +32,11 @@ namespace InvisibleHand
                         select catGroup.Key).Distinct()
                         .ToList();
 
-            if (IHBase.oLockingEnabled) //slot locking on
+            if (IHBase.ModOptions["LockingEnabled"]) //slot locking on
             {
                 for (int i=49; i>=10; i--)  // reverse through player inv
                 {
-                    if ( !pInventory[i].IsBlank() && !IHPlayer.SlotLocked(i) &&
+                    if ( !pInventory[i].IsBlank() && !IHPlayer.SlotLocked(Main.localPlayer, i) &&
                         catList.Contains(pInventory[i].GetCategory()) )
                             IHUtils.MoveItemToChest(i, sendNetMsg);
                 }//end loop

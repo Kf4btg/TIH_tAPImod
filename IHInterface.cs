@@ -1,7 +1,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 using System;
+
 using TAPI;
 using TAPI.UIKit;
 using Terraria;
@@ -10,9 +12,29 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
+        public static IHInterface self { get; private set; }
+        public IHInterface() : base() {self=this;}
+
+        public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
+        {
+            if (Main.playerInventory)
+            {
+                if (Main.localPlayer.chest!=-1)
+                    InterfaceLayer.Add(list, IHBase.self.chestButtons, InterfaceLayer.LayerInventory, true);
+                else
+                    InterfaceLayer.Add(list, IHBase.self.invButtons, InterfaceLayer.LayerInventory, true);
+            }
+        }
+
+        public override bool PreDrawInventory(SpriteBatch sb)
+        {
+            IHBase.KEP.Update();
+            return true;
+        }
+
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (IHBase.oLockingEnabled && slot.type == "Inventory" && IHPlayer.SlotLocked(slot.index))
+            if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(Main.localPlayer, slot.index))
             {
                 sb.Draw(IHBase.lockedIcon,      // the texture to draw
                             slot.pos,           // (Vector2) location in screen coords to draw sprite
@@ -32,25 +54,21 @@ namespace InvisibleHand
         {
             if (!KState.Special.Shift.Down()) return true;
 
-            if (IHBase.oLockingEnabled && slot.modBase == null && Main.playerInventory && release )
+            if (IHBase.ModOptions["LockingEnabled"] && slot.modBase == null && Main.playerInventory && release )
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
-                    IHPlayer.ToggleLock(slot.index); //toggle lock state
-                    IHUtils.RingBell();
+                    IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
+                    Main.PlaySound(22); // I think this is the actual "lock" sound
                 }
             }
             return false;
         }
 
-        #region shiftmove
-
         /************************************************************************
         *   An implementation of the "Shift-click to move item between containers"
         *   concept. Possibly temporary, though it includes the feature of working
-        *   with the craft-guide slot, which I really like.
-        *
-        *   Known Issues:
+        *   with the craft-guide and reforge slots, which I really like.
         */
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
@@ -64,14 +82,14 @@ namespace InvisibleHand
                     // Moving inventory item -> chest
                     if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
                     {
-                        if (ShiftToChest(ref slot))
-                        Recipe.FindRecipes(); // !ref:Main:#22640.36#
+                        if (IHUtils.ShiftToChest(ref slot))
+                            Recipe.FindRecipes(); // !ref:Main:#22640.36#
                     }
                     // Moving chest item -> inventory
                     else if (slot.type == "Chest")
                     {
-                        if (ShiftToPlayer(ref slot, Main.localPlayer.chest>-1))
-                        Recipe.FindRecipes();
+                        if (IHUtils.ShiftToPlayer(ref slot, Main.localPlayer.chest>-1))
+                            Recipe.FindRecipes();
                     }
                     return false;
                 }
@@ -89,8 +107,8 @@ namespace InvisibleHand
                     }
                     else if (!Main.guideItem.IsBlank() && slot.type == "CraftGuide")
                     {
-                        if (ShiftToPlayer(ref slot, false))
-                        Main.guideItem = new Item();
+                        if (IHUtils.ShiftToPlayer(ref slot, false))
+                            Main.guideItem = new Item();
                         Recipe.FindRecipes();
                     }
                     return false;
@@ -109,8 +127,8 @@ namespace InvisibleHand
                     }
                     else if (!Main.reforgeItem.IsBlank() && slot.type == "Reforge")
                     {
-                        if (ShiftToPlayer(ref slot, false))
-                        Main.reforgeItem = new Item();
+                        if (IHUtils.ShiftToPlayer(ref slot, false))
+                            Main.reforgeItem = new Item();
                         Recipe.FindRecipes();
                     }
                     return false;
@@ -118,101 +136,6 @@ namespace InvisibleHand
             }
             return true;
         }
-
-        /**************************************************************
-        *   returns true if item moved/itemstack emptied
-        */
-
-        // move item from player inventory slot to chest
-        public static bool ShiftToChest(ref ItemSlot slot)
-        {
-            bool sendMessage = Main.localPlayer.chest > -1;
-
-            Item pItem = slot.MyItem;
-
-            int retIdx = -1;
-            if (pItem.stack == pItem.maxStack) //move non-stackable items or full stacks to empty slot.
-            {
-                retIdx =  IHUtils.MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
-                new Func<int,bool>( i => i<Chest.maxItems ),
-                new Func<int,int> ( i => i+1 ) );
-            }
-
-            // if we didn't find an empty slot...
-            if (retIdx < 0)
-            {
-                if (pItem.maxStack == 1) return false; //we can't stack it, so we already know there's no place for it.
-
-                retIdx = IHUtils.MoveItemP2C(ref pItem, Main.localPlayer.chestItems, sendMessage);
-
-                if (retIdx < 0)
-                {
-                    if (retIdx == -1)  // partial success (stack amt changed), but we don't want to reset the item.
-                    {
-                        IHUtils.RingBell();
-                        Recipe.FindRecipes();
-                    }
-                    return false;
-                }
-            }
-            //else, success!
-            IHUtils.RingBell();
-            slot.MyItem = new Item();
-            if (sendMessage) IHUtils.SendNetMessage(retIdx);
-            return true;
-        }
-
-        // MoveChestSlotItem - moves item from chest/guide slot to player inventory
-        public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
-        {
-            //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
-            Item cItem = slot.MyItem;
-
-            if (cItem.IsBlank()) return false;
-
-            if (cItem.Matches(ItemCat.COIN)) {
-                // don't bother with "shifting", just move it as usual
-                slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
-                return (slot.MyItem.IsBlank());
-            }
-
-            // ShiftToPlayer returns true if original item ends up empty
-            if (cItem.Matches(ItemCat.AMMO)) {
-                //ammo goes top-to-bottom
-                if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) return true;
-            }
-
-            // if it's a stackable item and the stack is *full*, just shift it.
-            else if (cItem.maxStack > 1 && cItem.stack==cItem.maxStack){
-                if (ShiftToPlayer(ref slot,  0,  9, sendMessage, false) //try hotbar first, ascending order (vanilla parity)
-                ||  ShiftToPlayer(ref slot, 10, 49, sendMessage,  true)) return true; //the other slots, descending
-            }
-
-            //if all of the above failed, then we have no empty slots.
-            // Let's save some work and get traditional:
-            slot.MyItem = Main.localPlayer.GetItem(Main.myPlayer, slot.MyItem);
-            return (slot.MyItem.IsBlank());
-        }
-
-        // attempts to move an item to an empty slot
-        public static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
-        {
-            int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
-
-            if (desc) { iStart =  ixStop; iCheck = i => i >= ixStart; iNext = i => i-1; }
-            else      { iStart = ixStart; iCheck = i => i <=  ixStop; iNext = i => i+1; }
-
-            int retIdx = IHUtils.MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
-            if (retIdx >= 0)
-            {
-                IHUtils.RingBell();
-                slot.MyItem = new Item();
-                if (sendMessage) IHUtils.SendNetMessage(retIdx);
-                return true;
-            }
-            return false;
-        }
-        #endregion
 
         // public override bool? ItemSlotAllowsItem(ItemSlot slot, Item item)
         // {

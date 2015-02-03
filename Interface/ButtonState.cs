@@ -31,36 +31,26 @@ namespace InvisibleHand
 
         public Color tint;
 
-        public ButtonState()
+        //make sure it at least has a label on construction
+        public ButtonState(string label)
         {
-            label         = "Button";
-            texture       = null;
-            altTexels     = null;
-            defaultTexels = null;
-            onClick       = null;
-            onRightClick  = null;
-            onMouseEnter  = null;
-            onMouseLeave  = null;
+            this.label    = label;
             tint          = Color.White;
         }
 
-        public ButtonState(string label, Texture2D tex=null, Rectangle? defaultTexels=null, Action onClick=null, Action onRightClick=null, Color? tintColor = null)
+        // commonly created series of states where all these were consistent; this overload eases their creation
+        public ButtonState(string label, Texture2D tex, Rectangle? defaultTexels, Rectangle? altTexels, Color? tintColor = null)
         {
             this.label         = label;
             this.texture       = tex;
             this.defaultTexels = defaultTexels;
-            this.altTexels     = null;
-            this.onClick       = onClick;
-            this.onRightClick  = onRightClick;
-            this.onMouseEnter  = null;
-            this.onMouseLeave  = null;
+            this.altTexels     = altTexels;
             this.tint          = tintColor ?? Color.White;
         }
 
         public ButtonState Duplicate()
         {
-            var bsNew          = new ButtonState();
-            bsNew.label        = label;
+            var bsNew          = new ButtonState(this.label);
             bsNew.texture      = texture;
             bsNew.altTexels    = altTexels;
             bsNew.defaultTexels= defaultTexels;

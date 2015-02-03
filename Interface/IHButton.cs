@@ -38,9 +38,9 @@ namespace InvisibleHand
                 Main.fontMouseText.MeasureString(Label); }
         }
 
-        public IHButton(Vector2? pos=null)
+        public IHButton(String label, Vector2? pos=null)
         {
-            this.DisplayState = new ButtonState();
+            this.DisplayState = new ButtonState(label);
             this.pos = pos ?? default(Vector2);
         }
 
@@ -103,50 +103,51 @@ namespace InvisibleHand
 
         //defaultish - gray out the inactive state, change the label
         public IHToggle(string inactiveLabel, string activeLabel, Texture2D tex, Func<bool> isActive,
-                        Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(pos)
+                        Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(inactiveLabel, pos)
         {
             IsActive = isActive;
             OnToggle = onToggle;
 
             if (toggleOnRightClick){
-                ActiveState   = new ButtonState(activeLabel,   tex, null, () => {}, DoToggle );
-                InactiveState = new ButtonState(inactiveLabel, tex, null, () => {}, DoToggle, Color.Gray );
+                ActiveState   = new ButtonState(activeLabel)   { texture = tex, onRightClick = DoToggle };
+                InactiveState = new ButtonState(inactiveLabel) { texture = tex, onRightClick = DoToggle, tint = Color.Gray };
             } else {
-                ActiveState   = new ButtonState(activeLabel,   tex, null, DoToggle );
-                InactiveState = new ButtonState(inactiveLabel, tex, null, DoToggle, null, Color.Gray );
+                ActiveState   = new ButtonState(activeLabel)   { texture=tex, onClick = DoToggle };
+                InactiveState = new ButtonState(inactiveLabel) { texture=tex, onClick = DoToggle, tint=Color.Gray };
             }
-            DisplayState = ActiveState;
+            DisplayState = InactiveState;
         }
 
+        // provide two complete states
         public IHToggle(ButtonState inactiveState, ButtonState activeState, Func<bool> isActive,
-                        Vector2? pos = null, bool toggleOnRightClick = false) : base(pos)
+                        Vector2? pos = null, bool toggleOnRightClick = false) : base(inactiveState, pos)
         {
             IsActive = isActive;
-
-            if (toggleOnRightClick){
-                makeActive                 = inactiveState.onRightClick;
-                makeInactive               = activeState.onRightClick;
-
-                activeState.onRightClick   = DoSwitch;
-                inactiveState.onRightClick = DoSwitch;
-            } else {
-                makeActive                 = inactiveState.onClick;
-                makeInactive               = activeState.onClick;
-
-                activeState.onClick        = DoSwitch;
-                inactiveState.onClick      = DoSwitch;
-            }
 
             ActiveState   = activeState;
             InactiveState = inactiveState;
 
-            DisplayState  = ActiveState; //initialize
+            if (toggleOnRightClick){
+                //store provided click actions in the makeXXX Actions
+                makeActive   = inactiveState.onRightClick;
+                makeInactive = activeState.onRightClick;
+
+                // change button click actions to the DoSwitch wrapper function
+                ActiveState.onRightClick = InactiveState.onRightClick = DoSwitch;
+
+            } else {
+                makeActive   = inactiveState.onClick;
+                makeInactive = activeState.onClick;
+
+                ActiveState.onClick = InactiveState.onClick = DoSwitch;
+            }
+            DisplayState  = InactiveState; //initialize
         }
 
         public void DoToggle()
         {
-            OnToggle(); //
-            SetState(IsActive() ? ActiveState : InactiveState);
+            OnToggle(); //swap the keyed game property
+            SetState(IsActive() ? ActiveState : InactiveState); //update state from current value of property
         }
 
         // rather than just doing something like: activeState.onClick = setState(inActiveState)

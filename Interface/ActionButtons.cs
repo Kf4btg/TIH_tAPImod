@@ -7,7 +7,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-
     public class InventoryButtons : ButtonLayer
     {
         //put these above the coins/ammo slot to be less intrusive.
@@ -179,7 +178,7 @@ namespace InvisibleHand
                 null, //can leave position null since position for this button has already been set
                 true); //toggleOnRightClick=true
 
-            mbase.ButtonUpdates.Push(label[3]); //set it's state to be initialized on World Load
+            mbase.ButtonUpdates.Push(label[3]); //set its state to be initialized on World Load
 
             //now create keywatchers to toggle the button from restock to quickstack when Shift is pressed
             Buttons[IHAction.Refill].RegisterKeyToggle(KState.Special.Shift, label[2], label[3]);
@@ -196,14 +195,14 @@ namespace InvisibleHand
             mbase.ButtonRepo[label[5]] = new IHButton(States[5], new Vector2(posX, posY));
             Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[label[5]]));
 
-            // label   = "Deposit All (Unlocked)";
+            // label   = "Deposit All (Unlocked)";  --> InactiveState
             SetUpStateBasics(6);
             States[6].onClick = IHUtils.DoDepositAll;
             States[6].onRightClick = () => {
                 Main.PlaySound(22); //lock sound
                 IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); };
 
-            // label   = "Deposit All (Locked)";
+            // label   = "Deposit All (Locked)";  --> ActiveState
             SetUpStateBasics(7);
 
             States[7].onClick      = States[6].onClick;

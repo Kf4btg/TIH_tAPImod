@@ -102,7 +102,7 @@ namespace InvisibleHand
         private readonly Action makeInactive;
 
         //defaultish - gray out the inactive state, change the label
-        public IHToggle(string activeLabel, string inactiveLabel, Texture2D tex, Func<bool> isActive,
+        public IHToggle(string inactiveLabel, string activeLabel, Texture2D tex, Func<bool> isActive,
                         Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(pos)
         {
             IsActive = isActive;
@@ -118,7 +118,7 @@ namespace InvisibleHand
             DisplayState = ActiveState;
         }
 
-        public IHToggle(ButtonState activeState, ButtonState inactiveState, Func<bool> isActive,
+        public IHToggle(ButtonState inactiveState, ButtonState activeState, Func<bool> isActive,
                         Vector2? pos = null, bool toggleOnRightClick = false) : base(pos)
         {
             IsActive = isActive;
@@ -145,7 +145,7 @@ namespace InvisibleHand
 
         public void DoToggle()
         {
-            OnToggle();
+            OnToggle(); //
             SetState(IsActive() ? ActiveState : InactiveState);
         }
 

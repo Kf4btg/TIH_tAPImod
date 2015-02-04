@@ -93,6 +93,19 @@
                 "Disabled"
             ],
             "default": 3
+        },
+        {
+            "name": "buttonDisplay",
+            "displayName": "Default button function",
+            "type": "List",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "list": [
+                "Vanilla",
+                "TIH"
+            ],
+            "default": 1
         }
     ]
 }

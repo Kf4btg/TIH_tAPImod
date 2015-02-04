@@ -32,23 +32,28 @@ namespace InvisibleHand
             self = this;
             ActionKeys = new Dictionary<String, Keys>();
             ModOptions = new Dictionary<String, bool>();
-
-            // this should prevent dictionary-key exceptions if mod-options page not visited
-            foreach (Option o in options)
-            {
-                OptionChanged(o);
-            }
-
-            KEP           = new KeyEventProvider();
-            ButtonRepo    = new Dictionary<String, IHButton>();
-            ButtonUpdates = new Stack<String>();
         }
 
         public override void OnAllModsLoaded()
         {
             lockedIcon = self.textures["resources/LockIndicator"];
 
+            // this should prevent dictionary-key exceptions if mod-options page not visited
+            // This also calls the button initializer
+            foreach (Option o in options)
+            {
+                OptionChanged(o);
+            }
+            // InitButtons();
+
             CategoryDef.Initialize();
+        }
+
+        private void InitButtons()
+        {
+            KEP           = new KeyEventProvider();
+            ButtonRepo    = new Dictionary<String, IHButton>();
+            ButtonUpdates = new Stack<String>();
 
             ButtonGrid   = textures["resources/ButtonGrid"];
             ButtonBG     = textures["resources/button_bg"];
@@ -110,7 +115,12 @@ namespace InvisibleHand
                             ModOptions["ReverseSortPlayer"] = ModOptions["ReverseSortChest"] = false;
                             break;
                     }
-                break;
+                    break;
+
+                case "buttonDisplay":
+                    ModOptions["ShowVanillaButtons"] = ((string)option.Value)=="Vanilla";
+                    InitButtons(); //create or reset the button layers
+                    break;
             }
         }
     }

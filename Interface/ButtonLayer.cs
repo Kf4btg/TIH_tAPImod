@@ -46,12 +46,16 @@ namespace InvisibleHand
         {
             if (!parentLayer.visible) return;
 
-            LayerOpacity=opacity_inactive;
             if (IsHovered)
             {
                 Main.localPlayer.mouseInterface = true;
                 LayerOpacity=opacity_active;
+                DrawButtons(sb);
+                return;
             }
+            // these two calls are down here so we can use the return statement
+            // above to avoid setting the opacity twice on each call to OnDraw
+            LayerOpacity=opacity_inactive;
             DrawButtons(sb);
         }
     }

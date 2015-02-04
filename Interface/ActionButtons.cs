@@ -75,11 +75,17 @@ namespace InvisibleHand
 
     public class ChestButtons : ButtonLayer
     {
-        private float[] posX = {
-            453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //leftmost
-            453 - (2*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //middle
-            453 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE)      //right beside trash
-        };
+        // private float[] posX = {
+        //     453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //leftmost
+        //     453 - (2*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //middle
+        //     453 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE)      //right beside trash
+        // };
+
+        // X-val of Trash slot = 453; calc positions of the buttons from that
+        private float PosX(int posIndex)
+        {
+            return 453 - ((posIndex+1)*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE);
+        }
         private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4;
 
         //position offset for the "locked" icon on QS/DA
@@ -87,7 +93,16 @@ namespace InvisibleHand
 
         private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
-        public ChestButtons(IHBase mbase) : base("ChestButtons")
+        public ChestButtons(IDictionary<String, IHButton> buttonRepo, Queue<String> updateQueue) : base("ChestButtons")
+        {
+            //create differently depending on state of "use-locks" options
+            if (IHBase.ModOptions["LockingEnabled"])
+                CB_Locks(buttonRepo, updateQueue);
+            else
+                CB_NoLocks(buttonRepo, updateQueue);
+        }
+
+        private void CB_Locks(IDictionary<String, IHButton> buttonRepo, Queue<String> updateQueue)
         {
             string[] labels = {
                 "Sort Chest",               //0
@@ -160,12 +175,12 @@ namespace InvisibleHand
             };
 
             // make some anonymous types to help with readability
-            var sort  = new { label=labels[0], forward = states[0], reversed = states[1], toggleKey = KState.Special.Shift, position = new Vector2(posX[0], posY) };
+            var sort  = new { label=labels[0], forward = states[0], reversed = states[1], toggleKey = KState.Special.Shift, position = new Vector2(PosX(0), posY) };
 
-            var restock    = new { label = labels[2], face     = states[2], position = new Vector2(posX[1], posY) };
+            var restock    = new { label = labels[2], face     = states[2], position = new Vector2(PosX(1), posY) };
             var quickStack = new { label = labels[3], unlocked = states[3], locked   = states[4], toggleOnRC = true };
 
-            var smartDep   = new { label = labels[5], face     = states[5], position = new Vector2(posX[2], posY) };
+            var smartDep   = new { label = labels[5], face     = states[5], position = new Vector2(PosX(2), posY) };
             var depositAll = new { label = labels[6], unlocked = states[6], locked   = states[7], toggleOnRC = true };
 
             //add all the buttons to the repo
@@ -175,12 +190,16 @@ namespace InvisibleHand
             mbase.ButtonRepo.Add ( restock.label,
                 new IHButton(restock.face, restock.position) );
             mbase.ButtonRepo.Add ( quickStack.label,
-                new IHToggle(quickStack.unlocked, quickStack.locked, () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), null, quickStack.toggleOnRC) );
+                new IHToggle(quickStack.unlocked, quickStack.locked,
+                            () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), //IsActive()
+                            restock.position, quickStack.toggleOnRC) ); //position is same as restock
 
             mbase.ButtonRepo.Add ( smartDep.label,
                 new IHButton(smartDep.face, smartDep.position) );
             mbase.ButtonRepo.Add ( depositAll.label,
-                new IHToggle(depositAll.unlocked, depositAll.locked, () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA), null, depositAll.toggleOnRC) );
+                new IHToggle(depositAll.unlocked, depositAll.locked,
+                            () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA),
+                            smartDep.position, depositAll.toggleOnRC) );
 
             // set QS & DA to have their state initialized on world load
             mbase.ButtonUpdates.Push(quickStack.label);
@@ -188,12 +207,40 @@ namespace InvisibleHand
 
             // add the three ButtonBases to this layer
             Buttons.Add(IHAction.Sort,    new ButtonBase(this, mbase.ButtonRepo[sort.label]));
-            Buttons.Add(IHAction.Refill,  new ButtonBase(this, mbase.ButtonRepo[restock.label]));
-            Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[smartDep.label]));
 
-            //now create keywatchers to toggle Restock/QS & SD/DA
-            Buttons[IHAction.Refill].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label);
-            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, smartDep.label, depositAll.label);
+            //different setup depending on whether we're showing Vanilla or TIH buttons by default
+            if (IHBase.ModOptions["ShowVanillaButtons"]){
+                Buttons.Add(IHAction.QS, new ButtonBase(this, mbase.ButtonRepo[quickStack.label]));
+                Buttons.Add(IHAction.DA, new ButtonBase(this, mbase.ButtonRepo[depositAll.label]));
+
+                //now create keywatchers to toggle Restock/QS & SD/DA
+                Buttons[IHAction.QS].RegisterKeyToggle( KState.Special.Shift,  quickStack.label, restock.label);
+                Buttons[IHAction.DA].RegisterKeyToggle(KState.Special.Shift, depositAll.label, smartDep.label);
+            } else {
+                Buttons.Add(IHAction.Refill,  new ButtonBase(this, mbase.ButtonRepo[restock.label]));
+                Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[smartDep.label]));
+
+                //now create keywatchers to toggle Restock/QS & SD/DA
+                Buttons[IHAction.Refill].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label);
+                Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, smartDep.label, depositAll.label);
+            }
+        }
+
+        private void CB_NoLocks(IDictionary<String, IHButton> buttonRepo, Queue<String> updateQueuembase)
+        {
+            string[] labels = {
+                "Sort Chest",               //0
+                "Sort Chest (Reverse)",     //1
+                "Restock",                  //2
+                "Quick Stack",              //3
+                "Smart Deposit",            //5
+                "Deposit All",              //6
+            };
+
+            int i=-1;
+            string L;
+
+            ButtonState[] states = {
         }
 
         /*************************************************************************

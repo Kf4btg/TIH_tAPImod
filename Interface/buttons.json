@@ -1,0 +1,213 @@
+{
+    "__notes": {
+        "1": "Any option specified in this file will be overridden by a tag of the same name but with higher specificity, cascading from global->group->button->face.",
+        "2": "A name need only be unique to its sub-grouping as the various pieces will be namespaced; for instance, each button-face will be identified as 'ModName.GroupName.ButtonName.FaceName'.",
+        "3": "The 'orientation' tag specifies whether the buttons in this group will be arranged horizontally ('H') or vertically ('V').",
+        "4": "The 'anchor' tag specifies which side of group's first button will be affixed at the given X,Y coordinates; additional buttons will be attached on the side opposite the anchor. Can be L(eft) or R(ight) for horizontal groups, T(op) or B(ottom) for vertical."
+    },
+    "globals": {
+        "spriteImage": "resources/ButtonGrid",
+        "bgImage": "resources/button_bg",
+
+        "ButtonWidth": 32,
+        "ButtonHeight": 32,
+        "SpritePadding": 2,
+
+        "colorConstants": [
+            {
+                "name": "INVENTORY",
+                "rgba": [ 63, 65, 151, 255 ]
+            }, {
+                "name": "CHEST",
+                "rgba": [ 104, 52, 52, 255 ]
+            }
+        ]
+    },
+    "emblems": [
+        {
+            "name": "lock",
+            "texture": "resources/LockIndicator"
+        }
+    ],
+    "buttonGroups": [
+        {
+            "groupName": "invButtons",
+            "orientation": "horizontal",
+            "anchor": "left",
+            "x": 496,
+            "y": 28,
+            "bgColor": "INVENTORY",
+            "bgAlpha": 0.8,
+            "spacing": 4,
+            "scale": 0.85,
+
+            "buttons": [
+                {
+                    "name": "Sort",
+                    "order": 1,
+                    "type": "keyToggle",
+                    "toggleKey": "Shift",
+
+                    "faces": [
+                        {
+                            "label": "Sort",
+                            "onClick": {
+                                "args": [],
+                                "action": "IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions[\"ReverseSortPlayer\"])"
+                            }
+                        }, {
+                            "label": "Sort (Reverse)",
+                            "onClick": {
+                                "args": [],
+                                "action": "IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions[\"ReverseSortPlayer\"])"
+                            }
+                        }
+                    ]
+                }, {
+                    "name": "CleanStacks",
+                    "order": 2,
+                    "type": "simple",
+                    "face": {
+                        "label": "Clean Stacks",
+                        "onClick": {
+                            "args": [],
+                            "action": "IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50)"
+                        }
+                    }
+                }
+            ]
+        }, {
+            "groupName": "chestButtons",
+            "orientation": "horizontal",
+            "anchor": "right",
+            "x": "453-Main.inventoryBackTexture*0.755f",
+            "y": 28,
+            "bgColor": "CHEST",
+            "bgAlpha": 0.8,
+            "spacing": 4,
+            "scale": 0.755,
+
+            "buttons": [
+                {
+                    "name": "Sort",
+                    "order": 3,
+                    "type": "keyToggle",
+                    "toggleKey": "Shift",
+                    "faces": [
+                        {
+                            "label": "Sort",
+                            "onClick": {
+                                "args": [],
+                                "action": "IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions[\"ReverseSortChest\"])"
+                            }
+                        }, {
+                            "label": "Sort (Reverse)",
+                            "onClick": {
+                                "args": [],
+                                "action": "IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions[\"ReverseSortChest\"])"
+                            }
+                        }
+                    ]
+                }, {
+                    "name": "restockQuickstack",
+                    "order": 2,
+                    "type": "keyToggle",
+                    "toggleKey": "Shift",
+                    "buttons": [
+                        {
+                            "name": "restock",
+                            "type": "simple",
+                            "face": {
+                                "label": "Restock",
+                                "onclick": {
+                                    "args": [],
+                                    "action": "IHSmartStash.SmartLoot"
+                                }
+                            }
+                        }, {
+                            "name": "quickstack",
+                            "type": "switch",
+                            "mouseBtn": "right",
+                            "isActive": {
+                                "args": [],
+                                "action": "IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS)"
+                            },
+                            "onRightClick": {
+                                "args": [],
+                                "actions": [
+                                    "Main.PlaySound(22);",
+                                    "IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);"
+                                ]
+                            },
+                            "onClick": {
+                                "action": "IHUtils.DoQuickStack"
+                            },
+                            "faces": [
+                                {
+                                    "label": "Quick Stack"
+                                }, {
+                                    "label": "Quick Stack (Locked)",
+                                    "useEmblem": {
+                                        "emblem": "lock",
+                                        "color": "Color.Firebrick",
+                                        "offsetX": 0.5,
+                                        "offsetY": -0.5
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, {
+                    "name": "deposits",
+                    "order": 1,
+                    "type": "keyToggle",
+                    "toggleKey": "Shift",
+                    "buttons": [
+                        {
+                            "name": "smartDep",
+                            "type": "simple",
+                            "face": {
+                                "label": "Smart Deposit",
+                                "onclick": {
+                                    "args": [],
+                                    "action": "IHSmartStash.SmartDeposit"
+                                }
+                            }
+                        }, {
+                            "name": "depositAll",
+                            "type": "switch",
+                            "mouseBtn": "right",
+                            "isActive": {
+                                "args": [],
+                                "action": "IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA)"
+                            },
+                            "onRightClick": {
+                                "args": [],
+                                "actions": [
+                                    "Main.PlaySound(22);",
+                                    "IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);"
+                                ]
+                            },
+                            "onClick": {
+                                "action": "IHUtils.DoDepositAll"
+                            },
+                            "faces": [
+                                {
+                                    "label": "Deposit All"
+                                }, {
+                                    "label": "Deposit All (Locked)",
+                                    "useEmblem": {
+                                        "emblem": "lock",
+                                        "color": "Color.Firebrick",
+                                        "offsetX": 0.5,
+                                        "offsetY": -0.5
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

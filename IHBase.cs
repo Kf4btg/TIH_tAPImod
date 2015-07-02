@@ -55,10 +55,66 @@ namespace InvisibleHand
             ButtonRepo    = new Dictionary<String, IHButton>();
             ButtonUpdates = new Stack<String>();
 
+            //Add some actions to the ButtonParser
+            ButtonParser.RegisterActions( new Dictionary<String,Action>
+            {
+                { "pSort", () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]) },
+                { "pSortRev", () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) },
+
+                { "cSort", () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]) },
+                { "cSortRev", () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]) },
+
+
+
+                { "toggleLockDA", () => {
+                     Main.PlaySound(22); //lock sound
+                     IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); }},
+                {"toggleLockQS", () => {
+                     Main.PlaySound(22); //lock sound
+                     IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); }},
+
+                {"SmartLoot", IHSmartStash.SmartLoot},
+                {"SmartDeposit", IHSmartStash.SmartDeposit},
+
+                {"QuickStack", IHUtils.DoQuickStack},
+                {"DepositAll", IHUtils.DoDepositAll},
+                {"LootAll", IHUtils.DoLootAll}
+             }
+            );
+
+
+
+
+
             ButtonGrid   = textures["resources/ButtonGrid"];
             ButtonBG     = textures["resources/button_bg"];
             invButtons   = ButtonMaker.GetButtons("Inventory");
             chestButtons = ButtonMaker.GetButtons("Chest");
+        }
+
+        /**
+         * For Inter-Mod communication.
+         * Currently only to support loading buttons from external configuration files.
+         * And SPECIFICALLY to support adding actions to events on said buttons.
+         */
+        public override object OnModCall(ModBase mod, params object[] arguments)
+        {
+            if (arguments.Length == 0 || !(arguments[0] is string)) {
+                throw new ArgumentException("First argument for mod calls to 'InvisibleHand' must be a string.");
+            }
+            switch((string)arguments[0])
+            {
+                case "AddButtonEventAction":
+                    return ButtonParser.GetAction((string)arguments[2]);
+                    // switch((string)arguments[1])
+                    // {
+                    //     case "onClick":
+                    //         break;
+                    //     case "onRightClick":
+                    //         break;
+                    // }
+                    // break;
+            }
         }
 
         public override void OptionChanged(Option option)

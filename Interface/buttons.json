@@ -133,8 +133,9 @@
                                 "action": "IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS)"
                             },
                             "onRightClick": {
-                                "args": [],
-                                "actions": [
+                                "modIN": "InvisibleHand",
+                                "args": [
+                                    "Action",
                                     "Main.PlaySound(22);",
                                     "IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);"
                                 ]

@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
+// using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -83,7 +83,7 @@ namespace InvisibleHand
 
         public void RegisterKeyToggle(KState.Special key, String context1, String context2)
         {
-            RegisterKeyToggle(key, IHBase.self.ButtonRepo[context1], IHBase.self.ButtonRepo[context2]);
+            RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1], IHBase.Instance.ButtonRepo[context2]);
         }
 
         // set up key-event-subscribers that will toggle btw 2 contexts

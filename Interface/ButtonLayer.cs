@@ -20,7 +20,7 @@ namespace InvisibleHand
         //TODO: have this fade in/out?
         public float LayerOpacity { get; private set; }
 
-        protected ButtonLayer(string name) : base(IHBase.self.mod.InternalName + ":" + name)
+        protected ButtonLayer(string name) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
             Buttons = new Dictionary<IHAction, ButtonBase>();
             ButtonFrame = Rectangle.Empty;
@@ -68,10 +68,10 @@ namespace InvisibleHand
             switch(type)
             {
                 case "Inventory":
-                    btns = new InventoryButtons(IHBase.self);
+                    btns = new InventoryButtons(IHBase.Instance);
                     break;
                 case "Chest":
-                    btns = new ChestButtons(IHBase.self);
+                    btns = new ChestButtons(IHBase.Instance);
                     break;
                 default:
                     throw new ArgumentException("Invalid ButtonLayer type \"" + type + "\"; valid types are \"Inventory\" and \"Chest\".");

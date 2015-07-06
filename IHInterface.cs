@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+// using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 
@@ -12,17 +12,17 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        public static IHInterface self { get; private set; }
-        public IHInterface() : base() {self=this;}
+        // public static IHInterface self { get; private set; }
+        // public IHInterface() : base() {self=this;}
 
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
             if (Main.playerInventory)
             {
                 if (Main.localPlayer.chest!=-1)
-                    InterfaceLayer.Add(list, IHBase.self.chestButtons, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.Instance.chestButtons, InterfaceLayer.LayerInventory, true);
                 else
-                    InterfaceLayer.Add(list, IHBase.self.invButtons, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.Instance.invButtons, InterfaceLayer.LayerInventory, true);
             }
         }
 
@@ -73,7 +73,7 @@ namespace InvisibleHand
         // Shift + Left Click on item slot to move it between inventory and chest
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
         {
-            if (!(bool)IHBase.self.options["enableShiftMove"].Value) return true;
+            if (!(bool)IHBase.Instance.options["enableShiftMove"].Value) return true;
 
             if (slot.modBase == null && release && KState.Special.Shift.Down())
             {

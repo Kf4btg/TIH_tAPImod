@@ -9,7 +9,7 @@ namespace InvisibleHand
 {
     public class IHBase : ModBase
     {
-        public static IHBase self { get; private set; }
+        public static IHBase Instance { get; private set; }
 
         public static Dictionary<String, Keys> ActionKeys;
         public static Dictionary<String, bool> ModOptions;
@@ -29,7 +29,7 @@ namespace InvisibleHand
 
         public override void OnLoad()
         {
-            self = this;
+            Instance = this;
             ActionKeys = new Dictionary<String, Keys>();
             ModOptions = new Dictionary<String, bool>();
 
@@ -46,7 +46,7 @@ namespace InvisibleHand
 
         public override void OnAllModsLoaded()
         {
-            lockedIcon = self.textures["resources/LockIndicator"];
+            lockedIcon = Instance.textures["resources/LockIndicator"];
 
             CategoryDef.Initialize();
 

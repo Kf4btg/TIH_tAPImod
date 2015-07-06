@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 // using System.Linq.Expressions;
 using System.Linq.Dynamic;
-using TAPI;
 using Terraria;
 
 namespace InvisibleHand

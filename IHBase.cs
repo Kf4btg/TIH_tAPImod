@@ -14,9 +14,25 @@ namespace InvisibleHand
         public static Dictionary<String, Keys> ActionKeys;
         public static Dictionary<String, bool> ModOptions;
 
-        public static Texture2D lockedIcon;
-        public static Texture2D ButtonGrid { get; private set; }
-        public static Texture2D ButtonBG { get; private set; }
+        private static Texture2D lockedIcon;
+        private static Texture2D buttonGrid;
+        private static Texture2D buttonBG;
+
+        // lazy-loading the textures prevents errors initialization errors
+        // on the dedicated server.
+        public static Texture2D LockedIcon
+        {
+            get { return lockedIcon ?? (lockedIcon = Instance.textures["resources/LockIndicator"]); }
+        }
+        public static Texture2D ButtonGrid
+        {
+            get { return buttonGrid ?? (buttonGrid = Instance.textures["resources/ButtonGrid"]); }
+        }
+        public static Texture2D ButtonBG
+        {
+            get { return buttonBG ?? (buttonBG = Instance.textures["resources/button_bg"]); }
+        }
+
         public static KeyEventProvider KEP;
 
         public ButtonLayer invButtons;
@@ -46,12 +62,9 @@ namespace InvisibleHand
 
         public override void OnAllModsLoaded()
         {
-            lockedIcon = Instance.textures["resources/LockIndicator"];
-
             CategoryDef.Initialize();
 
-            ButtonGrid   = textures["resources/ButtonGrid"];
-            ButtonBG     = textures["resources/button_bg"];
+            // TODO: does doing this here also make the dedicated-server freak out?
             invButtons   = ButtonMaker.GetButtons("Inventory");
             chestButtons = ButtonMaker.GetButtons("Chest");
         }

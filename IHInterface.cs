@@ -36,7 +36,7 @@ namespace InvisibleHand
         {
             if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(Main.localPlayer, slot.index))
             {
-                sb.Draw(IHBase.lockedIcon,      // the texture to draw
+                sb.Draw(IHBase.LockedIcon,      // the texture to draw
                             slot.pos,           // (Vector2) location in screen coords to draw sprite
                             null,               // Rectangle to specifies source texels from texture; null draws whole texture
                             Color.Firebrick,    // color to tint sprite; color.white=full color, no tint

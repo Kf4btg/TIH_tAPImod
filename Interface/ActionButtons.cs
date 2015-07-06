@@ -134,7 +134,7 @@ namespace InvisibleHand
                     onRightClick = () => {
                         Main.PlaySound(22); //lock sound
                         IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); },
-                    PostDraw = (sb, bBase) => sb.Draw(IHBase.lockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha) }, //draw lock
+                    PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha) }, //draw lock
 
                 // "Smart Deposit",            //5
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
@@ -156,7 +156,7 @@ namespace InvisibleHand
                     onRightClick = () => {
                         Main.PlaySound(22); //lock sound
                         IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); },
-                    PostDraw = (sb, bBase) => sb.Draw(IHBase.lockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha) },
+                    PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha) },
             };
 
             // make some anonymous types to help with readability

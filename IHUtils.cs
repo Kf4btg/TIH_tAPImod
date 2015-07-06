@@ -109,10 +109,10 @@ namespace InvisibleHand
         {
             if (player.chest == -1) return;
 
-            Item[] inventory = player.inventory;
-            Item[] container = player.chestItems;
+            var inventory = player.inventory;
+            var container = player.chestItems;
             bool sendMessage = player.chest > -1;
-            bool checkLocks  = IHPlayer.ActionLocked(player, IHAction.QS);
+            var checkLocks  = IHPlayer.ActionLocked(player, IHAction.QS);  //boolean
 
 
             for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
@@ -169,14 +169,15 @@ namespace InvisibleHand
         {
             bool sendMessage = Main.localPlayer.chest > -1;
 
-            Item pItem = slot.MyItem;
+            var pItem = slot.MyItem;
 
             int retIdx = -1;
             if (pItem.stack == pItem.maxStack) //move non-stackable items or full stacks to empty slot.
             {
                 retIdx = MoveToFirstEmpty( pItem, Main.localPlayer.chestItems, 0,
-                new Func<int,bool>( i => i<Chest.maxItems ),
-                new Func<int,int> ( i => i+1 ) );
+                                            i => i<Chest.maxItems,
+                                            i => i+1
+                                        );
             }
 
             // if we didn't find an empty slot...
@@ -207,7 +208,7 @@ namespace InvisibleHand
         public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
         {
             //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
-            Item cItem = slot.MyItem;
+            var cItem = slot.MyItem;
 
             if (cItem.IsBlank()) return false;
 
@@ -381,7 +382,7 @@ namespace InvisibleHand
             //search inventory for matching non-maxed stacks
             for (int i=iStart; iCheck(i); i=iNext(i))
             {
-                Item item2 = dest[i];
+                var item2 = dest[i];
                 // found a non-empty slot containing a not-full stack of the same item type
                 if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
                 {

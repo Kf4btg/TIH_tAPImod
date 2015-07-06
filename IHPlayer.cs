@@ -29,10 +29,12 @@ namespace InvisibleHand
         public override void Save(BinBuffer bb)
         {
             // if (!IHBase.oLockingEnabled) return;
-            // let's just do it anyway
-            for (int i=0; i<lockedSlots.Length; i++)
+
+            // for (int i=0; i<lockedSlots.Length; i++)
+            foreach (var l in lockedSlots)
             {
-                bb.Write(lockedSlots[i]);
+                // bb.Write(lockedSlots[i]);
+                bb.Write(l);
             }
             bb.Write(LockedActions.Count);
             foreach (KeyValuePair<IHAction, bool> kvp in LockedActions)

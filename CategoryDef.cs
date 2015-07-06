@@ -12,8 +12,11 @@ namespace InvisibleHand
     public static class CategoryDef
     {
         // pass initial capacity as ItemCat.OTHER -- this trick should work so long as OTHER remains the last member of the Enum
-        public static readonly Dictionary<ItemCat, List<String>> ItemSortRules  = new Dictionary<ItemCat, List<String>>((Int32)ItemCat.OTHER+1);
-        public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories = new Dictionary<ItemCat, Func<Item, bool>>((Int32)ItemCat.OTHER+1);
+        public static readonly Dictionary<ItemCat, List<string>> ItemSortRules  =
+                new Dictionary<ItemCat, List<string>>((int)ItemCat.OTHER+1);
+
+        public static readonly Dictionary<ItemCat, Func<Item, bool>> Categories =
+                new Dictionary<ItemCat, Func<Item, bool>>((int)ItemCat.OTHER+1);
 
         public static void Initialize()
         {
@@ -99,55 +102,274 @@ namespace InvisibleHand
         */
         public static void SetupSortingRules()
         {
-            ItemSortRules.Add( ItemCat.COIN,     new List<String> { "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.PICK,     new List<String> { "rare", "pick", "type", "value"});
-            ItemSortRules.Add( ItemCat.AXE,      new List<String> { "rare", "axe", "type", "value"});
-            ItemSortRules.Add( ItemCat.HAMMER,   new List<String> { "rare", "hammer", "type", "value"});
+            ItemSortRules.Add( ItemCat.COIN,     new List<string> {
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.PICK,     new List<string> {
+                "rare",
+                "pick",
+                "type",
+                "value"
+                });
+            ItemSortRules.Add( ItemCat.AXE,      new List<string> {
+                "rare",
+                "axe",
+                "type",
+                "value"
+                });
+            ItemSortRules.Add( ItemCat.HAMMER,   new List<string> {
+                "rare",
+                "hammer",
+                "type",
+                "value"
+                });
             // stack to sort the stackable boomerangs separately
-            ItemSortRules.Add( ItemCat.MELEE,    new List<String> { "maxStack", "damage", "type", "rare", "value", "stack desc"});
-            ItemSortRules.Add( ItemCat.TOOL,     new List<String> { "consumable", "fishingPole", "shoot", "type", "stack desc" });
+            ItemSortRules.Add( ItemCat.MELEE,    new List<string> {
+                "maxStack",
+                "damage",
+                "type",
+                "rare",
+                "value",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.TOOL,     new List<string> {
+                "consumable",
+                "fishingPole",
+                "shoot",
+                "type",
+                "stack desc"
+                });
             // consumable to sort throwing weapons separately
-            ItemSortRules.Add( ItemCat.MECH,     new List<String> { "cartTrack", "tileBoost", "createTile desc", "value", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.RANGED,   new List<String> { "consumable", "damage", "type", "rare", "value", "stack desc"});
-            ItemSortRules.Add( ItemCat.BOMB,     new List<String> { "damage>0 desc", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.AMMO,     new List<String> { "rare", "damage", "type", "value", "stack desc"});
-            ItemSortRules.Add( ItemCat.MAGIC,    new List<String> { "damage", "rare", "type", "value"});
-            ItemSortRules.Add( ItemCat.SUMMON,   new List<String> { "damage", "rare", "type", "value"});
-            ItemSortRules.Add( ItemCat.PET,      new List<String> { "buffType", "type"});
-            ItemSortRules.Add( ItemCat.HEAD,     new List<String> { "rare", "defense", "value", "type"});
-            ItemSortRules.Add( ItemCat.BODY,     new List<String> { "rare", "defense", "value", "type"});
-            ItemSortRules.Add( ItemCat.LEGS,     new List<String> { "rare", "defense", "value", "type"});
-            ItemSortRules.Add( ItemCat.ACCESSORY,new List<String> { "handOffSlot", "handOnSlot", "backSlot", "frontSlot", "shoeSlot", "waistSlot",
-                                                                    "wingSlot", "balloonSlot", "faceSlot", "neckSlot", "shieldSlot",
-                                                                    "rare", "value", "type", "prefix.id"});
+            ItemSortRules.Add( ItemCat.MECH,     new List<string> {
+                "cartTrack",
+                "tileBoost",
+                "createTile desc",
+                "value",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.RANGED,   new List<string> {
+                "consumable",
+                "damage",
+                "type",
+                "rare",
+                "value",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.BOMB,     new List<string> {
+                "damage>0 desc",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.AMMO,     new List<string> {
+                "rare",
+                "damage",
+                "type",
+                "value",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.MAGIC,    new List<string> {
+                "damage",
+                "rare",
+                "type",
+                "value"
+                });
+            ItemSortRules.Add( ItemCat.SUMMON,   new List<string> {
+                "damage",
+                "rare",
+                "type",
+                "value"
+                });
+            ItemSortRules.Add( ItemCat.PET,      new List<string> {
+                "buffType",
+                "type"
+                });
+            ItemSortRules.Add( ItemCat.HEAD,     new List<string> {
+                "rare",
+                "defense",
+                "value",
+                "type"
+                });
+            ItemSortRules.Add( ItemCat.BODY,     new List<string> {
+                "rare",
+                "defense",
+                "value",
+                "type"
+                });
+            ItemSortRules.Add( ItemCat.LEGS,     new List<string> {
+                "rare",
+                "defense",
+                "value",
+                "type"
+                });
+            ItemSortRules.Add( ItemCat.ACCESSORY,new List<string> {
+                "handOffSlot",
+                "handOnSlot",
+                "backSlot",
+                "frontSlot",
+                "shoeSlot",
+                "waistSlot",
+                "wingSlot",
+                "balloonSlot",
+                "faceSlot",
+                "neckSlot",
+                "shieldSlot",
+                "rare",
+                "value",
+                "type",
+                "prefix.id"
+                });
             // stack because of those fishbowls...
-            ItemSortRules.Add( ItemCat.VANITY,   new List<String> { "headSlot!=-1 desc", "bodySlot!=-1 desc", "legSlot!=-1 desc", "name", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.POTION,   new List<String> { "healLife desc", "healMana desc", "buffType!=0 desc", "buffType", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.CONSUME,  new List<String> { "potion desc", "buffType", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.BAIT,     new List<String> { "bait", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.DYE,      new List<String> { "dye", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.PAINT,    new List<String> { "paint", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.ORE,      new List<String> { "rare", "value", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.BAR,      new List<String> { "rare", "value", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.GEM,      new List<String> { "rare", "value", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.SEED,     new List<String> { "name", "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.LIGHT,    new List<String> { "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.CRAFT,    new List<String> { "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.FURNITURE,new List<String> { "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.STATUE,   new List<String> { "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.WALLDECO, new List<String> { "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.BANNER,   new List<String> { "type", "stack desc"});
-            ItemSortRules.Add( ItemCat.CLUTTER,  new List<String> { "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.WOOD,     new List<String> { "createTile", "type", "name", "stack desc" });
-            ItemSortRules.Add( ItemCat.BLOCK,    new List<String> { "createTile", "type", "name", "stack desc" });
-            ItemSortRules.Add( ItemCat.BRICK,    new List<String> { "createTile", "type", "name", "stack desc" });
-            ItemSortRules.Add( ItemCat.TILE,     new List<String> { "tileWand", "createTile", "type", "name", "stack desc"});
-            ItemSortRules.Add( ItemCat.WALL,     new List<String> { "createWall", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.VANITY,   new List<string> {
+                "headSlot!=-1 desc",
+                "bodySlot!=-1 desc",
+                "legSlot!=-1 desc",
+                "name",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.POTION,   new List<string> {
+                "healLife desc",
+                "healMana desc",
+                "buffType!=0 desc",
+                "buffType",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.CONSUME,  new List<string> {
+                "potion desc",
+                "buffType",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.BAIT,     new List<string> {
+                "bait",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.DYE,      new List<string> {
+                "dye",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.PAINT,    new List<string> {
+                "paint",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.ORE,      new List<string> {
+                "rare",
+                "value",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.BAR,      new List<string> {
+                "rare",
+                "value",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.GEM,      new List<string> {
+                "rare",
+                "value",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.SEED,     new List<string> {
+                "name",
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.LIGHT,    new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.CRAFT,    new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.FURNITURE,new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.STATUE,   new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.WALLDECO, new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.BANNER,   new List<string> {
+                "type",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.CLUTTER,  new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.WOOD,     new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.BLOCK,    new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.BRICK,    new List<string> {
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.TILE,     new List<string> {
+                "tileWand",
+                "createTile",
+                "type",
+                "name",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.WALL,     new List<string> {
+                "createWall",
+                "type",
+                "stack desc"
+                });
             // generic stuff
-            ItemSortRules.Add( ItemCat.MISC_MAT, new List<String> { "type", "netID", "stack desc"});
-            ItemSortRules.Add( ItemCat.SPECIAL,  new List<String> { "maxStack", "type", "stack desc"});
+            ItemSortRules.Add( ItemCat.MISC_MAT, new List<string> {
+                "type",
+                "netID",
+                "stack desc"
+                });
+            ItemSortRules.Add( ItemCat.SPECIAL,  new List<string> {
+                "maxStack",
+                "type",
+                "stack desc"
+                });
             // quest fish: uniquestack=true, rare=-11
-            ItemSortRules.Add( ItemCat.OTHER,    new List<String> { "uniqueStack", "rare", "type", "netID", "stack desc"});
+            ItemSortRules.Add( ItemCat.OTHER,    new List<string> {
+                "uniqueStack",
+                "rare",
+                "type",
+                "netID",
+                "stack desc"
+                });
         }//end setup sorting rules
     }
 }

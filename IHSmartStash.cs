@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System;
 using System.Linq;
-using TAPI;
 using Terraria;
 
 namespace InvisibleHand
@@ -18,13 +16,13 @@ namespace InvisibleHand
         {
             if (Main.localPlayer.chest == -1) return;
 
-            Item[] pInventory = Main.localPlayer.inventory;
-            Item[] chestItems = Main.localPlayer.chestItems;
-            bool sendNetMsg   = Main.localPlayer.chest >-1;
+            var pInventory = Main.localPlayer.inventory; //Item[]
+            var chestItems = Main.localPlayer.chestItems; //Item[]
+            var sendNetMsg = Main.localPlayer.chest >-1; //bool
 
             // define a query that creates category groups for the items in the chests,
-            // then pulls out the category keys into a distinct list
-            List<ItemCat> catList =
+            // then pulls out the category keys into a distinct list (List<ItemCat>)
+            var catList =
                     (from item in chestItems
                         where !item.IsBlank()
                         group item by item.GetCategory() into catGroup
@@ -66,9 +64,9 @@ namespace InvisibleHand
         {
             if (Main.localPlayer.chest == -1) return;
 
-            Item[] pInventory = Main.localPlayer.inventory;
-            Item[] chestItems = Main.localPlayer.chestItems;
-            bool sendNetMsg   = Main.localPlayer.chest >-1;
+            var pInventory = Main.localPlayer.inventory; //Item[]
+            var chestItems = Main.localPlayer.chestItems; //Item[]
+            var sendNetMsg = Main.localPlayer.chest >-1; //bool
 
             int index;
             //for each item in inventory (including coins & hotbar)...

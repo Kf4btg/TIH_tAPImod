@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Xna.Framework;
-using TAPI;
 using TAPI.UIKit;
 using Terraria;
 
@@ -79,8 +78,8 @@ namespace InvisibleHand
             //this shouldn't happen if method is called correctly
             if (player.chest == -1) return;
 
-            bool sendNetMsg = player.chest > -1;
-            Item[] container = player.chestItems;
+            var sendNetMsg = player.chest > -1;
+            var container = player.chestItems;
 
             for (int i=0; i<Chest.maxItems; i++)
             {
@@ -241,10 +240,20 @@ namespace InvisibleHand
         // attempts to move an item to an empty slot (returns success status)
         private static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
         {
-            int iStart; Func<int,bool> iCheck; Func<int,int> iNext;
+            int iStart;
+            Func<int,bool> iCheck;
+            Func<int,int> iNext;
 
-            if (desc) { iStart =  ixStop; iCheck = i => i >= ixStart; iNext = i => i-1; }
-            else      { iStart = ixStart; iCheck = i => i <=  ixStop; iNext = i => i+1; }
+            if (desc) {
+                iStart =  ixStop;
+                iCheck = i => i >= ixStart;
+                iNext = i => i-1;
+            }
+            else {
+                iStart = ixStart;
+                iCheck = i => i <=  ixStop;
+                iNext = i => i+1;
+            }
 
             int retIdx = MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
             if (retIdx >= 0)
@@ -344,6 +353,15 @@ namespace InvisibleHand
         */
 
         // @return: >=0 (index) if move succeeded; -1 if failed
+        /// <summary>
+        /// Will move the given item into a destination array.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="dest"></param>
+        /// <param name="iStart"></param>
+        /// <param name="iCheck"></param>
+        /// <param name="iNext"></param>
+        /// <returns>bigger than -1 if move succeeded; -1 if failed</returns>
         public static int MoveToFirstEmpty(Item item, Item[] dest, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
         {
             for (int i=iStart; iCheck(i); i=iNext(i)) //!ref:Main:#22416.00#

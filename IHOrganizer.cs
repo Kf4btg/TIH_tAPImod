@@ -23,7 +23,7 @@ namespace InvisibleHand
                 orderby category.Key
                 select category;
 
-            List<Item> sortedList = new List<Item>();
+            var sortedList = new List<Item>();
 
             //  Now we can dynamically construct Queries using Dynamic LINQ
             // expression methods with arbitrary (maybe later user-defined) sorting parameters.
@@ -34,8 +34,8 @@ namespace InvisibleHand
                 var result = category.AsQueryable().OrderBy(String.Join(", ", CategoryDef.ItemSortRules[category.Key]));
 
                 // execute the query and put the result in a list to return
-                foreach (Item i in result)
-                    sortedList.Add(i);
+                foreach (var s_item in result)
+                    sortedList.Add(s_item);
             }
             return sortedList;
         }
@@ -113,9 +113,7 @@ namespace InvisibleHand
         // as above, but given the actual chest object, pull out the array
         public static void SortChest(Chest chest, bool reverse=false)
         {
-            ConsolidateStacks(chest.item);
-
-            Sort(chest.item, true, reverse);
+            SortChest(chest.item, reverse);
         }
 
         /*************************************************************************
@@ -141,7 +139,7 @@ namespace InvisibleHand
             if (range == null) range = new Tuple<int,int>(0, container.Length -1);
 
             // for clarity
-            bool checkLocks = IHBase.ModOptions["LockingEnabled"];
+            var checkLocks = IHBase.ModOptions["LockingEnabled"]; //boolean
 
             // get copies of the items and send them off to be sorted
             var itemSorter = OrganizeItems(GetItemCopies(container, chest, range));
@@ -150,7 +148,7 @@ namespace InvisibleHand
             if (reverse) itemSorter.Reverse(); //reverse on user request
 
             // depending on user settings, decide if we copy items to end or beginning of container
-            bool fillFromEnd = chest ? IHBase.ModOptions["RearSortChest"] : IHBase.ModOptions["RearSortPlayer"];
+            var fillFromEnd = chest ? IHBase.ModOptions["RearSortChest"] : IHBase.ModOptions["RearSortPlayer"]; //boolean
 
             // set up the functions that will be used in the iterators ahead
             Func<int,int> getIndex, getIter;
@@ -175,13 +173,16 @@ namespace InvisibleHand
             if (!chest && checkLocks) // move these checks out of the loop
             {
                 // copy the sorted items back to the original container
-                foreach (Item item in itemSorter)
+                foreach (var item in itemSorter)
                 {
                     // find the first unlocked slot.
                     // this would throw an exception if range.Item1+filled somehow went over 49,
                     // but if the categorizer and slot-locker are functioning correctly,
                     // that _shouldn't_ be possible. Shouldn't. Probably.
-                    while (IHPlayer.SlotLocked(Main.localPlayer, getIndex(filled))) { filled++; }
+                    while (IHPlayer.SlotLocked(Main.localPlayer, getIndex(filled)))
+                    {
+                        filled++;
+                    }
                     container[getIndex(filled++)] = item.Clone();
                     Main.PlaySound(7, -1, -1, 1);
                 }
@@ -196,7 +197,7 @@ namespace InvisibleHand
             }
             else // just run through 'em all
             {
-                foreach ( Item item in itemSorter)
+                foreach ( var item in itemSorter)
                 {
                     container[getIndex(filled++)] = item.Clone();
                     Main.PlaySound(7, -1, -1, 1);
@@ -224,7 +225,7 @@ namespace InvisibleHand
 
             for (int i = range.Item2; i>=range.Item1; i--) //iterate in reverse
             {
-                Item item = container[i];
+                var item = container[i];
 
                 //found non-blank item in a <full stack
                 if (!item.IsBlank() && item.stack < item.maxStack)
@@ -242,7 +243,7 @@ namespace InvisibleHand
         {
             for (int j=rangeEnd; j>=rangeStart; j--) //iterate in reverse
             {
-                Item item2 = container[j];
+                var item2 = container[j];
                 // found another <full stack of a matching item
                 if (!item2.IsBlank() && item2.IsTheSameAs(item) && item2.stack < item2.maxStack)
                 {

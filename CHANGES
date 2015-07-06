@@ -1,3 +1,18 @@
+1.2.0-rc2
+    -   Improved multiplayer support:
+        -   Changed the way textures are loaded to hopefully reduce conflicts with the dedicated server.
+        -   Added code that wraps all the actions pertaining to moving items in-to/out-of/around-in chests.
+            -   All the wrapper does is record the contents of the chest before the action, which it then compares to the chest's contents after the action and sends a message to the server to update each slot that has changed.
+            -   This seems to work well, though there may be performance issues we should keep an eye out for.
+        -   This all still needs major testing.
+    -   Changed up position and appearance of buttons.  "Shift"-ed alternate actions and locking-features are still in place.
+        -   The buttons for the player inventory are above the coin & ammo slots. These disappear when a chest is open.
+        -   The buttons for an open chest appear to the left of the trash slot. Only present when using a chest.
+    -   Known Issues:
+        -   Both sets of buttons have VERY low opacity unless the player is hovering the mouse over them. This is intended to make them less intrusive and to preserve the Vanilla aesthetics and experience as much as possible. A side effect of this is that the player can easily lose sight of them on bright or complex backgrounds, since they'll blend in and become effectively invisible until the mouse is placed over them--and even with the mouse over them, they still sometimes blend in with complex backgrounds of the same general color. This may be a little disorienting when trying to quickly find the button one wants. I think I may at some point try to implement a mod-option to allow the player to adjust the opacity.
+        -   Stupid tooltips still get drawn under other UI-elements. Bleh.
+
+
 1.2.0-rc1
     -   First complete-ish version of buttons for sort/stack/restock/smart-deposit. Includes ability to lock down slots from being affected by QuickStack/Deposit All.
     -   How to use:

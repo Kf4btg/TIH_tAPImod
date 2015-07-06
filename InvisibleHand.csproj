@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B31E4BCD-F4B9-43FA-9AFD-EAA28A383100}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>InvisibleHand</RootNamespace>
+    <AssemblyName>InvisibleHand</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+      <Reference Include="Ionic.Zip.Reduced, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+        <SpecificVersion>False</SpecificVersion>
+        <HintPath>..\ref\Ionic.Zip.Reduced.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
+        <SpecificVersion>False</SpecificVersion>
+        <HintPath>..\ref\Microsoft.Xna.Framework.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
+        <SpecificVersion>False</SpecificVersion>
+        <HintPath>..\ref\Microsoft.Xna.Framework.Game.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
+        <SpecificVersion>False</SpecificVersion>
+        <HintPath>..\ref\Microsoft.Xna.Framework.Graphics.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Xna.Framework.Xact, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
+        <SpecificVersion>False</SpecificVersion>
+        <HintPath>..\ref\Microsoft.Xna.Framework.Xact.dll</HintPath>
+      </Reference>
+      <Reference Include="System">
+        <HintPath>..\ref\System.dll</HintPath>
+      </Reference>
+      <Reference Include="System.ServiceModel">
+        <HintPath>..\ref\System.ServiceModel.dll</HintPath>
+      </Reference>
+      <Reference Include="mscorlib">
+        <HintPath>..\ref\mscorlib.dll</HintPath>
+      </Reference>
+      <Reference Include="tAPI">
+        <HintPath>..\ref\tAPI Core.dll</HintPath>
+      </Reference>
+      <Reference Include="Terraria">
+        <HintPath>..\ref\Terraria.exe</HintPath>
+      </Reference>
+ </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CategoryDef.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IHBase.cs" />
+    <Compile Include="IHInterface.cs" />
+    <Compile Include="IHOrganizer.cs" />
+    <Compile Include="IHPlayer.cs" />
+    <Compile Include="IHSmartStash.cs" />
+    <Compile Include="IHUtils.cs" />
+    <Compile Include="IHWorld.cs" />
+    <Compile Include="KeyEventProvider.cs" />
+    <Compile Include="Interface\ActionButtons.cs" />
+    <Compile Include="Interface\ButtonBase.cs" />
+    <Compile Include="Interface\ButtonLayer.cs" />
+    <Compile Include="Interface\ButtonState.cs" />
+    <Compile Include="Interface\IHButton.cs" />
+    <Compile Include="DynamicQuery\Dynamic.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IHicon.png" />
+    <Content Include="resources\ButtonGrid.png" />
+    <Content Include="resources\button_bg.png" />
+    <Content Include="resources\LockIndicator.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ModInfo.json" />
+    <None Include="ModOptions.json" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

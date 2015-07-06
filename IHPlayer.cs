@@ -63,6 +63,10 @@ namespace InvisibleHand
             }
         }
 
+        // During this phase we check if the player has pressed any hotkeys;
+        // if so, the corresponding action is called, with the chest-related
+        // actions wrapped in special net-update code to prevent syncing issues
+        // during multiplayer.
         public override void PreUpdate()
         {
             //activate only if:
@@ -72,7 +76,8 @@ namespace InvisibleHand
                 // not talking to an npc
             if (!API.KeyboardInputFocused() && Main.playerInventory && Main.npcShop==0 && Main.localPlayer.talkNPC==-1)
             {
-                if (IHBase.ActionKeys["sort"].Pressed()) // Sort inventory/chest
+                // Sort inventory/chest
+                if (IHBase.ActionKeys["sort"].Pressed())
                 {
                     // NOTE: this used to check player.chestItems==null, but I once got a
                     // "object reference not set to instance of object" or whatever kind of error
@@ -85,32 +90,84 @@ namespace InvisibleHand
                         return;
                     }
                     // else call sort on the Item[] array returned by chestItems
-                    IHOrganizer.SortChest(player.chestItems, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
+                    DoChestUpdateAction( () => {
+                        IHOrganizer.SortChest(player.chestItems, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
+                    });
                 }
 
-                else if (IHBase.ActionKeys["cleanStacks"].Pressed()) //Consolidate Stacks
+                //Consolidate Stacks
+                else if (IHBase.ActionKeys["cleanStacks"].Pressed())
                 {
                     if ( player.chest == -1 )
                     {
                         IHOrganizer.ConsolidateStacks(player.inventory, 0, 50);
                         return;
                     }
-                    IHOrganizer.ConsolidateStacks(player.chestItems);
+                    DoChestUpdateAction( () => { IHOrganizer.ConsolidateStacks(player.chestItems); } );
                 }
                 else {
                     if ( player.chest == -1 ) return; //no action w/o open container
 
+                    // smartloot or quickstack
                     if (IHBase.ActionKeys["quickStack"].Pressed()) {
-                        if (KState.Special.Shift.Down()) IHSmartStash.SmartLoot();
-                        else IHUtils.DoQuickStack(player);
+                        if (KState.Special.Shift.Down())
+                            DoChestUpdateAction( IHSmartStash.SmartLoot );
+                        else
+                            DoChestUpdateAction( () => { IHUtils.DoQuickStack(player); } );
                     }
+                    // smart-deposit or deposit-all
                     else if (IHBase.ActionKeys["depositAll"].Pressed()) {
-                        if (KState.Special.Shift.Down()) IHSmartStash.SmartDeposit();
-                        else IHUtils.DoDepositAll(player);
+                        if (KState.Special.Shift.Down())
+                            DoChestUpdateAction( IHSmartStash.SmartDeposit );
+                        else
+                            DoChestUpdateAction( () => { IHUtils.DoDepositAll(player); } );
                     }
+                    // loot all
                     else if (IHBase.ActionKeys["lootAll"].Pressed())
-                        IHUtils.DoLootAll(player);
+                        DoChestUpdateAction( () => { IHUtils.DoLootAll(player); } );
                 }
+
+            }
+        }
+
+        /// <summary>
+        /// Takes an Action and will perform it wrapped in some net update code if we are a client. Otherwise it just does whatever it is.
+        /// </summary>
+        /// <param name="action">An Action (a lambda with no output)</param>
+        protected void DoChestUpdateAction(Action action)
+        {
+            // check net status and make sure a non-bank chest is open
+            // (bank-chests, i.e. piggy-bank & safe, are handled solely client-side)
+            if (Main.netMode == 1 && player.chest > -1)
+            {
+                Item[] oldItems = new Item[player.chestItems.Length];
+
+                // make an exact copy of the chest's original contents
+                for (int i = 0; i < oldItems.Length; i++)
+                {
+                    oldItems[i] = player.chestItems[i].Clone();
+                }
+
+                // perform the requested action
+                action();
+
+                // compare each item in the old copy of the original contents
+                // to the chest's new contents and send net-update message
+                // if they do not match.
+                for (int i = 0; i < oldItems.Length; i++)
+                {
+                    var oldItem = oldItems[i];
+                    var newItem = player.chestItems[i];
+
+                    if (oldItem.IsNotTheSameAs(newItem) || oldItem.stack != newItem.stack)
+                    {
+                        IHUtils.SendNetMessage(i);
+                    }
+                }
+            }
+            else // And this is important...
+            {
+                action();
             }
         }
 

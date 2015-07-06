@@ -15,6 +15,10 @@ namespace InvisibleHand
     public class ButtonState
     {
         public string label;
+        // the keybind with which to associate this button
+        // (used as a key to the ButtonTips dict when displaying the tooltip)
+        public string keyType;
+
         public Texture2D texture;
 
         public Rectangle? defaultTexels;  //texture source rectangle for base, non-mouseover appearance

@@ -11,8 +11,13 @@ namespace InvisibleHand
     {
         public static IHBase Instance { get; private set; }
 
-        public static Dictionary<String, Keys> ActionKeys;
-        public static Dictionary<String, bool> ModOptions;
+        // holds the various T/F options, e.g. enable-locking
+        public static Dictionary<string, bool> ModOptions;
+        // associates the default or player-assigned keybind with
+        // a string representing its corresponding game action.
+        public static Dictionary<string, Keys> ActionKeys;
+        // holds string-version of the keybinds for use in button tooltips
+        public static Dictionary<string, string> ButtonTips;
 
         private static Texture2D lockedIcon;
         private static Texture2D buttonGrid;
@@ -39,32 +44,44 @@ namespace InvisibleHand
         public ButtonLayer chestButtons;
 
         //keep track of ALL existing button contexts here.
-        public Dictionary<String, IHButton> ButtonRepo;
+        public Dictionary<string, IHButton> ButtonRepo;
         //the ids of those that need a state-update:
-        public Stack<String> ButtonUpdates;
+        public Stack<string> ButtonUpdates;
+
+        // this flag allows us to prevent initializing the buttons
+        // multiple times when the game is first loaded;
+        // it is set to true after first load to allow button re-init
+        // when the player changes a keybind.
+        private static bool doButtonReload;
 
         public override void OnLoad()
         {
             Instance = this;
-            ActionKeys = new Dictionary<String, Keys>();
-            ModOptions = new Dictionary<String, bool>();
+            ModOptions = new Dictionary<string, bool>();
+            ActionKeys = new Dictionary<string, Keys>();
+            ButtonTips = new Dictionary<string, string>();
+        }
 
+        public override void OnAllModsLoaded()
+        {
+            doButtonReload = false;
             // this should prevent dictionary-key exceptions if mod-options page not visited
             foreach (Option o in options)
             {
                 OptionChanged(o);
             }
-
-            KEP           = new KeyEventProvider();
-            ButtonRepo    = new Dictionary<String, IHButton>();
-            ButtonUpdates = new Stack<String>();
+            InitButtons();
+            doButtonReload = true;
+            CategoryDef.Initialize();
         }
 
-        public override void OnAllModsLoaded()
+        private void InitButtons()
         {
-            CategoryDef.Initialize();
+            KEP           = new KeyEventProvider();
+            ButtonRepo    = new Dictionary<string, IHButton>();
+            ButtonUpdates = new Stack<string>();
 
-            // TODO: does doing this here also make the dedicated-server freak out?
+            // TODO: does doing this here also make the mp-server freak out?
             invButtons   = ButtonMaker.GetButtons("Inventory");
             chestButtons = ButtonMaker.GetButtons("Chest");
         }
@@ -73,20 +90,24 @@ namespace InvisibleHand
         {
             switch(option.name)
             {
+                // keybinds
                 case "sort":
                 case "cleanStacks":
                 case "quickStack":
                 case "depositAll":
                 case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
+                    ButtonTips[option.name] = (string)option.Value;
                     break;
 
+                // slot-locking
                 case "enableLocking":
                     ModOptions["LockingEnabled"] = (bool)option.Value;
                     break;
 
+                //sort from end for...?
                 case "rearSort":
-                    switch ((String)option.Value)
+                    switch ((string)option.Value)
                     {
                         case "Inventory":
                             ModOptions["RearSortPlayer"] = true;
@@ -105,8 +126,9 @@ namespace InvisibleHand
                     }
                     break;
 
+                // reverse sort order of...?
                 case "reverseSort":
-                    switch ((String)option.Value)
+                    switch ((string)option.Value)
                     {
                         case "Inventory":
                             ModOptions["ReverseSortPlayer"] = true;

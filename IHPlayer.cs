@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Input;
 using TAPI;
 using Terraria;
 
@@ -30,14 +29,13 @@ namespace InvisibleHand
         {
             // if (!IHBase.oLockingEnabled) return;
 
-            // for (int i=0; i<lockedSlots.Length; i++)
             foreach (var l in lockedSlots)
             {
-                // bb.Write(lockedSlots[i]);
                 bb.Write(l);
             }
             bb.Write(LockedActions.Count);
-            foreach (KeyValuePair<IHAction, bool> kvp in LockedActions)
+            //KeyValuePair<IHAction, bool>
+            foreach (var kvp in LockedActions)
             {
                 bb.Write((int)kvp.Key);
                 bb.Write(kvp.Value);

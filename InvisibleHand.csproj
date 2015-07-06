@@ -85,6 +85,7 @@
     <Compile Include="Interface\ActionButtons.cs" />
     <Compile Include="Interface\ButtonBase.cs" />
     <Compile Include="Interface\ButtonLayer.cs" />
+    <Compile Include="Interface\ButtonMaker.cs" />
     <Compile Include="Interface\ButtonState.cs" />
     <Compile Include="Interface\IHButton.cs" />
     <Compile Include="DynamicQuery\Dynamic.cs" />

@@ -75,6 +75,11 @@ namespace InvisibleHand
                 { IHAction.QS, Lang.inter[iQS] }
             };
             // and now destroy them...
+            // FIXME: need to replace this on unload or the text will
+            // still be missing if the player disables the mod (until they
+            // restart the game, but still...)
+            // Probably this should be done on world load/unload rather
+            // than on game load
             Lang.inter[iLA] = Lang.inter[iDA] = Lang.inter[iQS] = "";
 
         }
@@ -106,9 +111,9 @@ namespace InvisibleHand
 
         /// Here we try to change the default string displayed for
         /// Deposit All, Loot All, etc.
-        private void SetKeyHint(string actionType, string assignedKey)
+        private void SetKeyHint(string actionType, string assignedKey, string prefix = " (", string suffix = ")")
         {
-            string keyHint = " (" + assignedKey + ")";
+            string keyHint = prefix + assignedKey + suffix;
             ButtonKeyTips[actionType] = keyHint;
 
             // switch(actionType)

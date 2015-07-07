@@ -55,17 +55,24 @@ namespace InvisibleHand
             if (state.texture == null)
             {
                 //doing this here to see if this enables the "pulse" effect all the vanilla text has
+                // Result: YES!
                 Color textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
-                // YES!
+
+                // Do these put the text in the proper place and cause it to expand like vanilla?
+                // Result: YES!
+                Vector2 origin = bBase.CurrentContext.Size / 2;
+                Vector2 pos = new Vector2(bBase.Position.X + (int)(origin.X * bBase.Scale), bBase.Position.Y);
 
                 sb.DrawString(
                         Main.fontMouseText,     //font
                         state.label,            //string
-                        bBase.Position,         //position
+                        // bBase.Position,         //position
+                        pos,
                         // state.tint*bBase.Alpha, //color
                         textColor,
                         0f,                     //rotation
-                        default(Vector2),       //origin
+                        // default(Vector2),       //origin
+                        origin,
                         bBase.Scale,            //scale
                         SpriteEffects.None,     //effects
                         0f                      //layerDepth
@@ -111,8 +118,8 @@ namespace InvisibleHand
         {
             byte a;
             if (mult != 1) {
-                // casting to byte is basically just taking modulus 256
-                // of the b*mult result: (b*mult)%256
+                // casting to byte is basically just taking modulus 256:
+                //  (b*mult)%256
                 byte c = (byte)((float)b * mult);
                 a = alpha > 0 ? (byte)(alpha * mult) : c;
                 return new Color((int)c, (int)c, (int)c, (int)a);

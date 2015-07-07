@@ -57,9 +57,10 @@ namespace InvisibleHand
         }
 
         //this is just here to enable the IHToggle Update(init) function from ModWorld; better solution later.
-        public virtual void OnUpdate()
-        {       }
+        public virtual void OnUpdate() {}
 
+    // the Boolean value returned from some of these hooks decide if the calling
+    // function will continue after the hook has run.
     #region hooks
         public virtual bool OnMouseEnter(ButtonBase bBase)
         {
@@ -70,7 +71,7 @@ namespace InvisibleHand
         {
             return DisplayState.onMouseLeave==null || DisplayState.onMouseLeave(bBase);
         }
-
+        // NOTE: PreDraw currently disabled in ButtonBase
         public virtual bool PreDraw(SpriteBatch sb, ButtonBase bBase)
         {
             return DisplayState.PreDraw==null || DisplayState.PreDraw(sb, bBase);
@@ -167,6 +168,7 @@ namespace InvisibleHand
             }
         }
 
+        // used to initialize button to correct state on world load
         public override void OnUpdate()
         {
             SetState(IsActive() ? ActiveState : InactiveState);

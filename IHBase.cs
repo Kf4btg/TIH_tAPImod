@@ -17,7 +17,7 @@ namespace InvisibleHand
         // a string representing its corresponding game action.
         public static Dictionary<string, Keys> ActionKeys;
         // holds string-version of the keybinds for use in button tooltips
-        public static Dictionary<string, string> ButtonTips;
+        public static Dictionary<string, string> ButtonKeyTips;
 
         private static Texture2D lockedIcon;
         private static Texture2D buttonGrid;
@@ -48,30 +48,22 @@ namespace InvisibleHand
         //the ids of those that need a state-update:
         public Stack<string> ButtonUpdates;
 
-        // this flag allows us to prevent initializing the buttons
-        // multiple times when the game is first loaded;
-        // it is set to true after first load to allow button re-init
-        // when the player changes a keybind.
-        private static bool doButtonReload;
-
         public override void OnLoad()
         {
             Instance = this;
             ModOptions = new Dictionary<string, bool>();
             ActionKeys = new Dictionary<string, Keys>();
-            ButtonTips = new Dictionary<string, string>();
+            ButtonKeyTips = new Dictionary<string, string>();
         }
 
         public override void OnAllModsLoaded()
         {
-            doButtonReload = false;
             // this should prevent dictionary-key exceptions if mod-options page not visited
             foreach (Option o in options)
             {
                 OptionChanged(o);
             }
             InitButtons();
-            doButtonReload = true;
             CategoryDef.Initialize();
         }
 
@@ -97,7 +89,7 @@ namespace InvisibleHand
                 case "depositAll":
                 case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
-                    ButtonTips[option.name] = (string)option.Value;
+                    ButtonKeyTips[option.name] = " (" + option.Value.ToString() + ")";
                     break;
 
                 // slot-locking

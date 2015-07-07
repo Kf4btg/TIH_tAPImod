@@ -498,15 +498,22 @@ namespace InvisibleHand
         //                  true = focused/mouseover/active appearance
         public static Rectangle? GetSourceRect(string action, bool active=false)
         {
-            String key = action;
+            // String key = action;
 
-            if (action.Contains("Chest"))
-                key = action.Contains("Reverse") ? "Sort (Reverse)" : "Sort";
+            // if (action.Contains("Chest"))
+            //     key = action.Contains("Reverse") ? "Sort (Reverse)" : "Sort";
+            //
+            // else if (action.StartsWith("Quick")) key = "Quick Stack";
+            // else if (action.StartsWith("Deposit")) key = "Deposit All";
 
-            else if (action.StartsWith("Quick")) key = "Quick Stack";
-            else if (action.StartsWith("Deposit")) key = "Deposit All";
+            return RectFromGridIndex( Constants.ButtonGridIndex[action], active );
+        }
 
-            return RectFromGridIndex( Constants.ButtonGridIndex[key], active );
+        // returns the key-bind (as a string) for the given button
+        // return value will be something like "(X)"
+        public static string GetKeyTip(string buttonLabel)
+        {
+            return IHBase.ButtonKeyTips[Constants.ButtonLabelToKBOption[buttonLabel]];
         }
 
     #endregion

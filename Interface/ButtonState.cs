@@ -1,8 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using TAPI;
-using Terraria;
 
 namespace InvisibleHand
 {
@@ -17,7 +15,8 @@ namespace InvisibleHand
         public string label;
         // the keybind with which to associate this button
         // (used as a key to the ButtonTips dict when displaying the tooltip)
-        public string keyType;
+        // TODO: see if this can be moved elsewhere; it is not as generalized as the rest of this class.
+        // public string keyType;
 
         public Texture2D texture;
 
@@ -27,10 +26,11 @@ namespace InvisibleHand
         public Action onClick;
         public Action onRightClick;
 
+        // hooks (plugged into the corresponding hooks in IHButton)
         public Func<ButtonBase,bool> onMouseEnter;
         public Func<ButtonBase,bool> onMouseLeave;
 
-        public Func<SpriteBatch, ButtonBase, bool> PreDraw;
+        public Func<SpriteBatch, ButtonBase, bool> PreDraw; //NOTE: currently disabled in ButtonBase
         public Action<SpriteBatch, ButtonBase> PostDraw;
 
         public Color tint;

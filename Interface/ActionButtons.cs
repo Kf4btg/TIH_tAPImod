@@ -13,31 +13,34 @@ namespace InvisibleHand
         private readonly float[] posX = { 496, 532 }; //X-pos of the two buttons
         private const float posY = 28; //maintain height
 
-        private readonly Color bgColor = Constants.InvSlotColor*0.8f; //make the bg translucent even at max button opacity
+        /// make the bg slightly translucent even at max button opacity
+        private readonly Color bgColor = Constants.InvSlotColor*0.8f;
 
         public InventoryButtons(IHBase mbase) : base("InventoryButtons")
         {
+            // TODO: use the ButtonLabels array from Constants.cs
             string[] labels = {"Sort", "Sort (Reverse)", "Clean Stacks"};
 
             /** --Create Sort and Stack Buttons-- **/
             int i=-1;
             string L;
-            ButtonState[] states = {
-
+            ButtonState[] states =
+            {
                 // "Sort"
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"]) },
-
+                    onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"])
+                },
                 //"Sort (Reverse)"
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"]) },
-
+                    onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"])
+                },
                 //Clean Stacks
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = () => IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50) }
+                    onClick = () => IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50)
+                }
             };
 
             //create anon types w/ named fields, simply for clarity's sake
@@ -78,17 +81,19 @@ namespace InvisibleHand
         private float[] posX = {
             453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //leftmost
             453 - (2*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //middle
-            453 - (Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE)      //right beside trash
+            453 - (Main.inventoryBackTexture.Width   * Constants.CHEST_INVENTORY_SCALE)    //right beside trash
         };
         private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4;
 
         //position offset for the "locked" icon on QS/DA
-        private readonly Vector2 lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2), -(float)(int)((float)Constants.ButtonH/2));
+        private readonly Vector2 lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
+                                                         -(float)(int)((float)Constants.ButtonH/2));
 
         private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
         public ChestButtons(IHBase mbase) : base("ChestButtons")
         {
+            // TODO: use the ButtonLabels array from Constants.cs
             string[] labels = {
                 "Sort Chest",               //0
                 "Sort Chest (Reverse)",     //1
@@ -104,63 +109,76 @@ namespace InvisibleHand
             string L;
 
             ButtonState[] states = {
-                //   "Sort Chest"
+                // 0 -- "Sort Chest"
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"]) },
-
-                //  "Sort Chest (Reverse)"
+                    onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"])
+                },
+                // 1 -- "Sort Chest (Reverse)"
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"]) },
-
-                // "Restock",                  //2
+                    onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"])
+                },
+                // 2 -- "Restock",
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = IHSmartStash.SmartLoot },
-
-                // "Quick Stack",              //3
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
-                {
-                    onClick = IHUtils.DoQuickStack,
-                    onRightClick = () => {
-                        Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); } },
-
-                // "Quick Stack (Locked)",     //4
+                    onClick = IHSmartStash.SmartLoot
+                },
+                // 3 -- "Quick Stack",
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoQuickStack,
-                    onRightClick = () => {
+                    onRightClick = () =>
+                    {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS); },
-                    PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha) }, //draw lock
-
-                // "Smart Deposit",            //5
+                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);
+                    }
+                },
+                // 4 -- "Quick Stack (Locked)",
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
-                    onClick = IHSmartStash.SmartDeposit },
-
-                // "Deposit All",              //6
+                    onClick = IHUtils.DoQuickStack,
+                    onRightClick = () =>
+                    {
+                        Main.PlaySound(22); //lock sound
+                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);
+                    },
+                    // use buttonstate's PostDraw hook to draw the lock indicator
+                    PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset,
+                                    Color.Firebrick*this.LayerOpacity*bBase.Alpha) //draw lock
+                },
+                // 5 -- "Smart Deposit",
+                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                {
+                    onClick = IHSmartStash.SmartDeposit
+                },
+                // 6 -- "Deposit All",
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoDepositAll,
-                    onRightClick = () => {
+                    onRightClick = () =>
+                    {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); } },
-
-                // "Deposit All (Locked)"      //7
+                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);
+                    }
+                },
+                // 7 -- "Deposit All (Locked)"
                 new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoDepositAll,
-                    onRightClick = () => {
+                    onRightClick = () =>
+                    {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA); },
-                    PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset, Color.Firebrick*this.LayerOpacity*bBase.Alpha) },
+                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);
+                    },
+                    // use buttonstate's PostDraw hook to draw the lock indicator
+                    PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset,
+                                    Color.Firebrick*this.LayerOpacity*bBase.Alpha) },
             };
 
             // make some anonymous types to help with readability
-            var sort  = new { label=labels[0], forward = states[0], reversed = states[1], toggleKey = KState.Special.Shift, position = new Vector2(posX[0], posY) };
+            var sort  = new { label=labels[0], forward = states[0], reversed = states[1],
+                            toggleKey = KState.Special.Shift, position = new Vector2(posX[0], posY) };
 
             var restock    = new { label = labels[2], face     = states[2], position = new Vector2(posX[1], posY) };
             var quickStack = new { label = labels[3], unlocked = states[3], locked   = states[4], toggleOnRC = true };
@@ -169,18 +187,32 @@ namespace InvisibleHand
             var depositAll = new { label = labels[6], unlocked = states[6], locked   = states[7], toggleOnRC = true };
 
             //add all the buttons to the repo
-            mbase.ButtonRepo.Add ( sort.label,
-                new IHDynamicButton( sort.forward, sort.reversed, sort.toggleKey, sort.position ) );
+            mbase.ButtonRepo.Add (
+                sort.label,
+                new IHDynamicButton( sort.forward, sort.reversed, sort.toggleKey, sort.position )
+                );
 
-            mbase.ButtonRepo.Add ( restock.label,
-                new IHButton(restock.face, restock.position) );
-            mbase.ButtonRepo.Add ( quickStack.label,
-                new IHToggle(quickStack.unlocked, quickStack.locked, () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS), null, quickStack.toggleOnRC) );
+            mbase.ButtonRepo.Add (
+                restock.label,
+                new IHButton(restock.face, restock.position)
+                );
+            mbase.ButtonRepo.Add (
+                quickStack.label,
+                new IHToggle(quickStack.unlocked, quickStack.locked,
+                            () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS),
+                            null, quickStack.toggleOnRC)
+                );
 
-            mbase.ButtonRepo.Add ( smartDep.label,
-                new IHButton(smartDep.face, smartDep.position) );
-            mbase.ButtonRepo.Add ( depositAll.label,
-                new IHToggle(depositAll.unlocked, depositAll.locked, () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA), null, depositAll.toggleOnRC) );
+            mbase.ButtonRepo.Add (
+                smartDep.label,
+                new IHButton(smartDep.face, smartDep.position)
+                );
+            mbase.ButtonRepo.Add (
+                depositAll.label,
+                new IHToggle(depositAll.unlocked, depositAll.locked,
+                            () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA),
+                            null, depositAll.toggleOnRC)
+                );
 
             // set QS & DA to have their state initialized on world load
             mbase.ButtonUpdates.Push(quickStack.label);

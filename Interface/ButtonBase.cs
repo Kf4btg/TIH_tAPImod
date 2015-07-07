@@ -7,7 +7,7 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    /*
+    /**
         Conceptually, this can be thought of as the "actual" button: it defines the location
         on the screen where the button appears and how much space it takes up. This is the
         object that will receive mouse clicks, which will then be passed on to its members.
@@ -18,17 +18,19 @@ namespace InvisibleHand
         can be swapped out and around to create some fairly dynamic interactivity.
 
         TODO: stop duplicating all the code from UIComponent et al...
+        TODO 2: what code was that, exactly?
     */
     public class ButtonBase
     {
-        // a _unique_ name that can identify this button
+        /// a _unique_ name that can identify this button
         public readonly string Name;
 
-        public readonly ButtonLayer Container; //interface layer this button belongs to
+        ///interface layer this button belongs to
+        public readonly ButtonLayer Container;
 
-        // this defines the location and size of this button.
-        // even if other buttons have differently-sized textures/strings,
-        // the button will not move from the coordinates defined here.
+        /// this defines the location and size of this button.
+        /// even if other buttons have differently-sized textures/strings,
+        /// the button will not move from the coordinates defined here.
         public readonly IHButton DefaultContext;
 
         // defines the current appearance and functionality of the button
@@ -42,7 +44,7 @@ namespace InvisibleHand
         public readonly Rectangle ButtonBounds;
         public bool IsHovered { get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); } }
 
-        // for determining when the mouse moves on and off the button
+        /// for determining when the mouse moves on and off the button
         private bool hasMouseFocus;
 
         public const float SCALE_FULL = 1.0f;
@@ -52,14 +54,14 @@ namespace InvisibleHand
         // affects the alpha component of the current tint
         private float alphaBase = 0.85f;
         private float alphaMult = 0.85f;
-        // gets current alpha (modified by container opacity), sets current and base alpha values
+        /// gets current alpha (modified by container opacity), sets current and base alpha values
         public float Alpha { get { return alphaMult*Container.LayerOpacity; } set { alphaMult = alphaBase = value; }}
 
-        // this will actively set the Source Texels based on whether or not the mouse is currently over this button.
-        // If both rects are null, then the entire texture will be drawn as per default
+        /// this will actively set the Source Texels based on whether or not the mouse is currently over this button.
+        /// If both rects are null, then the entire texture will be drawn as per default
         public Rectangle? SourceRect { get { return hasMouseFocus ? currentContext.ActiveRect : currentContext.InactiveRect; }}
 
-        /**************************************************************************
+        /** **********************************************************************
         * Construct the ButtonBase with just the reference to its default Context.
         * Handle changing contexts externally and effect it with ChangeContext
         */
@@ -75,18 +77,19 @@ namespace InvisibleHand
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
         }
 
-        // switch to a new context
+        /// switch to a new context (button function)
         public void ChangeContext(IHButton newContext)
         {
             currentContext = newContext;
         }
 
-        public void RegisterKeyToggle(KState.Special key, String context1, String context2)
+        /// allows registering key toggle w/ just the context (button) labels
+        public void RegisterKeyToggle(KState.Special key, string context1, string context2)
         {
             RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1], IHBase.Instance.ButtonRepo[context2]);
         }
 
-        // set up key-event-subscribers that will toggle btw 2 contexts
+        /// set up key-event-subscribers that will toggle btw 2 contexts
         public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
         {
             //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
@@ -125,16 +128,19 @@ namespace InvisibleHand
         public void OnHover()
         {
             DrawTooltip();
-            if (Main.mouseLeft && Main.mouseLeftRelease) currentContext.OnClick();
-            if (Main.mouseRight && Main.mouseRightRelease && currentContext.OnRightClick!=null) currentContext.OnRightClick();
+            if (Main.mouseLeft && Main.mouseLeftRelease)
+                currentContext.OnClick();
+
+            if (Main.mouseRight && Main.mouseRightRelease && currentContext.OnRightClick!=null)
+                currentContext.OnRightClick();
         }
 
-        //hooks into the current context's onDraw function
+        ///hooks into the current context's onDraw function
         public void Draw(SpriteBatch sb)
         {
             /** Disable this hook until something actually uses it... **/
             // if the context doesn't override this default draw function
-            // if (currentContext.OnDraw(sb, this))
+            // if (currentContext.PreDraw(sb, this))
             // {
                 sb.DrawIHButton(this, currentContext.DisplayState);
 
@@ -152,14 +158,22 @@ namespace InvisibleHand
             currentContext.PostDraw(sb, this);
         }
 
-        // rare affects the color of the text (0 is default);
-        // I'm not quite sure what diff does...
-        // FIXME: currently displays _under_ the chest item slots
+        /// rare affects the color of the text (0 is default);
+        /// I'm not quite sure what diff does...
+        /// FIXME: currently displays _under_ the chest item slots
         public void DrawTooltip(int rare=0, byte diff=0)
         {
             //only draw if displaying texture
             if (currentContext.Texture!=null) {
-                API.main.MouseText(currentContext.Label, rare, diff);
+
+                //TODO: is this the best place to do this? It could go lots of places.
+                //Depends on whether the keybind-reminder should be considered a "core" part of the
+                //button (part of the label) or something added on, just for this implementation; I'm
+                //leaning towards the latter. But still, constructing the string on each draw
+                //seems inefficient since we can't change the keybind in-game anyway.
+                var labelDisplay = currentContext.Label + IHUtils.GetKeyTip(currentContext.Label);
+
+                API.main.MouseText(labelDisplay, rare, diff);
                 Main.mouseText = true;
             }
         }

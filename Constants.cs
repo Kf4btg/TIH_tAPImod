@@ -5,8 +5,10 @@ using Terraria.ID;
 
 namespace InvisibleHand
 {
+    /// All the actions that the mod can perform
     public enum IHAction { QS, DA, LA, Sort, Stack, Deposit, Refill }
 
+    ///the ItemCat Enum defines the actual Sort Order of the categories
     public enum ItemCat
     {
         COIN,
@@ -70,11 +72,14 @@ namespace InvisibleHand
 
         public static readonly Dictionary<string, int> ButtonGridIndex;
 
-        //the ItemCat Enum defines the actual Sort Order of the categories,
-        // but this defines in which order an item will be checked against
-        // the category matching rules. This is important due to a kind
-        // of "sieve" or "cascade" effect, where items that would have matched
-        // a certain category were instead caught by an earlier one.
+        /// maps labels to the modoption defining their keybind
+        public static readonly Dictionary<string, string> ButtonLabelToKBOption;
+
+        ///the ItemCat Enum defines the actual Sort Order of the categories,
+        /// but this defines in which order an item will be checked against
+        /// the category matching rules. This is important due to a kind
+        /// of "sieve" or "cascade" effect, where items that would have matched
+        /// a certain category were instead caught by an earlier one.
         public static readonly ItemCat[] CheckOrder =  {
             ItemCat.COIN,
             ItemCat.MECH,
@@ -279,18 +284,72 @@ namespace InvisibleHand
             TileID.Pumpkins /*Pumpkin Seed*/
             }); // get the rest by EndsWith("Seeds")
 
+
+        public static readonly string[] ButtonLabels = {
+            //Player Inventory
+            "Sort",                     //0
+            "Sort (Reverse)",           //1
+            "Clean Stacks",             //2
+            //Chests
+            "Sort Chest",               //3
+            "Sort Chest (Reverse)",     //4
+            "Restock",                  //5
+            "Quick Stack",              //6
+            "Quick Stack (Locked)",     //7
+            "Smart Deposit",            //8
+            "Deposit All",              //9
+            "Deposit All (Locked)"      //10
+        };
+
         static Constants()
         {
-            // Make getting a button's texture (texels) easier
-            ButtonGridIndex = new Dictionary<string,int>(8);
-            ButtonGridIndex.Add("Sort",0);
-            ButtonGridIndex.Add("Sort (Reverse)",1);
+            /************************************************
+            * Make getting a button's texture (texels) easier
+            */
+            ButtonGridIndex = new Dictionary<string,int>(12);
+            //sort, sort chest
+            ButtonGridIndex.Add(ButtonLabels[0],0);
+            ButtonGridIndex.Add(ButtonLabels[3],0);
+            //sort reverse, sort chest reverse
+            ButtonGridIndex.Add(ButtonLabels[1],1);
+            ButtonGridIndex.Add(ButtonLabels[4],1);
+            //don't actually have a button for this one yet...
             ButtonGridIndex.Add("Loot All",2);
-            ButtonGridIndex.Add("Deposit All",3);
-            ButtonGridIndex.Add("Smart Deposit",4);
-            ButtonGridIndex.Add("Clean Stacks",5);
-            ButtonGridIndex.Add("Quick Stack",6);
-            ButtonGridIndex.Add("Restock",7);
+            //deposit all, DA+locked
+            ButtonGridIndex.Add(ButtonLabels[9],3);
+            ButtonGridIndex.Add(ButtonLabels[10],3);
+            //smart deposit
+            ButtonGridIndex.Add(ButtonLabels[8],4);
+            //clean stacks
+            ButtonGridIndex.Add(ButtonLabels[2],5);
+            //quick stack, QS+locked
+            ButtonGridIndex.Add(ButtonLabels[6],6);
+            ButtonGridIndex.Add(ButtonLabels[7],6);
+            // restock/smartloot
+            ButtonGridIndex.Add(ButtonLabels[5],7);
+
+            /*************************************************
+            * Map labels to the string used for the corresponding
+            * keybind in Modoptions.json
+            */
+            ButtonLabelToKBOption = new Dictionary<string, string> {
+                //s, s-r, sc, sc-r
+                { ButtonLabels[0], "sort" },
+                { ButtonLabels[1], "sort" },
+                { ButtonLabels[3], "sort" },
+                { ButtonLabels[4], "sort" },
+                //c.stacks
+                { ButtonLabels[2], "cleanStacks" },
+                //restock, qs, qs-l
+                { ButtonLabels[5], "quickStack" },
+                { ButtonLabels[6], "quickStack" },
+                { ButtonLabels[7], "quickStack" },
+                //sd, da, da-l
+                { ButtonLabels[8], "depositAll" },
+                { ButtonLabels[9], "depositAll" },
+                { ButtonLabels[10],"depositAll" }
+            };
+            //loot-all doesn't have a button (yet?)
         }
     }
 }

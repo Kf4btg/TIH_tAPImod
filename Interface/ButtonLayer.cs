@@ -7,6 +7,20 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    /// A ButtonLayer is a container that holds one or more Buttons (ButtonBase class).
+    /// It occupies a rectangular area on the screen, with its size and shape
+    /// defined by the buttons that it holds. It will be just big enough to hold them
+    /// all--but it must do so within a single rectangle, so its buttons should be grouped
+    /// near each other to prevent it taking up a large section of the screen. Buttons
+    /// that need to be placed in a different area of the screen should be placed in
+    /// separate ButtonLayer.
+    ///
+    /// The ButtonLayer is responsible for calling Draw() on each of its components.
+    /// It also defines the area in which the mouse will be considered "hovered"
+    /// over this group of buttons.
+    ///
+    /// ButtonLayer can be utilized by subclassing it and customizing its constructor
+    /// for each group of buttons you would like displayed.
     public abstract class ButtonLayer : InterfaceLayer
     {
         public readonly Dictionary<IHAction, ButtonBase> Buttons;

@@ -42,13 +42,12 @@ namespace InvisibleHand {
                 onClick = IHUtils.DoLootAll
             };
 
+            // get font color if this is a text button
             // set up textures if this is not a text-button
-            if (! textual)
-            {
-                bState.texture       = IHBase.ButtonGrid;
-                bState.defaultTexels = IHUtils.GetSourceRect("Loot All");
-                bState.altTexels     = IHUtils.GetSourceRect("Loot All", true);
-            }
+            if (textual)
+                bState.tint = Main.mouseTextColor.toColor();
+            else
+                GetButtonTexture("Loot All", ref bState);
 
             return new IHButton(bState, position);
         }
@@ -71,41 +70,16 @@ namespace InvisibleHand {
             };
 
             // set up textures if this is not a text-button
-            if (! textual)
-            {
-                bState.texture       = IHBase.ButtonGrid;
-                bState.defaultTexels = IHUtils.GetSourceRect("Deposit All");
-                bState.altTexels     = IHUtils.GetSourceRect("Deposit All", true);
-            }
-            else
-            {
+            if (textual)
+                //FIXME: maybe putting this in the actual draw function
+                //(the one that gets called on each frame) is the secret
+                //to the fade in/out effect?
                 bState.tint = Main.mouseTextColor.toColor();
-            }
+            else
+                GetButtonTexture("Deposit All", ref bState);
 
             if (lockable)
-            {
-                bState.onRightClick = () =>
-                {
-                    Main.PlaySound(22); //lock sound
-                    IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);
-                };
-
-                // if the "locked" state ever has different textures than the
-                // unlocked, we'll need to do the !textual block again.
-                // But, for now, we can just duplicate most of the initial state
-                var bState2 = bState.Duplicate();
-                bState2.label = label + " (Locked)";
-
-                var offset = lockOffset ?? default(Vector2);
-                Color color = lockColor ?? Color.Firebrick;
-                // use buttonstate's PostDraw hook to draw the lock indicator
-                bState2.PostDraw = (sb, bBase) => DrawLockIndicator(sb, bBase, parent, offset, color);
-
-                Func<bool> isActive = () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA);
-
-                // return toggling button
-                return new IHToggle(bState, bState2, isActive, position, true);
-            }
+                return CreateLockableButton(bState, IHAction.DA, parent, position, lockOffset, lockColor);
 
             //return plain single-state button
             return new IHButton(bState, position);
@@ -113,7 +87,7 @@ namespace InvisibleHand {
 
         // -------------------------------------------------------------------
         /// Generate Quick Stack button
-        /// This overload is used for lockable, non-textual buttons
+        /// This overload is best for lockable, non-textual buttons
         public static IHButton QuickStackButton(string label, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, bool textual = false, Color? lockColor = null, bool lockable = true)
         {
             return QuickStackButton(label, position, lockable, parent, lockOffset, lockColor, textual);
@@ -128,48 +102,58 @@ namespace InvisibleHand {
                 onClick = IHUtils.DoQuickStack
             };
 
+            // get font color if this is a text button
             // set up textures if this is not a text-button
-            if (! textual)
-            {
-                bState.texture       = IHBase.ButtonGrid;
-                bState.defaultTexels = IHUtils.GetSourceRect("Quick Stack");
-                bState.altTexels     = IHUtils.GetSourceRect("Quick Stack", true);
-            }
+            if (textual)
+                bState.tint = Main.mouseTextColor.toColor();
+            else
+                GetButtonTexture("Quick Stack", ref bState);
 
             if (lockable)
-            {
-                bState.onRightClick = () =>
-                {
-                    Main.PlaySound(22); //lock sound
-                    IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);
-                };
+                return CreateLockableButton(bState, IHAction.QS, parent, position, lockOffset, lockColor);
 
-                // if the "locked" state ever has different textures than the
-                // unlocked, we'll need to do the !textual block again.
-                // But, for now, we can just duplicate most of the initial state
-                var bState2 = bState.Duplicate();
-                bState2.label = label + " (Locked)";
-
-                var offset = lockOffset ?? default(Vector2);
-                Color color = lockColor ?? Color.Firebrick;
-                // use buttonstate's PostDraw hook to draw the lock indicator
-                bState2.PostDraw = (sb, bBase) => DrawLockIndicator(sb, bBase, parent, offset, color);
-
-                Func<bool> isActive = () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS);
-
-                // return toggling button
-                return new IHToggle(bState, bState2, isActive, position, true);
-            }
-
-            //return plain single-state button
+            //else return plain single-state button
             return new IHButton(bState, position);
         }
 
         // -------------------------------------------------------------------
-
+        /// set base texture and default/alt texels for given ButtonState
+        private static void GetButtonTexture(string label, ref ButtonState bState)
+        {
+            bState.texture       = IHBase.ButtonGrid;
+            bState.defaultTexels = IHUtils.GetSourceRect(label);
+            bState.altTexels     = IHUtils.GetSourceRect(label, true);
+        }
 
         // -------------------------------------------------------------------
         // for the lockable-actions
+
+        private static IHToggle CreateLockableButton(ButtonState bState1, IHAction toLock, ButtonLayer parent, Vector2 position, Vector2? lockOffset, Color? lockColor)
+        {
+            bState1.onRightClick = () =>
+            {
+                Main.PlaySound(22); //lock sound
+                IHPlayer.ToggleActionLock(Main.localPlayer, toLock);
+            };
+
+            // if the "locked" state ever has different textures than the
+            // unlocked, we'll need to do the "if (textual)" block again.
+            // But, for now, we can just duplicate most of the initial state
+            var bState2 = bState1.Duplicate();
+            bState2.label = bState1.label + " (Locked)";
+
+            var offset = lockOffset ?? default(Vector2);
+            Color color = lockColor ?? Color.Firebrick;
+            // use buttonstate's PostDraw hook to draw the lock indicator
+            bState2.PostDraw = (sb, bBase) => DrawLockIndicator(sb, bBase, parent, offset, color);
+
+            Func<bool> isActive = () => IHPlayer.ActionLocked(Main.localPlayer, toLock);
+
+            // return toggling button
+            return new IHToggle(bState1, bState2, isActive, position, true);
+        }
+
+
         private static void DrawLockIndicator(SpriteBatch sb, ButtonBase bb, ButtonLayer parent, Vector2 offset, Color tint)
         {
             sb.Draw(IHBase.LockedIcon, bb.Position + offset, tint * parent.LayerOpacity * bb.Alpha);

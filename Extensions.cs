@@ -50,20 +50,29 @@ namespace InvisibleHand
 
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
         {
-            if (state.texture==null)
+
+
+            if (state.texture == null)
+            {
+                //doing this here to see if this enables the "pulse" effect all the vanilla text has
+                Color textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
+                // YES!
+
                 sb.DrawString(
                         Main.fontMouseText,     //font
                         state.label,            //string
                         bBase.Position,         //position
-                        state.tint*bBase.Alpha, //color
+                        // state.tint*bBase.Alpha, //color
+                        textColor,
                         0f,                     //rotation
                         default(Vector2),       //origin
                         bBase.Scale,            //scale
                         SpriteEffects.None,     //effects
                         0f                      //layerDepth
                      );
+            }
             else
-                sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+                sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint * bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
 
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
@@ -96,12 +105,29 @@ namespace InvisibleHand
 
         /// Convert a byte to an rgba Color, using the
         /// value of the byte for each field unless a value > 1
-        /// is provided for alpha.
-        public static Color toColor(this byte b, float alpha = -1) {
-            float a = b;
-            if (alpha > 0)
-                a = alpha > 1 ? 1.0f : alpha;
-            return new Color(b, b, b, a);
+        /// is provided for alpha. If a mult. factor is provided, each
+        /// color component will be multiplied by that factor.
+        public static Color toColor(this byte b, float mult = 1, float alpha = -1)
+        {
+            byte a;
+            if (mult != 1) {
+                // casting to byte is basically just taking modulus 256
+                // of the b*mult result: (b*mult)%256
+                byte c = (byte)((float)b * mult);
+                a = alpha > 0 ? (byte)(alpha * mult) : c;
+                return new Color((int)c, (int)c, (int)c, (int)a);
+            }
+            a = alpha > 0 ? (byte)alpha : b ;
+            return new Color((int)b, (int)b, (int)b, (int)a);
+        }
+
+        /// This is a simplified version of toColor specifically tailored
+        /// for being called each frame when drawing text-only buttons.
+        /// This enables the pulse effect seen on the vanilla text.
+        public static Color toScaledColor(this byte b, float mult)
+        {
+                var c = (int)((byte)((float)b * mult));
+                return new Color(c, c, c, c);
         }
 
     #endregion

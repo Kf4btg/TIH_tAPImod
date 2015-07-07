@@ -19,8 +19,11 @@ namespace InvisibleHand
         {
             if (Main.playerInventory)
             {
-                if (Main.localPlayer.chest!=-1)
+                if (Main.localPlayer.chest != -1)
+                {
                     InterfaceLayer.Add(list, IHBase.Instance.chestButtons, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.Instance.replacerButtons, InterfaceLayer.LayerInventory, true);
+                }
                 else
                     InterfaceLayer.Add(list, IHBase.Instance.invButtons, InterfaceLayer.LayerInventory, true);
             }

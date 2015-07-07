@@ -298,7 +298,8 @@ namespace InvisibleHand
             "Quick Stack (Locked)",     //7
             "Smart Deposit",            //8
             "Deposit All",              //9
-            "Deposit All (Locked)"      //10
+            "Deposit All (Locked)",     //10
+            "Loot All"                  //11
         };
 
         static Constants()
@@ -313,8 +314,8 @@ namespace InvisibleHand
             //sort reverse, sort chest reverse
             ButtonGridIndex.Add(ButtonLabels[1],1);
             ButtonGridIndex.Add(ButtonLabels[4],1);
-            //don't actually have a button for this one yet...
-            ButtonGridIndex.Add("Loot All",2);
+            //loot all
+            ButtonGridIndex.Add(ButtonLabels[11],2);
             //deposit all, DA+locked
             ButtonGridIndex.Add(ButtonLabels[9],3);
             ButtonGridIndex.Add(ButtonLabels[10],3);
@@ -347,9 +348,10 @@ namespace InvisibleHand
                 //sd, da, da-l
                 { ButtonLabels[8], "depositAll" },
                 { ButtonLabels[9], "depositAll" },
-                { ButtonLabels[10],"depositAll" }
+                { ButtonLabels[10],"depositAll" },
+                //lootall
+                { ButtonLabels[11],"lootAll" }
             };
-            //loot-all doesn't have a button (yet?)
         }
     }
 }

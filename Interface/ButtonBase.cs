@@ -42,13 +42,19 @@ namespace InvisibleHand
         public readonly Vector2 Position;
         public readonly Vector2 Size;
         public readonly Rectangle ButtonBounds;
-        public bool IsHovered { get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); } }
+        public bool IsHovered {
+             get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); }
+        }
 
         /// for determining when the mouse moves on and off the button
         private bool hasMouseFocus;
 
+        private bool useScaleEffect = false;
+
         public const float SCALE_FULL = 1.0f;
         private float scale = ButtonBase.SCALE_FULL;
+        private readonly float baseScale;
+        private readonly float hoverScale;
         public float Scale { get { return scale; } set { scale = value < 0.5f ? 0.5f : value; } }
 
         // affects the alpha component of the current tint
@@ -64,8 +70,17 @@ namespace InvisibleHand
         /** **********************************************************************
         * Construct the ButtonBase with just the reference to its default Context.
         * Handle changing contexts externally and effect it with ChangeContext
+        *
+        * Enable scale effect on the button by providing a base scaling value (values less than
+        * 0.5 will be set to 0.5) and optionally one for on-mouse-hover (defaults to 1.0).
+        * Values larger than 1.0 are allowed.
+        *
+        * Enabling the scale effect automatically sets base alpha of the button to 1.0 (still
+        * modified by the opacity of it's containing ButtonLayer); usually the alpha changes
+        * from 0.85 to 1.0 on mouse hover. Provide a new base_alpha (unfocused transparency)
+        * if you would like to reenable the opacity change.
         */
-        public ButtonBase(ButtonLayer container, IHButton defaultContext)
+        public ButtonBase(ButtonLayer container, IHButton defaultContext, float base_scale = -1, float focused_scale = 1.0f, float base_alpha = -1 )
         {
             Container = container;
             DefaultContext = currentContext = defaultContext;
@@ -75,6 +90,20 @@ namespace InvisibleHand
             Size     = defaultContext.Size;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+
+            if (base_scale > 0)
+            {
+                this.useScaleEffect = true;
+                this.baseScale = base_scale < 0.5f ? 0.5f : base_scale;
+                Scale = this.baseScale;
+                this.hoverScale = focused_scale;
+
+                if (base_alpha > 0 && base_alpha < 1)
+                    Alpha = base_alpha;
+                else
+                    Alpha = 1.0f;
+
+            }
         }
 
         /// switch to a new context (button function)
@@ -116,13 +145,22 @@ namespace InvisibleHand
             Main.PlaySound(12); // "mouse-over" sound
 
             if (currentContext.OnMouseEnter(this))
+            {
+                if (useScaleEffect)
+                    Scale = hoverScale;
                 alphaMult = 1.0f;
+            }
         }
 
         public void OnMouseLeave()
         {
             if (currentContext.OnMouseLeave(this))
+            {
+                if (useScaleEffect)
+                    Scale = baseScale;
                 alphaMult = alphaBase;
+
+            }
         }
 
         public void OnHover()

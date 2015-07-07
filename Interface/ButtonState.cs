@@ -13,10 +13,6 @@ namespace InvisibleHand
     public class ButtonState
     {
         public string label;
-        // the keybind with which to associate this button
-        // (used as a key to the ButtonTips dict when displaying the tooltip)
-        // TODO: see if this can be moved elsewhere; it is not as generalized as the rest of this class.
-        // public string keyType;
 
         public Texture2D texture;
 

@@ -51,7 +51,17 @@ namespace InvisibleHand
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
         {
             if (state.texture==null)
-                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, state.tint*bBase.Alpha);
+                sb.DrawString(
+                        Main.fontMouseText,     //font
+                        state.label,            //string
+                        bBase.Position,         //position
+                        state.tint*bBase.Alpha, //color
+                        0f,                     //rotation
+                        default(Vector2),       //origin
+                        bBase.Scale,            //scale
+                        SpriteEffects.None,     //effects
+                        0f                      //layerDepth
+                     );
             else
                 sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
@@ -59,7 +69,17 @@ namespace InvisibleHand
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
         {
             if (state.texture==null)
-                sb.DrawString(Main.fontMouseText, state.label, bBase.Position, overrideColor*bBase.Alpha);
+                sb.DrawString(
+                        Main.fontMouseText,     //font
+                        state.label,            //string
+                        bBase.Position,         //position
+                        overrideColor*bBase.Alpha, //color
+                        0f,                     //rotation
+                        default(Vector2),       //origin
+                        bBase.Scale,            //scale
+                        SpriteEffects.None,     //effects
+                        0f                      //layerDepth
+                     );
             else
                 sb.Draw(state.texture, bBase.Position, bBase.SourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
         }
@@ -72,6 +92,16 @@ namespace InvisibleHand
         public static bool IsHovered(this Rectangle frame)
         {
             return frame.Contains(Main.mouseX, Main.mouseY);
+        }
+
+        /// Convert a byte to an rgba Color, using the
+        /// value of the byte for each field unless a value > 1
+        /// is provided for alpha.
+        public static Color toColor(this byte b, float alpha = -1) {
+            float a = b;
+            if (alpha > 0)
+                a = alpha > 1 ? 1.0f : alpha;
+            return new Color(b, b, b, a);
         }
 
     #endregion

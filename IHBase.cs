@@ -40,13 +40,24 @@ namespace InvisibleHand
 
         public static KeyEventProvider KEP;
 
+        /// holds the game's original strings for loot-all, dep-all, quick-stack;
+        /// we're going to be removing these later on, but will use their
+        /// original values to replace them with newer, better buttons.
+        public static Dictionary<IHAction, string> OriginalButtonLabels { get; private set; }
+
         public ButtonLayer invButtons;
         public ButtonLayer chestButtons;
+        public ButtonLayer replacerButtons;
 
         //keep track of ALL existing button contexts here.
         public Dictionary<string, IHButton> ButtonRepo;
         //the ids of those that need a state-update:
         public Stack<string> ButtonUpdates;
+
+        // indices in Lang.inter[]
+        private const int iLA = 29;
+        private const int iDA = 30;
+        private const int iQS = 31;
 
         public override void OnLoad()
         {
@@ -54,6 +65,18 @@ namespace InvisibleHand
             ModOptions = new Dictionary<string, bool>();
             ActionKeys = new Dictionary<string, Keys>();
             ButtonKeyTips = new Dictionary<string, string>();
+
+            // hopefully these won't be overwritten if the player quits
+            // to main menu and then rejoins the game...
+            // TODO: put this behind a modoption
+            OriginalButtonLabels = new Dictionary<IHAction, string> {
+                { IHAction.LA, Lang.inter[iLA] },
+                { IHAction.DA, Lang.inter[iDA] },
+                { IHAction.QS, Lang.inter[iQS] }
+            };
+            // and now destroy them...
+            Lang.inter[iLA] = Lang.inter[iDA] = Lang.inter[iQS] = "";
+
         }
 
         public override void OnAllModsLoaded()
@@ -74,8 +97,36 @@ namespace InvisibleHand
             ButtonUpdates = new Stack<string>();
 
             // TODO: does doing this here also make the mp-server freak out?
-            invButtons   = ButtonMaker.GetButtons("Inventory");
-            chestButtons = ButtonMaker.GetButtons("Chest");
+            invButtons   = ButtonFactory.BuildButtons("Inventory");
+            chestButtons = ButtonFactory.BuildButtons("Chest");
+            replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
+        }
+
+
+
+        /// Here we try to change the default string displayed for
+        /// Deposit All, Loot All, etc.
+        private void SetKeyHint(string actionType, string assignedKey)
+        {
+            string keyHint = " (" + assignedKey + ")";
+            ButtonKeyTips[actionType] = keyHint;
+
+            // switch(actionType)
+            // {
+            //     case "lootAll":
+            //         // Lang.inter[iLA] = Lang.inter[iLA] + keyHint;
+            //         Lang.inter[iLA] = "";
+            //         break;
+            //     case "depositAll":
+            //         // Lang.inter[iDA] = Lang.inter[iDA] + keyHint;
+            //         Lang.inter[iDA] = "";
+            //         break;
+            //     case "quickStack":
+            //         // Lang.inter[iQS] = Lang.inter[iQS] + keyHint;
+            //         Lang.inter[iQS] = "";
+            //         break;
+            // }
+
         }
 
         public override void OptionChanged(Option option)
@@ -89,7 +140,9 @@ namespace InvisibleHand
                 case "depositAll":
                 case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
-                    ButtonKeyTips[option.name] = " (" + option.Value.ToString() + ")";
+                    //let's try this:
+                    SetKeyHint(option.name, option.Value.ToString());
+                    // ButtonKeyTips[option.name] = " (" + option.Value.ToString() + ")";
                     break;
 
                 // slot-locking

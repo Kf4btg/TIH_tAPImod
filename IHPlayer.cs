@@ -29,6 +29,24 @@ namespace InvisibleHand
         {
             // if (!IHBase.oLockingEnabled) return;
 
+            // TODO: reset original chest-button strings if we're quitting to main menu.
+            // It should be possible to check for this by checking:
+            //     if (Main.gameMenu == true)
+            // as this is set during the SaveAndQuit() method of the worldgen
+            // immediately before player save. So:
+            // if (Main.gameMenu)
+            // {
+            //  Lang.inter[iLA] = OriginalButtonLabels[IHAction.LA];
+            //  Lang.inter[iDA] = OriginalButtonLabels[IHAction.DA];
+            //  Lang.inter[iQS] = OriginalButtonLabels[IHAction.QS];
+            // }
+            //
+            // should take care of it and make sure the strings are set correctly
+            // if the mod is unloaded/the replacer-button option is disabled.
+            // NOTE: this means we'll also need to move the original replacement
+            // to IHWorld.Initialize()
+            //
+
             foreach (var l in lockedSlots)
             {
                 bb.Write(l);

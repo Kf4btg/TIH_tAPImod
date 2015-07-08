@@ -55,9 +55,9 @@ namespace InvisibleHand
         public Stack<string> ButtonUpdates;
 
         // indices in Lang.inter[]
-        private const int iLA = 29;
-        private const int iDA = 30;
-        private const int iQS = 31;
+        internal const int iLA = 29;
+        internal const int iDA = 30;
+        internal const int iQS = 31;
 
         public override void OnLoad()
         {
@@ -80,7 +80,7 @@ namespace InvisibleHand
             // restart the game, but still...)
             // Probably this should be done on world load/unload rather
             // than on game load
-            Lang.inter[iLA] = Lang.inter[iDA] = Lang.inter[iQS] = "";
+            // Lang.inter[iLA] = Lang.inter[iDA] = Lang.inter[iQS] = "";
 
         }
 
@@ -115,23 +115,6 @@ namespace InvisibleHand
         {
             string keyHint = prefix + assignedKey + suffix;
             ButtonKeyTips[actionType] = keyHint;
-
-            // switch(actionType)
-            // {
-            //     case "lootAll":
-            //         // Lang.inter[iLA] = Lang.inter[iLA] + keyHint;
-            //         Lang.inter[iLA] = "";
-            //         break;
-            //     case "depositAll":
-            //         // Lang.inter[iDA] = Lang.inter[iDA] + keyHint;
-            //         Lang.inter[iDA] = "";
-            //         break;
-            //     case "quickStack":
-            //         // Lang.inter[iQS] = Lang.inter[iQS] + keyHint;
-            //         Lang.inter[iQS] = "";
-            //         break;
-            // }
-
         }
 
         public override void OptionChanged(Option option)

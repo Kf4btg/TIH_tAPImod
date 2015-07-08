@@ -8,8 +8,12 @@ namespace InvisibleHand
 
     public class IHPlayer : ModPlayer
     {
+        /// map of user-locked item slots in player inventory
         private bool[] lockedSlots;
 
+        /// Holds status of flag indicating whether a particular
+        /// action will respect (i.e. ignore) locked slots.
+        /// Some actions are unaffected by this flag.
         private Dictionary<IHAction,bool> LockedActions;
 
         public override void Initialize()
@@ -17,6 +21,8 @@ namespace InvisibleHand
             // MUST use "new", as tAPI derps with clearing (quoth: Miraimai)
             lockedSlots = new bool[40]; //not the hotbar
 
+            // init "locked" status of all available actions;
+            // not all actions are affected by this flag
             LockedActions = new Dictionary<IHAction,bool>();
             foreach (IHAction aID in Enum.GetValues(typeof(IHAction)))
             {
@@ -24,29 +30,26 @@ namespace InvisibleHand
             }
         }
 
-        // save locked-slot state with player
         public override void Save(BinBuffer bb)
         {
-            // if (!IHBase.oLockingEnabled) return;
-
-            // TODO: reset original chest-button strings if we're quitting to main menu.
-            // It should be possible to check for this by checking:
+            // reset original chest-button strings if we're quitting to main
+            // menu, which should be indicated by checking:
             //     if (Main.gameMenu == true)
             // as this is set during the SaveAndQuit() method of the worldgen
             // immediately before player save. So:
-            // if (Main.gameMenu)
-            // {
-            //  Lang.inter[iLA] = OriginalButtonLabels[IHAction.LA];
-            //  Lang.inter[iDA] = OriginalButtonLabels[IHAction.DA];
-            //  Lang.inter[iQS] = OriginalButtonLabels[IHAction.QS];
-            // }
-            //
-            // should take care of it and make sure the strings are set correctly
-            // if the mod is unloaded/the replacer-button option is disabled.
-            // NOTE: this means we'll also need to move the original replacement
-            // to IHWorld.Initialize()
-            //
+            if (Main.gameMenu)
+            {
+                Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[IHAction.LA];
+                Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[IHAction.DA];
+                Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[IHAction.QS];
+            }
+            // should take care of it and make sure the strings are set
+            // correctly if the mod is unloaded/the replacer-button option
+            // is disabled.
 
+            // if (!IHBase.oLockingEnabled) return; //maybe?
+
+            // save locked-slot state with player
             foreach (var l in lockedSlots)
             {
                 bb.Write(l);
@@ -60,7 +63,7 @@ namespace InvisibleHand
             }
         }
 
-        //load back locked-slot state
+        ///load back locked-slot state
         public override void Load(BinBuffer bb)
         {
             if (bb.IsEmpty) return;
@@ -81,10 +84,10 @@ namespace InvisibleHand
             }
         }
 
-        // During this phase we check if the player has pressed any hotkeys;
-        // if so, the corresponding action is called, with the chest-related
-        // actions wrapped in special net-update code to prevent syncing issues
-        // during multiplayer.
+        /// During this phase we check if the player has pressed any hotkeys;
+        /// if so, the corresponding action is called, with the chest-related
+        /// actions wrapped in special net-update code to prevent syncing
+        /// issues during multiplayer.
         public override void PreUpdate()
         {
             //activate only if:
@@ -189,12 +192,19 @@ namespace InvisibleHand
             }
         }
 
+        /// Only valid for the 40 Player inventory slots below the hotbar.
+        /// <returns>True if indicated slot is locked</returns>
         public static bool SlotLocked(Player player, int slotIndex)
         {
+            // pull IHPlayer subclass from the current Player-object's
+            // list of subclasses
             IHPlayer mp = player.GetSubClass<IHPlayer>();
+            // subtract 10 since our array only contains 40 items and
+            // we're ignoring the first 10 actual slots (the hotbar).
             return slotIndex>9 && slotIndex<50 && mp.lockedSlots[slotIndex-10];
         }
 
+        /// Locks/unlocks indicated slot depending on current status.
         public static void ToggleLock(Player player, int slotIndex)
         {
             if (slotIndex<10 || slotIndex>49) return;
@@ -203,12 +213,15 @@ namespace InvisibleHand
             mp.lockedSlots[slotIndex-10]=!mp.lockedSlots[slotIndex-10];
         }
 
+        /// <returns>True if indicated action is set to respect locked slots.</returns>
         public static bool ActionLocked(Player player, IHAction actionID)
         {
             IHPlayer mp = player.GetSubClass<IHPlayer>();
                 return mp.LockedActions[actionID];
         }
 
+        /// Set indicated action to respect/not-respect locked slots,
+        /// depending on current status.
         public static void ToggleActionLock(Player p, IHAction actionID)
         {
             IHPlayer mp = p.GetSubClass<IHPlayer>();

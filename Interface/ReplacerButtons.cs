@@ -11,9 +11,9 @@ namespace InvisibleHand
 
         private const float posX = 506;
         // these likely won't work without the original buttons...but we'll see
-        public static float scaleLA { get { return API.main.chestLootScale; } }
-        public static float scaleDA { get { return API.main.chestDepositScale; } }
-        public static float scaleQS { get { return API.main.chestStackScale; } }
+        // public static float scaleLA { get { return API.main.chestLootScale; } }
+        // public static float scaleDA { get { return API.main.chestDepositScale; } }
+        // public static float scaleQS { get { return API.main.chestStackScale; } }
 
 
         public TextReplacerButtons(IHBase mbase) : base("TextReplacerButtons")
@@ -24,18 +24,13 @@ namespace InvisibleHand
             float posYDA = posYLA + 26;
             float posYQS = posYLA + 52;
 
-            // goes from 0.75 (base) -> 1 (when hovered)
-            // float scaleLA = API.main.chestLootScale;
-            // float scaleDA = API.main.chestDepositScale;
-            // float scaleQS = API.main.chestStackScale;
 
             // get labels with key-hint
-            // TODO: make sure this changes correctly when reloading
             var labels = new
             {
-                lootAll       = IHBase.OriginalButtonLabels[IHAction.LA] + IHUtils.GetKeyTip("Loot All"), //could use Constants.ButtonLabels[11]
-                depAll        = IHBase.OriginalButtonLabels[IHAction.DA] + IHUtils.GetKeyTip("Deposit All"), //could use Constants.ButtonLabels[9]
-                qStack        = IHBase.OriginalButtonLabels[IHAction.QS] + IHUtils.GetKeyTip("Quick Stack"), //could use Constants.ButtonLabels[6]
+                lootAll = IHBase.OriginalButtonLabels[IHAction.LA] + IHUtils.GetKeyTip("Loot All"), //could use Constants.ButtonLabels[11]
+                depAll  = IHBase.OriginalButtonLabels[IHAction.DA] + IHUtils.GetKeyTip("Deposit All"), //could use Constants.ButtonLabels[9]
+                qStack  = IHBase.OriginalButtonLabels[IHAction.QS] + IHUtils.GetKeyTip("Quick Stack"), //could use Constants.ButtonLabels[6]
             };
 
             var lockOffset = new Vector2(-20, -10);
@@ -51,9 +46,11 @@ namespace InvisibleHand
             mbase.ButtonUpdates.Push(labels.depAll);
             mbase.ButtonUpdates.Push(labels.qStack);
 
-            var baseLA = new ButtonBase(this, mbase.ButtonRepo[labels.lootAll], 0.75f);
-            var baseDA = new ButtonBase(this, mbase.ButtonRepo[labels.depAll], 0.75f);
-            var baseQS = new ButtonBase(this, mbase.ButtonRepo[labels.qStack], 0.75f);
+            // ButtonBase(ButtonLayer, Button, normal-scale, hovered-scale, scale-step, [alpha] )
+            // scale goes from 0.75 (base) -> 1 (when hovered) (from Main code)
+            var baseLA = new ButtonBase(this, mbase.ButtonRepo[labels.lootAll], 0.75f, 1.0f, 0.05f);
+            var baseDA = new ButtonBase(this, mbase.ButtonRepo[labels.depAll],  0.75f, 1.0f, 0.05f);
+            var baseQS = new ButtonBase(this, mbase.ButtonRepo[labels.qStack],  0.75f, 1.0f, 0.05f);
 
             Buttons.Add(IHAction.LA, baseLA);
             Buttons.Add(IHAction.DA, baseDA);

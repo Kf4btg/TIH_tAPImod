@@ -41,9 +41,10 @@ namespace InvisibleHand
         // will be set at construction
         public readonly Vector2 Position;
         public readonly Vector2 Size;
-        public readonly Rectangle ButtonBounds;
+        public readonly Func<Rectangle> CurrentBounds;
+        public readonly Rectangle MaxBounds;
         public bool IsHovered {
-             get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); }
+             get { return CurrentBounds().Contains(Main.mouseX, Main.mouseY); }
         }
 
         /// for determining when the mouse moves on and off the button
@@ -55,7 +56,13 @@ namespace InvisibleHand
         private float scale = ButtonBase.SCALE_FULL;
         private readonly float baseScale;
         private readonly float hoverScale;
-        public float Scale { get { return scale; } set { scale = value < 0.5f ? 0.5f : value; } }
+        private readonly float scaleStep;
+        public float Scale {
+            get { return scale; }
+            set {
+                scale = value < baseScale ? baseScale :
+                            value > hoverScale ? hoverScale : value;
+            } }
 
         // affects the alpha component of the current tint
         private float alphaBase = 0.85f;
@@ -73,14 +80,17 @@ namespace InvisibleHand
         *
         * Enable scale effect on the button by providing a base scaling value (values less than
         * 0.5 will be set to 0.5) and optionally one for on-mouse-hover (defaults to 1.0).
-        * Values larger than 1.0 are allowed.
+        * Values larger than 1.0 are allowed. Provide a scale_step larger than 0 to control
+        * how quickly the scale effect eases in and out (default is instantly).
         *
         * Enabling the scale effect automatically sets base alpha of the button to 1.0 (still
         * modified by the opacity of it's containing ButtonLayer); usually the alpha changes
         * from 0.85 to 1.0 on mouse hover. Provide a new base_alpha (unfocused transparency)
         * if you would like to reenable the opacity change.
         */
-        public ButtonBase(ButtonLayer container, IHButton defaultContext, float base_scale = -1, float focused_scale = 1.0f, float base_alpha = -1 )
+        public ButtonBase(ButtonLayer container, IHButton defaultContext,
+                float base_scale = 0, float focused_scale = 1.0f, float scale_step = 0,
+                float base_alpha = 0 )
         {
             Container = container;
             DefaultContext = currentContext = defaultContext;
@@ -89,7 +99,7 @@ namespace InvisibleHand
             Position = defaultContext.pos;
             Size     = defaultContext.Size;
 
-            ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
+            MaxBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
 
             if (base_scale > 0)
             {
@@ -97,12 +107,38 @@ namespace InvisibleHand
                 this.baseScale = base_scale < 0.5f ? 0.5f : base_scale;
                 Scale = this.baseScale;
                 this.hoverScale = focused_scale;
+                this.scaleStep = scale_step;
 
                 if (base_alpha > 0 && base_alpha < 1)
                     Alpha = base_alpha;
                 else
                     Alpha = 1.0f;
 
+                //dynamic bounds that changes with the scale
+                var origin = Size / 2;
+                CurrentBounds = () =>
+                {
+                    var px = Position.X + (int)(origin.X * Scale);
+                    var o = origin * Scale;
+
+                    //WHAAAAAAAATTTTTTT
+                    // FIXME: the hitbox for the string buttons is
+                    // still WAY too big. Also, they freak out when
+                    // the cursor is on the very edge of their area.
+                    // And they may be scaling too fast? Hard to tell.
+                    // Maybe we need to stop using a rectangle and
+                    // just check float bounds (rather than these ints)
+                    return new Rectangle(
+                        (int)(px - o.X),
+                        (int)(Position.Y - o.Y),
+                        (int)(Size.X + o.X),
+                        (int)(Size.Y + o.Y));
+                };
+            }
+            else
+            {
+                //static size, static bounds
+                CurrentBounds = () => MaxBounds;
             }
         }
 
@@ -146,8 +182,7 @@ namespace InvisibleHand
 
             if (currentContext.OnMouseEnter(this))
             {
-                if (useScaleEffect)
-                    Scale = hoverScale;
+
                 alphaMult = 1.0f;
             }
         }
@@ -156,10 +191,7 @@ namespace InvisibleHand
         {
             if (currentContext.OnMouseLeave(this))
             {
-                if (useScaleEffect)
-                    Scale = baseScale;
                 alphaMult = alphaBase;
-
             }
         }
 
@@ -185,6 +217,8 @@ namespace InvisibleHand
                 if (IsHovered)
                 {
                     if (!hasMouseFocus) { hasMouseFocus=true; OnMouseEnter(); }
+
+                    if (useScaleEffect) Scale += scaleStep;
                     OnHover();
 
                     currentContext.PostDraw(sb, this);
@@ -192,6 +226,8 @@ namespace InvisibleHand
                 }
                 if (hasMouseFocus) { OnMouseLeave(); }
                 hasMouseFocus=false;
+                if (useScaleEffect) Scale -= scaleStep;
+
             // }
             currentContext.PostDraw(sb, this);
         }

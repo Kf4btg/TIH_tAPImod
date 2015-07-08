@@ -44,7 +44,7 @@ namespace InvisibleHand
         {
             foreach (var kvp in Buttons)
             {
-                ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
+                ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.MaxBounds : Rectangle.Union(ButtonFrame, kvp.Value.MaxBounds);
             }
         }
 

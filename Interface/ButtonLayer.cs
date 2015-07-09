@@ -23,7 +23,7 @@ namespace InvisibleHand
     /// for each group of buttons you would like displayed.
     public abstract class ButtonLayer : InterfaceLayer
     {
-        public readonly Dictionary<IHAction, ButtonBase> Buttons;
+        public readonly Dictionary<TIH, ButtonBase> Buttons;
 
         public Rectangle ButtonFrame { get; protected set;}  //use this to determine MouseInterface
         public bool IsHovered {
@@ -42,7 +42,7 @@ namespace InvisibleHand
         /// Constructor
         protected ButtonLayer(string name) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
-            Buttons = new Dictionary<IHAction, ButtonBase>();
+            Buttons = new Dictionary<TIH, ButtonBase>();
             ButtonFrame = Rectangle.Empty;
         }
 
@@ -57,7 +57,7 @@ namespace InvisibleHand
 
         protected virtual void DrawButtons(SpriteBatch sb)
         {
-            //KeyValuePair<IHAction, ButtonBase>
+            //KeyValuePair<TIH, ButtonBase>
             foreach (var kvp in Buttons)
             {
                 kvp.Value.Draw(sb);

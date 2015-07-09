@@ -6,7 +6,7 @@ using Terraria.ID;
 namespace InvisibleHand
 {
     /// All the actions that the mod can perform
-    public enum IHAction { QS, DA, LA, Sort, Stack, Deposit, Refill }
+    public enum TIH { QS, DA, LA, Sort, Stack, Deposit, Refill }
 
     ///the ItemCat Enum defines the actual Sort Order of the categories
     public enum ItemCat

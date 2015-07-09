@@ -43,7 +43,7 @@ namespace InvisibleHand
         /// holds the game's original strings for loot-all, dep-all, quick-stack;
         /// we're going to be removing these later on, but will use their
         /// original values to replace them with newer, better buttons.
-        public static Dictionary<IHAction, string> OriginalButtonLabels { get; private set; }
+        public static Dictionary<TIH, string> OriginalButtonLabels { get; private set; }
 
         public ButtonLayer invButtons;
         public ButtonLayer chestButtons;
@@ -69,10 +69,10 @@ namespace InvisibleHand
             // hopefully these won't be overwritten if the player quits
             // to main menu and then rejoins the game...
             // TODO: put this behind a modoption
-            OriginalButtonLabels = new Dictionary<IHAction, string> {
-                { IHAction.LA, Lang.inter[iLA] },
-                { IHAction.DA, Lang.inter[iDA] },
-                { IHAction.QS, Lang.inter[iQS] }
+            OriginalButtonLabels = new Dictionary<TIH, string> {
+                { TIH.LA, Lang.inter[iLA] },
+                { TIH.DA, Lang.inter[iDA] },
+                { TIH.QS, Lang.inter[iQS] }
             };
             // and now destroy them...
             // FIXME: need to replace this on unload or the text will

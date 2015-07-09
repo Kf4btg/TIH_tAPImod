@@ -59,8 +59,8 @@ namespace InvisibleHand
             );
 
             // and now add to this ButtonLayer's Buttons collection
-            Buttons.Add(IHAction.Sort,  new ButtonBase(this, mbase.ButtonRepo[sortButton.label]));
-            Buttons.Add(IHAction.Stack, new ButtonBase(this, mbase.ButtonRepo[stackButton.label]));
+            Buttons.Add(TIH.Sort,  new ButtonBase(this, mbase.ButtonRepo[sortButton.label]));
+            Buttons.Add(TIH.Stack, new ButtonBase(this, mbase.ButtonRepo[stackButton.label]));
         }
 
         /*************************************************************************
@@ -68,7 +68,7 @@ namespace InvisibleHand
          */
         protected override void DrawButtons(SpriteBatch sb)
         {
-            foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+            foreach (KeyValuePair<TIH, ButtonBase> kvp in Buttons)
             {
                 sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
                 kvp.Value.Draw(sb);
@@ -131,7 +131,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.QS);
                     }
                 },
                 // 4 -- "Quick Stack (Locked)",
@@ -141,7 +141,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.QS);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.QS);
                     },
                     // use buttonstate's PostDraw hook to draw the lock indicator
                     PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset,
@@ -159,7 +159,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.DA);
                     }
                 },
                 // 7 -- "Deposit All (Locked)"
@@ -169,7 +169,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, IHAction.DA);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.DA);
                     },
                     // use buttonstate's PostDraw hook to draw the lock indicator
                     PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset,
@@ -199,7 +199,7 @@ namespace InvisibleHand
             mbase.ButtonRepo.Add (
                 quickStack.label,
                 new IHToggle(quickStack.unlocked, quickStack.locked,
-                            () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.QS),
+                            () => IHPlayer.ActionLocked(Main.localPlayer, TIH.QS),
                             null, quickStack.toggleOnRC)
                 );
 
@@ -210,7 +210,7 @@ namespace InvisibleHand
             mbase.ButtonRepo.Add (
                 depositAll.label,
                 new IHToggle(depositAll.unlocked, depositAll.locked,
-                            () => IHPlayer.ActionLocked(Main.localPlayer, IHAction.DA),
+                            () => IHPlayer.ActionLocked(Main.localPlayer, TIH.DA),
                             null, depositAll.toggleOnRC)
                 );
 
@@ -219,13 +219,13 @@ namespace InvisibleHand
             mbase.ButtonUpdates.Push(depositAll.label);
 
             // add the three ButtonBases to this layer
-            Buttons.Add(IHAction.Sort,    new ButtonBase(this, mbase.ButtonRepo[sort.label]));
-            Buttons.Add(IHAction.Refill,  new ButtonBase(this, mbase.ButtonRepo[restock.label]));
-            Buttons.Add(IHAction.Deposit, new ButtonBase(this, mbase.ButtonRepo[smartDep.label]));
+            Buttons.Add(TIH.Sort,    new ButtonBase(this, mbase.ButtonRepo[sort.label]));
+            Buttons.Add(TIH.Refill,  new ButtonBase(this, mbase.ButtonRepo[restock.label]));
+            Buttons.Add(TIH.Deposit, new ButtonBase(this, mbase.ButtonRepo[smartDep.label]));
 
             //now create keywatchers to toggle Restock/QS & SD/DA
-            Buttons[IHAction.Refill].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label);
-            Buttons[IHAction.Deposit].RegisterKeyToggle(KState.Special.Shift, smartDep.label, depositAll.label);
+            Buttons[TIH.Refill].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label);
+            Buttons[TIH.Deposit].RegisterKeyToggle(KState.Special.Shift, smartDep.label, depositAll.label);
         }
 
         /*************************************************************************
@@ -233,7 +233,7 @@ namespace InvisibleHand
          */
         protected override void DrawButtons(SpriteBatch sb)
         {
-            foreach (KeyValuePair<IHAction, ButtonBase> kvp in Buttons)
+            foreach (KeyValuePair<TIH, ButtonBase> kvp in Buttons)
             {
                 sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
                 kvp.Value.Draw(sb);

@@ -30,9 +30,9 @@ namespace InvisibleHand
             // get labels with key-hint
             var labels = new
             {
-                lootAll = IHBase.OriginalButtonLabels[IHAction.LA] + IHUtils.GetKeyTip("Loot All"), //could use Constants.ButtonLabels[11]
-                depAll  = IHBase.OriginalButtonLabels[IHAction.DA] + IHUtils.GetKeyTip("Deposit All"), //could use Constants.ButtonLabels[9]
-                qStack  = IHBase.OriginalButtonLabels[IHAction.QS] + IHUtils.GetKeyTip("Quick Stack"), //could use Constants.ButtonLabels[6]
+                lootAll = IHBase.OriginalButtonLabels[TIH.LA] + IHUtils.GetKeyTip("Loot All"), //could use Constants.ButtonLabels[11]
+                depAll  = IHBase.OriginalButtonLabels[TIH.DA] + IHUtils.GetKeyTip("Deposit All"), //could use Constants.ButtonLabels[9]
+                qStack  = IHBase.OriginalButtonLabels[TIH.QS] + IHUtils.GetKeyTip("Quick Stack"), //could use Constants.ButtonLabels[6]
             };
 
             var lockOffset = new Vector2(-20, -18);
@@ -54,9 +54,9 @@ namespace InvisibleHand
             var baseDA = new TextReplacerBase(this, mbase.ButtonRepo[labels.depAll]);
             var baseQS = new TextReplacerBase(this, mbase.ButtonRepo[labels.qStack]);
 
-            Buttons.Add(IHAction.LA, baseLA);
-            Buttons.Add(IHAction.DA, baseDA);
-            Buttons.Add(IHAction.QS, baseQS);
+            Buttons.Add(TIH.LA, baseLA);
+            Buttons.Add(TIH.DA, baseDA);
+            Buttons.Add(TIH.QS, baseQS);
 
             // TODO: add sort button somehow?
             if (swapNewActions)
@@ -74,8 +74,8 @@ namespace InvisibleHand
                 mbase.ButtonRepo.Add(nlabels.restock, SLButton);
 
                 //now create keywatchers to toggle Restock/QS & SD/DA
-                Buttons[IHAction.DA].RegisterKeyToggle(KState.Special.Shift, labels.depAll, nlabels.smartdep);
-                Buttons[IHAction.QS].RegisterKeyToggle( KState.Special.Shift, labels.qStack, nlabels.restock);
+                Buttons[TIH.DA].RegisterKeyToggle(KState.Special.Shift, labels.depAll, nlabels.smartdep);
+                Buttons[TIH.QS].RegisterKeyToggle( KState.Special.Shift, labels.qStack, nlabels.restock);
 
 
             }

@@ -26,14 +26,20 @@ namespace InvisibleHand
         public readonly Dictionary<IHAction, ButtonBase> Buttons;
 
         public Rectangle ButtonFrame { get; protected set;}  //use this to determine MouseInterface
-        public bool IsHovered { get { return ButtonFrame.Contains(Main.mouseX, Main.mouseY); } }
+        public bool IsHovered {
+            get
+            {
+                return ButtonFrame.Contains(Main.mouseX, Main.mouseY);
+            }
+        }
 
         protected float opacity_inactive = 0.45f;
         protected float opacity_active = 1.0f;
 
         //TODO: have this fade in/out?
-        public float LayerOpacity { get; private set; }
+        public float LayerOpacity { get; protected set; }
 
+        /// Constructor
         protected ButtonLayer(string name) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
             Buttons = new Dictionary<IHAction, ButtonBase>();
@@ -42,9 +48,10 @@ namespace InvisibleHand
 
         internal void UpdateFrame()
         {
+            LayerOpacity = opacity_inactive;
             foreach (var kvp in Buttons)
             {
-                ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.MaxBounds : Rectangle.Union(ButtonFrame, kvp.Value.MaxBounds);
+                ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
             }
         }
 

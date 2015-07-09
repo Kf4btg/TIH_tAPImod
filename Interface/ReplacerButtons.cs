@@ -18,7 +18,7 @@ namespace InvisibleHand
         // public static float scaleQS { get { return API.main.chestStackScale; } }
 
 
-        public TextReplacerButtons(IHBase mbase) : base("TextReplacerButtons")
+        public TextReplacerButtons(IHBase mbase, bool swapNewActions = false) : base("TextReplacerButtons")
         {
             this.opacity_inactive = 1.0f;
             // pulled these numbers (and posX) from Terraria.Main
@@ -57,6 +57,28 @@ namespace InvisibleHand
             Buttons.Add(IHAction.LA, baseLA);
             Buttons.Add(IHAction.DA, baseDA);
             Buttons.Add(IHAction.QS, baseQS);
+
+            // TODO: add sort button somehow?
+            if (swapNewActions)
+            {
+                var nlabels = new
+                {
+                    smartdep = Constants.ButtonLabels[8] + IHUtils.GetKeyTip(Constants.ButtonLabels[8]),
+                    restock = Constants.ButtonLabels[5] + IHUtils.GetKeyTip(Constants.ButtonLabels[5])
+                };
+
+                var SDButton = ButtonFactory.SmartDepositButton(nlabels.smartdep, new Vector2(posX, posYDA), true);
+                var SLButton = ButtonFactory.SmartLootButton(nlabels.restock, new Vector2(posX, posYQS), true);
+
+                mbase.ButtonRepo.Add(nlabels.smartdep, SDButton);
+                mbase.ButtonRepo.Add(nlabels.restock, SLButton);
+
+                //now create keywatchers to toggle Restock/QS & SD/DA
+                Buttons[IHAction.DA].RegisterKeyToggle(KState.Special.Shift, labels.depAll, nlabels.smartdep);
+                Buttons[IHAction.QS].RegisterKeyToggle( KState.Special.Shift, labels.qStack, nlabels.restock);
+
+
+            }
 
         }
 

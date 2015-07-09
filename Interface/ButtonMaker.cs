@@ -23,7 +23,7 @@ namespace InvisibleHand {
                     btns = new ChestButtons(IHBase.Instance);
                     break;
                 case "TextReplacer":
-                    btns = new TextReplacerButtons(IHBase.Instance);
+                    btns = new TextReplacerButtons(IHBase.Instance, true);
                     break;
                 default:
                     throw new ArgumentException("Invalid ButtonLayer type \"" + type + "\"; valid types are \"Inventory\", \"Chest\", and \"TextReplacer\".");
@@ -113,6 +113,35 @@ namespace InvisibleHand {
                 return CreateLockableButton(bState, IHAction.QS, parent, position, lockOffset, lockColor);
 
             //else return plain single-state button
+            return new IHButton(bState, position);
+        }
+
+        public static IHButton SmartLootButton(string label, Vector2 position, bool textual = false)
+        {
+            var bState = new ButtonState(label)
+            {
+                onClick = IHSmartStash.SmartLoot
+            };
+
+            //TODO: In light of the "Smart Loot" action added to
+            // Terraria 1.3, maybe this should be renamed (back) to
+            // Smart Loot?
+            if (! textual)
+                GetButtonTexture("Restock", ref bState);
+
+            return new IHButton(bState, position);
+        }
+
+        public static IHButton SmartDepositButton(string label, Vector2 position, bool textual = false)
+        {
+            var bState = new ButtonState(label)
+            {
+                onClick = IHSmartStash.SmartDeposit
+            };
+
+            if (! textual)
+                GetButtonTexture("Smart Deposit", ref bState);
+
             return new IHButton(bState, position);
         }
 

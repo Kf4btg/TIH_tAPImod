@@ -6,7 +6,37 @@ using Terraria.ID;
 namespace InvisibleHand
 {
     /// All the actions that the mod can perform
-    public enum TIH { QS, DA, LA, Sort, Stack, Deposit, Refill }
+    public enum TIH
+    {
+        QuickStack,
+        QS = QuickStack,
+        
+        DepAll,
+        DA = DepAll,
+
+        LootAll,
+        LA = LootAll,
+
+        SortInv,
+        Sort = SortInv,
+
+        RSortInv,
+        RSort = RSortInv,
+
+        SortChest,
+        RSortChest,
+
+        CleanInv,
+        Stack = CleanInv,
+        CleanChest,
+
+        SmartDep,
+        Deposit = SmartDep,
+
+        SmartLoot,
+        Refill = SmartLoot,
+        Restock = SmartLoot
+    }
 
     ///the ItemCat Enum defines the actual Sort Order of the categories
     public enum ItemCat

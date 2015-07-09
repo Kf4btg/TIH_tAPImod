@@ -133,9 +133,18 @@ namespace InvisibleHand
         /// This enables the pulse effect seen on the vanilla text.
         public static Color toScaledColor(this byte b, float mult)
         {
-                var c = (int)((byte)((float)b * mult));
-                return new Color(c, c, c, c);
+            var c = (int)((byte)((float)b * mult));
+            return new Color(c, c, c, c);
         }
+
+        public static Color toScaledColor(this byte b, float mult, Color tint)
+        {
+            var c = (int)((byte)((float)b * mult));
+            return TAPI.Extensions.Multiply(new Color(c, c, c, c), tint);
+            // Terraria.Utils.Multiply(textColor, tint),
+
+        }
+
 
     #endregion
 

@@ -35,7 +35,7 @@ namespace InvisibleHand
                 qStack  = IHBase.OriginalButtonLabels[IHAction.QS] + IHUtils.GetKeyTip("Quick Stack"), //could use Constants.ButtonLabels[6]
             };
 
-            var lockOffset = new Vector2(-20, -20);
+            var lockOffset = new Vector2(-20, -18);
 
             var LAButton = ButtonFactory.LootAllButton(labels.lootAll, new Vector2(posX, posYLA), true);
             var DAButton = ButtonFactory.DepositAllButton(labels.depAll, new Vector2(posX, posYDA), this, lockOffset, true);
@@ -84,9 +84,8 @@ namespace InvisibleHand
 
         public override float Scale {
             get { return scale; }
-            set {
-                scale = value < baseScale ? baseScale :
-                            value > hoverScale ? hoverScale : value;
+            set { scale = value < baseScale ? baseScale :
+                          value > hoverScale ? hoverScale : value;
                 }
             }
 
@@ -111,6 +110,7 @@ namespace InvisibleHand
         public override void Draw(SpriteBatch sb)
         {
             //doing this enables the "pulse" effect all the vanilla text has
+            // var textColor = Main.mouseTextColor.toScaledColor(Scale, CurrentState.tint);
             var textColor = Main.mouseTextColor.toScaledColor(Scale);
 
             // and setting the origin and position like this makes the word expand
@@ -125,8 +125,7 @@ namespace InvisibleHand
                 Main.fontMouseText,        //font
                 CurrentState.label,     //string
                 new Vector2(pos.X, pos.Y), //position
-                // state.tint*bBase.Alpha,
-                textColor,                 //color
+                textColor,                    //color
                 0f,                        //rotation
                 origin,
                 Scale,                  //scale

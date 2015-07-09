@@ -44,9 +44,10 @@ namespace InvisibleHand {
 
             // get font color if this is a text button
             // set up textures if this is not a text-button
-            if (textual)
-                bState.tint = Main.mouseTextColor.toColor();
-            else
+            // if (textual)
+            //     bState.tint = Main.mouseTextColor.toColor();
+            // else
+            if (! textual)
                 GetButtonTexture("Loot All", ref bState);
 
             return new IHButton(bState, position);
@@ -70,12 +71,10 @@ namespace InvisibleHand {
             };
 
             // set up textures if this is not a text-button
-            if (textual)
-                //FIXME: maybe putting this in the actual draw function
-                //(the one that gets called on each frame) is the secret
-                //to the fade in/out effect?
-                bState.tint = Main.mouseTextColor.toColor();
-            else
+            // if (textual)
+            //     bState.tint = Main.mouseTextColor.toColor();
+            // else
+            if (! textual)
                 GetButtonTexture("Deposit All", ref bState);
 
             if (lockable)
@@ -104,9 +103,10 @@ namespace InvisibleHand {
 
             // get font color if this is a text button
             // set up textures if this is not a text-button
-            if (textual)
-                bState.tint = Main.mouseTextColor.toColor();
-            else
+            // if (textual)
+            //     bState.tint = Main.mouseTextColor.toColor();
+            // else
+            if (! textual)
                 GetButtonTexture("Quick Stack", ref bState);
 
             if (lockable)
@@ -140,10 +140,11 @@ namespace InvisibleHand {
             // unlocked, we'll need to do the "if (textual)" block again.
             // But, for now, we can just duplicate most of the initial state
             var bState2 = bState1.Duplicate();
-            bState2.label = bState1.label + " (Locked)";
+            // bState2.label = bState1.label + " (Locked)";
 
             var offset = lockOffset ?? default(Vector2);
             Color color = lockColor ?? Color.Firebrick;
+            // bState2.tint = Color.LightCoral; // a bit brighter text?
             // use buttonstate's PostDraw hook to draw the lock indicator
             bState2.PostDraw = (sb, bBase) => DrawLockIndicator(sb, bBase, parent, offset, color);
 

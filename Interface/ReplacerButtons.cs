@@ -30,16 +30,16 @@ namespace InvisibleHand
             // get labels with key-hint
             var labels = new
             {
-                lootAll = IHBase.OriginalButtonLabels[TIH.LA] + IHUtils.GetKeyTip("Loot All"), //could use Constants.ButtonLabels[11]
-                depAll  = IHBase.OriginalButtonLabels[TIH.DA] + IHUtils.GetKeyTip("Deposit All"), //could use Constants.ButtonLabels[9]
-                qStack  = IHBase.OriginalButtonLabels[TIH.QS] + IHUtils.GetKeyTip("Quick Stack"), //could use Constants.ButtonLabels[6]
+                lootAll = IHBase.OriginalButtonLabels[TIH.LootAll]    + IHUtils.GetKeyTip(TIH.LootAll),
+                depAll  = IHBase.OriginalButtonLabels[TIH.DepAll]     + IHUtils.GetKeyTip(TIH.DepAll),
+                qStack  = IHBase.OriginalButtonLabels[TIH.QuickStack] + IHUtils.GetKeyTip(TIH.QuickStack),
             };
 
             var lockOffset = new Vector2(-20, -18);
 
             var LAButton = ButtonFactory.GetSimpleButton(TIH.LootAll, labels.lootAll, new Vector2(posX, posYLA), true);
-            var DAButton = ButtonFactory.DepositAllButton(labels.depAll, new Vector2(posX, posYDA), this, lockOffset, true);
-            var QSButton = ButtonFactory.QuickStackButton(labels.qStack, new Vector2(posX, posYQS), this, lockOffset, true);
+            var DAButton = ButtonFactory.GetLockableTextButton(TIH.DepAll, labels.depAll, new Vector2(posX, posYDA), this, lockOffset);
+            var QSButton = ButtonFactory.GetLockableTextButton(TIH.QuickStack, labels.qStack, new Vector2(posX, posYQS), this, lockOffset);
 
             mbase.ButtonRepo.Add(labels.lootAll, LAButton);
             mbase.ButtonRepo.Add(labels.depAll, DAButton);

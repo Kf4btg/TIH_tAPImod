@@ -27,17 +27,17 @@ namespace InvisibleHand
             ButtonState[] states =
             {
                 // "Sort"
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.Sort, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"])
                 },
                 //"Sort (Reverse)"
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.RSort, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"])
                 },
                 //Clean Stacks
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.CleanInv, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50)
                 }
@@ -110,22 +110,22 @@ namespace InvisibleHand
 
             ButtonState[] states = {
                 // 0 -- "Sort Chest"
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.SortChest, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, IHBase.ModOptions["ReverseSortChest"])
                 },
                 // 1 -- "Sort Chest (Reverse)"
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.RSortChest, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.SortChest(Main.localPlayer.chestItems, !IHBase.ModOptions["ReverseSortChest"])
                 },
                 // 2 -- "Restock",
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.SmartLoot, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHSmartStash.SmartLoot
                 },
                 // 3 -- "Quick Stack",
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.QuickStack, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoQuickStack,
                     onRightClick = () =>
@@ -135,7 +135,7 @@ namespace InvisibleHand
                     }
                 },
                 // 4 -- "Quick Stack (Locked)",
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.QuickStack, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoQuickStack,
                     onRightClick = () =>
@@ -148,12 +148,12 @@ namespace InvisibleHand
                                     Color.Firebrick*this.LayerOpacity*bBase.Alpha) //draw lock
                 },
                 // 5 -- "Smart Deposit",
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.SmartDep, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHSmartStash.SmartDeposit
                 },
                 // 6 -- "Deposit All",
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.DepAll, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoDepositAll,
                     onRightClick = () =>
@@ -163,7 +163,7 @@ namespace InvisibleHand
                     }
                 },
                 // 7 -- "Deposit All (Locked)"
-                new ButtonState( L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.DepAll, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = IHUtils.DoDepositAll,
                     onRightClick = () =>

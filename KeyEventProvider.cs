@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Input;
-
 using TAPI;
 
 namespace InvisibleHand

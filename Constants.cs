@@ -100,10 +100,6 @@ namespace InvisibleHand
         public const int ButtonW = 32;
         public const int ButtonH = 32;
 
-        public static readonly Dictionary<string, int> ButtonGridIndex;
-
-        /// maps labels to the modoption defining their keybind
-        public static readonly Dictionary<string, string> ButtonLabelToKBOption;
 
         ///the ItemCat Enum defines the actual Sort Order of the categories,
         /// but this defines in which order an item will be checked against
@@ -332,10 +328,55 @@ namespace InvisibleHand
             "Loot All"                  //11
         };
 
+        public static readonly Dictionary<TIH, string> DefaultButtonLabels;
+        public static readonly Dictionary<TIH, Action> DefaultClickActions;
+
+        public static readonly Dictionary<string, int> ButtonGridIndex;
         public static readonly Dictionary<TIH, int> ButtonGridIndexByActionType;
+
+        /// maps labels to the modoption defining their keybind
+        public static readonly Dictionary<string, string> ButtonLabelToKBOption;
+        public static readonly Dictionary<TIH, string> ButtonActionToKeyBindOption;
 
         static Constants()
         {
+
+            DefaultButtonLabels = new Dictionary<TIH, string>
+            {
+                //Player Inventory
+                {TIH.SortInv,    "Sort"},                     //0
+                {TIH.RSortInv,   "Sort (Reverse)"},           //1
+                {TIH.CleanInv,   "Clean Stacks"},             //2
+                {TIH.CleanChest, "Clean Stacks"},             //2
+                //Chests
+                {TIH.SortChest,  "Sort Chest"},               //3
+                {TIH.RSortChest, "Sort Chest (Reverse)"},     //4
+                {TIH.SmartLoot,  "Restock"},                  //5
+                {TIH.QuickStack, "Quick Stack"},              //6
+                {TIH.SmartDep,   "Smart Deposit"},            //8
+                {TIH.DepAll,     "Deposit All"},              //9
+                {TIH.LootAll,    "Loot All"}                  //11
+            };
+
+            DefaultClickActions = new Dictionary<TIH, Action>
+            {
+                //Player Inventory
+                {TIH.SortInv,    () => IHPlayer.SortInventory()},                     //0
+                {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},           //1
+                {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},             //2
+                {TIH.CleanChest, IHPlayer.CleanChestStacks},             //2
+                //Chests
+                {TIH.SortChest,  () => IHPlayer.SortChest()},               //3
+                {TIH.RSortChest, () => IHPlayer.SortChest(true)},     //4
+                {TIH.SmartLoot,  IHSmartStash.SmartLoot},                  //5
+                {TIH.QuickStack, IHUtils.DoQuickStack},                  //5
+                {TIH.SmartDep,   IHSmartStash.SmartDeposit},            //8
+                {TIH.DepAll,     IHUtils.DoDepositAll},              //9
+                {TIH.LootAll,    IHUtils.DoLootAll}                  //11
+            };
+
+
+
             /************************************************
             * Make getting a button's texture (texels) easier
             */
@@ -363,7 +404,7 @@ namespace InvisibleHand
 
             //------------------------------------------------
             // and now do it with the action enum
-            ButtonGridIndexByActionType = new Dictionary<TIH, int>()
+            ButtonGridIndexByActionType = new Dictionary<TIH, int>
             {
                 {TIH.SortInv,    0},
                 {TIH.SortChest,  0},
@@ -389,7 +430,8 @@ namespace InvisibleHand
             * Map labels to the string used for the corresponding
             * keybind in Modoptions.json
             */
-            ButtonLabelToKBOption = new Dictionary<string, string> {
+            ButtonLabelToKBOption = new Dictionary<string, string>
+            {
                 //s, s-r, sc, sc-r
                 { ButtonLabels[0], "sort" },
                 { ButtonLabels[1], "sort" },
@@ -407,6 +449,27 @@ namespace InvisibleHand
                 { ButtonLabels[10],"depositAll" },
                 //lootall
                 { ButtonLabels[11],"lootAll" }
+            };
+
+            //------------------------------------------------
+            // and now do it with the action enum
+            ButtonActionToKeyBindOption = new Dictionary<TIH, string>()
+            {
+                {TIH.CleanInv,   "cleanStacks"},
+                {TIH.CleanChest, "cleanStacks"},
+
+                {TIH.DepAll,     "depositAll"},
+                {TIH.SmartDep,   "depositAll"},
+
+                {TIH.LootAll,    "lootAll"},
+
+                {TIH.QuickStack, "quickStack"},
+                {TIH.SmartLoot,  "quickStack"},
+
+                {TIH.SortInv,    "sort"},
+                {TIH.SortChest,  "sort"},
+                {TIH.RSortInv,   "sort"},
+                {TIH.RSortChest, "sort"},
             };
         }
     }

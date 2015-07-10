@@ -480,12 +480,12 @@ namespace InvisibleHand
 
     #region gui_stuff
 
-        /*************************************************
+        /* ************************************************
         *	 Unrelated to any of the above, these methods assist in the GUI/buttons part of the mod.
         */
 
-        // get source texels based on an index (defined in Constants class).
-        // the "+2" is due to the 2-pixel gap between the button faces in the grid png
+        /// get source texels based on an index (defined in Constants class).
+        /// the "+2" is due to the 2-pixel gap between the button faces in the grid png
         public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
         {
             return active ?
@@ -493,33 +493,34 @@ namespace InvisibleHand
                 new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
         }
 
-        //Get source Texels for the button based on its name (i.e. what @action it performs)
-        // @param active - false = default/inactive button appearance;
-        //                  true = focused/mouseover/active appearance
-        public static Rectangle? GetSourceRect(string action, bool active=false)
+        ///Get source Texels for the button based on its name (i.e. what @action it performs)
+        /// @param active - false = default/inactive button appearance;
+        ///                  true = focused/mouseover/active appearance
+        public static Rectangle? GetSourceRect(string btnAction, bool active=false)
         {
-            // String key = action;
-
-            // if (action.Contains("Chest"))
-            //     key = action.Contains("Reverse") ? "Sort (Reverse)" : "Sort";
-            //
-            // else if (action.StartsWith("Quick")) key = "Quick Stack";
-            // else if (action.StartsWith("Deposit")) key = "Deposit All";
-
-            return RectFromGridIndex( Constants.ButtonGridIndex[action], active );
+            return RectFromGridIndex( Constants.ButtonGridIndex[btnAction], active );
         }
-
+        ///Get source Texels for the button based what @action it performs
+        /// @param action
+        /// @param active - false = default/inactive button appearance;
+        ///                  true = focused/mouseover/active appearance
         public static Rectangle? GetSourceRect(TIH action, bool active=false)
         {
             return RectFromGridIndex( Constants.ButtonGridIndexByActionType[action], active );
         }
 
-
-        // returns the key-bind (as a string) for the given button
-        // return value will be something like "(X)"
+        /// returns the key-bind (as a string) for the given button
+        /// return value will be something like "(X)"
         public static string GetKeyTip(string buttonLabel)
         {
             return IHBase.ButtonKeyTips[Constants.ButtonLabelToKBOption[buttonLabel]];
+        }
+
+        /// returns the key-bind (as a string) for the button with the given action.
+        /// return value will be something like "(X)"
+        public static string GetKeyTip(TIH action)
+        {
+            return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
         }
 
     #endregion

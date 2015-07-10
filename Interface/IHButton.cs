@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -21,6 +20,7 @@ namespace InvisibleHand
 
         public ButtonState DisplayState { get; protected set; }
 
+        public TIH Action           { get { return DisplayState.action; } }
         public Action OnClick       { get { return DisplayState.onClick;} }
         public Action OnRightClick  { get { return DisplayState.onRightClick;} }
         public string Label         { get { return DisplayState.label;} }
@@ -38,9 +38,15 @@ namespace InvisibleHand
                 Main.fontMouseText.MeasureString(Label); }
         }
 
-        public IHButton(String label, Vector2? pos=null)
+        public IHButton(TIH action, Vector2? pos=null)
         {
-            this.DisplayState = new ButtonState(label);
+            this.DisplayState = new ButtonState(action);
+            this.pos = pos ?? default(Vector2);
+        }
+
+        public IHButton(TIH action, string label, Vector2? pos=null)
+        {
+            this.DisplayState = new ButtonState(action, label);
             this.pos = pos ?? default(Vector2);
         }
 
@@ -103,18 +109,18 @@ namespace InvisibleHand
         private readonly Action makeInactive;
 
         //defaultish - gray out the inactive state, change the label
-        public IHToggle(string inactiveLabel, string activeLabel, Texture2D tex, Func<bool> isActive,
-                        Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(inactiveLabel, pos)
+        public IHToggle(TIH action, string inactiveLabel, string activeLabel, Texture2D tex, Func<bool> isActive,
+                        Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(action, inactiveLabel, pos)
         {
             IsActive = isActive;
             OnToggle = onToggle;
 
             if (toggleOnRightClick){
-                ActiveState   = new ButtonState(activeLabel)   { texture = tex, onRightClick = DoToggle };
-                InactiveState = new ButtonState(inactiveLabel) { texture = tex, onRightClick = DoToggle, tint = Color.Gray };
+                ActiveState   = new ButtonState(action, activeLabel)   { texture = tex, onRightClick = DoToggle };
+                InactiveState = new ButtonState(action, inactiveLabel) { texture = tex, onRightClick = DoToggle, tint = Color.Gray };
             } else {
-                ActiveState   = new ButtonState(activeLabel)   { texture=tex, onClick = DoToggle };
-                InactiveState = new ButtonState(inactiveLabel) { texture=tex, onClick = DoToggle, tint=Color.Gray };
+                ActiveState   = new ButtonState(action, activeLabel)   { texture=tex, onClick = DoToggle };
+                InactiveState = new ButtonState(action, inactiveLabel) { texture=tex, onClick = DoToggle, tint=Color.Gray };
             }
             DisplayState = InactiveState;
         }

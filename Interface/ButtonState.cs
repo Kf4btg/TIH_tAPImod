@@ -14,6 +14,10 @@ namespace InvisibleHand
     {
         public string label;
 
+        /// The game-affecting action this state represents
+        /// (not necessarily unique amongst all buttonstates).
+        public TIH action;
+
         public Texture2D texture;
 
         public Rectangle? defaultTexels;  //texture source rectangle for base, non-mouseover appearance
@@ -31,15 +35,16 @@ namespace InvisibleHand
 
         public Color tint;
 
-        //make sure it at least has a label on construction
-        public ButtonState(string label)
+        //make sure it at least has a related action and a label on construction
+        public ButtonState(TIH action, string label="")
         {
-            this.label    = label;
-            tint          = Color.White;
+            this.action = action;
+            this.label  = label == "" ? Constants.DefaultButtonLabels[action] : label;
+            tint        = Color.White;
         }
 
         // commonly created series of states where all these were consistent; this overload eases their creation
-        public ButtonState(string label, Texture2D tex, Rectangle? defaultTexels, Rectangle? altTexels, Color? tintColor = null)
+        public ButtonState(TIH action, string label, Texture2D tex, Rectangle? defaultTexels, Rectangle? altTexels, Color? tintColor = null)
         {
             this.label         = label;
             this.texture       = tex;
@@ -50,7 +55,7 @@ namespace InvisibleHand
 
         public ButtonState Duplicate()
         {
-            var bsNew          = new ButtonState(this.label);
+            var bsNew          = new ButtonState(this.action, this.label);
             bsNew.texture      = texture;
             bsNew.altTexels    = altTexels;
             bsNew.defaultTexels= defaultTexels;
@@ -65,6 +70,7 @@ namespace InvisibleHand
 
         public void CopyFrom(ButtonState bsCopy)
         {
+            action       = bsCopy.action;
             label        = bsCopy.label;
             texture      = bsCopy.texture;
             altTexels    = bsCopy.altTexels;

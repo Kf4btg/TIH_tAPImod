@@ -10,7 +10,7 @@ namespace InvisibleHand
     {
         QuickStack,
         QS = QuickStack,
-        
+
         DepAll,
         DA = DepAll,
 
@@ -332,6 +332,8 @@ namespace InvisibleHand
             "Loot All"                  //11
         };
 
+        public static readonly Dictionary<TIH, int> ButtonGridIndexByActionType;
+
         static Constants()
         {
             /************************************************
@@ -358,6 +360,30 @@ namespace InvisibleHand
             ButtonGridIndex.Add(ButtonLabels[7],6);
             // restock/smartloot
             ButtonGridIndex.Add(ButtonLabels[5],7);
+
+            //------------------------------------------------
+            // and now do it with the action enum
+            ButtonGridIndexByActionType = new Dictionary<TIH, int>()
+            {
+                {TIH.SortInv,    0},
+                {TIH.SortChest,  0},
+
+                {TIH.RSortInv,   1},
+                {TIH.RSortChest, 1},
+
+                {TIH.LootAll,    2},
+
+                {TIH.DepAll,     3},
+
+                {TIH.SmartDep,   4},
+
+                {TIH.CleanInv,   5},
+                {TIH.CleanChest, 5},
+
+                {TIH.QuickStack, 6},
+
+                {TIH.SmartLoot,  7}
+            };
 
             /*************************************************
             * Map labels to the string used for the corresponding

@@ -509,6 +509,12 @@ namespace InvisibleHand
             return RectFromGridIndex( Constants.ButtonGridIndex[action], active );
         }
 
+        public static Rectangle? GetSourceRect(TIH action, bool active=false)
+        {
+            return RectFromGridIndex( Constants.ButtonGridIndexByActionType[action], active );
+        }
+
+
         // returns the key-bind (as a string) for the given button
         // return value will be something like "(X)"
         public static string GetKeyTip(string buttonLabel)

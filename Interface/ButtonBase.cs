@@ -93,6 +93,12 @@ namespace InvisibleHand
             RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1], IHBase.Instance.ButtonRepo[context2]);
         }
 
+        /// register a key toggle for this base's default context
+        public void RegisterKeyToggle(KState.Special key, IHButton context2)
+        {
+            RegisterKeyToggle(key, this.DefaultContext, context2);
+        }
+
         /// set up key-event-subscribers that will toggle btw 2 contexts
         public void RegisterKeyToggle(KState.Special key, IHButton context1, IHButton context2)
         {

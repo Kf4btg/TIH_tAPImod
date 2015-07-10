@@ -12,9 +12,6 @@ namespace InvisibleHand
 {
     public class IHInterface : ModInterface
     {
-        // public static IHInterface self { get; private set; }
-        // public IHInterface() : base() {self=this;}
-
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
             if (Main.playerInventory)

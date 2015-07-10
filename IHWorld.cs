@@ -16,9 +16,8 @@ namespace InvisibleHand
             // TODO: put this behind a mod-option.
             Lang.inter[IHBase.iLA] = Lang.inter[IHBase.iDA] = Lang.inter[IHBase.iQS] = "";
 
-
             // finding a place to do this where the buttons are actually *set correctly*
-            // upon initial load has beensdjnkdsjnklsakjnasdfjk
+            // upon initial load was...difficult. I hope it doesn't bork on the server.
             while (IHBase.Instance.ButtonUpdates.Count>0)
             {
                 // grab the next button that has been queued for update

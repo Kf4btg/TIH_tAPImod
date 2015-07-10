@@ -50,29 +50,21 @@ namespace InvisibleHand
 
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
         {
-
-
             if (state.texture == null)
             {
-                //doing this here to see if this enables the "pulse" effect all the vanilla text has
-                // Result: YES!
-                Color textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
+                // this creates the text-pulse effect of vanilla
+                var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
 
-                // Do these put the text in the proper place and cause it to expand like vanilla?
-                // Result: YES!
-                Vector2 origin = bBase.CurrentContext.Size / 2;
-                Vector2 pos = new Vector2(bBase.Position.X + (int)(origin.X * bBase.Scale), bBase.Position.Y);
-
+                // TODO: maybe don't ignore Alpha. Also, see if it's
+                // practical/if-there's-actually-a-need-for supporting
+                // tinting the text (TAPI.Extensions.Multiply(textcolor, tint))
                 sb.DrawString(
                         Main.fontMouseText,     //font
                         state.label,            //string
-                        // bBase.Position,         //position
-                        pos,
-                        // state.tint*bBase.Alpha, //color
-                        textColor,
+                        bBase.Position,         //position
+                        textColor,              //color
                         0f,                     //rotation
-                        // default(Vector2),       //origin
-                        origin,
+                        default(Vector2),       //origin
                         bBase.Scale,            //scale
                         SpriteEffects.None,     //effects
                         0f                      //layerDepth
@@ -84,12 +76,15 @@ namespace InvisibleHand
 
         public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
         {
+            var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
+
             if (state.texture==null)
                 sb.DrawString(
                         Main.fontMouseText,     //font
                         state.label,            //string
                         bBase.Position,         //position
-                        overrideColor*bBase.Alpha, //color
+                        // overrideColor*bBase.Alpha, //color
+                        TAPI.Extensions.Multiply(textColor, overrideColor),
                         0f,                     //rotation
                         default(Vector2),       //origin
                         bBase.Scale,            //scale
@@ -144,7 +139,6 @@ namespace InvisibleHand
             // Terraria.Utils.Multiply(textColor, tint),
 
         }
-
 
     #endregion
 

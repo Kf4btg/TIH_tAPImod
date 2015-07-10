@@ -9,33 +9,20 @@ namespace InvisibleHand
     public enum TIH
     {
         QuickStack,
-        QS = QuickStack,
-
         DepAll,
-        DA = DepAll,
-
         LootAll,
-        LA = LootAll,
 
         SortInv,
-        Sort = SortInv,
-
         RSortInv,
-        RSort = RSortInv,
 
         SortChest,
         RSortChest,
 
         CleanInv,
-        Stack = CleanInv,
         CleanChest,
 
         SmartDep,
-        Deposit = SmartDep,
-
-        SmartLoot,
-        Refill = SmartLoot,
-        Restock = SmartLoot
+        SmartLoot
     }
 
     ///the ItemCat Enum defines the actual Sort Order of the categories
@@ -361,18 +348,18 @@ namespace InvisibleHand
             DefaultClickActions = new Dictionary<TIH, Action>
             {
                 //Player Inventory
-                {TIH.SortInv,    () => IHPlayer.SortInventory()},                     //0
-                {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},           //1
-                {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},             //2
-                {TIH.CleanChest, IHPlayer.CleanChestStacks},             //2
+                {TIH.SortInv,    () => IHPlayer.SortInventory()},
+                {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},
+                {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},
+                {TIH.CleanChest, IHPlayer.CleanChestStacks},
                 //Chests
-                {TIH.SortChest,  () => IHPlayer.SortChest()},               //3
-                {TIH.RSortChest, () => IHPlayer.SortChest(true)},     //4
-                {TIH.SmartLoot,  IHSmartStash.SmartLoot},                  //5
-                {TIH.QuickStack, IHUtils.DoQuickStack},                  //5
-                {TIH.SmartDep,   IHSmartStash.SmartDeposit},            //8
-                {TIH.DepAll,     IHUtils.DoDepositAll},              //9
-                {TIH.LootAll,    IHUtils.DoLootAll}                  //11
+                {TIH.SortChest,  () => IHPlayer.SortChest()},
+                {TIH.RSortChest, () => IHPlayer.SortChest(true)},
+                {TIH.SmartLoot,  IHSmartStash.SmartLoot},
+                {TIH.QuickStack, IHUtils.DoQuickStack},
+                {TIH.SmartDep,   IHSmartStash.SmartDeposit},
+                {TIH.DepAll,     IHUtils.DoDepositAll},
+                {TIH.LootAll,    IHUtils.DoLootAll}
             };
 
 

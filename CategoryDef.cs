@@ -24,15 +24,15 @@ namespace InvisibleHand
             SetupSortingRules();
         }
 
-        /*************************************************************************
+        /** ***********************************************************************
         *  Define the categories and their matching rules
         */
         public static void SetupCategories()
         {
-            // Item matching functions unceremoniously stolen from Shockah's Fancy Cheat Menu mod,
+            // Original item matching functions unceremoniously stolen from Shockah's Fancy Cheat Menu mod,
             // who graciously did all the hard work figuring these out so I didn't have to!
-            // Although I did end up editing a few to make them mutually more exclusive
-            // (e.g. adding the !vanity check to the armor items)
+            // Since then I've added a boat load of new categories and adjusted some of the
+            // matching logic pretty heavily.
             Categories.Add( ItemCat.COIN,       item    => Constants.TileGroupCoin.Contains(item.createTile));
             Categories.Add( ItemCat.PICK, 		item   	=> item.pick > 0);
             Categories.Add( ItemCat.AXE, 		item   	=> item.axe > 0);
@@ -88,7 +88,7 @@ namespace InvisibleHand
 
         } //end setupCategories()
 
-        /*************************************************************************
+        /** ***********************************************************************
         *    This is where we define how the items within each category will be
         *    sorted re: each other. Each category will be associated with a list
         *    of strings corresponding to properties of an Item instance. This list,

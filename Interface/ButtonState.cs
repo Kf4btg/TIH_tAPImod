@@ -20,8 +20,10 @@ namespace InvisibleHand
 
         public Texture2D texture;
 
-        public Rectangle? defaultTexels;  //texture source rectangle for base, non-mouseover appearance
-        public Rectangle? altTexels;    //texture source rect for mouseover appearance
+        ///texture source rectangle for base, non-mouseover appearance
+        public Rectangle? defaultTexels;
+        ///texture source rect for mouseover appearance
+        public Rectangle? altTexels;
 
         public Action onClick;
         public Action onRightClick;
@@ -30,7 +32,9 @@ namespace InvisibleHand
         public Func<ButtonBase,bool> onMouseEnter;
         public Func<ButtonBase,bool> onMouseLeave;
 
-        public Func<SpriteBatch, ButtonBase, bool> PreDraw; //NOTE: currently disabled in ButtonBase
+        /// NOTE: currently not called in ButtonBase
+        public Func<SpriteBatch, ButtonBase, bool> PreDraw;
+        /// Called after all drawing and mouse-interaction checking is done
         public Action<SpriteBatch, ButtonBase> PostDraw;
 
         public Color tint;
@@ -43,7 +47,8 @@ namespace InvisibleHand
             tint        = Color.White;
         }
 
-        // commonly created series of states where all these were consistent; this overload eases their creation
+        // found myself commonly creating series of states where all these were
+        // consistent; this overload eases that process
         public ButtonState(TIH action, string label, Texture2D tex, Rectangle? defaultTexels, Rectangle? altTexels, Color? tintColor = null)
         {
             this.label         = label;

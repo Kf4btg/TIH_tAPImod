@@ -25,7 +25,9 @@ namespace InvisibleHand
     {
         public readonly Dictionary<TIH, ButtonBase> Buttons;
 
-        public Rectangle ButtonFrame { get; protected set;}  //use this to determine MouseInterface
+        /// Area on screen containing all the buttons in Buttons within
+        /// its boundaries. Use this to determine MouseInterface
+        public Rectangle ButtonFrame { get; protected set;}
         public bool IsHovered {
             get
             {
@@ -48,7 +50,9 @@ namespace InvisibleHand
 
         internal void UpdateFrame()
         {
+            // initialize this here so it doesn't somehow get stuck at 0
             LayerOpacity = opacity_inactive;
+            // ButtonFrame = rectangle big enough to contain all the buttons assigned to this layer
             foreach (var kvp in Buttons)
             {
                 ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);

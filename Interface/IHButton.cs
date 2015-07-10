@@ -21,9 +21,9 @@ namespace InvisibleHand
         public ButtonState DisplayState { get; protected set; }
 
         public TIH Action           { get { return DisplayState.action; } }
+        public string Label         { get { return DisplayState.label;} }
         public Action OnClick       { get { return DisplayState.onClick;} }
         public Action OnRightClick  { get { return DisplayState.onRightClick;} }
-        public string Label         { get { return DisplayState.label;} }
         public Texture2D Texture    { get { return DisplayState.texture;} }
         public Color Tint           { get { return DisplayState.tint;} }
 
@@ -50,7 +50,7 @@ namespace InvisibleHand
             this.pos = pos ?? default(Vector2);
         }
 
-        //require a pre-constructed state (or no state, as per the above constructor)
+        //require a pre-constructed state (or no state, as per the above constructors)
         public IHButton(ButtonState bState, Vector2? pos=null)
         {
             this.DisplayState = bState;
@@ -62,7 +62,7 @@ namespace InvisibleHand
             DisplayState = newState;
         }
 
-        //this is just here to enable the IHToggle Update(init) function from ModWorld; better solution later.
+        //this is just here to enable the IHToggle Update(init) function from ModWorld; better solution later maybe.
         public virtual void OnUpdate() {}
 
     // the Boolean value returned from some of these hooks decide if the calling
@@ -77,7 +77,7 @@ namespace InvisibleHand
         {
             return DisplayState.onMouseLeave==null || DisplayState.onMouseLeave(bBase);
         }
-        // NOTE: PreDraw currently disabled in ButtonBase
+        /// NOTE: PreDraw currently not called in ButtonBase
         public virtual bool PreDraw(SpriteBatch sb, ButtonBase bBase)
         {
             return DisplayState.PreDraw==null || DisplayState.PreDraw(sb, bBase);
@@ -91,12 +91,12 @@ namespace InvisibleHand
     #endregion
     }
 
-    // This is basically an "On/Off" switch - has an active and an
-    // inactive state, and onClick toggles between them.
-    // The First constructor is a literal toggle, performing one action
-    // that causes IsActive to swap from true to false or vice-versa and simply graying out the button
-    // The second constructor allows for more flexibility in defining what actions
-    // are taken when switching from one state to another and how the button display changes.
+    /// This is basically an "On/Off" switch - has an active and an
+    /// inactive state, and onClick toggles between them.
+    /// The First constructor is a literal toggle, performing one action
+    /// that causes IsActive to swap from true to false or vice-versa and simply graying out the button
+    /// The second constructor allows for more flexibility in defining what actions
+    /// are taken when switching from one state to another and how the button display changes.
     public class IHToggle : IHButton
     {
         public readonly ButtonState ActiveState;
@@ -108,7 +108,7 @@ namespace InvisibleHand
         private readonly Action makeActive;
         private readonly Action makeInactive;
 
-        //defaultish - gray out the inactive state, change the label
+        ///defaultish - gray out the inactive state, change the label
         public IHToggle(TIH action, string inactiveLabel, string activeLabel, Texture2D tex, Func<bool> isActive,
                         Action onToggle, Vector2? pos=null, bool toggleOnRightClick = false) : base(action, inactiveLabel, pos)
         {
@@ -125,7 +125,7 @@ namespace InvisibleHand
             DisplayState = InactiveState;
         }
 
-        // provide two complete states
+        /// provide two complete states to toggle between
         public IHToggle(ButtonState inactiveState, ButtonState activeState, Func<bool> isActive,
                         Vector2? pos = null, bool toggleOnRightClick = false) : base(inactiveState, pos)
         {
@@ -157,10 +157,10 @@ namespace InvisibleHand
             SetState(IsActive() ? ActiveState : InactiveState); //update state from current value of property
         }
 
-        // rather than just doing something like: activeState.onClick = setState(inActiveState)
-        // I prefer to have it actually check the state of the game parameter it affects
-        // in order to avoid issues from race-conditions or some other possible action
-        // that changed said paramater.
+        /// rather than just doing something like: activeState.onClick = setState(inActiveState)
+        /// I prefer to have it actually check the state of the game parameter it affects
+        /// in order to avoid issues from race-conditions or some other possible action
+        /// that changed said paramater.
         public void DoSwitch()
         {
             if (IsActive())
@@ -174,15 +174,15 @@ namespace InvisibleHand
             }
         }
 
-        // used to initialize button to correct state on world load
+        /// used to initialize button to correct state on world load
         public override void OnUpdate()
         {
             SetState(IsActive() ? ActiveState : InactiveState);
         }
     }
 
-    // a button that dynamically changes its appearance and/or function based on
-    // an external condition (as opposed to changing on user-click like IHToggle)
+    /// A button that dynamically changes its appearance and/or function based on
+    /// an external condition (as opposed to changing on user-click like IHToggle).
     public class IHDynamicButton : IHButton
     {
         private readonly ButtonState defaultState;

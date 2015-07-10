@@ -11,13 +11,12 @@ namespace InvisibleHand
     {
         public static IHBase Instance { get; private set; }
 
-        // holds the various T/F options, e.g. enable-locking
+        /// holds the various T/F options, e.g. enable-locking
         public static Dictionary<string, bool> ModOptions;
-        // associates the default or player-assigned keybind with
-        // a string representing its corresponding game action.
+
+        /// associates the default or player-assigned keybind with
+        /// a string representing its corresponding game action.
         public static Dictionary<string, Keys> ActionKeys;
-        // holds string-version of the keybinds for use in button tooltips
-        public static Dictionary<string, string> ButtonKeyTips;
 
         private static Texture2D lockedIcon;
         private static Texture2D buttonGrid;
@@ -38,7 +37,12 @@ namespace InvisibleHand
             get { return buttonBG ?? (buttonBG = Instance.textures["resources/button_bg"]); }
         }
 
+        /// provides notifications to buttons listening for a key to be pressed/released
+        /// (just shift right now, I believe) in order to change what function they perform
         public static KeyEventProvider KEP;
+
+        /// holds string-version of the keybinds for use in button labels/tooltips
+        public static Dictionary<string, string> ButtonKeyTips;
 
         /// holds the game's original strings for loot-all, dep-all, quick-stack;
         /// we're going to be removing these later on, but will use their
@@ -49,9 +53,11 @@ namespace InvisibleHand
         public ButtonLayer chestButtons;
         public ButtonLayer replacerButtons;
 
-        //keep track of ALL existing button contexts here.
+        /// keep track of ALL existing button contexts here.
+        /// TODO: there has to be a better way to key these things
+        /// than with their label.
         public Dictionary<string, IHButton> ButtonRepo;
-        //the ids of those that need a state-update:
+        ///the ids of those that need a state-update:
         public Stack<string> ButtonUpdates;
 
         // indices in Lang.inter[]
@@ -66,22 +72,12 @@ namespace InvisibleHand
             ActionKeys = new Dictionary<string, Keys>();
             ButtonKeyTips = new Dictionary<string, string>();
 
-            // hopefully these won't be overwritten if the player quits
-            // to main menu and then rejoins the game...
             // TODO: put this behind a modoption
             OriginalButtonLabels = new Dictionary<TIH, string> {
-                { TIH.LA, Lang.inter[iLA] },
-                { TIH.DA, Lang.inter[iDA] },
-                { TIH.QS, Lang.inter[iQS] }
+                { TIH.LootAll,    Lang.inter[iLA] },
+                { TIH.DepAll,     Lang.inter[iDA] },
+                { TIH.QuickStack, Lang.inter[iQS] }
             };
-            // and now destroy them...
-            // FIXME: need to replace this on unload or the text will
-            // still be missing if the player disables the mod (until they
-            // restart the game, but still...)
-            // Probably this should be done on world load/unload rather
-            // than on game load
-            // Lang.inter[iLA] = Lang.inter[iDA] = Lang.inter[iQS] = "";
-
         }
 
         public override void OnAllModsLoaded()
@@ -101,16 +97,14 @@ namespace InvisibleHand
             ButtonRepo    = new Dictionary<string, IHButton>();
             ButtonUpdates = new Stack<string>();
 
-            // TODO: does doing this here also make the mp-server freak out?
+            // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
             invButtons   = ButtonFactory.BuildButtons("Inventory");
             chestButtons = ButtonFactory.BuildButtons("Chest");
             replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
         }
 
-
-
-        /// Here we try to change the default string displayed for
-        /// Deposit All, Loot All, etc.
+        /// Store the Key assigned for each action as a hint
+        /// that can be tacked on to a button label or tooltip.
         private void SetKeyHint(string actionType, string assignedKey, string prefix = " (", string suffix = ")")
         {
             string keyHint = prefix + assignedKey + suffix;
@@ -128,9 +122,7 @@ namespace InvisibleHand
                 case "depositAll":
                 case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
-                    //let's try this:
                     SetKeyHint(option.name, option.Value.ToString());
-                    // ButtonKeyTips[option.name] = " (" + option.Value.ToString() + ")";
                     break;
 
                 // slot-locking

@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-// using System.Collections.Generic;
 using TAPI;
 using Terraria;
 
@@ -18,7 +17,7 @@ namespace InvisibleHand
         can be swapped out and around to create some fairly dynamic interactivity.
 
         TODO: stop duplicating all the code from UIComponent et al...
-        TODO 2: what code was that, exactly?
+        TODO 2: ...what code was that, again?
     */
     public class ButtonBase
     {

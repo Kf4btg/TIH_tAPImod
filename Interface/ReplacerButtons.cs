@@ -8,26 +8,22 @@ namespace InvisibleHand
 {
     public class TextReplacerButtons : ButtonLayer
     {
-
-        // new protected float opacity_inactive = 1.0f;
-
         private const float posX = 506;
-        // these likely won't work without the original buttons...but we'll see
-        // public static float scaleLA { get { return API.main.chestLootScale; } }
-        // public static float scaleDA { get { return API.main.chestDepositScale; } }
-        // public static float scaleQS { get { return API.main.chestStackScale; } }
 
-
+        /// Without swapNewActions == true, these buttons will look and act
+        /// just like fancy versions of the normal Quick Stack, Loot All, and
+        /// Deposit All text-buttons. With swapNewActions, holding down the
+        /// Shift button will swap Loot/Deposit buttons with their smart counterparts.
         public TextReplacerButtons(IHBase mbase, bool swapNewActions = false) : base("TextReplacerButtons")
         {
-            this.opacity_inactive = 1.0f;
+            this.opacity_inactive = 1.0f; // don't fade buttons
+
             // pulled these numbers (and posX) from Terraria.Main
             float posYLA = API.main.invBottom + 40;
             float posYDA = posYLA + 26;
             float posYQS = posYLA + 52;
 
-
-            // get labels with key-hint
+            // get labels with key-hint (e.g. "Loot All (Z)")
             var labels = new
             {
                 lootAll = IHBase.OriginalButtonLabels[TIH.LootAll]    + IHUtils.GetKeyTip(TIH.LootAll),
@@ -54,17 +50,17 @@ namespace InvisibleHand
             var baseDA = new TextReplacerBase(this, mbase.ButtonRepo[labels.depAll]);
             var baseQS = new TextReplacerBase(this, mbase.ButtonRepo[labels.qStack]);
 
-            Buttons.Add(TIH.LA, baseLA);
-            Buttons.Add(TIH.DA, baseDA);
-            Buttons.Add(TIH.QS, baseQS);
+            Buttons.Add(TIH.LootAll, baseLA);
+            Buttons.Add(TIH.DepAll, baseDA);
+            Buttons.Add(TIH.QuickStack, baseQS);
 
-            // TODO: add sort button somehow?
+            // TODO: add sort button somehow somewhere?
             if (swapNewActions)
             {
                 var nlabels = new
                 {
                     smartdep = Constants.ButtonLabels[8] + IHUtils.GetKeyTip(Constants.ButtonLabels[8]),
-                    restock = Constants.ButtonLabels[5] + IHUtils.GetKeyTip(Constants.ButtonLabels[5])
+                    restock  = Constants.ButtonLabels[5] + IHUtils.GetKeyTip(Constants.ButtonLabels[5])
                 };
 
                 var SDButton = ButtonFactory.GetSimpleButton(TIH.SmartDep, nlabels.smartdep, new Vector2(posX, posYDA), true);
@@ -74,28 +70,18 @@ namespace InvisibleHand
                 mbase.ButtonRepo.Add(nlabels.restock, SLButton);
 
                 //now create keywatchers to toggle Restock/QS & SD/DA
-                Buttons[TIH.DA].RegisterKeyToggle(KState.Special.Shift, labels.depAll, nlabels.smartdep);
-                Buttons[TIH.QS].RegisterKeyToggle( KState.Special.Shift, labels.qStack, nlabels.restock);
-
-
+                Buttons[TIH.DepAll].RegisterKeyToggle(KState.Special.Shift, labels.depAll, nlabels.smartdep);
+                Buttons[TIH.QuickStack].RegisterKeyToggle( KState.Special.Shift, labels.qStack, nlabels.restock);
             }
-
         }
 
         protected override void OnDraw(SpriteBatch sb)
         {
             if (!parentLayer.visible) return;
 
-            // if (IsHovered)
-            // {
-                // on this case, the buttons themselves will handle this.
-                // Main.localPlayer.mouseInterface = true;
-                // we're also not worried about layer opacity here.
-                // LayerOpacity=opacity_active;
+            // handling mouseInterface individually by button
             DrawButtons(sb);
-            // }
         }
-
     }
 
     public class TextReplacerBase : ButtonBase
@@ -145,17 +131,19 @@ namespace InvisibleHand
 
             sb.DrawString(
                 Main.fontMouseText,        //font
-                CurrentState.label,     //string
+                CurrentState.label,        //string
                 new Vector2(pos.X, pos.Y), //position
-                textColor,                    //color
+                textColor,                 //color
                 0f,                        //rotation
                 origin,
-                Scale,                  //scale
+                Scale,
                 SpriteEffects.None,        //effects
                 0f                         //layerDepth
             );
 
+            // shift origin up-right or down-left
             origin *= Scale;
+            // use specialized isHovered() below
             if (isHovered(pos, origin))
             {
                 if (!hasMouseFocus)
@@ -175,7 +163,6 @@ namespace InvisibleHand
                 OnHover();
                 currentContext.PostDraw(sb, this);
                 return;
-
             }
             if (hasMouseFocus)
                 OnMouseLeave();

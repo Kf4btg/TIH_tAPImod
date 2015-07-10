@@ -7,6 +7,7 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    // FIXME: Port this file over to the new ButtonFactory functions for button creation.
     public class InventoryButtons : ButtonLayer
     {
         //put these above the coins/ammo slot to be less intrusive.
@@ -27,12 +28,12 @@ namespace InvisibleHand
             ButtonState[] states =
             {
                 // "Sort"
-                new ButtonState(TIH.Sort, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.SortInv, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, IHBase.ModOptions["ReverseSortPlayer"])
                 },
                 //"Sort (Reverse)"
-                new ButtonState(TIH.RSort, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
+                new ButtonState(TIH.RSortInv, L=labels[++i], IHBase.ButtonGrid, IHUtils.GetSourceRect(L), IHUtils.GetSourceRect(L,true) )
                 {
                     onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer, !IHBase.ModOptions["ReverseSortPlayer"])
                 },
@@ -59,8 +60,8 @@ namespace InvisibleHand
             );
 
             // and now add to this ButtonLayer's Buttons collection
-            Buttons.Add(TIH.Sort,  new ButtonBase(this, mbase.ButtonRepo[sortButton.label]));
-            Buttons.Add(TIH.Stack, new ButtonBase(this, mbase.ButtonRepo[stackButton.label]));
+            Buttons.Add(TIH.SortInv,  new ButtonBase(this, mbase.ButtonRepo[sortButton.label]));
+            Buttons.Add(TIH.CleanInv, new ButtonBase(this, mbase.ButtonRepo[stackButton.label]));
         }
 
         /*************************************************************************
@@ -131,7 +132,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.QS);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.QuickStack);
                     }
                 },
                 // 4 -- "Quick Stack (Locked)",
@@ -141,7 +142,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.QS);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.QuickStack);
                     },
                     // use buttonstate's PostDraw hook to draw the lock indicator
                     PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset,
@@ -159,7 +160,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.DA);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.DepAll);
                     }
                 },
                 // 7 -- "Deposit All (Locked)"
@@ -169,7 +170,7 @@ namespace InvisibleHand
                     onRightClick = () =>
                     {
                         Main.PlaySound(22); //lock sound
-                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.DA);
+                        IHPlayer.ToggleActionLock(Main.localPlayer, TIH.DepAll);
                     },
                     // use buttonstate's PostDraw hook to draw the lock indicator
                     PostDraw = (sb, bBase) => sb.Draw(IHBase.LockedIcon, bBase.Position + lockOffset,
@@ -199,7 +200,7 @@ namespace InvisibleHand
             mbase.ButtonRepo.Add (
                 quickStack.label,
                 new IHToggle(quickStack.unlocked, quickStack.locked,
-                            () => IHPlayer.ActionLocked(Main.localPlayer, TIH.QS),
+                            () => IHPlayer.ActionLocked(Main.localPlayer, TIH.QuickStack),
                             null, quickStack.toggleOnRC)
                 );
 
@@ -210,7 +211,7 @@ namespace InvisibleHand
             mbase.ButtonRepo.Add (
                 depositAll.label,
                 new IHToggle(depositAll.unlocked, depositAll.locked,
-                            () => IHPlayer.ActionLocked(Main.localPlayer, TIH.DA),
+                            () => IHPlayer.ActionLocked(Main.localPlayer, TIH.DepAll),
                             null, depositAll.toggleOnRC)
                 );
 
@@ -219,13 +220,13 @@ namespace InvisibleHand
             mbase.ButtonUpdates.Push(depositAll.label);
 
             // add the three ButtonBases to this layer
-            Buttons.Add(TIH.Sort,    new ButtonBase(this, mbase.ButtonRepo[sort.label]));
-            Buttons.Add(TIH.Refill,  new ButtonBase(this, mbase.ButtonRepo[restock.label]));
-            Buttons.Add(TIH.Deposit, new ButtonBase(this, mbase.ButtonRepo[smartDep.label]));
+            Buttons.Add(TIH.SortChest, new ButtonBase(this, mbase.ButtonRepo[sort.label]));
+            Buttons.Add(TIH.SmartLoot, new ButtonBase(this, mbase.ButtonRepo[restock.label]));
+            Buttons.Add(TIH.SmartDep,  new ButtonBase(this, mbase.ButtonRepo[smartDep.label]));
 
             //now create keywatchers to toggle Restock/QS & SD/DA
-            Buttons[TIH.Refill].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label);
-            Buttons[TIH.Deposit].RegisterKeyToggle(KState.Special.Shift, smartDep.label, depositAll.label);
+            Buttons[TIH.SmartLoot].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label );
+            Buttons[TIH.SmartDep]. RegisterKeyToggle( KState.Special.Shift, smartDep.label, depositAll.label );
         }
 
         /*************************************************************************

@@ -44,9 +44,9 @@ namespace InvisibleHand
             // immediately before player save. So:
             if (Main.gameMenu)
             {
-                Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[TIH.LA];
-                Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[TIH.DA];
-                Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[TIH.QS];
+                Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[TIH.LootAll];
+                Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[TIH.DepAll];
+                Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[TIH.QuickStack];
             }
             // should take care of it and make sure the strings are set
             // correctly if the mod is unloaded/the replacer-button option
@@ -112,12 +112,14 @@ namespace InvisibleHand
                     {
                         // shift-pressed XOR Reverse-sort-mod-option:
                         //   this will reverse the sort IFF exactly one of these two bools is true
-                        IHOrganizer.SortPlayerInv(player, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortPlayer"]);
+                        IHOrganizer.SortPlayerInv(player,
+                                KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortPlayer"]);
                         return;
                     }
                     // else call sort on the Item[] array returned by chestItems
                     DoChestUpdateAction( () => {
-                        IHOrganizer.SortChest(player.chestItems, KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
+                        IHOrganizer.SortChest(player.chestItems,
+                                KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
                     });
                 }
 

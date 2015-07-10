@@ -43,6 +43,11 @@ namespace InvisibleHand {
         {
             return GetLockableButton(action, label, position, parent, lockOffset, lockColor, true);
         }
+        public static IHButton GetLockableTextButton(TIH action, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null)
+        {
+            return GetLockableButton(action, Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, true);
+        }
+        
         ///<returns>A button that, in addition to performing its regular action on left click,
         /// on a right-click will toggle between respecting or ignoring locked inventory slots.</returns>
         public static IHButton GetLockableButton(TIH action, string label, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
@@ -51,7 +56,7 @@ namespace InvisibleHand {
         }
         public static IHButton GetLockableButton(TIH action, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
         {
-            return GetLockableButton(action, Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, true);
+            return GetLockableButton(action, Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, textual);
         }
 
 

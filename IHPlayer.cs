@@ -198,19 +198,34 @@ namespace InvisibleHand
             }
         }
 
+        public static void SortInventory(bool reverse = false)
+        {
+            if ( Main.localPlayer.chest == -1 )
+                IHOrganizer.SortPlayerInv(Main.localPlayer,
+                reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
+        }
+
+        public static void SortChest(bool reverse = false)
+        {
+            if ( Main.localPlayer.chest != -1 )
+                Instance.DoChestUpdateAction( () =>
+                    IHOrganizer.SortChest(Main.localPlayer.chestItems,
+                    reverse ^ IHBase.ModOptions["ReverseSortChest"])
+                );
+        }
 
         public static void CleanInventoryStacks()
         {
-            Instance.DoChestUpdateAction( () =>
-                IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory)
-            );
+            if ( Main.localPlayer.chest == -1 )
+                IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory);
         }
 
         public static void CleanChestStacks()
         {
-            Instance.DoChestUpdateAction( () =>
-                IHOrganizer.ConsolidateStacks(Instance.player.chestItems)
-            );
+            if ( Main.localPlayer.chest != -1 )
+                Instance.DoChestUpdateAction( () =>
+                    IHOrganizer.ConsolidateStacks(Main.localPlayer.chestItems)
+                );
         }
 
         /// Only valid for the 40 Player inventory slots below the hotbar.

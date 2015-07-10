@@ -8,23 +8,28 @@ namespace InvisibleHand
 
     public class IHPlayer : ModPlayer
     {
+        private static IHPlayer Instance;
+
         /// map of user-locked item slots in player inventory
         private bool[] lockedSlots;
 
         /// Holds status of flag indicating whether a particular
         /// action will respect (i.e. ignore) locked slots.
         /// Some actions are unaffected by this flag.
-        private Dictionary<IHAction,bool> LockedActions;
+        private Dictionary<TIH,bool> LockedActions;
 
         public override void Initialize()
         {
+
+            Instance = this;
+
             // MUST use "new", as tAPI derps with clearing (quoth: Miraimai)
             lockedSlots = new bool[40]; //not the hotbar
 
             // init "locked" status of all available actions;
             // not all actions are affected by this flag
-            LockedActions = new Dictionary<IHAction,bool>();
-            foreach (IHAction aID in Enum.GetValues(typeof(IHAction)))
+            LockedActions = new Dictionary<TIH,bool>();
+            foreach (TIH aID in Enum.GetValues(typeof(TIH)))
             {
                 LockedActions.Add(aID, false);
             }
@@ -39,9 +44,9 @@ namespace InvisibleHand
             // immediately before player save. So:
             if (Main.gameMenu)
             {
-                Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[IHAction.LA];
-                Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[IHAction.DA];
-                Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[IHAction.QS];
+                Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[TIH.LA];
+                Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[TIH.DA];
+                Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[TIH.QS];
             }
             // should take care of it and make sure the strings are set
             // correctly if the mod is unloaded/the replacer-button option
@@ -55,7 +60,7 @@ namespace InvisibleHand
                 bb.Write(l);
             }
             bb.Write(LockedActions.Count);
-            //KeyValuePair<IHAction, bool>
+            //KeyValuePair<TIH, bool>
             foreach (var kvp in LockedActions)
             {
                 bb.Write((int)kvp.Key);
@@ -79,8 +84,8 @@ namespace InvisibleHand
             {
                 int aID = bb.ReadInt();
                 bool state = bb.ReadBool();
-                if (Enum.IsDefined(typeof(IHAction), aID))
-                    LockedActions[(IHAction)aID] = state;
+                if (Enum.IsDefined(typeof(TIH), aID))
+                    LockedActions[(TIH)aID] = state;
             }
         }
 
@@ -157,6 +162,7 @@ namespace InvisibleHand
         /// <param name="action">An Action (a lambda with no output)</param>
         protected void DoChestUpdateAction(Action action)
         {
+
             // check net status and make sure a non-bank chest is open
             // (bank-chests, i.e. piggy-bank & safe, are handled solely client-side)
             if (Main.netMode == 1 && player.chest > -1)
@@ -192,6 +198,21 @@ namespace InvisibleHand
             }
         }
 
+
+        public static void CleanInventoryStacks()
+        {
+            Instance.DoChestUpdateAction( () =>
+                IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory)
+            );
+        }
+
+        public static void CleanChestStacks()
+        {
+            Instance.DoChestUpdateAction( () =>
+                IHOrganizer.ConsolidateStacks(Instance.player.chestItems)
+            );
+        }
+
         /// Only valid for the 40 Player inventory slots below the hotbar.
         /// <returns>True if indicated slot is locked</returns>
         public static bool SlotLocked(Player player, int slotIndex)
@@ -214,7 +235,7 @@ namespace InvisibleHand
         }
 
         /// <returns>True if indicated action is set to respect locked slots.</returns>
-        public static bool ActionLocked(Player player, IHAction actionID)
+        public static bool ActionLocked(Player player, TIH actionID)
         {
             IHPlayer mp = player.GetSubClass<IHPlayer>();
                 return mp.LockedActions[actionID];
@@ -222,7 +243,7 @@ namespace InvisibleHand
 
         /// Set indicated action to respect/not-respect locked slots,
         /// depending on current status.
-        public static void ToggleActionLock(Player p, IHAction actionID)
+        public static void ToggleActionLock(Player p, TIH actionID)
         {
             IHPlayer mp = p.GetSubClass<IHPlayer>();
             mp.LockedActions[actionID] = !mp.LockedActions[actionID];

@@ -63,6 +63,12 @@ namespace InvisibleHand {
             return GenerateIHButton(action, label, position, false, textual, null, null, null);
         }
 
+        /// Use default label for this button's action
+        public static IHButton GetSimpleButton(TIH action, Vector2 position, bool textual = false)
+        {
+            return GetSimpleButton(action, Constants.DefaultButtonLabels[action], position, textual);
+        }
+
         /// Generic button-generator which is fed info from the other "Get...Button" methods.
         public static IHButton GenerateIHButton(TIH action, string label, Vector2 position, bool lockable,  bool textual,  ButtonLayer parent, Vector2? lockOffset, Color? lockColor)
         {

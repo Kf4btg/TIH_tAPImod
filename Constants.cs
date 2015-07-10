@@ -14,11 +14,10 @@ namespace InvisibleHand
 
         SortInv,
         RSortInv,
+        CleanInv,
 
         SortChest,
         RSortChest,
-
-        CleanInv,
         CleanChest,
 
         SmartDep,
@@ -87,7 +86,6 @@ namespace InvisibleHand
         public const int ButtonW = 32;
         public const int ButtonH = 32;
 
-
         ///the ItemCat Enum defines the actual Sort Order of the categories,
         /// but this defines in which order an item will be checked against
         /// the category matching rules. This is important due to a kind
@@ -140,7 +138,7 @@ namespace InvisibleHand
 
         // A large number of "Tile"-type items will share a .createTile attribute with items that fulfill a similar purpose.
         // This gives us a handy way to sort and possibly even categorize these item types.
-        /*************************************************************************
+        /** ***********************************************************************
         Create several hashsets to quickly check values of "item.createTile" to aid in categorization/sorting.
         Initialize them here with an anonymous array to avoid the resizing penalty of .Add()
         */
@@ -327,7 +325,6 @@ namespace InvisibleHand
 
         static Constants()
         {
-
             DefaultButtonLabels = new Dictionary<TIH, string>
             {
                 //Player Inventory
@@ -362,8 +359,6 @@ namespace InvisibleHand
                 {TIH.LootAll,    IHUtils.DoLootAll}
             };
 
-
-
             /************************************************
             * Make getting a button's texture (texels) easier
             */
@@ -389,7 +384,6 @@ namespace InvisibleHand
             // restock/smartloot
             ButtonGridIndex.Add(ButtonLabels[5],7);
 
-            //------------------------------------------------
             // and now do it with the action enum
             ButtonGridIndexByActionType = new Dictionary<TIH, int>
             {
@@ -438,7 +432,6 @@ namespace InvisibleHand
                 { ButtonLabels[11],"lootAll" }
             };
 
-            //------------------------------------------------
             // and now do it with the action enum
             ButtonActionToKeyBindOption = new Dictionary<TIH, string>()
             {

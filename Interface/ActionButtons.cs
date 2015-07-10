@@ -14,6 +14,12 @@ namespace InvisibleHand
         private readonly float[] posX = { 496, 532 }; //X-pos of the two buttons
         private const float posY = 28; //maintain height
 
+        private readonly Dictionary<TIH,float> PosX = new Dictionary<TIH, float> {
+            {TIH.SortInv, 496},
+            {TIH.RSortInv, 496},
+            {TIH.CleanInv, 532}
+        };
+
         /// make the bg slightly translucent even at max button opacity
         private readonly Color bgColor = Constants.InvSlotColor*0.8f;
 
@@ -64,9 +70,31 @@ namespace InvisibleHand
             Buttons.Add(TIH.CleanInv, new ButtonBase(this, mbase.ButtonRepo[stackButton.label]));
         }
 
-        /*************************************************************************
-         * Draw each button in this layer (bg first, then button)
-         */
+        public InventoryButtons(IHBase mbase, bool replace) : base("InventoryButtons")
+        {
+            var actions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
+
+            // create a button for each action & add it to the main ButtonRepo.
+            // also create a button base and add it to the Buttons
+            // collection for each action other than RSort,
+            // which is instead registered as a toggle for Sort
+            // (this actually eliminates the need for IHDynamicButton)
+            foreach (var a in actions)
+            {
+                // uses default label for the action
+                var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
+                mbase.ButtonRepo.Add(button.Label, button);
+
+                if (a != TIH.RSortInv)
+                    Buttons.Add(a, new ButtonBase(this, button));
+                else
+                    Buttons[TIH.SortInv].RegisterKeyToggle(KState.Special.Shift, button);
+            }
+        }
+
+        /*************************************************************************/
+
+        /// Draw each button in this layer (bg first, then button)
         protected override void DrawButtons(SpriteBatch sb)
         {
             foreach (KeyValuePair<TIH, ButtonBase> kvp in Buttons)
@@ -227,6 +255,13 @@ namespace InvisibleHand
             //now create keywatchers to toggle Restock/QS & SD/DA
             Buttons[TIH.SmartLoot].RegisterKeyToggle( KState.Special.Shift, restock.label,  quickStack.label );
             Buttons[TIH.SmartDep]. RegisterKeyToggle( KState.Special.Shift, smartDep.label, depositAll.label );
+        }
+
+        public ChestButtons(IHBase mbase, bool replace) : base("ChestButtons")
+        {
+            var simpleActions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
+            var lockingActions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
+
         }
 
         /*************************************************************************

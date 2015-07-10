@@ -35,23 +35,23 @@ namespace InvisibleHand {
         // ***************************************************************
         // Collecting common code
 
-        public static IHButton LootAllButton(string label, Vector2 position, bool textual = false)
-        {
-            var bState = new ButtonState(label)
-            {
-                onClick = IHUtils.DoLootAll
-            };
-
-            // get font color if this is a text button
-            // set up textures if this is not a text-button
-            // if (textual)
-            //     bState.tint = Main.mouseTextColor.toColor();
-            // else
-            if (! textual)
-                GetButtonTexture("Loot All", ref bState);
-
-            return new IHButton(bState, position);
-        }
+        // public static IHButton LootAllButton(string label, Vector2 position, bool textual = false)
+        // {
+        //     var bState = new ButtonState(label)
+        //     {
+        //         onClick = IHUtils.DoLootAll
+        //     };
+        //
+        //     // get font color if this is a text button
+        //     // set up textures if this is not a text-button
+        //     // if (textual)
+        //     //     bState.tint = Main.mouseTextColor.toColor();
+        //     // else
+        //     if (! textual)
+        //         GetButtonTexture("Loot All", ref bState);
+        //
+        //     return new IHButton(bState, position);
+        // }
 
         // -------------------------------------------------------------------
         /// Generate Deposit All button
@@ -75,10 +75,10 @@ namespace InvisibleHand {
             //     bState.tint = Main.mouseTextColor.toColor();
             // else
             if (! textual)
-                GetButtonTexture("Deposit All", ref bState);
+                GetButtonTexture(TIH.DepAll, ref bState);
 
             if (lockable)
-                return CreateLockableButton(bState, IHAction.DA, parent, position, lockOffset, lockColor);
+                return CreateLockableButton(bState, TIH.DepAll, parent, position, lockOffset, lockColor);
 
             //return plain single-state button
             return new IHButton(bState, position);
@@ -107,57 +107,97 @@ namespace InvisibleHand {
             //     bState.tint = Main.mouseTextColor.toColor();
             // else
             if (! textual)
-                GetButtonTexture("Quick Stack", ref bState);
+                GetButtonTexture(TIH.QuickStack, ref bState);
 
             if (lockable)
-                return CreateLockableButton(bState, IHAction.QS, parent, position, lockOffset, lockColor);
+                return CreateLockableButton(bState, TIH.QuickStack, parent, position, lockOffset, lockColor);
 
             //else return plain single-state button
             return new IHButton(bState, position);
         }
 
-        public static IHButton SmartLootButton(string label, Vector2 position, bool textual = false)
-        {
-            var bState = new ButtonState(label)
-            {
-                onClick = IHSmartStash.SmartLoot
-            };
+        // public static IHButton SmartLootButton(string label, Vector2 position, bool textual = false)
+        // {
+        //     var bState = new ButtonState(label)
+        //     {
+        //         onClick = IHSmartStash.SmartLoot
+        //     };
+        //
+        //     //TODO: In light of the "Smart Loot" action added to
+        //     // Terraria 1.3, maybe this should be renamed (back) to
+        //     // Smart Loot?
+        //     if (! textual)
+        //         GetButtonTexture("Restock", ref bState);
+        //
+        //     return new IHButton(bState, position);
+        // }
+        //
+        // public static IHButton SmartDepositButton(string label, Vector2 position, bool textual = false)
+        // {
+        //     var bState = new ButtonState(label)
+        //     {
+        //         onClick = IHSmartStash.SmartDeposit
+        //     };
+        //
+        //     if (! textual)
+        //         GetButtonTexture("Smart Deposit", ref bState);
+        //
+        //     return new IHButton(bState, position);
+        // }
+        //
+        // public static IHButton CleanStacksButton(TIH action, string label, Vector2 position, bool textual = false)
+        // {
+        //     var bState = new ButtonState(label)
+        //     {
+        //         onClick = IHSmartStash.SmartDeposit
+        //     };
+        //
+        //     if (! textual)
+        //         GetButtonTexture(action, ref bState);
+        //
+        //     return new IHButton(bState, position);
+        // }
 
-            //TODO: In light of the "Smart Loot" action added to
-            // Terraria 1.3, maybe this should be renamed (back) to
-            // Smart Loot?
+        public static IHButton GetSimpleButton(TIH action, string label, Vector2 position, bool textual = false)
+        {
+            var bState = new ButtonState(label);
+            switch(action)
+            {
+                case TIH.LootAll:
+                    bState.onClick = IHUtils.DoLootAll;
+                    break;
+                case TIH.SmartDep:
+                    bState.onClick = IHSmartStash.SmartDeposit;
+                    break;
+                case TIH.SmartLoot:
+                    bState.onClick = IHSmartStash.SmartLoot;
+                    break;
+                case TIH.CleanChest:
+                    bState.onClick = IHPlayer.CleanChestStacks;
+                    break;
+            }
+
             if (! textual)
-                GetButtonTexture("Restock", ref bState);
+                GetButtonTexture(action, ref bState);
 
             return new IHButton(bState, position);
-        }
 
-        public static IHButton SmartDepositButton(string label, Vector2 position, bool textual = false)
-        {
-            var bState = new ButtonState(label)
-            {
-                onClick = IHSmartStash.SmartDeposit
-            };
 
-            if (! textual)
-                GetButtonTexture("Smart Deposit", ref bState);
-
-            return new IHButton(bState, position);
         }
 
         // -------------------------------------------------------------------
         /// set base texture and default/alt texels for given ButtonState
-        private static void GetButtonTexture(string label, ref ButtonState bState)
+        private static void GetButtonTexture(TIH action, ref ButtonState bState)
         {
             bState.texture       = IHBase.ButtonGrid;
-            bState.defaultTexels = IHUtils.GetSourceRect(label);
-            bState.altTexels     = IHUtils.GetSourceRect(label, true);
+            bState.defaultTexels = IHUtils.GetSourceRect(action);
+            bState.altTexels     = IHUtils.GetSourceRect(action, true);
         }
 
         // -------------------------------------------------------------------
         // for the lockable-actions
 
-        private static IHToggle CreateLockableButton(ButtonState bState1, IHAction toLock, ButtonLayer parent, Vector2 position, Vector2? lockOffset, Color? lockColor)
+        private static IHToggle CreateLockableButton(ButtonState bState1, TIH toLock, ButtonLayer parent, Vector2 position, Vector2? lockOffset, Color? lockColor)
         {
             bState1.onRightClick = () =>
             {

@@ -37,7 +37,7 @@ namespace InvisibleHand
 
             var lockOffset = new Vector2(-20, -18);
 
-            var LAButton = ButtonFactory.LootAllButton(labels.lootAll, new Vector2(posX, posYLA), true);
+            var LAButton = ButtonFactory.GetSimpleButton(TIH.LootAll, labels.lootAll, new Vector2(posX, posYLA), true);
             var DAButton = ButtonFactory.DepositAllButton(labels.depAll, new Vector2(posX, posYDA), this, lockOffset, true);
             var QSButton = ButtonFactory.QuickStackButton(labels.qStack, new Vector2(posX, posYQS), this, lockOffset, true);
 
@@ -67,8 +67,8 @@ namespace InvisibleHand
                     restock = Constants.ButtonLabels[5] + IHUtils.GetKeyTip(Constants.ButtonLabels[5])
                 };
 
-                var SDButton = ButtonFactory.SmartDepositButton(nlabels.smartdep, new Vector2(posX, posYDA), true);
-                var SLButton = ButtonFactory.SmartLootButton(nlabels.restock, new Vector2(posX, posYQS), true);
+                var SDButton = ButtonFactory.GetSimpleButton(TIH.SmartDep, nlabels.smartdep, new Vector2(posX, posYDA), true);
+                var SLButton = ButtonFactory.GetSimpleButton(TIH.SmartLoot, nlabels.restock, new Vector2(posX, posYQS), true);
 
                 mbase.ButtonRepo.Add(nlabels.smartdep, SDButton);
                 mbase.ButtonRepo.Add(nlabels.restock, SLButton);

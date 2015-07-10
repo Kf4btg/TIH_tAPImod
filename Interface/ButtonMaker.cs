@@ -17,10 +17,10 @@ namespace InvisibleHand {
             switch(type)
             {
                 case "Inventory":
-                    btns = new InventoryButtons(IHBase.Instance);
+                    btns = new InventoryButtons(IHBase.Instance, false);
                     break;
                 case "Chest":
-                    btns = new ChestButtons(IHBase.Instance);
+                    btns = new ChestButtons(IHBase.Instance, false);
                     break;
                 case "TextReplacer":
                     btns = new TextReplacerButtons(IHBase.Instance, true);
@@ -49,6 +49,11 @@ namespace InvisibleHand {
         {
             return GenerateIHButton(action, label, position, true, textual, parent, lockOffset, lockColor);
         }
+        public static IHButton GetLockableButton(TIH action, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
+        {
+            return GetLockableButton(action, Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, true);
+        }
+
 
         /// This method makes it easy to create the simpler button types, mainly:
         ///      - LootAll

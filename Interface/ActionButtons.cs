@@ -14,7 +14,7 @@ namespace InvisibleHand
         private readonly float[] posX = { 496, 532 }; //X-pos of the two buttons
         private const float posY = 28; //maintain height
 
-        private readonly Dictionary<TIH,float> PosX = new Dictionary<TIH, float> {
+        private static readonly Dictionary<TIH,float> PosX = new Dictionary<TIH, float> {
             {TIH.SortInv, 496},
             {TIH.RSortInv, 496},
             {TIH.CleanInv, 532}
@@ -107,18 +107,34 @@ namespace InvisibleHand
 
     public class ChestButtons : ButtonLayer
     {
-        private float[] posX = {
+        private static readonly float[] posX = {
             453 - (3*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //leftmost
             453 - (2*Main.inventoryBackTexture.Width * Constants.CHEST_INVENTORY_SCALE),   //middle
             453 - (Main.inventoryBackTexture.Width   * Constants.CHEST_INVENTORY_SCALE)    //right beside trash
         };
+
+        private static readonly Dictionary<TIH,float> PosX = new Dictionary<TIH,float>{
+            {TIH.SortChest, posX[0]},   //leftmost
+            {TIH.RSortChest, posX[0]},   //leftmost
+            {TIH.SmartLoot, posX[1]},   //middle
+            {TIH.QuickStack, posX[1]},   //middle
+            {TIH.SmartDep, posX[2]},    //right beside trash
+            {TIH.DepAll, posX[2]}    //right beside trash
+        };
+
+        private static readonly Dictionary<TIH, TIH> togglesWith = new Dictionary<TIH, TIH>{
+            {TIH.RSortChest, TIH.SortChest},
+            {TIH.QuickStack, TIH.SmartLoot},
+            {TIH.DepAll, TIH.SmartDep}
+        };
+
         private readonly float posY = API.main.invBottom + (224*Constants.CHEST_INVENTORY_SCALE) + 4;
 
         //position offset for the "locked" icon on QS/DA
-        private readonly Vector2 lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
+        private static readonly Vector2 lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
                                                          -(float)(int)((float)Constants.ButtonH/2));
 
-        private readonly Color bgColor = Constants.ChestSlotColor*0.8f;
+        private static readonly Color bgColor = Constants.ChestSlotColor*0.8f;
 
         public ChestButtons(IHBase mbase) : base("ChestButtons")
         {
@@ -259,9 +275,30 @@ namespace InvisibleHand
 
         public ChestButtons(IHBase mbase, bool replace) : base("ChestButtons")
         {
-            var simpleActions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
-            var lockingActions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
+            var simpleActions = new TIH[] { TIH.SortChest, TIH.RSortChest, TIH.SmartDep, TIH.SmartLoot };
+            var lockingActions = new TIH[] { TIH.QuickStack, TIH.DepAll };
 
+            foreach (var a in simpleActions)
+            {
+                // uses default label for the action
+                var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
+                mbase.ButtonRepo.Add(button.Label, button);
+
+                if (a != TIH.RSortChest)
+                    Buttons.Add(a, new ButtonBase(this, button));
+                else
+                    Buttons[TIH.SortChest].RegisterKeyToggle(KState.Special.Shift, button);
+            }
+
+            foreach (var a in lockingActions)
+            {
+                var button = ButtonFactory.GetLockableButton(a, new Vector2(PosX[a], posY), this, lockOffset);
+                mbase.ButtonRepo.Add(button.Label, button);
+                // set QS & DA to have their state initialized on world load
+                mbase.ButtonUpdates.Push(button.Label);
+
+                Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
+            }
         }
 
         /*************************************************************************

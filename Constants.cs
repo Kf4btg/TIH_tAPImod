@@ -331,7 +331,7 @@ namespace InvisibleHand
                 {TIH.SortInv,    "Sort"},                     //0
                 {TIH.RSortInv,   "Sort (Reverse)"},           //1
                 {TIH.CleanInv,   "Clean Stacks"},             //2
-                {TIH.CleanChest, "Clean Stacks"},             //2
+                {TIH.CleanChest, "Clean Chest Stacks"},             //2
                 //Chests
                 {TIH.SortChest,  "Sort Chest"},               //3
                 {TIH.RSortChest, "Sort Chest (Reverse)"},     //4

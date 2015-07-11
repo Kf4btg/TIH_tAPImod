@@ -29,21 +29,29 @@ namespace InvisibleHand
         {
             var actions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
 
-            // create a button for each action & add it to the main ButtonRepo.
-            // also create a button base and add it to the Buttons
-            // collection for each action other than RSort,
-            // which is instead registered as a toggle for Sort
-            // (this actually eliminates the need for IHDynamicButton)
-            foreach (var a in actions)
-            {
-                // uses default label for the action
-                var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
-                mbase.ButtonRepo.Add(button.Label, button);
 
-                if (a != TIH.RSortInv)
-                    Buttons.Add(a, new ButtonBase(this, button));
-                else
-                    Buttons[TIH.SortInv].RegisterKeyToggle(KState.Special.Shift, button);
+            if (replace)
+            {
+
+            }
+            else
+            {
+                // create a button for each action & add it to the main ButtonRepo.
+                // also create a button base and add it to the Buttons
+                // collection for each action other than RSort,
+                // which is instead registered as a toggle for Sort
+                // (this actually eliminates the need for IHDynamicButton)
+                foreach (var a in actions)
+                {
+                    // uses default label for the action
+                    var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
+                    mbase.ButtonRepo.Add(button.Label, button);
+
+                    if (a != TIH.RSortInv)
+                        Buttons.Add(a, new ButtonBase(this, button));
+                    else
+                        Buttons[TIH.SortInv].RegisterKeyToggle(KState.Special.Shift, button);
+                }
             }
         }
 
@@ -96,26 +104,85 @@ namespace InvisibleHand
             var simpleActions = new TIH[] { TIH.SortChest, TIH.RSortChest, TIH.SmartDep, TIH.SmartLoot };
             var lockingActions = new TIH[] { TIH.QuickStack, TIH.DepAll };
 
-            foreach (var a in simpleActions)
+            // FIXME: This code needs to be in ReplacerButtons, and it needs to behind a
+            // "text or not-text ReplacerButtons" check; this way the type of Replacers
+            // (if any) can be decided at mod-load time and we can just keep the one call
+            // to ReplacerButtons in ModifyInterfaceLayerList() rather than having to
+            // check every frame "text or not-text" and drawing the appropriate set.
+            // This will also let a user have replacers and non-replacers at the same
+            // time, if so desired.
+            if (replace)
             {
-                // uses default label for the action
-                var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
-                mbase.ButtonRepo.Add(button.Label, button);
+                float posX = 506;
 
-                if (a != TIH.RSortChest)
-                    Buttons.Add(a, new ButtonBase(this, button));
-                else
-                    Buttons[TIH.SortChest].RegisterKeyToggle(KState.Special.Shift, button);
+                //40  22
+                //66  54
+                //92  86
+                //118
+                // resize these to the button size
+                // float posYLA = API.main.invBottom + 40;
+                float posYLA = API.main.invBottom + 22;
+                // float posYDA = posYLA + 26;
+                float posYDA = posYLA + 32;
+                // float posYQS = posYLA + 52;
+                float posYQS = posYDA + 32;
+
+                // FIXME: the bottom button overlaps "Edit Chest" 
+                var PosY = new Dictionary<TIH, float>{
+                    {TIH.SortChest,  posYLA},   //leftmost
+                    {TIH.RSortChest, posYLA},   //leftmost
+                    {TIH.SmartLoot,  posYQS},   //middle
+                    {TIH.QuickStack, posYQS},   //middle
+                    {TIH.SmartDep,   posYDA},    //right beside trash
+                    {TIH.DepAll,     posYDA}
+                };
+
+                foreach (var a in simpleActions)
+                {
+                    // uses default label for the action
+                    var button = ButtonFactory.GetSimpleButton(a, new Vector2(posX, PosY[a]));
+                    mbase.ButtonRepo.Add(button.Label, button);
+
+                    if (a != TIH.RSortChest)
+                        Buttons.Add(a, new ButtonBase(this, button));
+                    else
+                        Buttons[TIH.SortChest].RegisterKeyToggle(KState.Special.Shift, button);
+                }
+
+                foreach (var a in lockingActions)
+                {
+                    var button = ButtonFactory.GetLockableButton(a, new Vector2(posX, PosY[a]), this, lockOffset);
+                    mbase.ButtonRepo.Add(button.Label, button);
+                    // set QS & DA to have their state initialized on world load
+                    mbase.ButtonUpdates.Push(button.Label);
+
+                    Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
+                }
+
             }
-
-            foreach (var a in lockingActions)
+            else
             {
-                var button = ButtonFactory.GetLockableButton(a, new Vector2(PosX[a], posY), this, lockOffset);
-                mbase.ButtonRepo.Add(button.Label, button);
-                // set QS & DA to have their state initialized on world load
-                mbase.ButtonUpdates.Push(button.Label);
+                foreach (var a in simpleActions)
+                {
+                    // uses default label for the action
+                    var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
+                    mbase.ButtonRepo.Add(button.Label, button);
 
-                Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
+                    if (a != TIH.RSortChest)
+                        Buttons.Add(a, new ButtonBase(this, button));
+                    else
+                        Buttons[TIH.SortChest].RegisterKeyToggle(KState.Special.Shift, button);
+                }
+
+                foreach (var a in lockingActions)
+                {
+                    var button = ButtonFactory.GetLockableButton(a, new Vector2(PosX[a], posY), this, lockOffset);
+                    mbase.ButtonRepo.Add(button.Label, button);
+                    // set QS & DA to have their state initialized on world load
+                    mbase.ButtonUpdates.Push(button.Label);
+
+                    Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
+                }
             }
         }
 

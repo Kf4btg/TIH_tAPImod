@@ -13,8 +13,15 @@ namespace InvisibleHand
             // that the default buttons for these actions (that
             // appear to the right of an open chest) do not display,
             // allowing us to replace them with customized versions.
-            // TODO: put this behind a mod-option.
-            Lang.inter[IHBase.iLA] = Lang.inter[IHBase.iDA] = Lang.inter[IHBase.iQS] = "";
+            if (IHBase.ModOptions["UseReplacers"])
+            {
+                Lang.inter[IHBase.iLA] = Lang.inter[IHBase.iDA] = Lang.inter[IHBase.iQS] = "";
+
+                // and get rid of the edit-chest stuff if we're using
+                // icons rather than text
+                if (IHBase.ModOptions["IconReplacers"])
+                    Lang.inter[IHBase.iRC] = Lang.inter[IHBase.iSC] = Lang.inter[IHBase.iCE] = "";
+            }
 
             // finding a place to do this where the buttons are actually *set correctly*
             // upon initial load was...difficult. I hope it doesn't bork on the server.

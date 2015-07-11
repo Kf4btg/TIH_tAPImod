@@ -37,21 +37,35 @@ namespace InvisibleHand
 
         public override void Save(BinBuffer bb)
         {
-            // reset original chest-button strings if we're quitting to main
-            // menu, which should be indicated by checking:
-            //     if (Main.gameMenu == true)
-            // as this is set during the SaveAndQuit() method of the worldgen
-            // immediately before player save. So:
-            if (Main.gameMenu)
-            {
-                Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[TIH.LootAll];
-                Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[TIH.DepAll];
-                Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[TIH.QuickStack];
-            }
-            // should take care of it and make sure the strings are set
-            // correctly if the mod is unloaded/the replacer-button option
-            // is disabled.
 
+            if (IHBase.ModOptions["UseReplacers"])
+            {
+                // reset original chest-button strings if we're quitting to main
+                // menu, which should be indicated by checking:
+                //     if (Main.gameMenu == true)
+                // as this is set during the SaveAndQuit() method of the worldgen
+                // immediately before player save. So:
+                if (Main.gameMenu)
+                {
+                    Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[TIH.LootAll];
+                    Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[TIH.DepAll];
+                    Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[TIH.QuickStack];
+
+
+                    if (IHBase.ModOptions["IconReplacers"])
+                    {
+                        Lang.inter[IHBase.iRC] = IHBase.OriginalButtonLabels[TIH.Rename];
+                        Lang.inter[IHBase.iSC] = IHBase.OriginalButtonLabels[TIH.SaveName];
+                        Lang.inter[IHBase.iCE] = IHBase.OriginalButtonLabels[TIH.CancelEdit];
+                    }
+                }
+                // should take care of it and make sure the strings are set
+                // correctly if the mod is unloaded/the replacer-button option
+                // is disabled.
+
+
+
+            }
             // if (!IHBase.oLockingEnabled) return; //maybe?
 
             // save locked-slot state with player

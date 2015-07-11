@@ -80,13 +80,13 @@ namespace InvisibleHand
         * Construct the ButtonBase with just the reference to its default Context.
         * Handle changing contexts externally and effect it with ChangeContext
         */
-        public ButtonBase(ButtonLayer container, IHButton defaultContext, float base_alpha = 0.85f, float alpha_step = 0.05f)
+        public ButtonBase(ButtonLayer container, IHButton defaultContext, float base_alpha = 0.85f, float alpha_step = 0.01f)
         {
             Container = container;
             DefaultContext = currentContext = defaultContext;
 
             Name     = defaultContext.Label;
-            Position = defaultContext.pos;
+            Position = defaultContext.Position;
             Size     = defaultContext.Size;
 
             alphaBase = alphaMult = base_alpha;
@@ -107,10 +107,10 @@ namespace InvisibleHand
             ChangeContext(DefaultContext);
         }
 
-        /// allows registering key toggle w/ just the context (button) labels
-        public void RegisterKeyToggle(KState.Special key, string context1, string context2)
+        /// allows registering key toggle w/ just the context (button) IDs
+        public void RegisterKeyToggle(KState.Special key, string context1ID, string context2ID)
         {
-            RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1], IHBase.Instance.ButtonRepo[context2]);
+            RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1ID], IHBase.Instance.ButtonRepo[context2ID]);
         }
 
         /// register a key toggle for this base's default context

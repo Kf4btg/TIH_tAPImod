@@ -25,9 +25,11 @@ namespace InvisibleHand {
                 case "TextReplacer":
                     btns = new TextReplacerButtons(IHBase.Instance, true);
                     break;
-                //TODO: add Tile-Button-replacers
+                case "IconReplacer":
+                    btns = new IconReplacerButtons(IHBase.Instance, true);
+                    break;
                 default:
-                    throw new ArgumentException("Invalid ButtonLayer type \"" + type + "\"; valid types are \"Inventory\", \"Chest\", and \"TextReplacer\".");
+                    throw new ArgumentException("Invalid ButtonLayer type \"" + type + "\"; valid types are \"Inventory\", \"Chest\", \"TextReplacer\", and \"IconReplacer\".");
             }
             btns.UpdateFrame();
             return btns;

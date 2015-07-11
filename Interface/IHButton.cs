@@ -16,7 +16,12 @@ namespace InvisibleHand
     */
     public class IHButton
     {
-        public Vector2 pos;
+        // public Vector2 pos;
+        public Vector2 Position     { get;  protected set;}
+
+        /// Let's experiment with using the button's TIH action type +
+        /// screen position as a unique ID for the Main ButtonRepo
+        public string ID        { get; protected set; }
 
         public ButtonState DisplayState { get; protected set; }
 
@@ -41,20 +46,26 @@ namespace InvisibleHand
         public IHButton(TIH action, Vector2? pos=null)
         {
             this.DisplayState = new ButtonState(action);
-            this.pos = pos ?? default(Vector2);
+            this.Position = pos ?? default(Vector2);
+
+            this.ID = Enum.GetName(typeof(TIH), action) + '.' + Position.X + '.' + Position.Y;
         }
 
         public IHButton(TIH action, string label, Vector2? pos=null)
         {
             this.DisplayState = new ButtonState(action, label);
-            this.pos = pos ?? default(Vector2);
+            this.Position = pos ?? default(Vector2);
+
+            this.ID = Enum.GetName(typeof(TIH), action) + '.' + Position.X + '.' + Position.Y;
         }
 
         //require a pre-constructed state (or no state, as per the above constructors)
         public IHButton(ButtonState bState, Vector2? pos=null)
         {
             this.DisplayState = bState;
-            this.pos = pos ?? default(Vector2);
+            this.Position = pos ?? default(Vector2);
+
+            this.ID = Enum.GetName(typeof(TIH), bState.action) + '.' + Position.X + '.' + Position.Y;
         }
 
         protected virtual void SetState(ButtonState newState)

@@ -500,13 +500,6 @@ namespace InvisibleHand
                 new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
         }
 
-        ///Get source Texels for the button based on its name (i.e. what @action it performs)
-        /// @param active - false = default/inactive button appearance;
-        ///                  true = focused/mouseover/active appearance
-        // public static Rectangle? GetSourceRect(string btnAction, bool active=false)
-        // {
-        //     return RectFromGridIndex( Constants.ButtonGridIndex[btnAction], active );
-        // }
         ///Get source Texels for the button based what @action it performs
         /// @param action
         /// @param active - false = default/inactive button appearance;
@@ -516,18 +509,17 @@ namespace InvisibleHand
             return RectFromGridIndex( Constants.ButtonGridIndexByActionType[action], active );
         }
 
-        /// returns the key-bind (as a string) for the given button
-        /// return value will be something like "(X)"
-        // public static string GetKeyTip(string buttonLabel)
-        // {
-        //     return IHBase.ButtonKeyTips[Constants.ButtonLabelToKBOption[buttonLabel]];
-        // }
-
         /// returns the key-bind (as a string) for the button with the given action.
         /// return value will be something like "(X)"
         public static string GetKeyTip(TIH action)
         {
             return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
+        }
+
+        /// adds a button to the main button collection with a unique ID
+        public static void AddToButtonRepo(IHButton btn)
+        {
+            IHBase.Instance.ButtonRepo.Add(btn.ID, btn);
         }
 
     #endregion

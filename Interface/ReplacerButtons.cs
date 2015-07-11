@@ -58,18 +58,22 @@ namespace InvisibleHand
             var DAButton = ButtonFactory.GetLockableTextButton(TIH.DepAll, labels.depAll, new Vector2(posX, posYDA), this, lockOffset);
             var QSButton = ButtonFactory.GetLockableTextButton(TIH.QuickStack, labels.qStack, new Vector2(posX, posYQS), this, lockOffset);
 
-            mbase.ButtonRepo.Add(labels.lootAll, LAButton);
-            mbase.ButtonRepo.Add(labels.depAll, DAButton);
-            mbase.ButtonRepo.Add(labels.qStack, QSButton);
+            // mbase.ButtonRepo.Add(labels.lootAll, LAButton);
+            IHUtils.AddToButtonRepo(LAButton);
+            // mbase.ButtonRepo.Add(labels.depAll, DAButton);
+            IHUtils.AddToButtonRepo(DAButton);
+            // mbase.ButtonRepo.Add(labels.qStack, QSButton);
+            IHUtils.AddToButtonRepo(QSButton);
 
-            mbase.ButtonUpdates.Push(labels.depAll);
-            mbase.ButtonUpdates.Push(labels.qStack);
+
+            mbase.ButtonUpdates.Push(LAButton.ID);
+            mbase.ButtonUpdates.Push(QSButton.ID);
 
             // TextReplacerBase(ButtonLayer, Button, normal-scale, hovered-scale, scale-step, [alpha] )
             // scale goes from 0.75 (base) -> 1 (when hovered) (from Main code)
-            var baseLA = new TextReplacerBase(this, mbase.ButtonRepo[labels.lootAll]);
-            var baseDA = new TextReplacerBase(this, mbase.ButtonRepo[labels.depAll]);
-            var baseQS = new TextReplacerBase(this, mbase.ButtonRepo[labels.qStack]);
+            var baseLA = new TextReplacerBase(this, LAButton);
+            var baseDA = new TextReplacerBase(this, DAButton);
+            var baseQS = new TextReplacerBase(this, QSButton);
 
             Buttons.Add(TIH.LootAll, baseLA);
             Buttons.Add(TIH.DepAll, baseDA);
@@ -87,12 +91,14 @@ namespace InvisibleHand
                 var SDButton = ButtonFactory.GetSimpleButton(TIH.SmartDep, nlabels.smartdep, new Vector2(posX, posYDA), true);
                 var SLButton = ButtonFactory.GetSimpleButton(TIH.SmartLoot, nlabels.restock, new Vector2(posX, posYQS), true);
 
-                mbase.ButtonRepo.Add(nlabels.smartdep, SDButton);
-                mbase.ButtonRepo.Add(nlabels.restock, SLButton);
+                // mbase.ButtonRepo.Add(nlabels.smartdep, SDButton);
+                IHUtils.AddToButtonRepo(SDButton);
+                // mbase.ButtonRepo.Add(nlabels.restock, SLButton);
+                IHUtils.AddToButtonRepo(SLButton);
 
                 //now create keywatchers to toggle Restock/QS & SD/DA
-                Buttons[TIH.DepAll].RegisterKeyToggle(KState.Special.Shift, labels.depAll, nlabels.smartdep);
-                Buttons[TIH.QuickStack].RegisterKeyToggle( KState.Special.Shift, labels.qStack, nlabels.restock);
+                Buttons[TIH.DepAll].RegisterKeyToggle(KState.Special.Shift, DAButton, SDButton);
+                Buttons[TIH.QuickStack].RegisterKeyToggle( KState.Special.Shift, QSButton, SLButton);
             }
         }
 
@@ -115,8 +121,10 @@ namespace InvisibleHand
 
         public readonly Dictionary<TIH, ButtonBase> ChestEditButtons;
 
-        public IconReplacerButtons(IHBase mbase, bool swapNewActions = false) : base("TextReplacerButtons")
+        public IconReplacerButtons(IHBase mbase, bool swapNewActions = false) : base("IconReplacerButtons")
         {
+            ChestEditButtons = new Dictionary<TIH, ButtonBase>();
+
             // move this up due to larger buttons
             float posYLA = API.main.invBottom + 22;
             // float posYDA = posYLA + 26;
@@ -159,11 +167,12 @@ namespace InvisibleHand
                 var button = ButtonFactory.GetLockableButton(a, new Vector2(posX, PosY[a]), this, lockOffset);
                 button.DisplayState.PreDraw = PreDraw;
 
-                mbase.ButtonRepo.Add(button.Label, button);
+                IHUtils.AddToButtonRepo(button);
                 // set QS & DA to have their state initialized on world load
-                mbase.ButtonUpdates.Push(button.Label);
+                mbase.ButtonUpdates.Push(button.ID);
 
-                Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
+                Buttons.Add(a, new ButtonBase(this, button));
+                // Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
             }
 
             foreach (var a in simpleActions)
@@ -172,12 +181,12 @@ namespace InvisibleHand
                 var button = ButtonFactory.GetSimpleButton(a, new Vector2(posX, PosY[a]));
                 button.DisplayState.PreDraw = PreDraw;
 
-                mbase.ButtonRepo.Add(button.Label, button);
+                IHUtils.AddToButtonRepo(button);
 
                 if (a == TIH.LootAll)
                     Buttons.Add(a, new ButtonBase(this, button));
                 else
-                    Buttons[TIH.SortChest].RegisterKeyToggle(KState.Special.Shift, button);
+                    Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
             }
 
             // =============================================================================
@@ -198,8 +207,10 @@ namespace InvisibleHand
             // rename.DisplayState.onClick = () => EditChest.DoChestEdit();
             // savename.DisplayState.onClick = () => EditChest.DoChestEdit();
 
-            mbase.ButtonRepo.Add(rename.Label, rename);
-            mbase.ButtonRepo.Add(savename.Label, savename);
+            // mbase.ButtonRepo.Add(rename.Label, rename);
+            IHUtils.AddToButtonRepo(rename);
+            // mbase.ButtonRepo.Add(savename.Label, savename);
+            IHUtils.AddToButtonRepo(savename);
 
             ChestEditButtons.Add(TIH.Rename, new ButtonBase(this, rename));
             ChestEditButtons.Add(TIH.SaveName, new ButtonBase(this, savename));
@@ -215,7 +226,9 @@ namespace InvisibleHand
                             true
                             );
             // cancel.DisplayState.onClick = () => EditChest.CancelRename();
-            mbase.ButtonRepo.Add(cancel.Label, cancel);
+            // mbase.ButtonRepo.Add(cancel.Label, cancel);
+            IHUtils.AddToButtonRepo(cancel);
+
 
             ChestEditButtons.Add(TIH.CancelEdit, new TextReplacerBase(this, cancel));
         }

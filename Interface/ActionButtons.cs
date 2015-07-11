@@ -40,7 +40,7 @@ namespace InvisibleHand
                 {
                     // uses default label for the action
                     var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
-                    mbase.ButtonRepo.Add(button.Label, button);
+                    IHUtils.AddToButtonRepo(button);
 
                     if (a != TIH.RSortInv)
                         Buttons.Add(a, new ButtonBase(this, button));
@@ -97,7 +97,6 @@ namespace InvisibleHand
         {
             var simpleActions = new TIH[] { TIH.SortChest, TIH.RSortChest, TIH.SmartDep, TIH.SmartLoot };
             var lockingActions = new TIH[] { TIH.QuickStack, TIH.DepAll };
-
             // FIXME: This code needs to be in ReplacerButtons, and it needs to behind a
             // "text or not-text ReplacerButtons" check; this way the type of Replacers
             // (if any) can be decided at mod-load time and we can just keep the one call
@@ -105,6 +104,7 @@ namespace InvisibleHand
             // check every frame "text or not-text" and drawing the appropriate set.
             // This will also let a user have replacers and non-replacers at the same
             // time, if so desired.
+            replace = false;
             if (replace)
             {
                 float posX = 506;
@@ -142,7 +142,7 @@ namespace InvisibleHand
                 {
                     // uses default label for the action
                     var button = ButtonFactory.GetSimpleButton(a, new Vector2(posX, PosY[a]));
-                    mbase.ButtonRepo.Add(button.Label, button);
+                    IHUtils.AddToButtonRepo(button);
 
                     if (a != TIH.RSortChest)
                         Buttons.Add(a, new ButtonBase(this, button));
@@ -153,9 +153,10 @@ namespace InvisibleHand
                 foreach (var a in lockingActions)
                 {
                     var button = ButtonFactory.GetLockableButton(a, new Vector2(posX, PosY[a]), this, lockOffset);
-                    mbase.ButtonRepo.Add(button.Label, button);
+                    // mbase.ButtonRepo.Add(button.Label, button);
+                    IHUtils.AddToButtonRepo(button);
                     // set QS & DA to have their state initialized on world load
-                    mbase.ButtonUpdates.Push(button.Label);
+                    mbase.ButtonUpdates.Push(button.ID);
 
                     Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
                 }
@@ -167,7 +168,7 @@ namespace InvisibleHand
                 {
                     // uses default label for the action
                     var button = ButtonFactory.GetSimpleButton(a, new Vector2(PosX[a], posY));
-                    mbase.ButtonRepo.Add(button.Label, button);
+                    IHUtils.AddToButtonRepo(button);
 
                     if (a != TIH.RSortChest)
                         Buttons.Add(a, new ButtonBase(this, button));
@@ -178,9 +179,9 @@ namespace InvisibleHand
                 foreach (var a in lockingActions)
                 {
                     var button = ButtonFactory.GetLockableButton(a, new Vector2(PosX[a], posY), this, lockOffset);
-                    mbase.ButtonRepo.Add(button.Label, button);
+                    IHUtils.AddToButtonRepo(button);
                     // set QS & DA to have their state initialized on world load
-                    mbase.ButtonUpdates.Push(button.Label);
+                    mbase.ButtonUpdates.Push(button.ID);
 
                     Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
                 }

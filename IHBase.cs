@@ -108,7 +108,12 @@ namespace InvisibleHand
             // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
             invButtons   = ButtonFactory.BuildButtons("Inventory");
             chestButtons = ButtonFactory.BuildButtons("Chest");
-            replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
+
+            if (ModOptions["TextReplacers"])
+                replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
+            else if (ModOptions["IconReplacers"])
+                replacerButtons = ButtonFactory.BuildButtons("IconReplacer");
+
         }
 
         /// Store the Key assigned for each action as a hint
@@ -183,10 +188,19 @@ namespace InvisibleHand
                     switch((string)option.Value)
                     {
                         case "Text":
+                            ModOptions["UseReplacers"] =
+                            ModOptions["TextReplacers"] = true;
+                            ModOptions["IconReplacers"] = false;
                             break;
                         case "Buttons":
+                            ModOptions["UseReplacers"] = 
+                            ModOptions["IconReplacers"] = true;
+                            ModOptions["TextReplacers"] = false;
                             break;
                         case "None":
+                            ModOptions["UseReplacers"] =
+                            ModOptions["TextReplacers"] =
+                            ModOptions["IconReplacers"] = false;
                             break;
                     }
                     break;

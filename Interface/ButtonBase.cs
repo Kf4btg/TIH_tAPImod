@@ -203,15 +203,7 @@ namespace InvisibleHand
         {
             //only draw if displaying texture
             if (currentContext.Texture!=null) {
-
-                //TODO: is this the best place to do this? It could go lots of places.
-                //Depends on whether the keybind-reminder should be considered a "core" part of the
-                //button (part of the label) or something added on, just for this implementation; I'm
-                //leaning towards the latter. But still, constructing the string on each draw
-                //seems inefficient since we can't change the keybind in-game anyway.
-                var labelDisplay = currentContext.Label + IHUtils.GetKeyTip(currentContext.Action);
-
-                API.main.MouseText(labelDisplay, rare, diff);
+                API.main.MouseText(CurrentState.tooltip, rare, diff);
                 Main.mouseText = true;
             }
         }

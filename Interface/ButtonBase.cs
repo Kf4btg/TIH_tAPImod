@@ -101,6 +101,7 @@ namespace InvisibleHand
             currentContext = newContext;
         }
 
+        /// return this ButtonBase to its default context
         public void Reset()
         {
             ChangeContext(DefaultContext);
@@ -178,8 +179,8 @@ namespace InvisibleHand
                 {
                     if (!HasMouseFocus) { HasMouseFocus=true; OnMouseEnter(); }
 
-                    if (alphaMult!=1.0f)
-                        alphaMult += alphaStep;
+                    if (AlphaMult!=1.0f)
+                        AlphaMult += alphaStep;
 
                     OnHover();
 
@@ -187,8 +188,8 @@ namespace InvisibleHand
                     return;
                 }
                 if (HasMouseFocus) { OnMouseLeave(); }
-                if (alphaMult!=alphaBase)
-                    alphaMult -= alphaStep;
+                if (AlphaMult!=alphaBase)
+                    AlphaMult -= alphaStep;
                 HasMouseFocus=false;
 
             }

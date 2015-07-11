@@ -13,6 +13,7 @@ namespace InvisibleHand
     public class ButtonState
     {
         public string label;
+        public string tooltip;
 
         /// The game-affecting action this state represents
         /// (not necessarily unique amongst all buttonstates).
@@ -44,7 +45,9 @@ namespace InvisibleHand
         {
             this.action = action;
             this.label  = label == "" ? Constants.DefaultButtonLabels[action] : label;
-            tint        = Color.White;
+            this.tint   = Color.White;
+
+            this.tooltip = this.label + IHUtils.GetKeyTip(action);
         }
 
         // found myself commonly creating series of states where all these were
@@ -56,11 +59,15 @@ namespace InvisibleHand
             this.defaultTexels = defaultTexels;
             this.altTexels     = altTexels;
             this.tint          = tintColor ?? Color.White;
+
+            this.tooltip = this.label + IHUtils.GetKeyTip(action);
+
         }
 
         public ButtonState Duplicate()
         {
             var bsNew          = new ButtonState(this.action, this.label);
+            bsNew.tooltip      = tooltip;
             bsNew.texture      = texture;
             bsNew.altTexels    = altTexels;
             bsNew.defaultTexels= defaultTexels;
@@ -77,6 +84,7 @@ namespace InvisibleHand
         {
             action       = bsCopy.action;
             label        = bsCopy.label;
+            tooltip      = bsCopy.tooltip;
             texture      = bsCopy.texture;
             altTexels    = bsCopy.altTexels;
             defaultTexels= bsCopy.defaultTexels;

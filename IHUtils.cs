@@ -513,7 +513,12 @@ namespace InvisibleHand
         /// return value will be something like "(X)"
         public static string GetKeyTip(TIH action)
         {
-            return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
+            // return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
+            string kbopt;
+            if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
+                return IHBase.ButtonKeyTips[kbopt];
+
+            return "";
         }
 
         /// adds a button to the main button collection with a unique ID

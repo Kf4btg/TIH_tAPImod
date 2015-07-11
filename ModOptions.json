@@ -81,7 +81,7 @@
         },
         {
             "name": "reverseSort",
-            "displayName": "Reverse sort order",
+            "displayName": "Reverse sort",
             "type": "List",
             "notify": true,
             "notifyOnChange": true,
@@ -93,6 +93,20 @@
                 "Disabled"
             ],
             "default": 3
+        },
+        {
+            "name": "replaceButtons",
+            "displayName": "Replacements",
+            "type": "List",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "list": [
+                "None",
+                "Text",
+                "Buttons"
+            ],
+            "default": 1
         }
     ]
 }

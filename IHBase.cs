@@ -81,7 +81,7 @@ namespace InvisibleHand
                 { TIH.LootAll,    Lang.inter[iLA] },
                 { TIH.DepAll,     Lang.inter[iDA] },
                 { TIH.QuickStack, Lang.inter[iQS] },
-                
+
                 { TIH.Rename,  Lang.inter[iRC] },
                 { TIH.SaveName,  Lang.inter[iSC] },
                 { TIH.CancelEdit,  Lang.inter[iCE] }
@@ -178,7 +178,18 @@ namespace InvisibleHand
                             ModOptions["ReverseSortPlayer"] = ModOptions["ReverseSortChest"] = false;
                             break;
                     }
-                break;
+                    break;
+                case "replaceButtons":
+                    switch((string)option.Value)
+                    {
+                        case "Text":
+                            break;
+                        case "Buttons":
+                            break;
+                        case "None":
+                            break;
+                    }
+                    break;
             }
         }
     }

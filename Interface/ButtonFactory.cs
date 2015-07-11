@@ -39,24 +39,30 @@ namespace InvisibleHand {
         /// <returns>A text-based button that, in addition to performing its regular action
         /// on left click, on a right-click will toggle between respecting or ignoring
         /// locked inventory slots.</returns>
-        public static IHButton GetLockableTextButton(TIH action, string label, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null)
+        public static IHButton GetLockableTextButton(TIH action, string label, Vector2 position, ButtonLayer parent,
+            Vector2? lockOffset = null, Color? lockColor = null)
         {
             return GetLockableButton(action, label, position, parent, lockOffset, lockColor, true);
         }
-        public static IHButton GetLockableTextButton(TIH action, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null)
+        public static IHButton GetLockableTextButton(TIH action, Vector2 position, ButtonLayer parent,
+            Vector2? lockOffset = null, Color? lockColor = null)
         {
-            return GetLockableButton(action, Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, true);
+            return GetLockableButton(action,
+                Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, true);
         }
-        
+
         ///<returns>A button that, in addition to performing its regular action on left click,
         /// on a right-click will toggle between respecting or ignoring locked inventory slots.</returns>
-        public static IHButton GetLockableButton(TIH action, string label, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
+        public static IHButton GetLockableButton(TIH action, string label, Vector2 position, ButtonLayer parent,
+            Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
         {
             return GenerateIHButton(action, label, position, true, textual, parent, lockOffset, lockColor);
         }
-        public static IHButton GetLockableButton(TIH action, Vector2 position, ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
+        public static IHButton GetLockableButton(TIH action, Vector2 position, ButtonLayer parent,
+            Vector2? lockOffset = null, Color? lockColor = null, bool textual = false)
         {
-            return GetLockableButton(action, Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, textual);
+            return GetLockableButton(action,
+                Constants.DefaultButtonLabels[action], position, parent, lockOffset, lockColor, textual);
         }
 
 
@@ -80,7 +86,8 @@ namespace InvisibleHand {
         }
 
         /// Generic button-generator which is fed info from the other "Get...Button" methods.
-        public static IHButton GenerateIHButton(TIH action, string label, Vector2 position, bool lockable,  bool textual,  ButtonLayer parent, Vector2? lockOffset, Color? lockColor)
+        public static IHButton GenerateIHButton(TIH action, string label, Vector2 position, bool lockable,  bool textual,
+            ButtonLayer parent, Vector2? lockOffset, Color? lockColor)
         {
             var bState = new ButtonState(action, label)
             {
@@ -111,7 +118,8 @@ namespace InvisibleHand {
         /// Given one pre-made state, this will automatically construct the
         /// "locked" version of that state and return a button that toggles
         /// between the two on right-click.
-        private static IHToggle CreateLockableButton(ButtonState bState1, TIH toLock, ButtonLayer parent, Vector2 position, Vector2? lockOffset, Color? lockColor)
+        private static IHToggle CreateLockableButton(ButtonState bState1, TIH toLock, ButtonLayer parent,
+            Vector2 position, Vector2? lockOffset, Color? lockColor)
         {
             bState1.onRightClick = () =>
             {

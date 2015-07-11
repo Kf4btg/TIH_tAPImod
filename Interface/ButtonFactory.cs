@@ -17,7 +17,7 @@ namespace InvisibleHand {
             switch(type)
             {
                 case "Inventory":
-                    btns = new InventoryButtons(IHBase.Instance, false);
+                    btns = new InventoryButtons(IHBase.Instance);
                     break;
                 case "Chest":
                     btns = new ChestButtons(IHBase.Instance, false);

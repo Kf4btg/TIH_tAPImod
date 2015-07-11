@@ -25,17 +25,12 @@ namespace InvisibleHand
         /// make the bg slightly translucent even at max button opacity
         private readonly Color bgColor = Constants.InvSlotColor*0.8f;
 
-        public InventoryButtons(IHBase mbase, bool replace) : base("InventoryButtons")
+        public InventoryButtons(IHBase mbase) : base("InventoryButtons")
         {
             var actions = new TIH[] { TIH.SortInv, TIH.RSortInv, TIH.CleanInv };
 
 
-            if (replace)
-            {
 
-            }
-            else
-            {
                 // create a button for each action & add it to the main ButtonRepo.
                 // also create a button base and add it to the Buttons
                 // collection for each action other than RSort,
@@ -52,7 +47,6 @@ namespace InvisibleHand
                     else
                         Buttons[TIH.SortInv].RegisterKeyToggle(KState.Special.Shift, button);
                 }
-            }
         }
 
         /*************************************************************************/

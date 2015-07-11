@@ -125,7 +125,8 @@ namespace InvisibleHand
 
                         if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
                         {
-                            RingBell();                                                         //...play "item-moved" sound and...
+                            // RingBell();                                                       //...play "item-moved" sound and...
+                            Sound.ItemMoved.Play();
                                                                                                 // ...merge inv. item stack to chest item stack
                             if (StackMerge(ref inventory[iP], container, iC))
                             {                                                                   // do merge & check return (inv stack empty) status
@@ -191,14 +192,16 @@ namespace InvisibleHand
                 {
                     if (retIdx == -1)  // partial success (stack amt changed), but we don't want to reset the item.
                     {
-                        RingBell();
+                        // RingBell();
+                        Sound.ItemMoved.Play();
                         Recipe.FindRecipes();
                     }
                     return false;
                 }
             }
             //else, success!
-            RingBell();
+            // RingBell();
+            Sound.ItemMoved.Play();
             slot.MyItem = new Item();
             if (sendMessage) SendNetMessage(retIdx);
             return true;
@@ -259,7 +262,8 @@ namespace InvisibleHand
             int retIdx = MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
             if (retIdx >= 0)
             {
-                RingBell();
+                // RingBell();
+                Sound.ItemMoved.Play();
                 slot.MyItem = new Item();
                 if (sendMessage) SendNetMessage(retIdx);
                 return true;
@@ -301,7 +305,8 @@ namespace InvisibleHand
 
             if (retIdx > -2) // >=partial success
             {
-                RingBell();
+                // RingBell();
+                Sound.ItemMoved.Play();
                 if (retIdx > -1) // =full success!
                 {
                     Main.localPlayer.inventory[iPlayer] = new Item();
@@ -464,7 +469,9 @@ namespace InvisibleHand
         //plays the "item moved" sound
         public static void RingBell(int o1 = -1, int o2 = -1, int o3 = 1)
         {
-            Main.PlaySound(7, o1, o2, o3);
+            // Main.PlaySound(7, o1, o2, o3);
+            // Main.PlaySound(Sounds.ItemMoved, o1, o2, o3);
+            Sound.ItemMoved.Play();
         }
 
         // calls the NetMessage.sendData method for the current chest
@@ -496,10 +503,10 @@ namespace InvisibleHand
         ///Get source Texels for the button based on its name (i.e. what @action it performs)
         /// @param active - false = default/inactive button appearance;
         ///                  true = focused/mouseover/active appearance
-        public static Rectangle? GetSourceRect(string btnAction, bool active=false)
-        {
-            return RectFromGridIndex( Constants.ButtonGridIndex[btnAction], active );
-        }
+        // public static Rectangle? GetSourceRect(string btnAction, bool active=false)
+        // {
+        //     return RectFromGridIndex( Constants.ButtonGridIndex[btnAction], active );
+        // }
         ///Get source Texels for the button based what @action it performs
         /// @param action
         /// @param active - false = default/inactive button appearance;
@@ -511,10 +518,10 @@ namespace InvisibleHand
 
         /// returns the key-bind (as a string) for the given button
         /// return value will be something like "(X)"
-        public static string GetKeyTip(string buttonLabel)
-        {
-            return IHBase.ButtonKeyTips[Constants.ButtonLabelToKBOption[buttonLabel]];
-        }
+        // public static string GetKeyTip(string buttonLabel)
+        // {
+        //     return IHBase.ButtonKeyTips[Constants.ButtonLabelToKBOption[buttonLabel]];
+        // }
 
         /// returns the key-bind (as a string) for the button with the given action.
         /// return value will be something like "(X)"

@@ -85,7 +85,8 @@ namespace InvisibleHand
                     {   //...for a matching item stack...
                         if (!chestItems[j].IsBlank() && chestItems[j].IsTheSameAs(pInventory[index]))
                         {
-                            IHUtils.RingBell();
+                            // IHUtils.RingBell();
+                            Sound.ItemMoved.Play();
                             //...and merge it to the Player's inventory
 
                             // I *think* this ItemText.NewText command just makes the text pulse...

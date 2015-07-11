@@ -59,7 +59,8 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
-                    Main.PlaySound(22); // the actual "lock" sound
+                    // Main.PlaySound(22); // the actual "lock" sound
+                    Sound.Lock.Play();
                 }
             }
             return false;
@@ -99,7 +100,8 @@ namespace InvisibleHand
                     {
                         if (slot.MyItem.material && !slot.MyItem.notMaterial)
                         {
-                            IHUtils.RingBell();
+                            // IHUtils.RingBell();
+                            Sound.ItemMoved.Play();
                             Main.guideItem = slot.MyItem.Clone();
                             slot.MyItem    = new Item();
                             Recipe.FindRecipes();
@@ -119,7 +121,8 @@ namespace InvisibleHand
                     {
                         if (slot.MyItem.maxStack == 1 && Prefix.CanHavePrefix(slot.MyItem))
                         {
-                            IHUtils.RingBell();
+                            // IHUtils.RingBell();
+                            Sound.ItemMoved.Play();
                             Main.reforgeItem = slot.MyItem.Clone();
                             slot.MyItem = new Item();
                             Recipe.FindRecipes();

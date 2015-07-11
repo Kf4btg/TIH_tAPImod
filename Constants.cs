@@ -21,7 +21,14 @@ namespace InvisibleHand
         CleanChest,
 
         SmartDep,
-        SmartLoot
+        SmartLoot,
+
+        //simply for replacing the button with a visually-consistent
+        // tiled-graphic version when someone chooses non-text
+        // replacements
+        Rename,
+        SaveName,
+        CancelEdit
     }
 
     ///the ItemCat Enum defines the actual Sort Order of the categories
@@ -71,16 +78,27 @@ namespace InvisibleHand
         OTHER
     }
 
+    public enum Sound
+    {
+        //just because it causes issues when there's no value for 0
+        //in an enum; 0 is the dig sound, but this mod doesn't use it
+        Dig       =  0,
+        ItemMoved =  7,
+        MouseOver = 12,
+        Coins     = 18,
+        Lock      = 22
+    }
+
     public static class Constants
     {
         //pulled from Main.DrawInventory  !ref:Main:#22137.0#
         public const float CHEST_INVENTORY_SCALE = 0.755f;
         public const float PLAYER_INVENTORY_SCALE = 0.85f;
 
-        public static readonly Color InvSlotColor   = new Color(63,65,151,255);  //bluish
-        public static readonly Color ChestSlotColor = new Color(104,52,52,255);  //reddish
-        public static readonly Color BankSlotColor  = new Color(130,62,102,255); //pinkish
-        public static readonly Color EquipSlotColor = new Color(50,106,46,255); //greenish
+        public static readonly Color InvSlotColor = new Color(63, 65, 151, 255);  //bluish
+        public static readonly Color ChestSlotColor = new Color(104, 52, 52, 255);  //reddish
+        public static readonly Color BankSlotColor = new Color(130, 62, 102, 255); //pinkish
+        public static readonly Color EquipSlotColor = new Color(50, 106, 46, 255); //greenish
 
         //width and height of button
         public const int ButtonW = 32;
@@ -143,7 +161,7 @@ namespace InvisibleHand
         Initialize them here with an anonymous array to avoid the resizing penalty of .Add()
         */
         public static readonly
-        HashSet<int> TileGroupFurniture  = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupFurniture = new HashSet<int>(new int[] {
             TileID.ClosedDoor,
             TileID.Tables,
             TileID.Chairs,
@@ -166,7 +184,7 @@ namespace InvisibleHand
             });
 
         public static readonly
-        HashSet<int> TileGroupLighting   = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupLighting = new HashSet<int>(new int[] {
             TileID.Torches,
             TileID.Candles,
             TileID.Chandeliers,
@@ -183,7 +201,7 @@ namespace InvisibleHand
             });
 
         public static readonly
-        HashSet<int> TileGroupStatue     = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupStatue = new HashSet<int>(new int[] {
             TileID.Tombstones,
             TileID.Statues,
             TileID.WaterFountain,
@@ -192,7 +210,7 @@ namespace InvisibleHand
             });
 
         public static readonly
-        HashSet<int> TileGroupWallDeco   = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupWallDeco = new HashSet<int>(new int[] {
             TileID.Painting2x3,
             TileID.Painting3x2,
             TileID.Painting3x3,
@@ -201,7 +219,7 @@ namespace InvisibleHand
             });
 
         public static readonly
-        HashSet<int> TileGroupClutter    = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupClutter = new HashSet<int>(new int[] {
             TileID.Bottles,
             TileID.Bowls,
             TileID.BeachPiles,
@@ -241,7 +259,7 @@ namespace InvisibleHand
             }); //blergh
 
         public static readonly
-        HashSet<int> TileGroupCrafting = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupCrafting = new HashSet<int>(new int[] {
             TileID.WorkBenches,
             TileID.Anvils,
             TileID.MythrilAnvil,
@@ -274,14 +292,14 @@ namespace InvisibleHand
             }); //also blergh
 
         public static readonly
-        HashSet<int> TileGroupOre      = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupOre = new HashSet<int>(new int[] {
             TileID.Meteorite,
             TileID.Obsidian,
             TileID.Hellstone
             }); //(get others by name)
 
         public static readonly
-        HashSet<int> TileGroupCoin     = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupCoin = new HashSet<int>(new int[] {
             TileID.CopperCoinPile,
             TileID.SilverCoinPile,
             TileID.GoldCoinPile,
@@ -289,7 +307,7 @@ namespace InvisibleHand
             });
 
         public static readonly
-        HashSet<int> TileGroupSeed     = new HashSet<int>( new int[] {
+        HashSet<int> TileGroupSeed = new HashSet<int>(new int[] {
             TileID.ImmatureHerbs,
             TileID.Saplings, /*Acorn*/
             TileID.Pumpkins /*Pumpkin Seed*/
@@ -339,12 +357,17 @@ namespace InvisibleHand
                 {TIH.QuickStack, "Quick Stack"},              //6
                 {TIH.SmartDep,   "Smart Deposit"},            //8
                 {TIH.DepAll,     "Deposit All"},              //9
-                {TIH.LootAll,    "Loot All"}                  //11
+                {TIH.LootAll,    "Loot All"},                  //11
+                {TIH.Rename,  "Rename"},
+                {TIH.SaveName, "Save"}
             };
 
             DefaultClickActions = new Dictionary<TIH, Action>
             {
                 //Player Inventory
+                // a couple overloads could easily allow for using
+                // plain functions like most of the other actions,
+                // if I care enough.
                 {TIH.SortInv,    () => IHPlayer.SortInventory()},
                 {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},
                 {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},
@@ -356,33 +379,36 @@ namespace InvisibleHand
                 {TIH.QuickStack, IHUtils.DoQuickStack},
                 {TIH.SmartDep,   IHSmartStash.SmartDeposit},
                 {TIH.DepAll,     IHUtils.DoDepositAll},
-                {TIH.LootAll,    IHUtils.DoLootAll}
+                {TIH.LootAll,    IHUtils.DoLootAll},
+                {TIH.Rename,     EditChest.DoChestEdit}, //don't have this one down to a easy call yet
+                {TIH.SaveName,   EditChest.DoChestEdit}, //don't have this one down to a easy call yet
+                {TIH.CancelEdit, EditChest.CancelRename} //don't have this one down to a easy call yet
             };
 
             /************************************************
             * Make getting a button's texture (texels) easier
             */
-            ButtonGridIndex = new Dictionary<string,int>(12);
-            //sort, sort chest
-            ButtonGridIndex.Add(ButtonLabels[0],0);
-            ButtonGridIndex.Add(ButtonLabels[3],0);
-            //sort reverse, sort chest reverse
-            ButtonGridIndex.Add(ButtonLabels[1],1);
-            ButtonGridIndex.Add(ButtonLabels[4],1);
-            //loot all
-            ButtonGridIndex.Add(ButtonLabels[11],2);
-            //deposit all, DA+locked
-            ButtonGridIndex.Add(ButtonLabels[9],3);
-            ButtonGridIndex.Add(ButtonLabels[10],3);
-            //smart deposit
-            ButtonGridIndex.Add(ButtonLabels[8],4);
-            //clean stacks
-            ButtonGridIndex.Add(ButtonLabels[2],5);
-            //quick stack, QS+locked
-            ButtonGridIndex.Add(ButtonLabels[6],6);
-            ButtonGridIndex.Add(ButtonLabels[7],6);
-            // restock/smartloot
-            ButtonGridIndex.Add(ButtonLabels[5],7);
+            // ButtonGridIndex = new Dictionary<string,int>(12);
+            // //sort, sort chest
+            // ButtonGridIndex.Add(ButtonLabels[0],0);
+            // ButtonGridIndex.Add(ButtonLabels[3],0);
+            // //sort reverse, sort chest reverse
+            // ButtonGridIndex.Add(ButtonLabels[1],1);
+            // ButtonGridIndex.Add(ButtonLabels[4],1);
+            // //loot all
+            // ButtonGridIndex.Add(ButtonLabels[11],2);
+            // //deposit all, DA+locked
+            // ButtonGridIndex.Add(ButtonLabels[9],3);
+            // ButtonGridIndex.Add(ButtonLabels[10],3);
+            // //smart deposit
+            // ButtonGridIndex.Add(ButtonLabels[8],4);
+            // //clean stacks
+            // ButtonGridIndex.Add(ButtonLabels[2],5);
+            // //quick stack, QS+locked
+            // ButtonGridIndex.Add(ButtonLabels[6],6);
+            // ButtonGridIndex.Add(ButtonLabels[7],6);
+            // // restock/smartloot
+            // ButtonGridIndex.Add(ButtonLabels[5],7);
 
             // and now do it with the action enum
             ButtonGridIndexByActionType = new Dictionary<TIH, int>
@@ -404,33 +430,36 @@ namespace InvisibleHand
 
                 {TIH.QuickStack, 6},
 
-                {TIH.SmartLoot,  7}
+                {TIH.SmartLoot,  7},
+
+                {TIH.Rename,     8},
+                {TIH.SaveName,   8}
             };
 
             /*************************************************
             * Map labels to the string used for the corresponding
             * keybind in Modoptions.json
             */
-            ButtonLabelToKBOption = new Dictionary<string, string>
-            {
-                //s, s-r, sc, sc-r
-                { ButtonLabels[0], "sort" },
-                { ButtonLabels[1], "sort" },
-                { ButtonLabels[3], "sort" },
-                { ButtonLabels[4], "sort" },
-                //c.stacks
-                { ButtonLabels[2], "cleanStacks" },
-                //restock, qs, qs-l
-                { ButtonLabels[5], "quickStack" },
-                { ButtonLabels[6], "quickStack" },
-                { ButtonLabels[7], "quickStack" },
-                //sd, da, da-l
-                { ButtonLabels[8], "depositAll" },
-                { ButtonLabels[9], "depositAll" },
-                { ButtonLabels[10],"depositAll" },
-                //lootall
-                { ButtonLabels[11],"lootAll" }
-            };
+            // ButtonLabelToKBOption = new Dictionary<string, string>
+            // {
+            //     //s, s-r, sc, sc-r
+            //     { ButtonLabels[0], "sort" },
+            //     { ButtonLabels[1], "sort" },
+            //     { ButtonLabels[3], "sort" },
+            //     { ButtonLabels[4], "sort" },
+            //     //c.stacks
+            //     { ButtonLabels[2], "cleanStacks" },
+            //     //restock, qs, qs-l
+            //     { ButtonLabels[5], "quickStack" },
+            //     { ButtonLabels[6], "quickStack" },
+            //     { ButtonLabels[7], "quickStack" },
+            //     //sd, da, da-l
+            //     { ButtonLabels[8], "depositAll" },
+            //     { ButtonLabels[9], "depositAll" },
+            //     { ButtonLabels[10],"depositAll" },
+            //     //lootall
+            //     { ButtonLabels[11],"lootAll" }
+            // };
 
             // and now do it with the action enum
             ButtonActionToKeyBindOption = new Dictionary<TIH, string>()
@@ -449,8 +478,16 @@ namespace InvisibleHand
                 {TIH.SortInv,    "sort"},
                 {TIH.SortChest,  "sort"},
                 {TIH.RSortInv,   "sort"},
-                {TIH.RSortChest, "sort"},
+                {TIH.RSortChest, "sort"}
+                // edit chest doesn't get a keyboard shortcut.
             };
         }
+
+        /// this lets buttons go through the ButtonFactory
+        /// methods even if they don't have a simple static
+        /// Action for onClick(); obviously the real action
+        /// should be added afterwards.
+        public static void None() { }
+        // yes it's a hack and I'll try to fix it later
     }
 }

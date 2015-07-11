@@ -64,6 +64,10 @@ namespace InvisibleHand
         internal const int iLA = 29;
         internal const int iDA = 30;
         internal const int iQS = 31;
+        //rename, save, cancel edit chest
+        internal const int iRC = 61;
+        internal const int iSC = 47;
+        internal const int iCE = 63;
 
         public override void OnLoad()
         {
@@ -76,7 +80,11 @@ namespace InvisibleHand
             OriginalButtonLabels = new Dictionary<TIH, string> {
                 { TIH.LootAll,    Lang.inter[iLA] },
                 { TIH.DepAll,     Lang.inter[iDA] },
-                { TIH.QuickStack, Lang.inter[iQS] }
+                { TIH.QuickStack, Lang.inter[iQS] },
+                
+                { TIH.Rename,  Lang.inter[iRC] },
+                { TIH.SaveName,  Lang.inter[iSC] },
+                { TIH.CancelEdit,  Lang.inter[iCE] }
             };
         }
 

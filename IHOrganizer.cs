@@ -183,7 +183,8 @@ namespace InvisibleHand
                         filled++;
                     }
                     container[getIndex(filled++)] = item.Clone();
-                    Main.PlaySound(7, -1, -1, 1);
+                    // Main.PlaySound(7, -1, -1, 1);
+                    Sound.ItemMoved.Play();
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
@@ -199,7 +200,8 @@ namespace InvisibleHand
                 foreach ( var item in itemSorter)
                 {
                     container[getIndex(filled++)] = item.Clone();
-                    Main.PlaySound(7, -1, -1, 1);
+                    // Main.PlaySound(7, -1, -1, 1);
+                    Sound.ItemMoved.Play();
                 }
                 // and the rest of the slots should be empty
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))

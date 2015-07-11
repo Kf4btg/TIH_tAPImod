@@ -123,7 +123,8 @@ namespace InvisibleHand {
         {
             bState1.onRightClick = () =>
             {
-                Main.PlaySound(22); //lock sound
+                // Main.PlaySound(22); //lock sound
+                Sound.Lock.Play();
                 IHPlayer.ToggleActionLock(Main.localPlayer, toLock);
             };
 

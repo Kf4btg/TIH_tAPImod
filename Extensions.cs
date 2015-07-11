@@ -142,5 +142,12 @@ namespace InvisibleHand
 
     #endregion
 
+    // misc
+        ///play the given sound effect;
+        public static void Play(this Sound s, int x = -1, int y = -1, int style = 1)
+        {
+            Main.PlaySound((int)s, x, y, style);
+        }
+
     }
 }

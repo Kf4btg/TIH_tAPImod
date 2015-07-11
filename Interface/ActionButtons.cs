@@ -123,18 +123,25 @@ namespace InvisibleHand
                 // float posYLA = API.main.invBottom + 40;
                 float posYLA = API.main.invBottom + 22;
                 // float posYDA = posYLA + 26;
-                float posYDA = posYLA + 32;
+                float posYDA = posYLA + Constants.ButtonH; //32
                 // float posYQS = posYLA + 52;
-                float posYQS = posYDA + 32;
+                float posYQS = posYDA + Constants.ButtonH;
+                //edit chest
+                float posYEC = posYQS + Constants.ButtonH;
+                // cancel edit
+                float posYCE = posYEC + Constants.ButtonH;
 
-                // FIXME: the bottom button overlaps "Edit Chest" 
+                // FIXME: the bottom button overlaps "Edit Chest"
+                // TODO: since we're replacing "edit chest" too,
+                // we can add sort and stuff in addition to loot all.
                 var PosY = new Dictionary<TIH, float>{
-                    {TIH.SortChest,  posYLA},   //leftmost
-                    {TIH.RSortChest, posYLA},   //leftmost
-                    {TIH.SmartLoot,  posYQS},   //middle
-                    {TIH.QuickStack, posYQS},   //middle
-                    {TIH.SmartDep,   posYDA},    //right beside trash
-                    {TIH.DepAll,     posYDA}
+                    {TIH.SortChest,  posYLA},
+                    {TIH.RSortChest, posYLA},
+                    {TIH.SmartLoot,  posYQS},
+                    {TIH.QuickStack, posYQS},
+                    {TIH.SmartDep,   posYDA},
+                    {TIH.DepAll,     posYDA},
+                    {TIH.Rename,  posYEC}
                 };
 
                 foreach (var a in simpleActions)

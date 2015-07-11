@@ -42,32 +42,45 @@ namespace InvisibleHand
         public readonly Vector2 Size;
         public readonly Rectangle ButtonBounds;
 
-        public virtual bool IsHovered {
-             get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); }
+        public virtual bool IsHovered
+        {
+            get { return ButtonBounds.Contains(Main.mouseX, Main.mouseY); }
         }
 
         /// for determining when the mouse moves on and off the button
-        protected bool hasMouseFocus;
+        // protected bool hasMouseFocus;
+        public virtual bool HasMouseFocus { get; set; }
 
-        public const float SCALE_FULL = 1.0f;
+    public const float SCALE_FULL = 1.0f;
         protected float scale = SCALE_FULL;
         public virtual float Scale {get { return scale; } set { scale = value < 0.5 ? 0.5f : value; } }
 
         // affects the alpha component of the current tint
-        protected float alphaBase;
+        public float alphaBase { get; protected set; }
         protected float alphaMult;
+        public float AlphaMult { get { return alphaMult; }
+            set {alphaMult = value < alphaBase ? alphaBase :
+                             value > 1.0f ? 1.0f : value;
+                }}
+        public readonly float alphaStep;
         /// gets current alpha (modified by container opacity), sets current and base alpha values
-        public virtual float Alpha { get { return alphaMult*Container.LayerOpacity; } set { alphaMult = alphaBase = value; }}
+        public virtual float Alpha { get { return alphaMult*Container.LayerOpacity; } set { AlphaMult = alphaBase = value; }}
+
+        // public virtual float Alpha {
+        //     get { return alphaMult*Container.LayerOpacity; }
+        //     set { AlphaMult = value; } }
+
+
 
         /// this will actively set the Source Texels based on whether or not the mouse is currently over this button.
         /// If both rects are null, then the entire texture will be drawn as per default
-        public Rectangle? SourceRect { get { return hasMouseFocus ? currentContext.ActiveRect : currentContext.InactiveRect; }}
+        public Rectangle? SourceRect { get { return HasMouseFocus ? currentContext.ActiveRect : currentContext.InactiveRect; }}
 
         /** **********************************************************************
         * Construct the ButtonBase with just the reference to its default Context.
         * Handle changing contexts externally and effect it with ChangeContext
         */
-        public ButtonBase(ButtonLayer container, IHButton defaultContext, float base_alpha = 0.85f)
+        public ButtonBase(ButtonLayer container, IHButton defaultContext, float base_alpha = 0.85f, float alpha_step = 0.05f)
         {
             Container = container;
             DefaultContext = currentContext = defaultContext;
@@ -76,7 +89,8 @@ namespace InvisibleHand
             Position = defaultContext.pos;
             Size     = defaultContext.Size;
 
-            Alpha = base_alpha;
+            alphaBase = alphaMult = base_alpha;
+            alphaStep = alpha_step;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)Size.X, (int)Size.Y);
         }
@@ -85,6 +99,11 @@ namespace InvisibleHand
         public void ChangeContext(IHButton newContext)
         {
             currentContext = newContext;
+        }
+
+        public void Reset()
+        {
+            ChangeContext(DefaultContext);
         }
 
         /// allows registering key toggle w/ just the context (button) labels
@@ -123,16 +142,17 @@ namespace InvisibleHand
 
         public virtual void OnMouseEnter()
         {
-            Main.PlaySound(12); // "mouse-over" sound
-
+            // Main.PlaySound(12); // "mouse-over" sound
             if (currentContext.OnMouseEnter(this))
-                alphaMult = 1.0f;
+                Sound.MouseOver.Play();
+
+                // alphaMult = 1.0f;
         }
 
         public virtual void OnMouseLeave()
         {
-            if (currentContext.OnMouseLeave(this))
-                alphaMult = alphaBase;
+            currentContext.OnMouseLeave(this);
+            // alphaMult = alphaBase;
         }
 
         public virtual void OnHover()
@@ -150,23 +170,28 @@ namespace InvisibleHand
         {
             /** Disable this hook until something actually uses it... **/
             // if the context doesn't override this default draw function
-            // if (currentContext.PreDraw(sb, this))
-            // {
+            if (currentContext.PreDraw(sb, this))
+            {
                 sb.DrawIHButton(this, currentContext.DisplayState);
 
                 if (IsHovered)
                 {
-                    if (!hasMouseFocus) { hasMouseFocus=true; OnMouseEnter(); }
+                    if (!HasMouseFocus) { HasMouseFocus=true; OnMouseEnter(); }
+
+                    if (alphaMult!=1.0f)
+                        alphaMult += alphaStep;
 
                     OnHover();
 
                     currentContext.PostDraw(sb, this);
                     return;
                 }
-                if (hasMouseFocus) { OnMouseLeave(); }
-                hasMouseFocus=false;
+                if (HasMouseFocus) { OnMouseLeave(); }
+                if (alphaMult!=alphaBase)
+                    alphaMult -= alphaStep;
+                HasMouseFocus=false;
 
-            // }
+            }
             currentContext.PostDraw(sb, this);
         }
 
@@ -183,7 +208,7 @@ namespace InvisibleHand
                 //button (part of the label) or something added on, just for this implementation; I'm
                 //leaning towards the latter. But still, constructing the string on each draw
                 //seems inefficient since we can't change the keybind in-game anyway.
-                var labelDisplay = currentContext.Label + IHUtils.GetKeyTip(currentContext.Label);
+                var labelDisplay = currentContext.Label + IHUtils.GetKeyTip(currentContext.Action);
 
                 API.main.MouseText(labelDisplay, rare, diff);
                 Main.mouseText = true;

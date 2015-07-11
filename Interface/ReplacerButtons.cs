@@ -3,20 +3,41 @@ using Microsoft.Xna.Framework.Graphics;
 using TAPI;
 using Terraria;
 using System;
+using System.Collections.Generic;
 
 namespace InvisibleHand
 {
-    public class TextReplacerButtons : ButtonLayer
+    public abstract class ReplacerButtons : ButtonLayer
     {
-        private const float posX = 506;
+        protected const float posX = 506;
 
+        protected ReplacerButtons(string name) : base(name)
+        {
+            this.opacity_inactive = 1.0f; // don't fade buttons
+        }
+
+        protected override void OnDraw(SpriteBatch sb)
+        {
+            if (!parentLayer.visible) return;
+
+            // handling mouseInterface individually by button
+            DrawButtons(sb);
+        }
+
+    }
+
+    public class TextReplacerButtons : ReplacerButtons
+    {
+        // private static float posYLA = API.main.invBottom + 40;
+        // private static float posYDA = posYLA + 26;
+        // private static float posYQS =  posYLA + 52;
         /// Without swapNewActions == true, these buttons will look and act
         /// just like fancy versions of the normal Quick Stack, Loot All, and
         /// Deposit All text-buttons. With swapNewActions, holding down the
         /// Shift button will swap Loot/Deposit buttons with their smart counterparts.
         public TextReplacerButtons(IHBase mbase, bool swapNewActions = false) : base("TextReplacerButtons")
         {
-            this.opacity_inactive = 1.0f; // don't fade buttons
+            // this.opacity_inactive = 1.0f; // don't fade buttons
 
             // pulled these numbers (and posX) from Terraria.Main
             float posYLA = API.main.invBottom + 40;
@@ -59,8 +80,8 @@ namespace InvisibleHand
             {
                 var nlabels = new
                 {
-                    smartdep = Constants.ButtonLabels[8] + IHUtils.GetKeyTip(Constants.ButtonLabels[8]),
-                    restock  = Constants.ButtonLabels[5] + IHUtils.GetKeyTip(Constants.ButtonLabels[5])
+                    smartdep = Constants.ButtonLabels[8] + IHUtils.GetKeyTip(TIH.SmartDep),
+                    restock  = Constants.ButtonLabels[5] + IHUtils.GetKeyTip(TIH.SmartLoot)
                 };
 
                 var SDButton = ButtonFactory.GetSimpleButton(TIH.SmartDep, nlabels.smartdep, new Vector2(posX, posYDA), true);
@@ -75,13 +96,183 @@ namespace InvisibleHand
             }
         }
 
-        protected override void OnDraw(SpriteBatch sb)
-        {
-            if (!parentLayer.visible) return;
+        // protected override void OnDraw(SpriteBatch sb)
+        // {
+        //     if (!parentLayer.visible) return;
+        //
+        //     // handling mouseInterface individually by button
+        //     DrawButtons(sb);
+        // }
+    }
 
-            // handling mouseInterface individually by button
-            DrawButtons(sb);
+    public class IconReplacerButtons : ReplacerButtons
+    {
+        private static readonly Dictionary<TIH, TIH> togglesWith = new Dictionary<TIH, TIH>{
+            {TIH.SortChest, TIH.RSortChest},
+            {TIH.SmartLoot, TIH.QuickStack},
+            {TIH.SmartDep, TIH.DepAll}
+        };
+
+        public readonly Dictionary<TIH, ButtonBase> ChestEditButtons;
+
+        public IconReplacerButtons(IHBase mbase, bool swapNewActions = false) : base("TextReplacerButtons")
+        {
+            // move this up due to larger buttons
+            float posYLA = API.main.invBottom + 22;
+            // float posYDA = posYLA + 26;
+            float posYDA = posYLA + Constants.ButtonH; //32
+            // float posYQS = posYLA + 52;
+            float posYQS = posYDA + Constants.ButtonH;
+            //edit chest
+            float posYEC = posYQS + Constants.ButtonH;
+            // cancel edit
+            float posYCE = posYEC + Constants.ButtonH;
+
+            var PosY = new Dictionary<TIH, float>{
+                // {TIH.SortChest,  posYLA},
+                // {TIH.RSortChest, posYLA},
+                {TIH.LootAll,    posYLA},
+
+                {TIH.DepAll,     posYLA + Constants.ButtonH},
+                {TIH.SmartDep,   posYLA + Constants.ButtonH},
+
+                {TIH.QuickStack, posYLA + 2 * Constants.ButtonH},
+                {TIH.SmartLoot,  posYLA + 2 * Constants.ButtonH},
+
+                {TIH.Rename,     posYLA + 3 * Constants.ButtonH},
+                {TIH.SaveName,   posYLA + 3 * Constants.ButtonH},
+
+                {TIH.CancelEdit, posYLA + 4 * Constants.ButtonH}
+            };
+
+            var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
+                                        -(float)(int)((float)Constants.ButtonH/2));
+
+
+            // var simpleActions = new TIH[] { TIH.SortChest, TIH.RSortChest, TIH.SmartDep, TIH.SmartLoot };
+            var simpleActions = new TIH[] { TIH.LootAll, TIH.SmartDep, TIH.SmartLoot };
+
+            var lockingActions = new TIH[] { TIH.QuickStack, TIH.DepAll };
+
+            foreach (var a in lockingActions)
+            {
+                var button = ButtonFactory.GetLockableButton(a, new Vector2(posX, PosY[a]), this, lockOffset);
+                button.DisplayState.PreDraw = PreDraw;
+
+                mbase.ButtonRepo.Add(button.Label, button);
+                // set QS & DA to have their state initialized on world load
+                mbase.ButtonUpdates.Push(button.Label);
+
+                Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
+            }
+
+            foreach (var a in simpleActions)
+            {
+                // uses default label for the action
+                var button = ButtonFactory.GetSimpleButton(a, new Vector2(posX, PosY[a]));
+                button.DisplayState.PreDraw = PreDraw;
+
+                mbase.ButtonRepo.Add(button.Label, button);
+
+                if (a == TIH.LootAll)
+                    Buttons.Add(a, new ButtonBase(this, button));
+                else
+                    Buttons[TIH.SortChest].RegisterKeyToggle(KState.Special.Shift, button);
+            }
+
+            // =============================================================================
+            // set up the Rename/SaveName Button(s)
+
+            var rename = ButtonFactory.GetSimpleButton(
+                            TIH.Rename,
+                            IHBase.OriginalButtonLabels[TIH.Rename],
+                            new Vector2(posX, PosY[TIH.Rename])
+                            );
+            var savename = ButtonFactory.GetSimpleButton(
+                            TIH.SaveName,
+                            IHBase.OriginalButtonLabels[TIH.SaveName],
+                            new Vector2(posX, PosY[TIH.SaveName])
+                            );
+
+            // whoops, this was easier than I thought
+            // rename.DisplayState.onClick = () => EditChest.DoChestEdit();
+            // savename.DisplayState.onClick = () => EditChest.DoChestEdit();
+
+            mbase.ButtonRepo.Add(rename.Label, rename);
+            mbase.ButtonRepo.Add(savename.Label, savename);
+
+            ChestEditButtons.Add(TIH.Rename, new ButtonBase(this, rename));
+            ChestEditButtons.Add(TIH.SaveName, new ButtonBase(this, savename));
+
+            // --------------------------------------------
+            // And now the Cancel button.
+            // It's just gonna be text because ehhhhh
+
+            var cancel = ButtonFactory.GetSimpleButton(
+                            TIH.CancelEdit,
+                            IHBase.OriginalButtonLabels[TIH.CancelEdit],
+                            new Vector2(posX, PosY[TIH.CancelEdit]),
+                            true
+                            );
+            // cancel.DisplayState.onClick = () => EditChest.CancelRename();
+            mbase.ButtonRepo.Add(cancel.Label, cancel);
+
+            ChestEditButtons.Add(TIH.CancelEdit, new TextReplacerBase(this, cancel));
         }
+
+        private static readonly Color bgColor = Constants.ChestSlotColor*0.8f;
+        private static readonly Color saveNameBGColor = Constants.EquipSlotColor*0.8f;
+
+        /// Draw each button in this layer (bg first, then button)
+        protected override void DrawButtons(SpriteBatch sb)
+        {
+            foreach (KeyValuePair<TIH, ButtonBase> kvp in Buttons)
+            {
+                sb.DrawButtonBG(kvp.Value, IHBase.ButtonBG, bgColor);
+                kvp.Value.Draw(sb);
+            }
+            // foreach (var kvp in ChestEditButtons)
+            // {
+            if (Main.editChest)
+            {
+                sb.DrawButtonBG(ChestEditButtons[TIH.SaveName], IHBase.ButtonBG, saveNameBGColor);
+                ChestEditButtons[TIH.SaveName].Draw(sb);
+                ChestEditButtons[TIH.CancelEdit].Draw(sb);
+            }
+            else
+            {
+                sb.DrawButtonBG(ChestEditButtons[TIH.Rename], IHBase.ButtonBG, bgColor);
+                ChestEditButtons[TIH.Rename].Draw(sb);
+            }
+            // }
+        }
+
+        public bool PreDraw(SpriteBatch sb, ButtonBase bb)
+        {
+            sb.DrawIHButton(bb, bb.CurrentContext.DisplayState);
+
+            if (bb.IsHovered)
+            {
+                if (!bb.HasMouseFocus) { bb.HasMouseFocus=true; bb.OnMouseEnter(); }
+
+                //handling mouseInterface individually again
+                Main.localPlayer.mouseInterface = true;
+
+                if (bb.AlphaMult!=1.0f)
+                    bb.AlphaMult += bb.alphaStep;
+
+                bb.OnHover();
+
+                return false;
+            }
+            if (bb.HasMouseFocus) { bb.OnMouseLeave(); }
+            if (bb.AlphaMult!=bb.alphaBase)
+                    bb.AlphaMult -= bb.alphaStep;
+            bb.HasMouseFocus=false;
+
+            return false;
+        }
+
     }
 
     public class TextReplacerBase : ButtonBase
@@ -146,9 +337,9 @@ namespace InvisibleHand
             // use specialized isHovered() below
             if (isHovered(pos, origin))
             {
-                if (!hasMouseFocus)
+                if (!HasMouseFocus)
                 {
-                    hasMouseFocus=true;
+                    HasMouseFocus=true;
                     OnMouseEnter();
                 }
 
@@ -164,11 +355,11 @@ namespace InvisibleHand
                 currentContext.PostDraw(sb, this);
                 return;
             }
-            if (hasMouseFocus)
+            if (HasMouseFocus)
                 OnMouseLeave();
             if (Scale!=baseScale)
                 Scale -= scaleStep;
-            hasMouseFocus=false;
+            HasMouseFocus=false;
 
             currentContext.PostDraw(sb, this);
         }

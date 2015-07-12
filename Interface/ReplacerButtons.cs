@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace InvisibleHand
 {
+    /// TextReplacer and IconReplacer will inherit from this class;
+    /// This is intended to allow other code to simply request the type
+    /// "ReplacerButtons" without worrying about which variety is returned.
     public abstract class ReplacerButtons : ButtonLayer
     {
         protected const float posX = 506;
@@ -102,6 +105,7 @@ namespace InvisibleHand
             }
         }
 
+        // moved this to ReplacerButtons base class
         // protected override void OnDraw(SpriteBatch sb)
         // {
         //     if (!parentLayer.visible) return;
@@ -128,13 +132,13 @@ namespace InvisibleHand
             // move this up due to larger buttons
             float posYLA = API.main.invBottom + 22;
             // float posYDA = posYLA + 26;
-            float posYDA = posYLA + Constants.ButtonH; //32
-            // float posYQS = posYLA + 52;
-            float posYQS = posYDA + Constants.ButtonH;
-            //edit chest
-            float posYEC = posYQS + Constants.ButtonH;
-            // cancel edit
-            float posYCE = posYEC + Constants.ButtonH;
+            // float posYDA = posYLA + Constants.ButtonH; //32
+            // // float posYQS = posYLA + 52;
+            // float posYQS = posYDA + Constants.ButtonH;
+            // //edit chest
+            // float posYEC = posYQS + Constants.ButtonH;
+            // // cancel edit
+            // float posYCE = posYEC + Constants.ButtonH;
 
             var PosY = new Dictionary<TIH, float>{
                 // {TIH.SortChest,  posYLA},
@@ -149,8 +153,8 @@ namespace InvisibleHand
 
                 {TIH.Rename,     posYLA + 3 * Constants.ButtonH},
                 {TIH.SaveName,   posYLA + 3 * Constants.ButtonH},
-
-                {TIH.CancelEdit, posYLA + 4 * Constants.ButtonH}
+                // add another half-height space to prevent overlap
+                {TIH.CancelEdit, posYLA + 4 * Constants.ButtonH + (Constants.ButtonH/2)}
             };
 
             var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
@@ -172,7 +176,6 @@ namespace InvisibleHand
                 mbase.ButtonUpdates.Push(button.ID);
 
                 Buttons.Add(a, new ButtonBase(this, button));
-                // Buttons[togglesWith[a]].RegisterKeyToggle(KState.Special.Shift, button);
             }
 
             foreach (var a in simpleActions)

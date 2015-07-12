@@ -5,18 +5,6 @@ namespace InvisibleHand
 {
     public static class EditChest
     {
-
-        public static void DoRenameChest(ButtonLayer container, TIH self, IHButton swapTo)
-        {
-            container.Buttons[self].ChangeContext(swapTo);
-
-            //this shouldn't happen, but just in case...
-            // this check and the swap above should get
-            // the button back in sync
-            if (Main.editChest) return;
-
-            DoChestEdit();
-        }
         /// Edit a chest's label. Essentially copied verbatim from vanilla code.
         /// Luckily most everything in it is a static variable.
         /// Can be called for either save or rename buttons
@@ -54,40 +42,6 @@ namespace InvisibleHand
                     {
                         Main.localPlayer.editedChestName = true;
                     }
-                }
-            }
-        }
-
-        public static void DoSaveChestName(ButtonLayer container, TIH self, IHButton swapTo)
-        {
-            container.Buttons[self].ChangeContext(swapTo);
-
-            //this shouldn't happen, but just in case...
-            // this check and the swap above should get
-            // the button back in sync
-            if (!Main.editChest) return;
-
-            SaveName();
-
-        }
-
-        private static void SaveName()
-        {
-            // even though this happens on click, vanilla code
-            // specifies the mouse-over sound to play.
-            Sound.MouseOver.Play();
-            Main.editChest = false;
-            int current = Main.localPlayer.chest;
-            if (Main.npcChatText == Main.defaultChestName)
-            {
-                Main.npcChatText = "";
-            }
-            if (Main.chest[current].name != Main.npcChatText)
-            {
-                Main.chest[current].name = Main.npcChatText;
-                if (Main.netMode == 1)
-                {
-                    Main.localPlayer.editedChestName = true;
                 }
             }
         }

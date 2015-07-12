@@ -40,6 +40,8 @@ namespace InvisibleHand
 
         public Color tint;
 
+        public OperationCollection operations;
+
         //make sure it at least has a related action and a label on construction
         public ButtonState(TIH action, string label="")
         {
@@ -93,6 +95,42 @@ namespace InvisibleHand
             tint         = bsCopy.tint;
             onMouseEnter = bsCopy.onMouseEnter;
             onMouseLeave = bsCopy.onMouseLeave;
+        }
+
+        // TODO: make Iterable. Enumerable. I don't knowable, one of those.
+        public class OperationCollection
+        {
+            public Action onClick { get; set;}
+            public Action onRightClick { get; set;}
+
+            public Func<ButtonBase,bool> onMouseEnter { get; set;}
+            public Func<ButtonBase,bool> onMouseLeave { get; set;}
+
+            public Func<SpriteBatch, ButtonBase, bool> preDraw { get; set;}
+            public Action<SpriteBatch, ButtonBase> postDraw { get; set;}
+
+
+            public OperationCollection(
+                Action onClick = null,
+                Action onRightClick = null,
+
+                Func<ButtonBase,bool> onMouseEnter = null,
+                Func<ButtonBase,bool> onMouseLeave = null,
+
+                Func<SpriteBatch, ButtonBase, bool> preDraw = null,
+                Action<SpriteBatch, ButtonBase> postDraw = null)
+                {
+                    this.onClick = onClick;
+                    this.onRightClick = onRightClick;
+                    this.onMouseEnter = onMouseEnter;
+                    this.onMouseLeave = onMouseLeave;
+                    this.preDraw = preDraw;
+                    this.postDraw = postDraw;
+                }
+
+            public OperationCollection(OperationCollection other) :
+                this(other.onClick, other.onRightClick, other.onMouseEnter,
+                     other.onMouseLeave, other.preDraw, other.postDraw) {}
         }
     }
 }

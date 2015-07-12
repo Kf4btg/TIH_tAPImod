@@ -39,7 +39,7 @@ namespace InvisibleHand
             return sortedList;
         }
 
-        /*************************************************************************
+        /** ***********************************************************************
         *  GetItemCopies - Construct a list containing cloned copies of items in the given
         *   container, skipping blank (and optionally locked) slots.
         *

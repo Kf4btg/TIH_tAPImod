@@ -51,7 +51,7 @@ namespace InvisibleHand
         // protected bool hasMouseFocus;
         public virtual bool HasMouseFocus { get; set; }
 
-    public const float SCALE_FULL = 1.0f;
+        public const float SCALE_FULL = 1.0f;
         protected float scale = SCALE_FULL;
         public virtual float Scale {get { return scale; } set { scale = value < 0.5 ? 0.5f : value; } }
 

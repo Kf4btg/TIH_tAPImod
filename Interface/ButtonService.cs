@@ -21,21 +21,21 @@ namespace InvisibleHand
 
         public abstract void Subscribe();
 
-        protected virtual void RegisterHook(string hookname)
+        protected void RegisterHook(string hookname)
         {
-            Client.RegisterHook(this, hookname);
+            Client.RegisterServiceHook(this, hookname);
         }
-        protected virtual void RegisterHooks(params string[] hookNames)
+        protected void RegisterHooks(params string[] hookNames)
         {
             foreach (var h in hookNames)
                 RegisterHook(h);
         }
 
-        protected virtual void RemoveHook(string hookname)
+        protected void RemoveHook(string hookname)
         {
-            Client.RemoveHook(this, hookname);
+            Client.RemoveServiceHook(this, hookname);
         }
-        protected virtual void RemoveHooks(params string[] hookNames)
+        protected void RemoveHooks(params string[] hookNames)
         {
             foreach (var h in hookNames)
                 RemoveHook(h);
@@ -61,7 +61,7 @@ namespace InvisibleHand
             Hooks.preDraw = PreDraw;
             Hooks.onRightClick = () => IHPlayer.ToggleActionLock(clientAction);
             Hooks.postDraw = PostDraw;
-            Hooks.onWorldLoad = onWorldLoad;
+            Hooks.onWorldLoad = OnWorldLoad;
         }
 
         public override void Subscribe()
@@ -69,7 +69,7 @@ namespace InvisibleHand
             RegisterHooks("onWorldLoad", "onRightClick", "preDraw");
         }
 
-        private void onWorldLoad()
+        private void OnWorldLoad()
         {
             isLocked = IHPlayer.ActionLocked(clientAction);
 
@@ -78,10 +78,9 @@ namespace InvisibleHand
             else
                 RemoveHook("postDraw");
                 // List<>.Remove() doesn't fail on missing keys
-
         }
 
-        private bool PreDraw(SpriteBatch sb, ButtonBase bb)
+        private bool PreDraw(SpriteBatch sb)
         {
             // Func<bool> isActive = () => IHPlayer.ActionLocked(Main.localPlayer, toLock);
             // don't run unless there's a change to avoid calling Reg/Rem Hook every frame
@@ -96,14 +95,14 @@ namespace InvisibleHand
             return true;
         }
 
-        private void PostDraw(SpriteBatch sb, ButtonBase bBase)
+        private void PostDraw(SpriteBatch sb)
         {
-
+            // DrawLockIndicator(sb, Client.Base); //FIXME: reenable this!
         }
 
-        private static void DrawLockIndicator(SpriteBatch sb, ButtonBase bb, ButtonLayer parent, Vector2 offset, Color tint)
+        private void DrawLockIndicator(SpriteBatch sb, ButtonBase bb)
         {
-            sb.Draw(IHBase.LockedIcon, bb.Position + offset, tint * parent.LayerOpacity * bb.Alpha);
+            sb.Draw(IHBase.LockedIcon, bb.Position + offset, Client.Tint * bb.Container.LayerOpacity * bb.Alpha);
         }
 
     }

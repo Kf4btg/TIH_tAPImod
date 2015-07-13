@@ -11,7 +11,7 @@ namespace InvisibleHand
     public abstract class CoreButton
     {
         // holds the button
-        public readonly ButtonRebase container;
+        public readonly ButtonRebase Base;
 
         // fields
         protected TIH action;
@@ -55,42 +55,113 @@ namespace InvisibleHand
             this.services = new List<ButtonService>();
         }
 
+        /// use this to help with creating buttons; e.g.:
+        /// CoreButton cb = new CoreButton(TIH.Sort).With(delegate(CoreButton b) {
+        ///          b.Hooks.onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer);
+        ///          b.ToolTip = "Sort Me";
+        ///          // ... etc.
+        ///    })
+        public CoreButton With(Action<CoreButton> action)
+        {
+            if (this != null)
+            {
+                action(this);
+            }
+            return this;
+        }
+
         #region hooks
-        public virtual bool OnMouseEnter(ButtonBase bBase)
+        public virtual void OnClick()
         {
-            return Hooks.onMouseEnter==null || Hooks.onMouseEnter(bBase);
+            if (this.Hooks.onClick != null) this.Hooks.onClick();
+            List<ButtonService> list;
+            if (enabledHooks.TryGetValue("onClick", out list))
+            {
+                foreach ( var service in list )
+                    service.Hooks.onClick();
+            }
         }
 
-        public virtual bool OnMouseLeave(ButtonBase bBase)
+        public virtual void OnRightClick()
         {
-            return Hooks.onMouseLeave==null || Hooks.onMouseLeave(bBase);
+            if (this.Hooks.onClick != null) this.Hooks.onClick();
+            List<ButtonService> list;
+            if (enabledHooks.TryGetValue("onRightClick", out list))
+            {
+                foreach ( var service in list )
+                    service.Hooks.onRightClick();
+            }
         }
 
-        public virtual bool PreDraw(SpriteBatch sb, ButtonBase bBase)
+        public virtual bool OnMouseEnter(SpriteBatch sb)
         {
-            return Hooks.preDraw==null || Hooks.preDraw(sb, bBase);
+            List<ButtonService> list;
+            bool result = true;
+            if (enabledHooks.TryGetValue("onMouseEnter", out list))
+            {
+                foreach ( var service in list )
+                    // any false return will lock result to false
+                    result = service.Hooks.onMouseEnter(sb) & result;
+            }
+            return result;
         }
 
-        public virtual void PostDraw(SpriteBatch sb, ButtonBase bBase)
+        public virtual bool OnMouseLeave(SpriteBatch sb)
+        {
+            List<ButtonService> list;
+            bool result = true;
+            if (enabledHooks.TryGetValue("onMouseLeave", out list))
+            {
+                foreach ( var service in list )
+                    // any false return will lock result to false
+                    result = service.Hooks.onMouseLeave(sb) & result;
+            }
+            return result;
+        }
+
+        public virtual bool PreDraw(SpriteBatch sb)
+        {
+            List<ButtonService> list;
+            bool result = true;
+            if (enabledHooks.TryGetValue("preDraw", out list))
+            {
+                foreach ( var service in list )
+                    // any false return will lock result to false
+                    result = service.Hooks.preDraw(sb) & result;
+            }
+            return result;
+        }
+
+        public virtual void PostDraw(SpriteBatch sb)
         {
             List<ButtonService> list;
             if (enabledHooks.TryGetValue("postDraw", out list))
             {
                 foreach ( var service in list )
-                    service.Hooks.postDraw(sb, bBase);
+                    service.Hooks.postDraw(sb);
             }
-
-            if (Hooks.postDraw!=null) Hooks.postDraw(sb, bBase);
         }
+
         #endregion
 
-        public void RegisterHook(ButtonService service, string hookName)
+        public void RegisterServiceHook(ButtonService service, string hookName)
         {
-            enabledHooks[hookName].Add(service);
+            // if the entry already exists, Add will throw an ArgumentException
+            // which we can catch and add the service to the existing list instead
+            try
+            {
+                enabledHooks.Add(hookName, new List<ButtonService>() { service });
+            }
+            catch (ArgumentException)
+            {
+                enabledHooks[hookName].Add(service);
+            }
         }
-        public void RemoveHook(ButtonService service, string hookName)
+        public void RemoveServiceHook(ButtonService service, string hookName)
         {
             enabledHooks[hookName].Remove(service);
+            if (enabledHooks[hookName].Count == 0)
+                enabledHooks.Remove(hookName);
         }
 
         /// contains the functionality of the button
@@ -99,11 +170,11 @@ namespace InvisibleHand
             public Action onClick;
             public Action onRightClick;
 
-            public Func<ButtonBase,bool> onMouseEnter;
-            public Func<ButtonBase,bool> onMouseLeave;
+            public Func<SpriteBatch,bool> onMouseEnter;
+            public Func<SpriteBatch,bool> onMouseLeave;
 
-            public Func<SpriteBatch, ButtonBase, bool> preDraw;
-            public Action<SpriteBatch, ButtonBase> postDraw;
+            public Func<SpriteBatch, bool> preDraw;
+            public Action<SpriteBatch> postDraw;
 
             public Action onWorldLoad;
         }

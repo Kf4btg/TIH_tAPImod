@@ -92,6 +92,7 @@
     <Compile Include="Interface\ButtonRebase.cs" />
     <Compile Include="Interface\ButtonService.cs" />
     <Compile Include="Interface\CoreButton.cs" />
+    <Compile Include="Interface\ReplacerButtons.cs" />
     <Compile Include="DynamicQuery\Dynamic.cs" />
   </ItemGroup>
   <ItemGroup>

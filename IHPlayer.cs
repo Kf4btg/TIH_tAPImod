@@ -272,6 +272,11 @@ namespace InvisibleHand
                 return mp.LockedActions[actionID];
         }
 
+        public static bool ActionLocked(TIH actionID)
+        {
+            return Instance.LockedActions[actionID];
+        }
+
         /// Set indicated action to respect/not-respect locked slots,
         /// depending on current status.
         public static void ToggleActionLock(Player p, TIH actionID)
@@ -279,5 +284,12 @@ namespace InvisibleHand
             IHPlayer mp = p.GetSubClass<IHPlayer>();
             mp.LockedActions[actionID] = !mp.LockedActions[actionID];
         }
+
+        public static void ToggleActionLock(TIH actionID)
+        {
+            Instance.LockedActions[actionID] = !Instance.LockedActions[actionID];
+
+        }
+
     }
 }

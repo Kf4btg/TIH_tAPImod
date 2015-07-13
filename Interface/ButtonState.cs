@@ -38,7 +38,12 @@ namespace InvisibleHand
         /// Called after all drawing and mouse-interaction checking is done
         public Action<SpriteBatch, ButtonBase> PostDraw;
 
+        /// to change tint of the button texture/text
         public Color tint;
+        /// color of button background, if any;
+        public Color bgColor;
+        /// color of lockIndicator, if used
+        public Color lockColor;
 
         public OperationCollection operations;
 
@@ -109,14 +114,11 @@ namespace InvisibleHand
             public Func<SpriteBatch, ButtonBase, bool> preDraw { get; set;}
             public Action<SpriteBatch, ButtonBase> postDraw { get; set;}
 
-
             public OperationCollection(
                 Action onClick = null,
                 Action onRightClick = null,
-
                 Func<ButtonBase,bool> onMouseEnter = null,
                 Func<ButtonBase,bool> onMouseLeave = null,
-
                 Func<SpriteBatch, ButtonBase, bool> preDraw = null,
                 Action<SpriteBatch, ButtonBase> postDraw = null)
                 {

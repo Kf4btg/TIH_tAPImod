@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -155,5 +156,150 @@ namespace InvisibleHand {
         {
             sb.Draw(IHBase.LockedIcon, bb.Position + offset, tint * parent.LayerOpacity * bb.Alpha);
         }
+
+        // ------------------------------------------------------------
+        // One of those fancy flowy-interfaces
+
+        // /// entry point to CreateButton, though the class itself can be used
+        // public static CreateButton MakeButton()
+        // {
+        //     return new CreateButton();
+        // }
+        //
+        public static IHButton testBtn()
+        {
+            return MakeButton().forAction(TIH.SortInv).atPosition(12, 15)
+                .withLabel("testing")
+                .withBehaviors(
+                    onRightClick: IHUtils.DoLootAll
+                ).Return();
+        }
+
+        public static CreateButton MakeButton()
+        {
+            return new CreateButton();
+        }
+
+        public class CreateButton
+        {
+            public CreateButton() {}
+
+            private IHButton button;
+            private List<ButtonState> states;
+            private ButtonState state;
+            private int stateCount = 0;
+            private Vector2 position;
+
+            //lock stuff
+            private bool lockable;
+            private ButtonLayer container;
+            private Vector2? lockOffset;
+            private Color? lockColor;
+
+            /// Finalize and return the created button
+            public IHButton Return()
+            {
+                if (button == null)
+                {
+                    if (lockable)
+                        button = CreateLockableButton(state, state.action, container, position, lockOffset, lockColor);
+                    else
+                        button = new IHButton(state, position);
+                }
+                return button;
+            }
+
+            public CreateButton forAction(TIH action)
+            {
+                // states.Add(new ButtonState(action));
+                // stateCount++;
+                state = new ButtonState(action);
+                return this;
+            }
+
+            public CreateButton atPosition(float x, float y)
+            {
+                position = new Vector2(x, y);
+                return this;
+            }
+
+            public CreateButton withLabel(string label)
+            {
+                state.label = label;
+                state.tooltip = label + IHUtils.GetKeyTip(state.action);
+
+                return this;
+            }
+
+            public CreateButton isLockable(ButtonLayer parent, Vector2? lockOffset = null, Color? lockColor = null)
+            {
+                lockable = true;
+                this.container = parent;
+                if (lockOffset!=null) this.lockOffset = lockOffset;
+                if (lockColor!=null) this.lockColor = lockColor;
+
+                return this;
+            }
+
+            public CreateButton withLockColor(Color lockColor)
+            {
+                this.lockColor = lockColor;
+                return this;
+            }
+
+            public CreateButton withLockColor(int R, int G, int B, int A=255)
+            {
+                return this.withLockColor(new Color(R % 256, G % 256, B % 256, A % 256));
+                // return this.WithLockColor(new Color((byte)R, (byte)G, (byte)B, (byte)A));
+            }
+
+            public CreateButton withLockOffset(Vector2 lockOffset)
+            {
+                this.lockOffset = lockOffset;
+                return this;
+            }
+
+            public CreateButton withLockOffset(float offX, float offY)
+            {
+                return this.withLockOffset(new Vector2(offX, offY));
+            }
+
+            public CreateButton withBackgroundColor(Color bgColor)
+            {
+                state.bgColor = bgColor;
+                return this;
+            }
+
+            public CreateButton withBackgroundColor(int R, int G, int B, int A=255)
+            {
+                return this.withLockColor(new Color(R % 256, G % 256, B % 256, A % 256));
+                // return this.WithLockColor(new Color((byte)R, (byte)G, (byte)B, (byte)A));
+            }
+
+            // WhichCan ? WhichDoes? WithFunctions ?
+            public CreateButton withBehaviors(
+             Action onClick = null,
+             Action onRightClick = null,
+             Func<ButtonBase,bool> onMouseEnter = null,
+             Func<ButtonBase,bool> onMouseLeave = null,
+             Func<SpriteBatch, ButtonBase, bool> preDraw = null,
+             Action<SpriteBatch, ButtonBase> postDraw = null)
+            {
+                if (onClick!=null)      state.onClick = onClick;
+                if (onRightClick!=null) state.onClick = onClick;
+                if (onMouseEnter!=null) state.onMouseEnter = onMouseEnter;
+                if (onMouseLeave!=null) state.onMouseLeave = onMouseLeave;
+                if (preDraw!=null)      state.PreDraw = preDraw;
+                if (postDraw!=null)     state.PostDraw = postDraw;
+
+                return this;
+            }
+
+
+
+
+        }
     }
+
+
 }

@@ -29,14 +29,19 @@ namespace InvisibleHand
         /// its boundaries. Use this to determine MouseInterface
         public Rectangle ButtonFrame { get; protected set;}
         public bool IsHovered {
-            get
-            {
+            get {
                 return ButtonFrame.Contains(Main.mouseX, Main.mouseY);
             }
         }
 
-        protected float opacity_inactive = 0.45f;
-        protected float opacity_active = 1.0f;
+        /// whether or not to set MouseInterface=true
+        /// when the mouse is ANYwhere over this layer,
+        /// including blank space; some buttons may need
+        /// to handle this themselves, so set it false in
+        /// those cases. Also disables the opacity stuff.
+        public bool handleMouseInterface = true;
+
+        protected float opacity_inactive, opacity_active = 1.0f;
 
         //TODO: have this fade in/out?
         public float LayerOpacity { get; protected set; }
@@ -74,8 +79,11 @@ namespace InvisibleHand
 
             if (IsHovered)
             {
-                Main.localPlayer.mouseInterface = true;
-                LayerOpacity=opacity_active;
+                if (handleMouseInterface)
+                {
+                    Main.localPlayer.mouseInterface = true;
+                    LayerOpacity = opacity_active;
+                }
                 DrawButtons(sb);
                 return;
             }

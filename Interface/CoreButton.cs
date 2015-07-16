@@ -65,9 +65,7 @@ namespace InvisibleHand
         public CoreButton With(Action<CoreButton> action)
         {
             if (this != null)
-            {
                 action(this);
-            }
             return this;
         }
 
@@ -75,105 +73,107 @@ namespace InvisibleHand
         public virtual void OnClick()
         {
             if (this.Hooks.onClick != null) this.Hooks.onClick();
-            List<ButtonService> list;
-            if (enabledHooks.TryGetValue("onClick", out list))
-            {
-                foreach ( var service in list )
-                    service.Hooks.onClick();
-            }
+            CallServiceHooks("onClick");
+            // List<ButtonService> list;
+            // if (enabledHooks.TryGetValue("onClick", out list))
+            // {
+            //     foreach ( var service in list )
+            //         service.Hooks.onClick();
+            // }
         }
 
         public virtual void OnRightClick()
         {
             if (this.Hooks.onRightClick != null) this.Hooks.onRightClick();
-            List<ButtonService> list;
-            if (enabledHooks.TryGetValue("onRightClick", out list))
-            {
-                foreach ( var service in list )
-                    service.Hooks.onRightClick();
-            }
+            CallServiceHooks("onRightClick");
+            // List<ButtonService> list;
+            // if (enabledHooks.TryGetValue("onRightClick", out list))
+            // {
+            //     foreach ( var service in list )
+            //         service.Hooks.onRightClick();
+            // }
         }
 
         public virtual bool OnMouseEnter()
         {
-            List<ButtonService> list;
-            bool result = true;
-            if (enabledHooks.TryGetValue("onMouseEnter", out list))
-            {
-                foreach ( var service in list )
-                    // any false return will lock result to false
-                    result = service.Hooks.onMouseEnter() & result;
-            }
-            return result;
+            return CallServiceHooks("onMouseEnter");
+            // List<ButtonService> list;
+            // bool result = true;
+            // if (enabledHooks.TryGetValue("onMouseEnter", out list))
+            // {
+            //     foreach ( var service in list )
+            //         // any false return will lock result to false
+            //         result = service.Hooks.onMouseEnter() & result;
+            // }
+            // return result;
         }
 
         public virtual bool OnMouseLeave()
         {
-            List<ButtonService> list;
-            bool result = true;
-            if (enabledHooks.TryGetValue("onMouseLeave", out list))
-            {
-                foreach ( var service in list )
-                    // any false return will lock result to false
-                    result = service.Hooks.onMouseLeave() & result;
-            }
-            return result;
+            return CallServiceHooks("onMouseLeave");
+
+            // List<ButtonService> list;
+            // bool result = true;
+            // if (enabledHooks.TryGetValue("onMouseLeave", out list))
+            // {
+            //     foreach ( var service in list )
+            //         // any false return will lock result to false
+            //         result = service.Hooks.onMouseLeave() & result;
+            // }
+            // return result;
         }
 
         public virtual bool PreDraw(SpriteBatch sb)
         {
-            List<ButtonService> list;
-            bool result = true;
-            if (enabledHooks.TryGetValue("preDraw", out list))
-            {
-                foreach ( var service in list )
-                    // any false return will lock result to false
-                    result = service.Hooks.preDraw(sb) & result;
-            }
-            return result;
+            return CallServiceHooks("predraw");
+            // List<ButtonService> list;
+            // bool result = true;
+            // if (enabledHooks.TryGetValue("preDraw", out list))
+            // {
+            //     foreach ( var service in list )
+            //         // any false return will lock result to false
+            //         result = service.Hooks.preDraw(sb) & result;
+            // }
+            // return result;
         }
 
         public virtual void PostDraw(SpriteBatch sb)
         {
-            List<ButtonService> list;
-            if (enabledHooks.TryGetValue("postDraw", out list))
-            {
-                foreach ( var service in list )
-                    service.Hooks.postDraw(sb);
-            }
+            CallServiceHooks("postdraw", sb);
+            // List<ButtonService> list;
+            // if (enabledHooks.TryGetValue("postDraw", out list))
+            // {
+            //     foreach ( var service in list )
+            //         service.Hooks.postDraw(sb);
+            // }
         }
 
-
-        public bool callhook(string hook, SpriteBatch sb = null, bool isFunction = false )
+        ///<param name="hook">String name of the hook being called, e.g. "onClick"</param>
+        ///<param name="sb">SpriteBatch object for Hooks which use it</param>
+        ///<param name="isFunction">whether the hook being called is a Func (otherwise it's an Action)</param>
+        ///<returns>Result of Function call if hook is Func, otherwise true</returns>
+        protected bool CallServiceHooks(string hook, SpriteBatch sb = null, bool isFunc = false )
         {
             List<ButtonService> list;
             if (!enabledHooks.TryGetValue(hook, out list)) return true;
 
-            if (isFunction)
-            {
-                bool result = true;
-                if (sb == null)
-                {
-                    // Func<bool>
+            bool result = true;
+            if (isFunc)
+                if (sb == null) // Func<bool>
                     foreach (var service in list)
-                        result = service.Hooks.GetHook(hook).Invoke() & result;
-                }
-                else
-                {
-                    // Func<sb, bool>
+                        result = service.Hooks[hook].Invoke() & result;
+                else // Func<sb, bool>
                     foreach (var service in list)
-                        result = service.Hooks.GetHook(hook).Invoke(sb) & result;
-                }
-                return result;
-            }
-            if (sb == null) //Action
-                foreach (var service in list)
-                    service.Hooks.GetHook(hook).Invoke();
-            else  //Action<sb>
-                foreach (var service in list)
-                    service.Hooks.GetHook(hook).Invoke(sb);
+                        result = service.Hooks[hook].Invoke(sb) & result;
+            else
+                if (sb == null) //Action
+                    foreach (var service in list)
+                        service.Hooks[hook].Invoke();
+                else  //Action<sb>
+                    foreach (var service in list)
+                        service.Hooks[hook].Invoke(sb);
 
-            return true;
+            return result;
         }
 
 
@@ -213,14 +213,16 @@ namespace InvisibleHand
 
             public Action onWorldLoad;
 
-            public dynamic GetHook(string hookname)
-            {
-                return hooks[hookname];
-            }
-
+            /// Map of hook names to dynamic option holding the actual
+            /// hook Action/Function; will throw runtime errors if
+            /// the hook is not invoked with correct parameter types
             private Dictionary<string, dynamic> hooks;
 
-
+            /// allows accessing the hooks like: Hooks["onClick"]
+            public dynamic this[string hookName]
+            {
+                get { return hooks[hookName]; }
+            }
 
             public ButtonHooks()
             {
@@ -234,14 +236,7 @@ namespace InvisibleHand
                     {"preDraw", preDraw},
                     {"postDraw", postDraw}
                 };
-
             }
-
-            public bool callhook(bool isFunction )
-            {
-                return true;
-            }
-
         }
     }
 

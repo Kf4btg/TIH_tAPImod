@@ -31,9 +31,6 @@ namespace InvisibleHand
         /// can change the overall color of the button texture or text
         public Color Tint     { get { return tint; }    set { tint    = value; } }
 
-        // public Vector2 Position { get { return position; }
-        //     set { position = value == null ? default(Vector2) : value; } }
-
         // ID
         public string ID { get; protected set; }
 
@@ -61,18 +58,7 @@ namespace InvisibleHand
             ID = UICore.GenerateHoverID();
         }
 
-        /// use this to help with creating buttons; e.g.:
-        /// CoreButton cb = new CoreButton(TIH.Sort).With(delegate(CoreButton b) {
-        ///          b.Hooks.onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer);
-        ///          b.ToolTip = "Sort Me";
-        ///          // ... etc.
-        ///    })
-        public CoreButton With(Action<CoreButton> action)
-        {
-            if (this != null)
-                action(this);
-            return this;
-        }
+
 
         #region hooks
         public virtual void OnWorldLoad()
@@ -162,6 +148,18 @@ namespace InvisibleHand
 
             return result;
         }
+        #endregion
+
+        #region serviceManagement
+
+        internal void addService(ButtonService bs)
+        {
+            services.Add(bs);
+            bs.Subscribe();
+        }
+
+        // TODO: implement this (maybe)
+        public void RemoveService(string serviceType) {}
 
         public void RegisterServiceHook(ButtonService service, string hookName)
         {
@@ -184,6 +182,8 @@ namespace InvisibleHand
         }
 
         #endregion
+
+
     }
 
     /// contains the functionality of a button
@@ -274,5 +274,30 @@ namespace InvisibleHand
         }
     }
 
+    /// intended to use in a fluent-interface type of way;
+    /// these are generic so that a separate class so that the proper
+    /// subtype will be returned rather than a generic CoreButton
+    public static class CBExtensions
+    {
+        public static T AddService<T>(this T button, ButtonService bs) where T: CoreButton
+        {
+            button.addService(bs);
+            return button;
+        }
+
+        /// use this to help with creating buttons; e.g.:
+        /// CoreButton cb = new TexturedButton(TIH.Sort).With<TexturedButton>(delegate(TexturedButton b) {
+        ///          b.Hooks.onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer);
+        ///          b.ToolTip = "Sort Me";
+        ///          // ... etc.
+        ///    })
+        public static T With<T>(this T button, Action<T> action) where T: CoreButton
+        {
+            if (button != null)
+                action(button);
+            return button;
+        }
+
+    }
 
 }

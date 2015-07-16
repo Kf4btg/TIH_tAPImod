@@ -8,7 +8,7 @@ namespace InvisibleHand
     public abstract class ButtonService
     {
         /// do I even need this?
-        // public abstract string ServiceID { get; }
+        public abstract string ServiceType { get; }
 
         /// The button to which this service's
         /// actions will attach.
@@ -24,6 +24,7 @@ namespace InvisibleHand
 
         /// Register required hooks with Client here
         public abstract void Subscribe();
+        public abstract void Unsubscribe();
 
         /// Tell client we're using this hook
         protected void RegisterHook(string hookname)
@@ -52,12 +53,12 @@ namespace InvisibleHand
 
     public class LockingService : ButtonService
     {
-        // public override string ServiceID { get { return "Locker"; } }
+        public override string ServiceType { get { return "Locker"; } }
 
         private readonly Color color;
         private readonly Vector2 offset;
         private readonly string lockString;
-        private readonly TIH clientAction;
+        // private readonly TIH clientAction;
         private bool isLocked;
 
         public LockingService(CoreButton client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
@@ -67,7 +68,7 @@ namespace InvisibleHand
             lockString = locked_string;
 
             Hooks.preDraw = PreDraw;
-            Hooks.onRightClick = () => IHPlayer.ToggleActionLock(clientAction);
+            Hooks.onRightClick = () => IHPlayer.ToggleActionLock(Client.Action);
             Hooks.postDraw = PostDraw;
             Hooks.onWorldLoad = OnWorldLoad;
         }
@@ -76,10 +77,14 @@ namespace InvisibleHand
         {
             RegisterHooks("onWorldLoad", "onRightClick", "preDraw");
         }
+        public override void Unsubscribe()
+        {
+            RemoveHooks("onWorldLoad", "onRightClick", "preDraw");
+        }
 
         private void OnWorldLoad()
         {
-            isLocked = IHPlayer.ActionLocked(clientAction);
+            isLocked = IHPlayer.ActionLocked(Client.Action);
 
             if (isLocked)
                 RegisterHook("postDraw");
@@ -92,7 +97,7 @@ namespace InvisibleHand
         {
             // Func<bool> isActive = () => IHPlayer.ActionLocked(Main.localPlayer, toLock);
             // don't run unless there's a change to avoid calling Reg/Rem Hook every frame
-            if (IHPlayer.ActionLocked(clientAction) != isLocked)
+            if (IHPlayer.ActionLocked(Client.Action) != isLocked)
             {
                 isLocked = !isLocked;
                 if (isLocked)

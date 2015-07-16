@@ -72,7 +72,7 @@ namespace InvisibleHand
         #region hooks
         public virtual void OnClick()
         {
-            if (this.Hooks.onClick != null) this.Hooks.onClick();
+            if (Hooks.onClick != null) Hooks.onClick();
             CallServiceHooks("onClick");
             // List<ButtonService> list;
             // if (enabledHooks.TryGetValue("onClick", out list))
@@ -84,7 +84,7 @@ namespace InvisibleHand
 
         public virtual void OnRightClick()
         {
-            if (this.Hooks.onRightClick != null) this.Hooks.onRightClick();
+            if (Hooks.onRightClick != null) Hooks.onRightClick();
             CallServiceHooks("onRightClick");
             // List<ButtonService> list;
             // if (enabledHooks.TryGetValue("onRightClick", out list))
@@ -96,7 +96,9 @@ namespace InvisibleHand
 
         public virtual bool OnMouseEnter()
         {
-            return CallServiceHooks("onMouseEnter");
+            bool result = true;
+            if (Hooks.onMouseEnter!=null) result = Hooks.onMouseEnter() & result;
+            return (CallServiceHooks("onMouseEnter") & result);
             // List<ButtonService> list;
             // bool result = true;
             // if (enabledHooks.TryGetValue("onMouseEnter", out list))
@@ -110,7 +112,9 @@ namespace InvisibleHand
 
         public virtual bool OnMouseLeave()
         {
-            return CallServiceHooks("onMouseLeave");
+            bool result = true;
+            if (Hooks.onMouseLeave!=null) result = Hooks.onMouseLeave() & result;
+            return (CallServiceHooks("onMouseLeave") & result);
 
             // List<ButtonService> list;
             // bool result = true;
@@ -125,27 +129,29 @@ namespace InvisibleHand
 
         public virtual bool PreDraw(SpriteBatch sb)
         {
-            return CallServiceHooks("predraw");
-            // List<ButtonService> list;
-            // bool result = true;
-            // if (enabledHooks.TryGetValue("preDraw", out list))
-            // {
-            //     foreach ( var service in list )
-            //         // any false return will lock result to false
-            //         result = service.Hooks.preDraw(sb) & result;
-            // }
-            // return result;
+            bool result = true;
+            if (Hooks.preDraw!=null) result = Hooks.preDraw(sb) & result;
+            // return CallServiceHooks("preDraw");
+            List<ButtonService> list;
+            if (enabledHooks.TryGetValue("preDraw", out list))
+            {
+                foreach ( var service in list )
+                    // any false return will lock result to false
+                    result = service.Hooks.preDraw(sb) & result;
+            }
+            return result;
         }
 
         public virtual void PostDraw(SpriteBatch sb)
         {
-            CallServiceHooks("postdraw", sb);
-            // List<ButtonService> list;
-            // if (enabledHooks.TryGetValue("postDraw", out list))
-            // {
-            //     foreach ( var service in list )
-            //         service.Hooks.postDraw(sb);
-            // }
+            if (Hooks.postDraw!=null) Hooks.postDraw(sb);
+            // CallServiceHooks("postdraw", sb);
+            List<ButtonService> list;
+            if (enabledHooks.TryGetValue("postDraw", out list))
+            {
+                foreach ( var service in list )
+                    service.Hooks.postDraw(sb);
+            }
         }
 
         ///<param name="hook">String name of the hook being called, e.g. "onClick"</param>
@@ -236,6 +242,11 @@ namespace InvisibleHand
                     {"preDraw", preDraw},
                     {"postDraw", postDraw}
                 };
+            }
+
+            public bool isAssigned(string hookName)
+            {
+                return hooks[hookName] != null;
             }
         }
     }

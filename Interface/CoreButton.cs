@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using TAPI;
 using Terraria;
+using System.Dynamic;
 
 namespace InvisibleHand
 {
@@ -84,7 +85,7 @@ namespace InvisibleHand
 
         public virtual void OnRightClick()
         {
-            if (this.Hooks.onClick != null) this.Hooks.onClick();
+            if (this.Hooks.onRightClick != null) this.Hooks.onRightClick();
             List<ButtonService> list;
             if (enabledHooks.TryGetValue("onRightClick", out list))
             {
@@ -93,7 +94,7 @@ namespace InvisibleHand
             }
         }
 
-        public virtual bool OnMouseEnter(SpriteBatch sb)
+        public virtual bool OnMouseEnter()
         {
             List<ButtonService> list;
             bool result = true;
@@ -101,12 +102,12 @@ namespace InvisibleHand
             {
                 foreach ( var service in list )
                     // any false return will lock result to false
-                    result = service.Hooks.onMouseEnter(sb) & result;
+                    result = service.Hooks.onMouseEnter() & result;
             }
             return result;
         }
 
-        public virtual bool OnMouseLeave(SpriteBatch sb)
+        public virtual bool OnMouseLeave()
         {
             List<ButtonService> list;
             bool result = true;
@@ -114,7 +115,7 @@ namespace InvisibleHand
             {
                 foreach ( var service in list )
                     // any false return will lock result to false
-                    result = service.Hooks.onMouseLeave(sb) & result;
+                    result = service.Hooks.onMouseLeave() & result;
             }
             return result;
         }
@@ -141,6 +142,40 @@ namespace InvisibleHand
                     service.Hooks.postDraw(sb);
             }
         }
+
+
+        public bool callhook(string hook, SpriteBatch sb = null, bool isFunction = false )
+        {
+            List<ButtonService> list;
+            if (!enabledHooks.TryGetValue(hook, out list)) return true;
+
+            if (isFunction)
+            {
+                bool result = true;
+                if (sb == null)
+                {
+                    // Func<bool>
+                    foreach (var service in list)
+                        result = service.Hooks.GetHook(hook).Invoke() & result;
+                }
+                else
+                {
+                    // Func<sb, bool>
+                    foreach (var service in list)
+                        result = service.Hooks.GetHook(hook).Invoke(sb) & result;
+                }
+                return result;
+            }
+            if (sb == null) //Action
+                foreach (var service in list)
+                    service.Hooks.GetHook(hook).Invoke();
+            else  //Action<sb>
+                foreach (var service in list)
+                    service.Hooks.GetHook(hook).Invoke(sb);
+
+            return true;
+        }
+
 
         #endregion
 
@@ -170,13 +205,43 @@ namespace InvisibleHand
             public Action onClick;
             public Action onRightClick;
 
-            public Func<SpriteBatch,bool> onMouseEnter;
-            public Func<SpriteBatch,bool> onMouseLeave;
+            public Func<bool> onMouseEnter;
+            public Func<bool> onMouseLeave;
 
             public Func<SpriteBatch, bool> preDraw;
             public Action<SpriteBatch> postDraw;
 
             public Action onWorldLoad;
+
+            public dynamic GetHook(string hookname)
+            {
+                return hooks[hookname];
+            }
+
+            private Dictionary<string, dynamic> hooks;
+
+
+
+            public ButtonHooks()
+            {
+                hooks = new Dictionary<string, dynamic>
+                {
+                    {"onClick", onClick},
+                    {"onRightClick", onRightClick},
+                    {"onWorldLoad", onWorldLoad},
+                    {"onMouseEnter", onMouseEnter},
+                    {"onMouseLeave", onMouseLeave},
+                    {"preDraw", preDraw},
+                    {"postDraw", postDraw}
+                };
+
+            }
+
+            public bool callhook(bool isFunction )
+            {
+                return true;
+            }
+
         }
     }
 

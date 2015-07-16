@@ -7,111 +7,154 @@ using Terraria;
 namespace InvisibleHand
 {
 
-    public class ButtonRebase
+    public abstract class ButtonRebase
     {
 
         /// interface layer this button belongs to
         public readonly ButtonLayer parentLayer;
-        public IButtonDrawHandler Drawer;
-        protected Vector2 Position;
+        // public IButtonDrawHandler Drawer;  //just subclass
+        public Vector2 Position { get; protected set; }
 
-        public readonly CoreButton defaultContent;
-        public CoreButton currentContent { get; protected set;}
+        public readonly CoreButton DefaultContent;
+        public CoreButton CurrentContent { get; protected set;}
 
-        // public bool IsHovered { get; protected set; }
-
-        public virtual bool HasMouseFocus { get; set; }
 
         public Rectangle ButtonBounds { get; protected set; }
 
-        public virtual Vector2 Size { get { return ButtonBounds.Size() * this.Scale; } }
+        public virtual Vector2 Size
+        {
+            get { return ButtonBounds.Size() * this.Scale; }
+        }
+
+        public virtual bool Hovered
+        {
+            get { return IsHovered(Main.mouse); }
+        }
+        public virtual bool HasMouseFocus { get; set; }
 
         public const float SCALE_FULL = 1.0f;
         protected float _scale = SCALE_FULL;
-        public virtual float Scale {get { return _scale; } set { _scale = clamp(value, 0.5f, SCALE_FULL); } }
+        public virtual float Scale
+        {
+            get { return _scale; }
+            set { _scale = clamp(value, 0.5f, SCALE_FULL); }
+        }
 
 
         protected float _baseAlpha = 0.85f;
-        public float baseAlpha { get { return _baseAlpha; } protected set { _baseAlpha = clamp(value); } }
-        protected float _alpha;
-        /// no longer including the parent container opacity in the return value
-        public virtual float Alpha { get { return _alpha; } set {  _alpha = clamp(value, this.baseAlpha); }}
+        /// This is the minimum Alpha value this ButtonBase can achieve,
+        /// not accounting for the opacity of its parent layer.
+        public float BaseAlpha
+        {
+            get { return _baseAlpha; }
+            set { _baseAlpha = clamp(value); }
+        }
 
-        public Func<Vector2, bool> IsHovered;
+        protected float _alpha = 1.0f;
+        // no longer including the parent container opacity in the return value.
+        /// Get current alpha value or set alpha to the given value (constrained
+        /// by the value of BaseAlpha)
+        public virtual float Alpha
+        {
+            get { return _alpha; }
+            set {  _alpha = clamp(value, BaseAlpha); }
+        }
+
 
         // public ButtonRebase(ButtonLayer container, IHButton defaultContext, float base_alpha = 0.85f, float alpha_step = 0.01f)
         //     : base(container, defaultContext, base_alpha, alpha_step)
         // {
         // }
 
-        public ButtonRebase(ButtonLayer parent, CoreButton content, Vector2 position, IButtonDrawHandler drawer)
+        public ButtonRebase(ButtonLayer parent, CoreButton content, Vector2 position) //, IButtonDrawHandler drawer)
         {
             parentLayer = parent;
-            Drawer = drawer;
-            this.defaultContent = this.currentContent = content;
+            // Drawer = drawer;
+            this.DefaultContent = this.CurrentContent = content;
 
             ButtonBounds = new Rectangle((int)position.X, (int)position.Y, (int)content.Size.X, (int)content.Size.Y);
-            this.IsHovered = defaultHover;
+            // this.IsHovered = defaultHoverCheck;
 
         }
 
 
 
-        public virtual void Draw(SpriteBatch sb)
+        public void Draw(SpriteBatch sb)
         {
-            if (currentContent.PreDraw(sb))
+            if (CurrentContent.PreDraw(sb))
             {
-                // current.Draw();
-                // sb.DrawIHButton(this, currentContext.DisplayState);
-                Drawer.Draw(sb, this);
+                DrawButtonContent(sb);
+                DrawBase(sb);
             }
+            CurrentContent.PostDraw(sb);
+        }
+
+        /// handles draw command, hover-check, hover events, etc.
+        /// subclass and override this to change these aspects.
+        protected virtual void DrawBase(SpriteBatch sb)
+        {
+            // sb.DrawIHButton(this, CurrentContent);
+            // DrawContent(sb);
+
+            if (Hovered)
+            {
+                if (!HasMouseFocus)
+                {
+                    HasMouseFocus=true;
+                    OnMouseEnter();
+                }
+
+                HandleClick();
+                return;
+            }
+            if (HasMouseFocus) OnMouseLeave();
+            HasMouseFocus=false;
         }
 
 
-        protected virtual bool defaultHover(Vector2 mouse)
+        public virtual bool IsHovered(Vector2 mouse)
         {
-            var size = this.Size;
-            return new Rectangle((int)Position.X, (int)Position.Y, (int)size.X, (int)size.Y).Contains(mouse);
+            // this.Size takes current scale into account
+            // (ButtonBounds defines normal size)
+            var s = this.Size;
+            return new Rectangle((int)Position.X, (int)Position.Y, (int)s.X, (int)s.Y).Contains(mouse);
         }
 
         // IDEA: can we affect the reported mouse position instead of recalculating
         // the size and position of the button? that's probably silly and would be
         // way more complicated
-        protected virtual bool otherHover(Vector2 mouse, Vector2 offset, Vector2 origin)
-        {
-            var pos = this.Position + offset;
-            return true;
-        }
+        // protected virtual bool otherHover(Vector2 mouse, Vector2 offset, Vector2 origin)
+        // {
+        //     var pos = this.Position + offset;
+        //     return true;
+        // }
 
 
-        public virtual void OnMouseEnter(SpriteBatch sb)
+        public virtual void OnMouseEnter()
         {
-            if (currentContent.OnMouseEnter(sb))
+            if (CurrentContent.OnMouseEnter())
                 Sound.MouseOver.Play();
         }
+        public virtual void OnMouseLeave()
+        {
+            CurrentContent.OnMouseLeave();
+        }
 
-        public virtual void OnHover()
+        /// Checks for both left and right clicks
+        public virtual void HandleClick()
         {
             if (Main.mouseLeft && Main.mouseLeftRelease)
-                currentContent.OnClick();
+                CurrentContent.OnClick();
 
             if (Main.mouseRight && Main.mouseRightRelease)
-                currentContent.OnRightClick();
+                CurrentContent.OnRightClick();
         }
 
+        /// Should handle the actual SpriteBatch command which draws the button
+        protected abstract void DrawButtonContent(SpriteBatch sb);
 
-        /// this is intended to allow services to target aspects of the
-        /// Button-drawing process that can't or shouldn't be handled
-        /// on the core-button level; pretty much anything that shouldn't
-        /// be affected by this base switching CoreButtons in the middle
-        /// of the operation. This could include things like fading,
-        /// scaling, or modifying the "hovered" area.
-        public class BaseHooks
-        {
-            public Func<bool> onCheckIsHovered;
-            public Func<bool> onHover;
-        }
-
+        ///<returns>given value bound by specified minumum and maximum
+        /// values (inclusive)</returns>
         protected float clamp(float value, float min = 0, float max = 1)
         {
             if (value < min) return min;

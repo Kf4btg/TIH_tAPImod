@@ -7,8 +7,10 @@ namespace InvisibleHand
 {
     public abstract class ButtonService
     {
+        /// TODO: do I even need this?
         public abstract string ServiceID { get; }
 
+        /// The button for which our actions will occur
         protected readonly CoreButton Client;
 
         public CoreButton.ButtonHooks Hooks;
@@ -19,22 +21,27 @@ namespace InvisibleHand
             Hooks = new CoreButton.ButtonHooks();
         }
 
+        /// Register required hooks with Client here
         public abstract void Subscribe();
 
+        /// Tell client we're using this hook
         protected void RegisterHook(string hookname)
         {
             Client.RegisterServiceHook(this, hookname);
         }
+        /// register a list of hooks with the client
         protected void RegisterHooks(params string[] hookNames)
         {
             foreach (var h in hookNames)
                 RegisterHook(h);
         }
 
+        /// Tell client we're no longer using this hook
         protected void RemoveHook(string hookname)
         {
             Client.RemoveServiceHook(this, hookname);
         }
+        /// remove several hooks at once
         protected void RemoveHooks(params string[] hookNames)
         {
             foreach (var h in hookNames)

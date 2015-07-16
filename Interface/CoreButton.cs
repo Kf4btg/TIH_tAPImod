@@ -8,11 +8,14 @@ using System.Dynamic;
 
 namespace InvisibleHand
 {
+    // the typing on this is confusing as hell; see
+    // http://blogs.msdn.com/b/ericlippert/archive/2011/02/03/curiouser-and-curiouser.aspx
+    // for a discussion on it.
     /// re-imagining the ButtonState and IHButton as one object
-    public abstract class CoreButton
+    public abstract class CoreButton<T> where T:CoreButton<T>
     {
         // holds the button
-        public readonly ButtonRebase Base;
+        public readonly ButtonRebase<T> Base;
 
         // fields
         protected TIH action;
@@ -36,9 +39,9 @@ namespace InvisibleHand
         // hook container
         public ButtonHooks Hooks;
         // plugins
-        protected List<ButtonService> services;
+        protected List<ButtonService<T>> services;
         /// hooks requested by services
-        protected Dictionary<String, List<ButtonService>> enabledHooks;
+        protected Dictionary<String, List<ButtonService<T>>> enabledHooks;
 
         // Derived size
         public abstract Vector2 Size { get; }
@@ -52,7 +55,7 @@ namespace InvisibleHand
             this.Label = label;
             // this.Position = position;
             this.Hooks = new ButtonHooks();
-            this.services = new List<ButtonService>();
+            this.services = new List<ButtonService<T>>();
 
             // set randomly-generated unique ID
             ID = UICore.GenerateHoverID();
@@ -64,7 +67,7 @@ namespace InvisibleHand
         ///          b.ToolTip = "Sort Me";
         ///          // ... etc.
         ///    })
-        public CoreButton With(Action<CoreButton> action)
+        public CoreButton<T> With(Action<CoreButton<T>> action)
         {
             if (this != null)
                 action(this);
@@ -109,7 +112,7 @@ namespace InvisibleHand
             bool result = true;
             if (Hooks.preDraw!=null) result = Hooks.preDraw(sb) & result;
             // return CallServiceHooks("preDraw");
-            List<ButtonService> list;
+            List<ButtonService<T>> list;
             if (enabledHooks.TryGetValue("preDraw", out list))
             {
                 foreach ( var service in list )
@@ -123,7 +126,7 @@ namespace InvisibleHand
         {
             if (Hooks.postDraw!=null) Hooks.postDraw(sb);
             // CallServiceHooks("postdraw", sb);
-            List<ButtonService> list;
+            List<ButtonService<T>> list;
             if (enabledHooks.TryGetValue("postDraw", out list))
             {
                 foreach ( var service in list )
@@ -137,7 +140,7 @@ namespace InvisibleHand
         ///<returns>Result of Function call if hook is Func, otherwise true</returns>
         protected bool CallServiceHooks(string hook, SpriteBatch sb = null, bool isFunc = false )
         {
-            List<ButtonService> list;
+            List<ButtonService<T>> list;
             if (!enabledHooks.TryGetValue(hook, out list)) return true;
 
             bool result = true;
@@ -161,20 +164,20 @@ namespace InvisibleHand
 
 
 
-        public void RegisterServiceHook(ButtonService service, string hookName)
+        public void RegisterServiceHook(ButtonService<T> service, string hookName)
         {
             // if the entry already exists, Add will throw an ArgumentException
             // which we can catch and add the service to the existing list instead
             try
             {
-                enabledHooks.Add(hookName, new List<ButtonService>() { service });
+                enabledHooks.Add(hookName, new List<ButtonService<T>>() { service });
             }
             catch (ArgumentException)
             {
                 enabledHooks[hookName].Add(service);
             }
         }
-        public void RemoveServiceHook(ButtonService service, string hookName)
+        public void RemoveServiceHook(ButtonService<T> service, string hookName)
         {
             enabledHooks[hookName].Remove(service);
             if (enabledHooks[hookName].Count == 0)
@@ -182,53 +185,56 @@ namespace InvisibleHand
         }
         #endregion
 
-        /// contains the functionality of the button
-        public class ButtonHooks
+
+    }
+
+    /// contains the functionality of a button
+    public class ButtonHooks
+    {
+        public Action onClick;
+        public Action onRightClick;
+
+        public Func<bool> onMouseEnter;
+        public Func<bool> onMouseLeave;
+
+        public Func<SpriteBatch, bool> preDraw;
+        public Action<SpriteBatch> postDraw;
+
+        public Action onWorldLoad;
+
+        /// Map of hook names to dynamic option holding the actual
+        /// hook Action/Function; will throw runtime errors if
+        /// the hook is not invoked with correct parameter types
+        private Dictionary<string, dynamic> hooks;
+
+        /// allows accessing the hooks like: Hooks["onClick"]
+        public dynamic this[string hookName]
         {
-            public Action onClick;
-            public Action onRightClick;
+            get { return hooks[hookName]; }
+        }
 
-            public Func<bool> onMouseEnter;
-            public Func<bool> onMouseLeave;
-
-            public Func<SpriteBatch, bool> preDraw;
-            public Action<SpriteBatch> postDraw;
-
-            public Action onWorldLoad;
-
-            /// Map of hook names to dynamic option holding the actual
-            /// hook Action/Function; will throw runtime errors if
-            /// the hook is not invoked with correct parameter types
-            private Dictionary<string, dynamic> hooks;
-
-            /// allows accessing the hooks like: Hooks["onClick"]
-            public dynamic this[string hookName]
+        public ButtonHooks()
+        {
+            hooks = new Dictionary<string, dynamic>
             {
-                get { return hooks[hookName]; }
-            }
+                {"onClick", onClick},
+                {"onRightClick", onRightClick},
+                {"onWorldLoad", onWorldLoad},
+                {"onMouseEnter", onMouseEnter},
+                {"onMouseLeave", onMouseLeave},
+                {"preDraw", preDraw},
+                {"postDraw", postDraw}
+            };
+        }
 
-            public ButtonHooks()
-            {
-                hooks = new Dictionary<string, dynamic>
-                {
-                    {"onClick", onClick},
-                    {"onRightClick", onRightClick},
-                    {"onWorldLoad", onWorldLoad},
-                    {"onMouseEnter", onMouseEnter},
-                    {"onMouseLeave", onMouseLeave},
-                    {"preDraw", preDraw},
-                    {"postDraw", postDraw}
-                };
-            }
-
-            public bool isAssigned(string hookName)
-            {
-                return hooks[hookName] != null;
-            }
+        public bool isAssigned(string hookName)
+        {
+            return hooks[hookName] != null;
         }
     }
 
-    public class TexturedButton : CoreButton
+
+    public class TexturedButton : CoreButton<TexturedButton>
     {
         protected Texture2D texture;
         protected Rectangle? defaultTexels;
@@ -257,7 +263,7 @@ namespace InvisibleHand
 
     }
 
-    public class TextButton : CoreButton
+    public class TextButton : CoreButton<TextButton>
     {
         // Derived size
         public override Vector2 Size

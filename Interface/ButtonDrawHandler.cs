@@ -8,17 +8,17 @@ namespace InvisibleHand
 {
     public interface IButtonDrawHandler
     {
-        void Draw(SpriteBatch batch, ButtonRebase bBase );
+        // void Draw(SpriteBatch batch, ButtonRebase bBase );
     }
 
 
 
     public class VanillaTextButtonDrawHandler : IButtonDrawHandler
     {
-        
-        public void Draw(SpriteBatch batch, ButtonRebase bBase)
-        {
 
-        }
+        // public void Draw(SpriteBatch batch, ButtonRebase bBase)
+        // {
+        //
+        // }
     }
 }

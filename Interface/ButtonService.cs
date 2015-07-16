@@ -5,21 +5,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace InvisibleHand
 {
-    public abstract class ButtonService
+    public abstract class ButtonService<T> where T: CoreButton<T>
     {
         /// do I even need this?
         // public abstract string ServiceID { get; }
 
         /// The button to which this service's
         /// actions will attach.
-        protected readonly CoreButton Client;
+        protected readonly T Client;
 
-        public CoreButton.ButtonHooks Hooks;
+        public ButtonHooks Hooks;
 
-        public ButtonService(CoreButton client)
+        public ButtonService(T client)
         {
             this.Client = client;
-            Hooks = new CoreButton.ButtonHooks();
+            Hooks = new ButtonHooks();
         }
 
         /// Register required hooks with Client here
@@ -50,7 +50,7 @@ namespace InvisibleHand
         }
     }
 
-    public class LockingService : ButtonService
+    public class LockingService<T> : ButtonService<T> where T : CoreButton<T>
     {
         // public override string ServiceID { get { return "Locker"; } }
 
@@ -60,7 +60,7 @@ namespace InvisibleHand
         private readonly TIH clientAction;
         private bool isLocked;
 
-        public LockingService(CoreButton client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
+        public LockingService(T client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
         {
             color = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);

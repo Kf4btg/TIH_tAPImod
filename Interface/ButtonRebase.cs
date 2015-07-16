@@ -9,15 +9,15 @@ namespace InvisibleHand
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonRebase
+    public abstract class ButtonRebase<T> where T:CoreButton<T>
     {
         /// interface layer this button belongs to
         public readonly ButtonLayer parentLayer;
         // public IButtonDrawHandler Drawer;  //just subclass
         public Vector2 Position { get; protected set; }
 
-        public readonly CoreButton DefaultContent;
-        public CoreButton CurrentContent { get; protected set;}
+        public virtual T DefaultContent { get; protected set; }
+        public virtual T CurrentContent { get; protected set; }
 
 
         public Rectangle ButtonBounds { get; protected set; }
@@ -57,10 +57,10 @@ namespace InvisibleHand
         public virtual float Alpha
         {
             get { return _alpha; }
-            set {  _alpha = clamp(value, BaseAlpha); }
+            set { _alpha = clamp(value, BaseAlpha); }
         }
 
-        public ButtonRebase(ButtonLayer parent, CoreButton content, Vector2 position) //, IButtonDrawHandler drawer)
+        public ButtonRebase(ButtonLayer parent, T content, Vector2 position)
         {
             parentLayer = parent;
             // Drawer = drawer;
@@ -71,7 +71,7 @@ namespace InvisibleHand
         }
 
         /// switch to a new button content
-        public void ChangeContent(CoreButton newContent)
+        public void ChangeContent(T newContent)
         {
             CurrentContent = newContent;
         }
@@ -99,7 +99,7 @@ namespace InvisibleHand
             {
                 if (!HasMouseFocus)
                 {
-                    HasMouseFocus=true;
+                    HasMouseFocus = true;
                     OnMouseEnter();
                 }
 
@@ -107,7 +107,7 @@ namespace InvisibleHand
                 return;
             }
             if (HasMouseFocus) OnMouseLeave();
-            HasMouseFocus=false;
+            HasMouseFocus = false;
         }
 
         public virtual bool IsHovered(Vector2 mouse)
@@ -156,5 +156,34 @@ namespace InvisibleHand
             if (value > max) return max;
             return value;
         }
+    }
+
+    // ------------------------------------------------------------
+    // some subclasses; maybe put these in separate file?
+
+    public class IconButtonBase : ButtonRebase<TexturedButton>
+    {
+
+        /// this will actively set the Source Texels based on whether or not the mouse is currently over this button.
+        /// If both rects are null, then the entire texture will be drawn as per default
+        public Rectangle? SourceRect
+        {
+            get { return HasMouseFocus ?
+                            CurrentContent.ActiveRect :
+                            CurrentContent.InactiveRect;
+                }
+        }
+
+        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position) : base(parent, content, position)
+        {
+
+        }
+
+
+        protected override void DrawButtonContent(SpriteBatch sb)
+        {
+            sb.Draw(CurrentContent.Texture, Position, SourceRect, CurrentContent.Tint*Alpha, 0f, default(Vector2), Scale, SpriteEffects.None, 0f);
+        }
+
     }
 }

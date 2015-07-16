@@ -12,10 +12,10 @@ namespace InvisibleHand
     // http://blogs.msdn.com/b/ericlippert/archive/2011/02/03/curiouser-and-curiouser.aspx
     // for a discussion on it.
     /// re-imagining the ButtonState and IHButton as one object
-    public abstract class CoreButton<T> where T:CoreButton<T>
+    public abstract class CoreButton
     {
         // holds the button
-        public readonly ButtonRebase<T> Base;
+        // public readonly ButtonRebase<T> Base;
 
         // fields
         protected TIH action;
@@ -39,9 +39,9 @@ namespace InvisibleHand
         // hook container
         public ButtonHooks Hooks;
         // plugins
-        protected List<ButtonService<T>> services;
+        protected List<ButtonService> services;
         /// hooks requested by services
-        protected Dictionary<String, List<ButtonService<T>>> enabledHooks;
+        protected Dictionary<String, List<ButtonService>> enabledHooks;
 
         // Derived size
         public abstract Vector2 Size { get; }
@@ -55,7 +55,7 @@ namespace InvisibleHand
             this.Label = label;
             // this.Position = position;
             this.Hooks = new ButtonHooks();
-            this.services = new List<ButtonService<T>>();
+            this.services = new List<ButtonService>();
 
             // set randomly-generated unique ID
             ID = UICore.GenerateHoverID();
@@ -67,7 +67,7 @@ namespace InvisibleHand
         ///          b.ToolTip = "Sort Me";
         ///          // ... etc.
         ///    })
-        public CoreButton<T> With(Action<CoreButton<T>> action)
+        public CoreButton With(Action<CoreButton> action)
         {
             if (this != null)
                 action(this);
@@ -112,7 +112,7 @@ namespace InvisibleHand
             bool result = true;
             if (Hooks.preDraw!=null) result = Hooks.preDraw(sb) & result;
             // return CallServiceHooks("preDraw");
-            List<ButtonService<T>> list;
+            List<ButtonService> list;
             if (enabledHooks.TryGetValue("preDraw", out list))
             {
                 foreach ( var service in list )
@@ -126,7 +126,7 @@ namespace InvisibleHand
         {
             if (Hooks.postDraw!=null) Hooks.postDraw(sb);
             // CallServiceHooks("postdraw", sb);
-            List<ButtonService<T>> list;
+            List<ButtonService> list;
             if (enabledHooks.TryGetValue("postDraw", out list))
             {
                 foreach ( var service in list )
@@ -140,7 +140,7 @@ namespace InvisibleHand
         ///<returns>Result of Function call if hook is Func, otherwise true</returns>
         protected bool CallServiceHooks(string hook, SpriteBatch sb = null, bool isFunc = false )
         {
-            List<ButtonService<T>> list;
+            List<ButtonService> list;
             if (!enabledHooks.TryGetValue(hook, out list)) return true;
 
             bool result = true;
@@ -164,20 +164,20 @@ namespace InvisibleHand
 
 
 
-        public void RegisterServiceHook(ButtonService<T> service, string hookName)
+        public void RegisterServiceHook(ButtonService service, string hookName)
         {
             // if the entry already exists, Add will throw an ArgumentException
             // which we can catch and add the service to the existing list instead
             try
             {
-                enabledHooks.Add(hookName, new List<ButtonService<T>>() { service });
+                enabledHooks.Add(hookName, new List<ButtonService>() { service });
             }
             catch (ArgumentException)
             {
                 enabledHooks[hookName].Add(service);
             }
         }
-        public void RemoveServiceHook(ButtonService<T> service, string hookName)
+        public void RemoveServiceHook(ButtonService service, string hookName)
         {
             enabledHooks[hookName].Remove(service);
             if (enabledHooks[hookName].Count == 0)
@@ -234,7 +234,7 @@ namespace InvisibleHand
     }
 
 
-    public class TexturedButton : CoreButton<TexturedButton>
+    public class TexturedButton : CoreButton
     {
         protected Texture2D texture;
         protected Rectangle? defaultTexels;
@@ -263,7 +263,7 @@ namespace InvisibleHand
 
     }
 
-    public class TextButton : CoreButton<TextButton>
+    public class TextButton : CoreButton
     {
         // Derived size
         public override Vector2 Size

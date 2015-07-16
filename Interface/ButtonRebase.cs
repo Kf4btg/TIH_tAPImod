@@ -9,7 +9,7 @@ namespace InvisibleHand
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonRebase<T> where T:CoreButton<T>
+    public abstract class ButtonRebase<T> where T:CoreButton
     {
         /// interface layer this button belongs to
         public readonly ButtonLayer parentLayer;

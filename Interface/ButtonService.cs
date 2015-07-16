@@ -7,10 +7,11 @@ namespace InvisibleHand
 {
     public abstract class ButtonService
     {
-        /// TODO: do I even need this?
-        public abstract string ServiceID { get; }
+        /// do I even need this?
+        // public abstract string ServiceID { get; }
 
-        /// The button for which our actions will occur
+        /// The button to which this service's
+        /// actions will attach.
         protected readonly CoreButton Client;
 
         public CoreButton.ButtonHooks Hooks;
@@ -51,7 +52,7 @@ namespace InvisibleHand
 
     public class LockingService : ButtonService
     {
-        public override string ServiceID { get { return "Locker"; } }
+        // public override string ServiceID { get { return "Locker"; } }
 
         private readonly Color color;
         private readonly Vector2 offset;

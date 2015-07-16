@@ -53,6 +53,9 @@ namespace InvisibleHand
             // this.Position = position;
             this.Hooks = new ButtonHooks();
             this.services = new List<ButtonService>();
+
+            // set randomly-generated unique ID
+            ID = UICore.GenerateHoverID();
         }
 
         /// use this to help with creating buttons; e.g.:
@@ -157,7 +160,6 @@ namespace InvisibleHand
         }
 
 
-        #endregion
 
         public void RegisterServiceHook(ButtonService service, string hookName)
         {
@@ -178,6 +180,7 @@ namespace InvisibleHand
             if (enabledHooks[hookName].Count == 0)
                 enabledHooks.Remove(hookName);
         }
+        #endregion
 
         /// contains the functionality of the button
         public class ButtonHooks

@@ -6,10 +6,11 @@ using Terraria;
 
 namespace InvisibleHand
 {
-
+    /// Implementations need to override at least DrawButtonContent;
+    /// everything else has a default impl. to use if applicable
+    /// Scale and Alpha properties are present, but aren't used by default
     public abstract class ButtonRebase
     {
-
         /// interface layer this button belongs to
         public readonly ButtonLayer parentLayer;
         // public IButtonDrawHandler Drawer;  //just subclass
@@ -40,7 +41,6 @@ namespace InvisibleHand
             set { _scale = clamp(value, 0.5f, SCALE_FULL); }
         }
 
-
         protected float _baseAlpha = 0.85f;
         /// This is the minimum Alpha value this ButtonBase can achieve,
         /// not accounting for the opacity of its parent layer.
@@ -60,12 +60,6 @@ namespace InvisibleHand
             set {  _alpha = clamp(value, BaseAlpha); }
         }
 
-
-        // public ButtonRebase(ButtonLayer container, IHButton defaultContext, float base_alpha = 0.85f, float alpha_step = 0.01f)
-        //     : base(container, defaultContext, base_alpha, alpha_step)
-        // {
-        // }
-
         public ButtonRebase(ButtonLayer parent, CoreButton content, Vector2 position) //, IButtonDrawHandler drawer)
         {
             parentLayer = parent;
@@ -74,10 +68,18 @@ namespace InvisibleHand
 
             ButtonBounds = new Rectangle((int)position.X, (int)position.Y, (int)content.Size.X, (int)content.Size.Y);
             // this.IsHovered = defaultHoverCheck;
-
         }
 
-
+        /// switch to a new button content
+        public void ChangeContent(CoreButton newContent)
+        {
+            CurrentContent = newContent;
+        }
+        /// return this ButtonBase to its default context
+        public void Reset()
+        {
+            ChangeContent(DefaultContent);
+        }
 
         public void Draw(SpriteBatch sb)
         {
@@ -89,13 +91,10 @@ namespace InvisibleHand
             CurrentContent.PostDraw(sb);
         }
 
-        /// handles draw command, hover-check, hover events, etc.
+        /// handles hover-check, hover events, etc.
         /// subclass and override this to change these aspects.
         protected virtual void DrawBase(SpriteBatch sb)
         {
-            // sb.DrawIHButton(this, CurrentContent);
-            // DrawContent(sb);
-
             if (Hovered)
             {
                 if (!HasMouseFocus)
@@ -104,13 +103,12 @@ namespace InvisibleHand
                     OnMouseEnter();
                 }
 
-                HandleClick();
+                HandleClicks();
                 return;
             }
             if (HasMouseFocus) OnMouseLeave();
             HasMouseFocus=false;
         }
-
 
         public virtual bool IsHovered(Vector2 mouse)
         {
@@ -120,15 +118,11 @@ namespace InvisibleHand
             return new Rectangle((int)Position.X, (int)Position.Y, (int)s.X, (int)s.Y).Contains(mouse);
         }
 
-        // IDEA: can we affect the reported mouse position instead of recalculating
-        // the size and position of the button? that's probably silly and would be
-        // way more complicated
         // protected virtual bool otherHover(Vector2 mouse, Vector2 offset, Vector2 origin)
         // {
         //     var pos = this.Position + offset;
         //     return true;
         // }
-
 
         public virtual void OnMouseEnter()
         {
@@ -137,11 +131,12 @@ namespace InvisibleHand
         }
         public virtual void OnMouseLeave()
         {
+            // no checking return value because...we don't do anything here
             CurrentContent.OnMouseLeave();
         }
 
         /// Checks for both left and right clicks
-        public virtual void HandleClick()
+        public virtual void HandleClicks()
         {
             if (Main.mouseLeft && Main.mouseLeftRelease)
                 CurrentContent.OnClick();
@@ -161,8 +156,5 @@ namespace InvisibleHand
             if (value > max) return max;
             return value;
         }
-
     }
-
-
 }

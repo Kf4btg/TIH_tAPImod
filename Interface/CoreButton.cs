@@ -19,14 +19,13 @@ namespace InvisibleHand
         protected string label;
         protected string tooltip;
         // protected Vector2 position; // position determined by base
-
         protected Color tint;
 
         // field-access properties
-        public TIH Action              { get { return action; }        set { action        = value; } }
-        public string Label            { get { return label; }         set { label         = value; } }
-        public string Tooltip          { get { return tooltip; }       set { tooltip       = value; } }
-        public Color Tint              { get { return tint; }          set { tint          = value; } }
+        public TIH Action     { get { return action; }  set { action  = value; } }
+        public string Label   { get { return label; }   set { label   = value; } }
+        public string Tooltip { get { return tooltip; } set { tooltip = value; } }
+        public Color Tint     { get { return tint; }    set { tint    = value; } }
 
         // public Vector2 Position { get { return position; }
         //     set { position = value == null ? default(Vector2) : value; } }
@@ -225,16 +224,6 @@ namespace InvisibleHand
             }
         }
     }
-
-    // public class LockingButton<T> where T: CoreButton
-    // {
-    //     protected Color lockColor;
-    //     // protected Vector2 lockOffset;
-    //
-    //     public Color LockColor { get { return lockColor; } set { lockColor = value; } }
-    //     public Vector2 LockOffset { get; protected set; }
-    //
-    // }
 
     public class TexturedButton : CoreButton
     {

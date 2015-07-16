@@ -70,28 +70,22 @@ namespace InvisibleHand
         }
 
         #region hooks
+        public virtual void OnWorldLoad()
+        {
+            if (Hooks.onWorldLoad != null) Hooks.onWorldLoad();
+            CallServiceHooks("onWorldLoad");
+        }
+
         public virtual void OnClick()
         {
             if (Hooks.onClick != null) Hooks.onClick();
             CallServiceHooks("onClick");
-            // List<ButtonService> list;
-            // if (enabledHooks.TryGetValue("onClick", out list))
-            // {
-            //     foreach ( var service in list )
-            //         service.Hooks.onClick();
-            // }
         }
 
         public virtual void OnRightClick()
         {
             if (Hooks.onRightClick != null) Hooks.onRightClick();
             CallServiceHooks("onRightClick");
-            // List<ButtonService> list;
-            // if (enabledHooks.TryGetValue("onRightClick", out list))
-            // {
-            //     foreach ( var service in list )
-            //         service.Hooks.onRightClick();
-            // }
         }
 
         public virtual bool OnMouseEnter()
@@ -99,15 +93,6 @@ namespace InvisibleHand
             bool result = true;
             if (Hooks.onMouseEnter!=null) result = Hooks.onMouseEnter() & result;
             return (CallServiceHooks("onMouseEnter") & result);
-            // List<ButtonService> list;
-            // bool result = true;
-            // if (enabledHooks.TryGetValue("onMouseEnter", out list))
-            // {
-            //     foreach ( var service in list )
-            //         // any false return will lock result to false
-            //         result = service.Hooks.onMouseEnter() & result;
-            // }
-            // return result;
         }
 
         public virtual bool OnMouseLeave()
@@ -115,16 +100,6 @@ namespace InvisibleHand
             bool result = true;
             if (Hooks.onMouseLeave!=null) result = Hooks.onMouseLeave() & result;
             return (CallServiceHooks("onMouseLeave") & result);
-
-            // List<ButtonService> list;
-            // bool result = true;
-            // if (enabledHooks.TryGetValue("onMouseLeave", out list))
-            // {
-            //     foreach ( var service in list )
-            //         // any false return will lock result to false
-            //         result = service.Hooks.onMouseLeave() & result;
-            // }
-            // return result;
         }
 
         public virtual bool PreDraw(SpriteBatch sb)

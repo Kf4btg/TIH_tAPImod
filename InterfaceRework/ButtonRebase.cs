@@ -39,7 +39,7 @@ namespace InvisibleHand
         public virtual float Scale
         {
             get { return _scale; }
-            set { _scale = clamp(value, _min_scale, _max_scale); }
+            set { _scale = value.Clamp(_min_scale, _max_scale); }
         }
 
         protected float _baseAlpha = 0.85f;
@@ -48,7 +48,7 @@ namespace InvisibleHand
         public float BaseAlpha
         {
             get { return _baseAlpha; }
-            set { _baseAlpha = clamp(value); }
+            set { _baseAlpha = value.Clamp(); }
         }
 
         protected float _alpha = 1.0f;
@@ -58,7 +58,7 @@ namespace InvisibleHand
         public virtual float Alpha
         {
             get { return _alpha; }
-            set { _alpha = clamp(value, BaseAlpha); }
+            set { _alpha = value.Clamp(BaseAlpha); }
         }
 
         public ButtonRebase(ButtonLayer parent, T content, Vector2 position)
@@ -158,14 +158,7 @@ namespace InvisibleHand
         protected virtual void WhenNotHovered() {}
 
 
-        ///<returns>given value bound by specified minumum and maximum
-        /// values (inclusive)</returns>
-        protected float clamp(float value, float min = 0, float max = 1)
-        {
-            if (value < min) return min;
-            if (value > max) return max;
-            return value;
-        }
+
 
         /// allows registering key toggle w/ just the context (button) IDs
         // public void RegisterKeyToggle(KState.Special key, string context1ID, string context2ID)

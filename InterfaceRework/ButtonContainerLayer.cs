@@ -7,43 +7,35 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    //TODO: transfer over documentation later
     public abstract class ButtonContainerLayer : InterfaceLayer
     {
-        public readonly Dictionary<TIH, ButtonBase> Buttons;
+        public readonly Dictionary<TIH, ButtonRebase<CoreButton>> Buttons;
 
-        /// Area on screen containing all the buttons in Buttons within
-        /// its boundaries. Use this to determine MouseInterface
         public Rectangle ButtonFrame { get; protected set;}
         public bool IsHovered {
             get {
-                return ButtonFrame.Contains(Main.mouseX, Main.mouseY);
+                return ButtonFrame.Contains(Main.mouse);
             }
         }
 
-        /// whether or not to set MouseInterface=true
-        /// when the mouse is ANYwhere over this layer,
-        /// including blank space; some buttons may need
-        /// to handle this themselves, so set it false in
-        /// those cases. Also disables the opacity stuff.
-        public bool handleMouseInterface = true;
+        public bool handleMouseInterface;
 
         protected float opacity_inactive, opacity_active = 1.0f;
 
         //TODO: have this fade in/out?
-        public float LayerOpacity { get; protected set; }
+        public virtual float LayerOpacity { get; protected set; }
 
-        /// Constructor
-        protected ButtonContainerLayer(string name) : base(IHBase.Instance.mod.InternalName + ":" + name)
+        protected ButtonContainerLayer(string name, bool handleMouseInterface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
-            Buttons = new Dictionary<TIH, ButtonBase>();
+            Buttons = new Dictionary<TIH, ButtonRebase<CoreButton>>();
             ButtonFrame = Rectangle.Empty;
+            this.handleMouseInterface = handleMouseInterface;
         }
 
         internal void UpdateFrame()
         {
-            // initialize this here so it doesn't somehow get stuck at 0
             LayerOpacity = opacity_inactive;
-            // ButtonFrame = rectangle big enough to contain all the buttons assigned to this layer
             foreach (var kvp in Buttons)
             {
                 ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
@@ -63,20 +55,58 @@ namespace InvisibleHand
         {
             if (!parentLayer.visible) return;
 
+            if (handleMouseInterface && IsHovered)
+                    Main.localPlayer.mouseInterface = true;
+            DrawButtons(sb);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    /// this Class will fade ALL buttons in the loyer in/out as the
+    /// LAYER itself is hovered/unhovered;
+    public abstract class FadingButtonLayer : ButtonContainerLayer
+    {
+        protected readonly float fadeStep;
+
+        private float _opacity;
+        public override float LayerOpacity
+        {
+            get { return _opacity; }
+            protected set { _opacity = value.Clamp(opacity_inactive, opacity_active ); }
+        }
+
+        /// fade step of 0 will cause instant opacity change;
+        protected FadingButtonLayer(string name, float min_opacity, float max_opacity, float fade_step = 0, bool handleMouseInterface = true) : base(name, handleMouseInterface)
+        {
+            opacity_inactive = min_opacity.Clamp();
+            opacity_active = max_opacity.Clamp();
+            fadeStep = fade_step == 0 ? opacity_active - opacity_inactive : fade_step;
+        }
+
+        protected override void OnDraw(SpriteBatch sb)
+        {
+            if (!parentLayer.visible) return;
+
             if (IsHovered)
             {
                 if (handleMouseInterface)
-                {
                     Main.localPlayer.mouseInterface = true;
-                    LayerOpacity = opacity_active;
-                }
-                DrawButtons(sb);
-                return;
+                if (LayerOpacity!=opacity_active) LayerOpacity += fadeStep;
             }
-            // these two calls are down here so we can use the return statement
-            // above to avoid setting the opacity twice on each call to OnDraw
-            LayerOpacity=opacity_inactive;
+            else
+                if (LayerOpacity!=opacity_inactive) LayerOpacity -= fadeStep;
             DrawButtons(sb);
         }
+
+
     }
 }

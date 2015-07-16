@@ -149,5 +149,13 @@ namespace InvisibleHand
             Main.PlaySound((int)s, x, y, style);
         }
 
+        ///<param name="min">Minimum value boundary; default is 0</param>
+        ///<param name="max">Maximum value boundary; default is 1</param>
+        ///<returns>value bound by specified minumum and maximum
+        /// values (inclusive)</returns>
+        public static float Clamp(this float value, float min = 0, float max = 1)
+        {
+            return MathHelper.Clamp(value, min, max);
+        }
     }
 }

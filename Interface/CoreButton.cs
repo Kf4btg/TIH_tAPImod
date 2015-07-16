@@ -21,13 +21,14 @@ namespace InvisibleHand
         protected TIH action;
         protected string label;
         protected string tooltip;
-        // protected Vector2 position; // position determined by base
         protected Color tint;
 
         // field-access properties
         public TIH Action     { get { return action; }  set { action  = value; } }
         public string Label   { get { return label; }   set { label   = value; } }
         public string Tooltip { get { return tooltip; } set { tooltip = value; } }
+
+        /// can change the overall color of the button texture or text
         public Color Tint     { get { return tint; }    set { tint    = value; } }
 
         // public Vector2 Position { get { return position; }
@@ -47,15 +48,14 @@ namespace InvisibleHand
         public abstract Vector2 Size { get; }
 
         // Constructors
-        public CoreButton(TIH action, Vector2 position, string label = "")
+        public CoreButton(TIH action, string label = "")
         {
             this.Action = action;
-            if (label == "")
-                label = Constants.DefaultButtonLabels[action];
-            this.Label = label;
-            // this.Position = position;
-            this.Hooks = new ButtonHooks();
-            this.services = new List<ButtonService>();
+            if (label == "") Label = Constants.DefaultButtonLabels[action];
+            else this.Label = label;
+
+            Hooks = new ButtonHooks();
+            services = new List<ButtonService>();
 
             // set randomly-generated unique ID
             ID = UICore.GenerateHoverID();
@@ -107,6 +107,7 @@ namespace InvisibleHand
             return (CallServiceHooks("onMouseLeave") & result);
         }
 
+        // bypass the dynamic calls for pre/post-draw for performance gains
         public virtual bool PreDraw(SpriteBatch sb)
         {
             bool result = true;
@@ -162,8 +163,6 @@ namespace InvisibleHand
             return result;
         }
 
-
-
         public void RegisterServiceHook(ButtonService service, string hookName)
         {
             // if the entry already exists, Add will throw an ArgumentException
@@ -183,9 +182,8 @@ namespace InvisibleHand
             if (enabledHooks[hookName].Count == 0)
                 enabledHooks.Remove(hookName);
         }
+
         #endregion
-
-
     }
 
     /// contains the functionality of a button
@@ -256,11 +254,10 @@ namespace InvisibleHand
             }
         }
 
-        public TexturedButton(TIH action, Vector2 position, string label = "") : base(action, position, label)
+        public TexturedButton(TIH action, Color bgColor, Texture2D texture=null, string label = "") : base(action, label)
         {
-
+            BgColor = bgColor;
         }
-
     }
 
     public class TextButton : CoreButton
@@ -271,7 +268,7 @@ namespace InvisibleHand
             get { return Main.fontMouseText.MeasureString(Label); }
         }
 
-        public TextButton(TIH action, Vector2 position, string label = "") : base(action, position, label)
+        public TextButton(TIH action, string label = "") : base(action, label)
         {
 
         }

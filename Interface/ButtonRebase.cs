@@ -33,12 +33,13 @@ namespace InvisibleHand
         }
         public virtual bool HasMouseFocus { get; set; }
 
-        public const float SCALE_FULL = 1.0f;
-        protected float _scale = SCALE_FULL;
+        protected float _min_scale = 0.5f;
+        protected float _max_scale = 1.0f;
+        protected float _scale = 1.0f;
         public virtual float Scale
         {
             get { return _scale; }
-            set { _scale = clamp(value, 0.5f, SCALE_FULL); }
+            set { _scale = clamp(value, _min_scale, _max_scale); }
         }
 
         protected float _baseAlpha = 0.85f;
@@ -86,14 +87,14 @@ namespace InvisibleHand
             if (CurrentContent.PreDraw(sb))
             {
                 DrawButtonContent(sb);
-                DrawBase(sb);
+                OnDrawBase(sb);
             }
             CurrentContent.PostDraw(sb);
         }
 
         /// handles hover-check, hover events, etc.
         /// subclass and override this to change these aspects.
-        protected virtual void DrawBase(SpriteBatch sb)
+        protected virtual void OnDrawBase(SpriteBatch sb)
         {
             if (Hovered)
             {
@@ -102,12 +103,13 @@ namespace InvisibleHand
                     HasMouseFocus = true;
                     OnMouseEnter();
                 }
-
+                WhenHovered();
                 HandleClicks();
                 return;
             }
             if (HasMouseFocus) OnMouseLeave();
             HasMouseFocus = false;
+            WhenNotHovered();
         }
 
         public virtual bool IsHovered(Vector2 mouse)
@@ -136,7 +138,7 @@ namespace InvisibleHand
         }
 
         /// Checks for both left and right clicks
-        public virtual void HandleClicks()
+        protected virtual void HandleClicks()
         {
             if (Main.mouseLeft && Main.mouseLeftRelease)
                 CurrentContent.OnClick();
@@ -148,6 +150,14 @@ namespace InvisibleHand
         /// Should handle the actual SpriteBatch command which draws the button
         protected abstract void DrawButtonContent(SpriteBatch sb);
 
+        /// hook for derived classes to add extra functionality
+        /// to OnDrawBase without having to reimplement the
+        /// whole method.
+        protected virtual void WhenHovered() {}
+
+        protected virtual void WhenNotHovered() {}
+
+
         ///<returns>given value bound by specified minumum and maximum
         /// values (inclusive)</returns>
         protected float clamp(float value, float min = 0, float max = 1)
@@ -155,6 +165,40 @@ namespace InvisibleHand
             if (value < min) return min;
             if (value > max) return max;
             return value;
+        }
+
+        /// allows registering key toggle w/ just the context (button) IDs
+        // public void RegisterKeyToggle(KState.Special key, string context1ID, string context2ID)
+        // {
+        //     RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1ID], IHBase.Instance.ButtonRepo[context2ID]);
+        // }
+
+        /// register a key toggle for this base's default context
+        public void RegisterKeyToggle(KState.Special key, T context2)
+        {
+            RegisterKeyToggle(key, this.DefaultContent, context2);
+        }
+
+        /// set up key-event-subscribers that will toggle btw 2 contexts
+        public void RegisterKeyToggle(KState.Special key, T context1, T context2)
+        {
+            //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
+            var kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
+
+            var kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
+            () => {
+                ChangeContent(context2);
+                kw2.Subscribe();
+                } );
+
+            // assign kw2 onkeyevent
+            kw2.OnKeyEvent = () => {
+                ChangeContent(context1);
+                kw1.Subscribe();
+                };
+
+            // subscribe to default watcher
+            kw1.Subscribe();
         }
     }
 
@@ -179,10 +223,102 @@ namespace InvisibleHand
 
         }
 
+        protected override void DrawButtonContent(SpriteBatch sb)
+        {
+            sb.Draw(CurrentContent.Texture,
+                    Position,
+                    SourceRect,
+                    CurrentContent.Tint*Alpha,
+                    0f,
+                    default(Vector2),
+                    Scale,
+                    SpriteEffects.None,
+                    0f);
+        }
+
+    }
+
+    public class TextButtonBase : ButtonRebase<TextButton>
+    {
+
+        /// Get the (relative) center of the full-size button
+        private Vector2 origin
+        {
+            get { return CurrentContent.Size / 2; }
+        }
+        /// shift origin up-right or down-left as button is scaled
+        private Vector2 scaledOrigin
+        {
+            get { return origin * Scale; }
+        }
+
+        ///doing this enables the "pulse" effect all the vanilla text has
+        private Color textColor
+        {
+            get { return Main.mouseTextColor.toScaledColor(Scale); }
+        }
+
+        /// modified position used in scaling/hover calculations
+        private Vector2 posMod;
+
+        /// makes the button smoothly grow and shrink as the mouse moves on and off
+        private readonly float scaleStep;
+        public TextButtonBase(ButtonLayer parent, TextButton content, Vector2 position,
+                                float base_scale = 0.75f,
+                                float focus_scale = 1.0f,
+                                float scale_step = 0.05f ) : base(parent, content, position)
+        {
+            posMod = Position;
+            _min_scale = base_scale;
+            _max_scale = focus_scale;
+            scaleStep = scale_step;
+        }
+
+        public override bool IsHovered(Vector2 mouse)
+        {
+            var o = scaledOrigin; //cache it
+            return (float)mouse.X > (float)posMod.X - o.X &&
+                    (float)mouse.X < (float)posMod.X + o.X &&
+                    (float)mouse.Y > (float)posMod.Y - o.Y &&
+                    (float)mouse.Y < (float)posMod.Y + o.Y;
+        }
 
         protected override void DrawButtonContent(SpriteBatch sb)
         {
-            sb.Draw(CurrentContent.Texture, Position, SourceRect, CurrentContent.Tint*Alpha, 0f, default(Vector2), Scale, SpriteEffects.None, 0f);
+            // var textColor = Main.mouseTextColor.toScaledColor(Scale, CurrentState.tint);
+
+            posMod = Position; //reset
+            posMod.X += (int)(origin.X * Scale);
+
+            sb.DrawString(
+                Main.fontMouseText,        //font
+                CurrentContent.Label,        //string
+                new Vector2(posMod.X, posMod.Y), //position
+                textColor,                 //color
+                0f,                        //rotation
+                origin,
+                Scale,
+                SpriteEffects.None,        //effects
+                0f                         //layerDepth
+            );
+        }
+
+        /// Handle mouseInterface, Scale up
+        protected override void WhenHovered()
+        {
+            // handling mouseInterface individually rather than by
+            // the ButtonFrame so that the buttons will act like the
+            // vanilla versions.
+            Main.localPlayer.mouseInterface = true;
+            if (Scale!=_max_scale)
+                Scale += scaleStep;
+        }
+
+        /// Scale down
+        protected override void WhenNotHovered()
+        {
+            if (Scale!=_min_scale)
+                Scale -= scaleStep;
         }
 
     }

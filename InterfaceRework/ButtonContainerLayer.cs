@@ -10,7 +10,9 @@ namespace InvisibleHand
     //TODO: transfer over documentation later
     public abstract class ButtonContainerLayer : InterfaceLayer
     {
-        public readonly Dictionary<TIH, ButtonRebase<CoreButton>> Buttons;
+        public readonly Dictionary<string,CoreButton> Buttons;
+
+        public readonly Dictionary<TIH, ButtonRebase<CoreButton>> ButtonBases;
 
         public Rectangle ButtonFrame { get; protected set;}
         public bool IsHovered {
@@ -28,7 +30,8 @@ namespace InvisibleHand
 
         protected ButtonContainerLayer(string name, bool handleMouseInterface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
-            Buttons = new Dictionary<TIH, ButtonRebase<CoreButton>>();
+            ButtonBases = new Dictionary<TIH, ButtonRebase<CoreButton>>();
+            Buttons = new Dictionary<string, CoreButton>();
             ButtonFrame = Rectangle.Empty;
             this.handleMouseInterface = handleMouseInterface;
         }
@@ -36,7 +39,7 @@ namespace InvisibleHand
         internal void UpdateFrame()
         {
             LayerOpacity = opacity_inactive;
-            foreach (var kvp in Buttons)
+            foreach (var kvp in ButtonBases)
             {
                 ButtonFrame = (ButtonFrame.IsEmpty) ? kvp.Value.ButtonBounds : Rectangle.Union(ButtonFrame, kvp.Value.ButtonBounds);
             }
@@ -45,7 +48,7 @@ namespace InvisibleHand
         protected virtual void DrawButtons(SpriteBatch sb)
         {
             //KeyValuePair<TIH, ButtonBase>
-            foreach (var kvp in Buttons)
+            foreach (var kvp in ButtonBases)
             {
                 kvp.Value.Draw(sb);
             }
@@ -59,6 +62,14 @@ namespace InvisibleHand
                     Main.localPlayer.mouseInterface = true;
             DrawButtons(sb);
         }
+
+
+        /// add the button, using a transform function to get its position
+        public void Add(CoreButton button, Func<TIH, Vector2> getPosition)
+        {
+            // Buttons.Add(button, getPosition(button.action));
+        }
+
     }
 
 

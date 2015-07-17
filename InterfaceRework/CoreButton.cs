@@ -19,8 +19,8 @@ namespace InvisibleHand
 
         // fields
         protected TIH action;
-        protected string label;
-        protected string tooltip;
+        protected string label = "";
+        protected string tooltip = "";
         protected Color tint;
 
         // field-access properties
@@ -50,6 +50,7 @@ namespace InvisibleHand
             this.Action = action;
             if (label == "") Label = Constants.DefaultButtonLabels[action];
             else this.Label = label;
+            Tooltip = Label;
 
             Hooks = new ButtonHooks();
             services = new List<ButtonService>();
@@ -161,6 +162,11 @@ namespace InvisibleHand
         // TODO: implement this (maybe)
         public void RemoveService(string serviceType) {}
 
+        /// <summary>
+        /// RegisterServiceHook
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="hookName"></param>
         public void RegisterServiceHook(ButtonService service, string hookName)
         {
             // if the entry already exists, Add will throw an ArgumentException
@@ -174,6 +180,12 @@ namespace InvisibleHand
                 enabledHooks[hookName].Add(service);
             }
         }
+
+        /// <summary>
+        /// RemoveServiceHook
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="hookName"></param>
         public void RemoveServiceHook(ButtonService service, string hookName)
         {
             enabledHooks[hookName].Remove(service);
@@ -186,7 +198,10 @@ namespace InvisibleHand
 
     }
 
+
+    // //////////////////////////////////////////
     /// contains the functionality of a button
+    // //////////////////////////////////////////
     public class ButtonHooks
     {
         public Action onClick;
@@ -232,6 +247,10 @@ namespace InvisibleHand
     }
 
 
+    // ///////////////////////////////////////////////
+    /// Icon Button with a texture and ability to vary
+    /// its appearance when hovered with the mouse.
+    // ///////////////////////////////////////////////
     public class TexturedButton : CoreButton
     {
         protected Texture2D texture;
@@ -240,10 +259,10 @@ namespace InvisibleHand
 
         protected Color bgColor;
 
-
         public Texture2D Texture       { get { return texture; }       set { texture       = value; } }
         public Rectangle? InactiveRect { get { return defaultTexels; } set { defaultTexels = value; } }
         public Rectangle? ActiveRect   { get { return altTexels; }     set { altTexels     = value; } }
+
         public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
 
 
@@ -254,12 +273,27 @@ namespace InvisibleHand
             }
         }
 
-        public TexturedButton(TIH action, Color bgColor, Texture2D texture=null, string label = "") : base(action, label)
+        public TexturedButton(TIH action,
+                              Color bgColor,
+                              Texture2D texture=null,
+                              Rectangle? defaultTexels = null,
+                              Rectangle? focusedTexels = null,
+                              string label = "") : base(action, label)
         {
             BgColor = bgColor;
+            Texture = (texture==null) ? IHBase.ButtonGrid : texture;
+
+            InactiveRect = defaultTexels.HasValue ? defaultTexels : IHUtils.GetSourceRect(action);
+            ActiveRect = altTexels.HasValue ? altTexels : IHUtils.GetSourceRect(action, true);
+
         }
     }
 
+
+
+    // ////////////////////////////////////////////////////////////////////////////
+    /// Text-only button in the vein of those directly beside the chest in Vanilla
+    // ////////////////////////////////////////////////////////////////////////////
     public class TextButton : CoreButton
     {
         // Derived size
@@ -279,18 +313,27 @@ namespace InvisibleHand
     /// subtype will be returned rather than a generic CoreButton
     public static class CBExtensions
     {
+        ///<summary>
+        /// Add a ButtonService to this button and subscribe to its hooks
+        ///</summary>
         public static T AddService<T>(this T button, ButtonService bs) where T: CoreButton
         {
             button.addService(bs);
             return button;
         }
 
+        /// <summary>
         /// use this to help with creating buttons; e.g.:
-        /// CoreButton cb = new TexturedButton(TIH.Sort).With<TexturedButton>(delegate(TexturedButton b) {
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// 	TexturedButton cb = new TexturedButton(TIH.Sort).With( (b) => {
         ///          b.Hooks.onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer);
         ///          b.ToolTip = "Sort Me";
         ///          // ... etc.
         ///    })
+        /// </code>
+        ///</example>
         public static T With<T>(this T button, Action<T> action) where T: CoreButton
         {
             if (button != null)

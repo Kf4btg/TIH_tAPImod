@@ -1,0 +1,49 @@
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using TAPI;
+using Terraria;
+using System;
+using System.Collections.Generic;
+
+namespace InvisibleHand
+{
+    /// TextReplacer and IconReplacer will inherit from this class;
+    /// This is intended to allow other code to simply request the type
+    /// "ReplacerButtons" without worrying about which variety is returned.
+    public class ReplaceChestButtons : ButtonLayer
+    {
+
+
+        public ReplaceChestButtons(): base("ReplaceChestButtons")
+        {
+            var buttonStack = new Stack<CoreButton>();
+
+            var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
+                                        -(float)(int)((float)Constants.ButtonH/2));
+            var bgColor = Constants.ChestSlotColor * 0.85f;
+            var saveColor = Constants.EquipSlotColor * 0.85f;
+            var tex = IHBase.ButtonGrid;
+
+            foreach (var tih in new[] {
+                TIH.SortChest, TIH.RSortChest,
+                TIH.LootAll, TIH.DepAll, TIH.QuickStack
+                }) {
+                buttonStack.Push(
+                    new TexturedButton(
+                        action : tih,
+                        bgColor : tih == TIH.SaveName ? Constants.ChestSlotColor * 0.85f :
+                                                 Constants.EquipSlotColor * 0.85f
+                    ).With((button) =>
+                    {
+                        button.Tooltip = button.Label + IHUtils.GetKeyTip(button.Action);
+
+                        if (button.Action == TIH.QuickStack || button.Action == TIH.DepAll)
+                            button.AddService(new LockingService( button, lockOffset ));
+                    })
+                );
+
+            }
+        }
+    }
+
+}

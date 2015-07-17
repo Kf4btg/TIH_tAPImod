@@ -13,13 +13,11 @@ namespace InvisibleHand
     {
         /// interface layer this button belongs to
         public readonly ButtonLayer parentLayer;
-        // public IButtonDrawHandler Drawer;  //just subclass
-        public Vector2 Position { get; protected set; }
 
         public virtual T DefaultContent { get; protected set; }
         public virtual T CurrentContent { get; protected set; }
 
-
+        public Vector2 Position { get; protected set; }
         public Rectangle ButtonBounds { get; protected set; }
 
         public virtual Vector2 Size
@@ -52,11 +50,11 @@ namespace InvisibleHand
         }
 
         protected float _alpha = 1.0f;
-        // no longer including the parent container opacity in the return value.
         /// Get current alpha value or set alpha to the given value (constrained
         /// by the value of BaseAlpha)
         public virtual float Alpha
         {
+            // no longer including the parent container opacity in the return value.
             get { return _alpha; }
             set { _alpha = value.Clamp(BaseAlpha); }
         }
@@ -64,19 +62,17 @@ namespace InvisibleHand
         public ButtonRebase(ButtonLayer parent, T content, Vector2 position)
         {
             parentLayer = parent;
-            // Drawer = drawer;
             this.DefaultContent = this.CurrentContent = content;
 
             ButtonBounds = new Rectangle((int)position.X, (int)position.Y, (int)content.Size.X, (int)content.Size.Y);
-            // this.IsHovered = defaultHoverCheck;
         }
 
-        /// switch to a new button content
+        /// switch to new button content
         public void ChangeContent(T newContent)
         {
             CurrentContent = newContent;
         }
-        /// return this ButtonBase to its default context
+        /// return this ButtonBase to its default content
         public void Reset()
         {
             ChangeContent(DefaultContent);
@@ -147,14 +143,18 @@ namespace InvisibleHand
                 CurrentContent.OnRightClick();
         }
 
+        /// <summary>
         /// Should handle the actual SpriteBatch command which draws the button
+        /// </summary>
+        /// <param name="sb">Spritebatch which performs the drawing</param>
         protected abstract void DrawButtonContent(SpriteBatch sb);
 
+        ///<summary>
         /// hook for derived classes to add extra functionality
         /// to OnDrawBase without having to reimplement the
         /// whole method.
+        ///</summary>
         protected virtual void WhenHovered() {}
-
         protected virtual void WhenNotHovered() {}
 
 
@@ -166,7 +166,11 @@ namespace InvisibleHand
         //     RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1ID], IHBase.Instance.ButtonRepo[context2ID]);
         // }
 
+        /// <summary>
         /// register a key toggle for this base's default context
+        /// </summary>
+        /// <param name="key">Activation key, e.g. Shift</param>
+        /// <param name="context2">Corebutton to swap with</param>
         public void RegisterKeyToggle(KState.Special key, T context2)
         {
             RegisterKeyToggle(key, this.DefaultContent, context2);
@@ -211,17 +215,36 @@ namespace InvisibleHand
                 }
         }
 
-        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position) : base(parent, content, position)
-        {
+        /// Texture resource that will be drawn in the background of this buttonbase.
+        /// BgColor property of current button content object is used for tint.
+        public Texture2D ButtonBG { get; set; }
 
+
+        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D buttonBG) : base(parent, content, position)
+        {
+            ButtonBG = buttonBG;
         }
 
         protected override void DrawButtonContent(SpriteBatch sb)
         {
+            var opacity = parentLayer.LayerOpacity*Alpha;
+            //draw button background first
+            // (otherwise button content will be below bg!)
+            sb.Draw(ButtonBG,
+                    Position,
+                    null,
+                    CurrentContent.BgColor*opacity,
+                    0f,
+                    default(Vector2),
+                    Scale,
+                    SpriteEffects.None,
+                    0f);
+
+            // and now the real button stuff
             sb.Draw(CurrentContent.Texture,
                     Position,
                     SourceRect,
-                    CurrentContent.Tint*Alpha,
+                    CurrentContent.Tint*opacity,
                     0f,
                     default(Vector2),
                     Scale,
@@ -245,9 +268,14 @@ namespace InvisibleHand
             get { return origin * Scale; }
         }
 
-        ///doing this enables the "pulse" effect all the vanilla text has
+        /// get current color of the text
         private Color textColor
         {
+            // basing textColor on Main.mouseTextColor enables
+            // the "pulse" effect all the vanilla text has;
+            // Combining it with the current scale makes the
+            // intensity of the text color fade up and down as the 
+            // button zooms in or out.
             get { return Main.mouseTextColor.toScaledColor(Scale); }
         }
 
@@ -256,6 +284,7 @@ namespace InvisibleHand
 
         /// makes the button smoothly grow and shrink as the mouse moves on and off
         private readonly float scaleStep;
+
         public TextButtonBase(ButtonLayer parent, TextButton content, Vector2 position,
                                 float base_scale = 0.75f,
                                 float focus_scale = 1.0f,

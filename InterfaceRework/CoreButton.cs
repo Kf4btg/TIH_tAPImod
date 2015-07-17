@@ -8,9 +8,13 @@ using System.Dynamic;
 
 namespace InvisibleHand
 {
-    // the typing on this is confusing as hell; see
-    // http://blogs.msdn.com/b/ericlippert/archive/2011/02/03/curiouser-and-curiouser.aspx
-    // for a discussion on it.
+    /// Having subclasses of CoreButton ALSO implement this interface seems to be
+    /// the ONLY way to get a reliably type-safe reference to the parent buttonbase
+    public interface ISocketedButton<T> where T: CoreButton
+    {
+        ButtonSocket<T> ButtonBase { get; }
+    }
+
     /// re-imagining the ButtonState and IHButton as one object
     public abstract class CoreButton
     {
@@ -258,7 +262,7 @@ namespace InvisibleHand
     /// Icon Button with a texture and ability to vary
     /// its appearance when hovered with the mouse.
     // ///////////////////////////////////////////////
-    public class TexturedButton : CoreButton
+    public class TexturedButton : CoreButton, ISocketedButton<TexturedButton>
     {
         protected Texture2D texture;
         protected Rectangle? defaultTexels;
@@ -277,6 +281,13 @@ namespace InvisibleHand
             get {
                 return InactiveRect.HasValue ? InactiveRect.Value.Size() : Texture.Size();
             }
+        }
+
+        private ButtonSocket<TexturedButton> parent;
+        public ButtonSocket<TexturedButton> ButtonBase
+        {
+            get { return parent; }
+            protected set { parent = value; }
         }
 
         public TexturedButton(TIH action,
@@ -300,13 +311,20 @@ namespace InvisibleHand
     // ////////////////////////////////////////////////////////////////////////////
     /// Text-only button in the vein of those directly beside the chest in Vanilla
     // ////////////////////////////////////////////////////////////////////////////
-    public class TextButton : CoreButton
+    public class TextButton : CoreButton, ISocketedButton<TextButton>
     {
 
         // Derived size
         public override Vector2 Size
         {
             get { return Main.fontMouseText.MeasureString(Label); }
+        }
+
+        private ButtonSocket<TextButton> parent;
+        public ButtonSocket<TextButton> ButtonBase
+        {
+            get { return parent; }
+            protected set { parent = value; }
         }
 
         public TextButton(TIH action, string label = "") : base(action, label)

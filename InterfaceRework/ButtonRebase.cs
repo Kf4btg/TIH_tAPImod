@@ -9,7 +9,7 @@ namespace InvisibleHand
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonRebase<T> where T:CoreButton
+    public abstract class ButtonSocket<T> where T:CoreButton
     {
         /// interface layer this button belongs to
         public readonly ButtonLayer parentLayer;
@@ -59,7 +59,7 @@ namespace InvisibleHand
             set { _alpha = value.Clamp(BaseAlpha); }
         }
 
-        public ButtonRebase(ButtonLayer parent, T content, Vector2 position)
+        public ButtonSocket(ButtonLayer parent, T content, Vector2 position)
         {
             parentLayer = parent;
             this.DefaultContent = this.CurrentContent = content;
@@ -202,7 +202,7 @@ namespace InvisibleHand
     // ------------------------------------------------------------
     // some subclasses; maybe put these in separate file?
 
-    public class IconButtonBase : ButtonRebase<TexturedButton>
+    public class IconButtonBase : ButtonSocket<TexturedButton>
     {
 
         /// this will actively set the Source Texels based on whether or not the mouse is currently over this button.
@@ -254,7 +254,7 @@ namespace InvisibleHand
 
     }
 
-    public class TextButtonBase : ButtonRebase<TextButton>
+    public class TextButtonBase : ButtonSocket<TextButton>
     {
 
         /// Get the (relative) center of the full-size button
@@ -274,7 +274,7 @@ namespace InvisibleHand
             // basing textColor on Main.mouseTextColor enables
             // the "pulse" effect all the vanilla text has;
             // Combining it with the current scale makes the
-            // intensity of the text color fade up and down as the 
+            // intensity of the text color fade up and down as the
             // button zooms in or out.
             get { return Main.mouseTextColor.toScaledColor(Scale); }
         }

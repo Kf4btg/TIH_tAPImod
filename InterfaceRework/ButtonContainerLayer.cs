@@ -12,7 +12,7 @@ namespace InvisibleHand
     {
         public readonly Dictionary<string,CoreButton> Buttons;
 
-        public readonly Dictionary<TIH, ButtonRebase<CoreButton>> ButtonBases;
+        public readonly Dictionary<TIH, ButtonSocket<CoreButton>> ButtonBases;
 
         public Rectangle ButtonFrame { get; protected set;}
         public bool IsHovered {
@@ -30,7 +30,7 @@ namespace InvisibleHand
 
         protected ButtonContainerLayer(string name, bool handleMouseInterface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
-            ButtonBases = new Dictionary<TIH, ButtonRebase<CoreButton>>();
+            ButtonBases = new Dictionary<TIH, ButtonSocket<CoreButton>>();
             Buttons = new Dictionary<string, CoreButton>();
             ButtonFrame = Rectangle.Empty;
             this.handleMouseInterface = handleMouseInterface;

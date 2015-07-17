@@ -51,7 +51,7 @@ namespace InvisibleHand
         }
     }
 
-    public class LockingService : ButtonService
+    public class LockingService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
     {
         public override string ServiceType { get { return "Locker"; } }
 
@@ -61,8 +61,11 @@ namespace InvisibleHand
         // private readonly TIH clientAction;
         private bool isLocked;
 
-        public LockingService(CoreButton client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
+        protected readonly T _client;
+
+        public LockingService(T client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
         {
+            _client = client;
             color = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
             lockString = locked_string;
@@ -110,12 +113,12 @@ namespace InvisibleHand
 
         private void PostDraw(SpriteBatch sb)
         {
-            // DrawLockIndicator(sb, Client.Base); //FIXME: reenable this!
+            DrawLockIndicator(sb, _client.ButtonBase); 
         }
 
-        private void DrawLockIndicator<T>(SpriteBatch sb, ButtonRebase<T> bb) where T: CoreButton
+        private void DrawLockIndicator(SpriteBatch sb, ButtonSocket<T> bb)
         {
-            // sb.Draw(IHBase.LockedIcon, bb.Position + offset, Client.Tint * bb.Container.LayerOpacity * bb.Alpha);
+            sb.Draw(IHBase.LockedIcon, bb.Position + offset, Client.Tint * bb.parentLayer.LayerOpacity * bb.Alpha);
         }
 
     }

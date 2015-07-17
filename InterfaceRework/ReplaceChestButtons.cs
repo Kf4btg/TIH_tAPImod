@@ -39,7 +39,7 @@ namespace InvisibleHand
                         button.Tooltip = button.Label + IHUtils.GetKeyTip(button.Action);
 
                         if (button.Action == TIH.QuickStack || button.Action == TIH.DepAll)
-                            button.AddService(new LockingService( button, lockOffset ));
+                            button.AddService(new LockingService<TexturedButton>( button, lockOffset ));
                     })
                 );
 

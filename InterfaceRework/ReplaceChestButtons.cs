@@ -23,6 +23,7 @@ namespace InvisibleHand
             var bgColor = Constants.ChestSlotColor * 0.85f;
             var saveColor = Constants.EquipSlotColor * 0.85f;
             var tex = IHBase.ButtonGrid;
+            var bgtex = IHBase.ButtonBG;
 
             foreach (var tih in new[] {
                 TIH.SortChest, TIH.RSortChest,

@@ -14,9 +14,6 @@ namespace InvisibleHand
     /// re-imagining the ButtonState and IHButton as one object
     public abstract class CoreButton
     {
-        // holds the button
-        // public readonly ButtonRebase<T> Base;
-
         // fields
         protected TIH action;
         protected string label = "";
@@ -31,7 +28,7 @@ namespace InvisibleHand
         /// can change the overall color of the button texture or text
         public Color Tint     { get { return tint; }    set { tint    = value; } }
 
-        // ID
+        /// Unique (well, effectively...), randomly-generated ID
         public string ID { get; protected set; }
 
         // hook container
@@ -60,8 +57,12 @@ namespace InvisibleHand
         }
 
 
-
         #region hooks
+        // //////////////////////////////////////////////////////////
+        // Handle hooks attached directly to this button and also
+        // those of subscribed services.
+        // //////////////////////////////////////////////////////////
+
         public virtual void OnWorldLoad()
         {
             if (Hooks.onWorldLoad != null) Hooks.onWorldLoad();
@@ -80,6 +81,7 @@ namespace InvisibleHand
             CallServiceHooks("onRightClick");
         }
 
+        /// <returns> whether to continue with the base's OnMouseEnter</returns>
         public virtual bool OnMouseEnter()
         {
             bool result = true;
@@ -87,6 +89,7 @@ namespace InvisibleHand
             return (CallServiceHooks("onMouseEnter") & result);
         }
 
+        /// <returns> whether to continue with the base's OnMouseLeave</returns>
         public virtual bool OnMouseLeave()
         {
             bool result = true;
@@ -95,6 +98,10 @@ namespace InvisibleHand
         }
 
         // bypass the dynamic calls for pre/post-draw for performance gains
+
+        ///<returns>False if any hooks returned false, indicating
+        /// not to continue with the rest of the Button Draw() Command
+        /// and immediately skip to the PostDraw hook.
         public virtual bool PreDraw(SpriteBatch sb)
         {
             bool result = true;
@@ -265,7 +272,6 @@ namespace InvisibleHand
 
         public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
 
-
         public override Vector2 Size
         {
             get {
@@ -296,6 +302,7 @@ namespace InvisibleHand
     // ////////////////////////////////////////////////////////////////////////////
     public class TextButton : CoreButton
     {
+
         // Derived size
         public override Vector2 Size
         {

@@ -113,9 +113,9 @@ namespace InvisibleHand
             // DrawLockIndicator(sb, Client.Base); //FIXME: reenable this!
         }
 
-        private void DrawLockIndicator(SpriteBatch sb, ButtonBase bb)
+        private void DrawLockIndicator<T>(SpriteBatch sb, ButtonRebase<T> bb) where T: CoreButton
         {
-            sb.Draw(IHBase.LockedIcon, bb.Position + offset, Client.Tint * bb.Container.LayerOpacity * bb.Alpha);
+            // sb.Draw(IHBase.LockedIcon, bb.Position + offset, Client.Tint * bb.Container.LayerOpacity * bb.Alpha);
         }
 
     }

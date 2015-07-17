@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TAPI;
 using Terraria;
 using System.Dynamic;
+using System.Reflection;
 
 namespace InvisibleHand
 {
@@ -45,6 +46,16 @@ namespace InvisibleHand
         // Derived size
         public abstract Vector2 Size { get; }
 
+        ///not intended for use other than by services
+        public CoreButton()
+        {
+            Hooks = new ButtonHooks();
+            services = new List<ButtonService>();
+
+            // set randomly-generated unique ID
+            ID = UICore.GenerateHoverID();
+        }
+
         // Constructors
         public CoreButton(TIH action, string label = "")
         {
@@ -58,6 +69,27 @@ namespace InvisibleHand
 
             // set randomly-generated unique ID
             ID = UICore.GenerateHoverID();
+        }
+
+        /// create this button by copying all the aspects of the given button
+        /// other than hooks and services
+        // public CoreButton(CoreButton other, bool copyHooks = false, bool copyServices = false) : this(other.Action, other.Label)
+        // {
+        //     if (copyHooks)
+        //         foreach (var h in other.Hooks)
+        //         {
+        //             if (h.Value != null) Hooks[h.Key] = h.Value;
+        //         }
+        // }
+
+        /// copying all the aspects of the given button
+        /// other than hooks, services, and ID
+        public virtual void CopyAttributes(CoreButton other)
+        {
+            this.Action = other.Action;
+            this.Label = other.Label;
+            this.Tooltip = other.Tooltip;
+            this.Tint = other.Tint;
         }
 
 
@@ -213,7 +245,7 @@ namespace InvisibleHand
     // //////////////////////////////////////////
     /// contains the functionality of a button
     // //////////////////////////////////////////
-    public class ButtonHooks
+    public class ButtonHooks : DynamicObject
     {
         public Action onClick;
         public Action onRightClick;
@@ -230,11 +262,54 @@ namespace InvisibleHand
         /// hook Action/Function; will throw runtime errors if
         /// the hook is not invoked with correct parameter types
         private Dictionary<string, dynamic> hooks;
+        public Dictionary<string, dynamic> AllHooks { get { return hooks;}}
 
-        /// allows accessing the hooks like: Hooks["onClick"]
+
+        // Dictionary<string, object> dhooks
+        // = new Dictionary<string, object>();
+
+        public int Count
+        {
+            get { return hooks.Count; }
+        }
+
+        // public override bool TryGetMember(
+        // GetMemberBinder binder, out object result)
+        // {
+        //     return hooks.TryGetValue(binder.Name, out result);
+        // }
+        //
+        // public override bool TrySetMember(
+        // SetMemberBinder binder, object value)
+        // {
+        //     hooks[binder.Name] = value;
+        //     return true;
+        // }
+        //
+        // public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
+        // {
+        //     Type dictType = typeof(Dictionary<string, object>);
+        //     try
+        //     {
+        //         result = dictType.InvokeMember(
+        //                      binder.Name,
+        //                      BindingFlags.InvokeMethod,
+        //                      null, hooks, args);
+        //         return true;
+        //     }
+        //     catch
+        //     {
+        //         result = null;
+        //         return false;
+        //     }
+        // }
+
+        // allows accessing the hooks like: Hooks["onClick"]
+        // FIXME: this is not goodstuff for setting the value;
         public dynamic this[string hookName]
         {
             get { return hooks[hookName]; }
+            set { hooks[hookName] = value; }
         }
 
         public ButtonHooks()
@@ -251,12 +326,16 @@ namespace InvisibleHand
             };
         }
 
+        public IEnumerator<KeyValuePair<string, dynamic>> GetEnumerator()
+        {
+            return hooks.GetEnumerator();
+        }
+
         public bool isAssigned(string hookName)
         {
             return hooks[hookName] != null;
         }
     }
-
 
     // ///////////////////////////////////////////////
     /// Icon Button with a texture and ability to vary
@@ -289,6 +368,22 @@ namespace InvisibleHand
             get { return parent; }
             protected set { parent = value; }
         }
+
+        public override void CopyAttributes(CoreButton other)
+        {
+            base.CopyAttributes(other);
+            if (other is TexturedButton)
+            {
+                TexturedButton ob = (TexturedButton)other;
+                this.Texture = ob.Texture;
+                this.InactiveRect = ob.InactiveRect;
+                this.ActiveRect = ob.ActiveRect;
+                this.BgColor = ob.BgColor;
+
+            }
+        }
+
+        public TexturedButton() : base() { }
 
         public TexturedButton(TIH action,
                               Color bgColor,
@@ -326,6 +421,17 @@ namespace InvisibleHand
             get { return parent; }
             protected set { parent = value; }
         }
+
+        // public override void CopyAttributes(CoreButton other)
+        // {
+        //     base.CopyAttributes(other);
+        //     if (other is TextButton)
+        //     {
+        //         TextButton ob = (TextButton)other;
+        //     }
+        // }
+
+        public TextButton() : base() { }
 
         public TextButton(TIH action, string label = "") : base(action, label)
         {

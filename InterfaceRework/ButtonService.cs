@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TAPI;
 
 
 namespace InvisibleHand
@@ -53,22 +54,26 @@ namespace InvisibleHand
 
     public class LockingService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
     {
-        public override string ServiceType { get { return "Locker"; } }
+        public override string ServiceType { get { return "Lock"; } }
 
         private readonly Color color;
         private readonly Vector2 offset;
-        private readonly string lockString;
+
+        private readonly string locked_label;
+        private readonly string initial_label;
         // private readonly TIH clientAction;
         private bool isLocked;
 
-        protected readonly T _client;
+        private readonly ButtonSocket<T> bBase;
 
         public LockingService(T client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
         {
-            _client = client;
+            bBase = client.ButtonBase;
             color = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
-            lockString = locked_string;
+
+            initial_label = client.Label;
+            locked_label = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
 
             Hooks.preDraw = PreDraw;
             Hooks.onRightClick = () => IHPlayer.ToggleActionLock(Client.Action);
@@ -90,10 +95,16 @@ namespace InvisibleHand
             isLocked = IHPlayer.ActionLocked(Client.Action);
 
             if (isLocked)
+            {
                 RegisterHook("postDraw");
+                Client.Label = locked_label;
+            }
             else
-                RemoveHook("postDraw");
+            {
                 // List<>.Remove() doesn't fail on missing keys
+                RemoveHook("postDraw");
+                Client.Label = initial_label;
+            }
         }
 
         private bool PreDraw(SpriteBatch sb)
@@ -104,22 +115,60 @@ namespace InvisibleHand
             {
                 isLocked = !isLocked;
                 if (isLocked)
+                {
                     RegisterHook("postDraw");
+                    Client.Label = locked_label;
+                }
                 else
+                {
                     RemoveHook("postDraw");
+                    Client.Label = initial_label;
+                }
             }
             return true;
         }
 
         private void PostDraw(SpriteBatch sb)
         {
-            DrawLockIndicator(sb, _client.ButtonBase); 
+            sb.Draw(IHBase.LockedIcon, bBase.Position + offset, Client.Tint * bBase.parentLayer.LayerOpacity * bBase.Alpha);
+        }
+    }
+
+    /// this class creates a second button and set's the given button's base to switch to it on shift
+    public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
+    {
+        public override string ServiceType { get { return "Sort"; } }
+
+        private readonly ButtonSocket<T> socket;
+        private readonly T reverseButton;
+
+        public SorterService(T client, KState.Special toggleKey) : base(client)
+        {
+            reverseButton = new T();
+            reverseButton.CopyAttributes(client);
+
+            
         }
 
-        private void DrawLockIndicator(SpriteBatch sb, ButtonSocket<T> bb)
+        public override void Subscribe()
         {
-            sb.Draw(IHBase.LockedIcon, bb.Position + offset, Client.Tint * bb.parentLayer.LayerOpacity * bb.Alpha);
+            RegisterHooks("onClick", "onRightClick");
+        }
+        public override void Unsubscribe()
+        {
+            RemoveHooks("onClick", "onRightClick");
+        }
+
+        private void sort()
+        {
+
+        }
+
+        private void reverseSort()
+        {
+
         }
 
     }
+
 }

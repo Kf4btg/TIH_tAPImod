@@ -14,8 +14,16 @@ namespace InvisibleHand
     {
 
 
+
+
         public ReplaceChestButtons(): base("ReplaceChestButtons")
         {
+            // Order of operations:
+            //  - First, create layer (that's what this is doing)
+            //  - Second, create bases and assign to layer
+            //	 - Finally, create buttons and assign to bases
+            // This allow assigning references to parent objects down the stack	 
+
             var buttonStack = new Stack<CoreButton>();
 
             var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),

@@ -59,20 +59,52 @@ namespace InvisibleHand
             set { _alpha = value.Clamp(BaseAlpha); }
         }
 
-        public ButtonSocket(ButtonLayer parent, T content, Vector2 position)
+        /// initialize a new, empty socket with blank content;
+        /// calls the derived-class specific version of InitEmptySocket()
+        public ButtonSocket(ButtonLayer parent, Vector2 position)
         {
             parentLayer = parent;
-            this.DefaultContent = this.CurrentContent = content;
+            Position = position;
 
-            ButtonBounds = new Rectangle((int)position.X, (int)position.Y, (int)content.Size.X, (int)content.Size.Y);
+            InitEmptySocket();
         }
 
-        /// switch to new button content
+        /// <summary>
+        /// Setup this socket in a stable but uninitialized manner
+        /// </summary>
+        protected virtual void InitEmptySocket() {}
+
+        /// <summary>
+        /// Make this button usable by adding its default button configuration
+        /// </summary>
+        /// <param name="defContent">Default button</param>
+        public virtual void SetupDefault(T defContent)
+        {
+            this.DefaultContent = this.CurrentContent = defContent;
+
+            ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)defContent.Size.X, (int)defContent.Size.Y);
+        }
+
+        // public ButtonSocket(ButtonLayer parent, T content, Vector2 position)
+        // {
+        //     parentLayer = parent;
+        //     this.DefaultContent = this.CurrentContent = content;
+        //
+        //     ButtonBounds = new Rectangle((int)position.X, (int)position.Y, (int)content.Size.X, (int)content.Size.Y);
+        // }
+
+
+        /// <summary>
+        /// Replace current button configuration
+        /// </summary>
+        /// <param name="newContent">The button to swap into this socket</param>
         public void ChangeContent(T newContent)
         {
             CurrentContent = newContent;
         }
-        /// return this ButtonBase to its default content
+        /// <summary>
+        /// return this Socket to its default configuration
+        /// </summary>
         public void Reset()
         {
             ChangeContent(DefaultContent);
@@ -83,14 +115,21 @@ namespace InvisibleHand
             if (CurrentContent.PreDraw(sb))
             {
                 DrawButtonContent(sb);
-                OnDrawBase(sb);
+                OnDrawBase();
             }
             CurrentContent.PostDraw(sb);
         }
 
-        /// handles hover-check, hover events, etc.
-        /// subclass and override this to change these aspects.
-        protected virtual void OnDrawBase(SpriteBatch sb)
+
+        /// <summary>
+        /// Handles hover-check, hover events, etc.
+        /// </summary><remarks>
+        /// Most of these events can be changed individually
+        /// by overriding their respective hooks, but, for more
+        /// fine-grained control, you can subclass and override
+        /// this entire method. Be careful to make sure all the
+        /// necessary hooks are called from the derived version.</remarks>
+        protected virtual void OnDrawBase()
         {
             if (Hovered)
             {
@@ -108,6 +147,12 @@ namespace InvisibleHand
             WhenNotHovered();
         }
 
+        /// <summary>
+        /// Determines whether the mouse is hovered over this button's
+        /// screen-area, accounting for the button's current scale.
+        /// </summary>
+        /// <param name="mouse">Current position of mouse cursor</param>
+        /// <returns>True if mouse currently over button</returns>
         public virtual bool IsHovered(Vector2 mouse)
         {
             // this.Size takes current scale into account
@@ -116,24 +161,29 @@ namespace InvisibleHand
             return new Rectangle((int)Position.X, (int)Position.Y, (int)s.X, (int)s.Y).Contains(mouse);
         }
 
-        // protected virtual bool otherHover(Vector2 mouse, Vector2 offset, Vector2 origin)
-        // {
-        //     var pos = this.Position + offset;
-        //     return true;
-        // }
-
+        /// <summary>
+        /// Called when the mouse first enters this button's space.
+        /// Also calls the OnMouseEnter hook of the currently socketed button.
+        /// </summary>
         public virtual void OnMouseEnter()
         {
             if (CurrentContent.OnMouseEnter())
                 Sound.MouseOver.Play();
         }
+        /// <summary>
+        /// Called when the mouse leaves this button's space.
+        /// Also calls the OnMouseLeave hook of the currently socketed button.
+        /// </summary>
         public virtual void OnMouseLeave()
         {
             // no checking return value because...we don't do anything here
             CurrentContent.OnMouseLeave();
         }
 
-        /// Checks for both left and right clicks
+        /// <summary>
+        /// Checks for both left and right clicks and calls
+        /// the associated button hook if detected.
+        /// </summary>
         protected virtual void HandleClicks()
         {
             if (Main.mouseLeft && Main.mouseLeftRelease)
@@ -150,17 +200,20 @@ namespace InvisibleHand
         protected abstract void DrawButtonContent(SpriteBatch sb);
 
         ///<summary>
-        /// hook for derived classes to add extra functionality
-        /// to OnDrawBase without having to reimplement the
-        /// whole method.
+        /// Called every frame while the mouse is hovered over this button
         ///</summary>
         protected virtual void WhenHovered() {}
+
+        ///<summary>
+        /// Called during every frame that the button is visible
+        /// but does not have direct mouse focus.
+        ///</summary>
         protected virtual void WhenNotHovered() {}
 
 
 
 
-        /// allows registering key toggle w/ just the context (button) IDs
+        // allows registering key toggle w/ just the context (button) IDs
         // public void RegisterKeyToggle(KState.Special key, string context1ID, string context2ID)
         // {
         //     RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1ID], IHBase.Instance.ButtonRepo[context2ID]);
@@ -176,7 +229,13 @@ namespace InvisibleHand
             RegisterKeyToggle(key, this.DefaultContent, context2);
         }
 
-        /// set up key-event-subscribers that will toggle btw 2 contexts
+        /// <summary>
+        /// Set up key-event-subscribers that will toggle between the 2 contexts
+        /// when the player holds or releases the button.
+        /// </summary>
+        /// <param name="key">Key (ctrl | shift | alt) on which to toggle content</param>
+        /// <param name="context1">Default button displayed</param>
+        /// <param name="context2">Button displayed while <paramref name="key "/> is held down.</param>
         public void RegisterKeyToggle(KState.Special key, T context1, T context2)
         {
             //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
@@ -220,9 +279,16 @@ namespace InvisibleHand
         public Texture2D ButtonBG { get; set; }
 
 
-        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D buttonBG) : base(parent, content, position)
+        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D buttonBG) : base(parent, position)
         {
             ButtonBG = buttonBG;
+            base.SetupDefault(content);
+        }
+
+        protected override void InitEmptySocket()
+        {
+            ButtonBG = IHBase.ButtonBG;
+            DefaultContent = CurrentContent = new TexturedButton();
         }
 
         protected override void DrawButtonContent(SpriteBatch sb)
@@ -283,17 +349,37 @@ namespace InvisibleHand
         private Vector2 posMod;
 
         /// makes the button smoothly grow and shrink as the mouse moves on and off
-        private readonly float scaleStep;
+        private float _scale_step = float.MinValue;
+        protected float scaleStep { get; private set; }
 
-        public TextButtonBase(ButtonLayer parent, TextButton content, Vector2 position,
-                                float base_scale = 0.75f,
-                                float focus_scale = 1.0f,
-                                float scale_step = 0.05f ) : base(parent, content, position)
+
+        ///<summary>
+        /// Create an empty socket at the given position</summary>
+        public TextButtonBase
+        (   ButtonLayer parent, Vector2 position,
+            float base_scale = 0.75f,
+            float focus_scale = 1.0f,
+            float scale_step = 0.05f
+        ) : base(parent, position)
         {
             posMod = Position;
-            _min_scale = base_scale;
-            _max_scale = focus_scale;
-            scaleStep = scale_step;
+            // 30 is honestly kind of a ridiculously high limit;
+            // I don't think I saw any text-scaling values go higher
+            // than 4 in the vanilla code.
+            _min_scale = base_scale.Clamp(0.5f, 30.0f);
+            _max_scale = focus_scale.Clamp(_min_scale, 30.0f);
+
+
+            scaleStep = (_min_scale == _max_scale) ? 0 :
+             scale_step;
+        }
+
+        public TextButtonBase
+        (   ButtonLayer parent, TextButton content, Vector2 position,
+            float base_scale = 0.75f, float focus_scale = 1.0f, float scale_step = 0.05f
+        ) : this(parent, position, base_scale, focus_scale, scale_step)
+        {
+            base.SetupDefault(content);
         }
 
         public override bool IsHovered(Vector2 mouse)

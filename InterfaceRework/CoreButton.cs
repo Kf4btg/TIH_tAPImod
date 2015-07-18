@@ -46,7 +46,7 @@ namespace InvisibleHand
         // Derived size
         public abstract Vector2 Size { get; }
 
-        ///not intended for use other than by services
+        /// blank button not intended for use other than by services
         public CoreButton()
         {
             Hooks = new ButtonHooks();
@@ -369,21 +369,13 @@ namespace InvisibleHand
             protected set { parent = value; }
         }
 
-        public override void CopyAttributes(CoreButton other)
+
+        public TexturedButton() : base()
         {
-            base.CopyAttributes(other);
-            if (other is TexturedButton)
-            {
-                TexturedButton ob = (TexturedButton)other;
-                this.Texture = ob.Texture;
-                this.InactiveRect = ob.InactiveRect;
-                this.ActiveRect = ob.ActiveRect;
-                this.BgColor = ob.BgColor;
+            Texture = IHBase.ButtonBG;
+            BgColor = Color.White;
 
-            }
         }
-
-        public TexturedButton() : base() { }
 
         public TexturedButton(TIH action,
                               Color bgColor,
@@ -399,6 +391,21 @@ namespace InvisibleHand
             ActiveRect = altTexels.HasValue ? altTexels : IHUtils.GetSourceRect(action, true);
 
         }
+
+        public override void CopyAttributes(CoreButton other)
+        {
+            base.CopyAttributes(other);
+            if (other is TexturedButton)
+            {
+                TexturedButton ob = (TexturedButton)other;
+                this.Texture = ob.Texture;
+                this.InactiveRect = ob.InactiveRect;
+                this.ActiveRect = ob.ActiveRect;
+                this.BgColor = ob.BgColor;
+
+            }
+        }
+
     }
 
 
@@ -431,7 +438,10 @@ namespace InvisibleHand
         //     }
         // }
 
-        public TextButton() : base() { }
+        public TextButton() : base()
+        {
+            Label = "Uninitialized";
+        }
 
         public TextButton(TIH action, string label = "") : base(action, label)
         {

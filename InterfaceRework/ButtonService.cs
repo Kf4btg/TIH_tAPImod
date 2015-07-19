@@ -28,26 +28,26 @@ namespace InvisibleHand
         public abstract void Unsubscribe();
 
         /// Tell client we're using this hook
-        protected void RegisterHook(string hookname)
+        protected void RegisterHook(string hook_name)
         {
-            Client.RegisterServiceHook(this, hookname);
+            Client.RegisterServiceHook(this, hook_name);
         }
         /// register a list of hooks with the client
-        protected void RegisterHooks(params string[] hookNames)
+        protected void RegisterHooks(params string[] hook_names)
         {
-            foreach (var h in hookNames)
+            foreach (var h in hook_names)
                 RegisterHook(h);
         }
 
         /// Tell client we're no longer using this hook
-        protected void RemoveHook(string hookname)
+        protected void RemoveHook(string hook_name)
         {
-            Client.RemoveServiceHook(this, hookname);
+            Client.RemoveServiceHook(this, hook_name);
         }
         /// remove several hooks at once
-        protected void RemoveHooks(params string[] hookNames)
+        protected void RemoveHooks(params string[] hook_names)
         {
-            foreach (var h in hookNames)
+            foreach (var h in hook_names)
                 RemoveHook(h);
         }
     }
@@ -59,21 +59,21 @@ namespace InvisibleHand
         private readonly Color color;
         private readonly Vector2 offset;
 
-        private readonly string locked_label;
-        private readonly string initial_label;
+        private readonly string lockedLabel;
+        private readonly string initialLabel;
         // private readonly TIH clientAction;
         private bool isLocked;
 
-        private readonly ButtonSocket<T> bBase;
+        private readonly ButtonSocket<T> socket;
 
         public LockingService(T client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
         {
-            bBase = client.ButtonBase;
+            socket = client.ButtonBase;
             color = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
 
-            initial_label = client.Label;
-            locked_label = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
+            initialLabel = client.Label;
+            lockedLabel = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
 
             Hooks.preDraw = PreDraw;
             Hooks.onRightClick = () => IHPlayer.ToggleActionLock(Client.Action);
@@ -97,13 +97,13 @@ namespace InvisibleHand
             if (isLocked)
             {
                 RegisterHook("postDraw");
-                Client.Label = locked_label;
+                Client.Label = lockedLabel;
             }
             else
             {
                 // List<>.Remove() doesn't fail on missing keys
                 RemoveHook("postDraw");
-                Client.Label = initial_label;
+                Client.Label = initialLabel;
             }
         }
 
@@ -117,12 +117,12 @@ namespace InvisibleHand
                 if (isLocked)
                 {
                     RegisterHook("postDraw");
-                    Client.Label = locked_label;
+                    Client.Label = lockedLabel;
                 }
                 else
                 {
                     RemoveHook("postDraw");
-                    Client.Label = initial_label;
+                    Client.Label = initialLabel;
                 }
             }
             return true;
@@ -130,7 +130,7 @@ namespace InvisibleHand
 
         private void PostDraw(SpriteBatch sb)
         {
-            sb.Draw(IHBase.LockedIcon, bBase.Position + offset, Client.Tint * bBase.parentLayer.LayerOpacity * bBase.Alpha);
+            sb.Draw(IHBase.LockedIcon, socket.Position + offset, Client.Tint * socket.ParentLayer.LayerOpacity * socket.Alpha);
         }
     }
 
@@ -142,12 +142,12 @@ namespace InvisibleHand
         private readonly ButtonSocket<T> socket;
         private readonly T reverseButton;
 
-        public SorterService(T client, KState.Special toggleKey) : base(client)
+        public SorterService(T client, KState.Special toggle_key) : base(client)
         {
             reverseButton = new T();
             reverseButton.CopyAttributes(client);
 
-            
+
         }
 
         public override void Subscribe()

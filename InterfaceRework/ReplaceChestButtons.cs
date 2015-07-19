@@ -22,7 +22,7 @@ namespace InvisibleHand
             //  - First, create layer (that's what this is doing)
             //  - Second, create bases and assign to layer
             //	 - Finally, create buttons and assign to bases
-            // This allow assigning references to parent objects down the stack	 
+            // This allow assigning references to parent objects down the stack
 
             var buttonStack = new Stack<CoreButton>();
 
@@ -40,7 +40,7 @@ namespace InvisibleHand
                 buttonStack.Push(
                     new TexturedButton(
                         action : tih,
-                        bgColor : tih == TIH.SaveName ? Constants.ChestSlotColor * 0.85f :
+                        bg_color : tih == TIH.SaveName ? Constants.ChestSlotColor * 0.85f :
                                                  Constants.EquipSlotColor * 0.85f
                     ).With((button) =>
                     {

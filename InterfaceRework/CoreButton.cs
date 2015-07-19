@@ -19,29 +19,44 @@ namespace InvisibleHand
     /// re-imagining the ButtonState and IHButton as one object
     public abstract class CoreButton
     {
-        // fields
-        protected TIH action;
-        protected string label = "";
-        protected string tooltip = "";
-        protected Color tint;
+        // fields //
 
-        // field-access properties
-        public TIH Action     { get { return action; }  set { action  = value; } }
-        public string Label   { get { return label; }   set { label   = value; } }
-        public string Tooltip { get { return tooltip; } set { tooltip = value; } }
+        private string _label = "";
+        private string _tooltip = "";
+
+        private string _id = String.Empty;
+
+        // protected TIH action;
+        // protected Color tint;
+
+
+        //Properties//
+
+        // public TIH Action     { get { return action; }  set { action  = value; } }
+        // public Color Tint     { get { return tint; }    set { tint    = value; } }
 
         /// can change the overall color of the button texture or text
-        public Color Tint     { get { return tint; }    set { tint    = value; } }
+        public Color Tint     { get; set; }
+        public TIH Action     { get; set; }
+        public string Label   { get { return _label; }   set { _label   = value; } }
+        public string Tooltip { get { return _tooltip; } set { _tooltip = value; } }
+
 
         /// Unique (well, effectively...), randomly-generated ID
-        public string ID { get; protected set; }
+        public string ID
+        {
+            //generate on first access
+            get { return _id == String.Empty ? UICore.GenerateHoverID() : _id; }
+        }
 
-        // hook container
-        public ButtonHooks Hooks;
-        // plugins
-        protected List<ButtonService> services;
+        /// Get hook container
+        public ButtonHooks Hooks { get; protected set; }
+
+        /// Subscribed Services
+        public List<ButtonService> Services { get; protected set; }
+
         /// hooks requested by services
-        protected Dictionary<String, List<ButtonService>> enabledHooks;
+        protected Dictionary<String, List<ButtonService>> enabledHooks { get; set; }
 
         // Derived size
         public abstract Vector2 Size { get; }
@@ -50,25 +65,19 @@ namespace InvisibleHand
         public CoreButton()
         {
             Hooks = new ButtonHooks();
-            services = new List<ButtonService>();
-
-            // set randomly-generated unique ID
-            ID = UICore.GenerateHoverID();
+            Services = new List<ButtonService>();
         }
 
         // Constructors
         public CoreButton(TIH action, string label = "")
         {
-            this.Action = action;
+            Action = action;
             if (label == "") Label = Constants.DefaultButtonLabels[action];
-            else this.Label = label;
+            else Label = label;
             Tooltip = Label;
 
             Hooks = new ButtonHooks();
-            services = new List<ButtonService>();
-
-            // set randomly-generated unique ID
-            ID = UICore.GenerateHoverID();
+            Services = new List<ButtonService>();
         }
 
         /// create this button by copying all the aspects of the given button
@@ -86,14 +95,14 @@ namespace InvisibleHand
         /// other than hooks, services, and ID
         public virtual void CopyAttributes(CoreButton other)
         {
-            this.Action = other.Action;
-            this.Label = other.Label;
+            this.Action  = other.Action;
+            this.Label   = other.Label;
             this.Tooltip = other.Tooltip;
-            this.Tint = other.Tint;
+            this.Tint    = other.Tint;
         }
 
 
-        #region hooks
+    #region hooks
         // //////////////////////////////////////////////////////////
         // Handle hooks attached directly to this button and also
         // those of subscribed services.
@@ -136,7 +145,7 @@ namespace InvisibleHand
         // bypass the dynamic calls for pre/post-draw for performance gains
 
         ///<returns>False if any hooks returned false, indicating
-        /// not to continue with the rest of the Button Draw() Command
+        /// not to continue with the rest of the ButtonSocket's Draw() Command
         /// and immediately skip to the PostDraw hook.
         public virtual bool PreDraw(SpriteBatch sb)
         {
@@ -194,11 +203,11 @@ namespace InvisibleHand
         }
         #endregion
 
-        #region serviceManagement
+    #region serviceManagement
 
         internal void addService(ButtonService bs)
         {
-            services.Add(bs);
+            Services.Add(bs);
             bs.Subscribe();
         }
 
@@ -209,18 +218,18 @@ namespace InvisibleHand
         /// RegisterServiceHook
         /// </summary>
         /// <param name="service"></param>
-        /// <param name="hookName"></param>
-        public void RegisterServiceHook(ButtonService service, string hookName)
+        /// <param name="hook_name"></param>
+        public void RegisterServiceHook(ButtonService service, string hook_name)
         {
             // if the entry already exists, Add will throw an ArgumentException
             // which we can catch and add the service to the existing list instead
             try
             {
-                enabledHooks.Add(hookName, new List<ButtonService>() { service });
+                enabledHooks.Add(hook_name, new List<ButtonService>() { service });
             }
             catch (ArgumentException)
             {
-                enabledHooks[hookName].Add(service);
+                enabledHooks[hook_name].Add(service);
             }
         }
 
@@ -228,114 +237,17 @@ namespace InvisibleHand
         /// RemoveServiceHook
         /// </summary>
         /// <param name="service"></param>
-        /// <param name="hookName"></param>
-        public void RemoveServiceHook(ButtonService service, string hookName)
+        /// <param name="hook_name"></param>
+        public void RemoveServiceHook(ButtonService service, string hook_name)
         {
-            enabledHooks[hookName].Remove(service);
-            if (enabledHooks[hookName].Count == 0)
-                enabledHooks.Remove(hookName);
+            enabledHooks[hook_name].Remove(service);
+            if (enabledHooks[hook_name].Count == 0)
+                enabledHooks.Remove(hook_name);
         }
 
         #endregion
-
-
     }
 
-
-    // //////////////////////////////////////////
-    /// contains the functionality of a button
-    // //////////////////////////////////////////
-    public class ButtonHooks : DynamicObject
-    {
-        public Action onClick;
-        public Action onRightClick;
-
-        public Func<bool> onMouseEnter;
-        public Func<bool> onMouseLeave;
-
-        public Func<SpriteBatch, bool> preDraw;
-        public Action<SpriteBatch> postDraw;
-
-        public Action onWorldLoad;
-
-        /// Map of hook names to dynamic option holding the actual
-        /// hook Action/Function; will throw runtime errors if
-        /// the hook is not invoked with correct parameter types
-        private Dictionary<string, dynamic> hooks;
-        public Dictionary<string, dynamic> AllHooks { get { return hooks;}}
-
-
-        // Dictionary<string, object> dhooks
-        // = new Dictionary<string, object>();
-
-        public int Count
-        {
-            get { return hooks.Count; }
-        }
-
-        // public override bool TryGetMember(
-        // GetMemberBinder binder, out object result)
-        // {
-        //     return hooks.TryGetValue(binder.Name, out result);
-        // }
-        //
-        // public override bool TrySetMember(
-        // SetMemberBinder binder, object value)
-        // {
-        //     hooks[binder.Name] = value;
-        //     return true;
-        // }
-        //
-        // public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
-        // {
-        //     Type dictType = typeof(Dictionary<string, object>);
-        //     try
-        //     {
-        //         result = dictType.InvokeMember(
-        //                      binder.Name,
-        //                      BindingFlags.InvokeMethod,
-        //                      null, hooks, args);
-        //         return true;
-        //     }
-        //     catch
-        //     {
-        //         result = null;
-        //         return false;
-        //     }
-        // }
-
-        // allows accessing the hooks like: Hooks["onClick"]
-        // FIXME: this is not goodstuff for setting the value;
-        public dynamic this[string hookName]
-        {
-            get { return hooks[hookName]; }
-            set { hooks[hookName] = value; }
-        }
-
-        public ButtonHooks()
-        {
-            hooks = new Dictionary<string, dynamic>
-            {
-                {"onClick", onClick},
-                {"onRightClick", onRightClick},
-                {"onWorldLoad", onWorldLoad},
-                {"onMouseEnter", onMouseEnter},
-                {"onMouseLeave", onMouseLeave},
-                {"preDraw", preDraw},
-                {"postDraw", postDraw}
-            };
-        }
-
-        public IEnumerator<KeyValuePair<string, dynamic>> GetEnumerator()
-        {
-            return hooks.GetEnumerator();
-        }
-
-        public bool isAssigned(string hookName)
-        {
-            return hooks[hookName] != null;
-        }
-    }
 
     // ///////////////////////////////////////////////
     /// Icon Button with a texture and ability to vary
@@ -343,17 +255,32 @@ namespace InvisibleHand
     // ///////////////////////////////////////////////
     public class TexturedButton : CoreButton, ISocketedButton<TexturedButton>
     {
-        protected Texture2D texture;
-        protected Rectangle? defaultTexels;
-        protected Rectangle? altTexels;
 
-        protected Color bgColor;
+        //store for implementing ISocketedButton
+        private ButtonSocket<TexturedButton> _parent;
 
-        public Texture2D Texture       { get { return texture; }       set { texture       = value; } }
-        public Rectangle? InactiveRect { get { return defaultTexels; } set { defaultTexels = value; } }
-        public Rectangle? ActiveRect   { get { return altTexels; }     set { altTexels     = value; } }
 
-        public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
+        // protected Texture2D texture;
+        // protected Rectangle? defaultTexels;
+        // protected Rectangle? altTexels;
+        //
+        // protected Color bgColor;
+
+        // public Texture2D Texture       { get { return texture; }       set { texture       = value; } }
+        // public Rectangle? InactiveRect { get { return defaultTexels; } set { defaultTexels = value; } }
+        // public Rectangle? ActiveRect   { get { return altTexels; }     set { altTexels     = value; } }
+        //
+        // public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
+
+        //Can I get rid of the backing stores? They were honestly just
+        //for default values, but maybe those are generated for properties too
+        public Texture2D Texture       { get; set; }
+        public Rectangle? InactiveRect { get; set; }
+        public Rectangle? ActiveRect   { get; set; }
+
+        public Color BackgroundColor   { get; set; }
+
+
 
         public override Vector2 Size
         {
@@ -362,46 +289,52 @@ namespace InvisibleHand
             }
         }
 
-        private ButtonSocket<TexturedButton> parent;
+        /// Get ButtonSocket in which this button is placed
         public ButtonSocket<TexturedButton> ButtonBase
         {
-            get { return parent; }
-            protected set { parent = value; }
+            get { return _parent; }
+            protected set { _parent = value; }
         }
 
 
         public TexturedButton() : base()
         {
             Texture = IHBase.ButtonBG;
-            BgColor = Color.White;
+            BackgroundColor = Color.White;
 
         }
 
         public TexturedButton(TIH action,
-                              Color bgColor,
-                              Texture2D texture=null,
-                              Rectangle? defaultTexels = null,
-                              Rectangle? focusedTexels = null,
+                              Color bg_color,
+                              Texture2D texture = null,
+                              Rectangle? default_texels = null,
+                              Rectangle? focused_texels = null,
                               string label = "") : base(action, label)
         {
-            BgColor = bgColor;
+            BackgroundColor = bg_color;
             Texture = (texture==null) ? IHBase.ButtonGrid : texture;
 
-            InactiveRect = defaultTexels.HasValue ? defaultTexels : IHUtils.GetSourceRect(action);
-            ActiveRect = altTexels.HasValue ? altTexels : IHUtils.GetSourceRect(action, true);
+            InactiveRect = default_texels.HasValue ? default_texels : IHUtils.GetSourceRect(action);
+            ActiveRect = focused_texels.HasValue ? focused_texels : IHUtils.GetSourceRect(action, true);
 
         }
 
-        public override void CopyAttributes(CoreButton other)
+        public override void CopyAttributes(CoreButton other_button)
         {
-            base.CopyAttributes(other);
-            if (other is TexturedButton)
+            base.CopyAttributes(other_button);
+
+            //being an inherited method, there didn't seem to be
+            // any practical way to make this method require a
+            // TexturedButton; so here we'll check type and
+            // handle the other properties once we're sure
+            if (other_button is TexturedButton)
             {
-                TexturedButton ob = (TexturedButton)other;
-                this.Texture = ob.Texture;
-                this.InactiveRect = ob.InactiveRect;
-                this.ActiveRect = ob.ActiveRect;
-                this.BgColor = ob.BgColor;
+                // have to cast to access properties
+                TexturedButton other = (TexturedButton)other_button;
+                this.Texture = other.Texture;
+                this.InactiveRect = other.InactiveRect;
+                this.ActiveRect = other.ActiveRect;
+                this.BackgroundColor = other.BackgroundColor;
 
             }
         }
@@ -416,17 +349,19 @@ namespace InvisibleHand
     public class TextButton : CoreButton, ISocketedButton<TextButton>
     {
 
+        private ButtonSocket<TextButton> _parent;
+
         // Derived size
         public override Vector2 Size
         {
             get { return Main.fontMouseText.MeasureString(Label); }
         }
 
-        private ButtonSocket<TextButton> parent;
+        ///ISocketedButton
         public ButtonSocket<TextButton> ButtonBase
         {
-            get { return parent; }
-            protected set { parent = value; }
+            get { return _parent; }
+            protected set { _parent = value; }
         }
 
         // public override void CopyAttributes(CoreButton other)
@@ -457,9 +392,9 @@ namespace InvisibleHand
         ///<summary>
         /// Add a ButtonService to this button and subscribe to its hooks
         ///</summary>
-        public static T AddService<T>(this T button, ButtonService bs) where T: CoreButton
+        public static T AddService<T>(this T button, ButtonService service) where T: CoreButton
         {
-            button.addService(bs);
+            button.addService(service);
             return button;
         }
 

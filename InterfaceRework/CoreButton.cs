@@ -53,31 +53,29 @@ namespace InvisibleHand
         public ButtonHooks Hooks { get; protected set; }
 
         /// Subscribed Services
-        public List<ButtonService> Services { get; protected set; }
+        public Dictionary<string, ButtonService> Services { get; protected set; }
 
         /// hooks requested by services
         protected Dictionary<String, List<ButtonService>> enabledHooks { get; set; }
 
-        // Derived size
+        /// Derived size
         public abstract Vector2 Size { get; }
 
         /// blank button not intended for use other than by services
         public CoreButton()
         {
             Hooks = new ButtonHooks();
-            Services = new List<ButtonService>();
+            Services = new Dictionary<string, ButtonService>();
         }
 
         // Constructors
-        public CoreButton(TIH action, string label = "")
+        public CoreButton(TIH action, string label = "") : this()
         {
             Action = action;
             if (label == "") Label = Constants.DefaultButtonLabels[action];
             else Label = label;
             Tooltip = Label;
 
-            Hooks = new ButtonHooks();
-            Services = new List<ButtonService>();
         }
 
         /// create this button by copying all the aspects of the given button
@@ -110,39 +108,41 @@ namespace InvisibleHand
 
         public virtual void OnWorldLoad()
         {
-            if (Hooks.onWorldLoad != null) Hooks.onWorldLoad();
-            CallServiceHooks("onWorldLoad");
+            foreach (var callHook in Hooks.OnWorldLoad)
+                callHook();
         }
 
         public virtual void OnClick()
         {
-            if (Hooks.onClick != null) Hooks.onClick();
-            CallServiceHooks("onClick");
+            foreach (var callHook in Hooks.OnClick)
+                callHook();
         }
 
         public virtual void OnRightClick()
         {
-            if (Hooks.onRightClick != null) Hooks.onRightClick();
-            CallServiceHooks("onRightClick");
+            foreach (var callHook in Hooks.OnRightClick)
+                callHook();
         }
 
         /// <returns> whether to continue with the base's OnMouseEnter</returns>
         public virtual bool OnMouseEnter()
         {
             bool result = true;
-            if (Hooks.onMouseEnter!=null) result = Hooks.onMouseEnter() & result;
-            return (CallServiceHooks("onMouseEnter") & result);
+            foreach (var callHook in Hooks.OnMouseEnter)
+                result = callHook() & result;
+
+            return result;
         }
 
         /// <returns> whether to continue with the base's OnMouseLeave</returns>
         public virtual bool OnMouseLeave()
         {
             bool result = true;
-            if (Hooks.onMouseLeave!=null) result = Hooks.onMouseLeave() & result;
-            return (CallServiceHooks("onMouseLeave") & result);
-        }
+            foreach (var callHook in Hooks.OnMouseLeave)
+                result = callHook() & result;
 
-        // bypass the dynamic calls for pre/post-draw for performance gains
+            return result;
+        }
 
         ///<returns>False if any hooks returned false, indicating
         /// not to continue with the rest of the ButtonSocket's Draw() Command
@@ -150,56 +150,17 @@ namespace InvisibleHand
         public virtual bool PreDraw(SpriteBatch sb)
         {
             bool result = true;
-            if (Hooks.preDraw!=null) result = Hooks.preDraw(sb) & result;
-            // return CallServiceHooks("preDraw");
-            List<ButtonService> list;
-            if (enabledHooks.TryGetValue("preDraw", out list))
-            {
-                foreach ( var service in list )
-                    // any false return will lock result to false
-                    result = service.Hooks.preDraw(sb) & result;
-            }
+            foreach (var callHook in Hooks.PreDraw)
+                // any false return will lock result to false
+                result = callHook(sb) & result;
+
             return result;
         }
 
         public virtual void PostDraw(SpriteBatch sb)
         {
-            if (Hooks.postDraw!=null) Hooks.postDraw(sb);
-            // CallServiceHooks("postdraw", sb);
-            List<ButtonService> list;
-            if (enabledHooks.TryGetValue("postDraw", out list))
-            {
-                foreach ( var service in list )
-                    service.Hooks.postDraw(sb);
-            }
-        }
-
-        ///<param name="hook">String name of the hook being called, e.g. "onClick"</param>
-        ///<param name="sb">SpriteBatch object for Hooks which use it</param>
-        ///<param name="isFunction">whether the hook being called is a Func (otherwise it's an Action)</param>
-        ///<returns>Result of Function call if hook is Func, otherwise true</returns>
-        protected bool CallServiceHooks(string hook, SpriteBatch sb = null, bool isFunc = false )
-        {
-            List<ButtonService> list;
-            if (!enabledHooks.TryGetValue(hook, out list)) return true;
-
-            bool result = true;
-            if (isFunc)
-                if (sb == null) // Func<bool>
-                    foreach (var service in list)
-                        result = service.Hooks[hook].Invoke() & result;
-                else // Func<sb, bool>
-                    foreach (var service in list)
-                        result = service.Hooks[hook].Invoke(sb) & result;
-            else
-                if (sb == null) //Action
-                    foreach (var service in list)
-                        service.Hooks[hook].Invoke();
-                else  //Action<sb>
-                    foreach (var service in list)
-                        service.Hooks[hook].Invoke(sb);
-
-            return result;
+            foreach (var callHook in Hooks.PreDraw)
+                callHook(sb);
         }
         #endregion
 
@@ -207,42 +168,18 @@ namespace InvisibleHand
 
         internal void addService(ButtonService bs)
         {
-            Services.Add(bs);
+            Services.Add(bs.ServiceType, bs);
             bs.Subscribe();
         }
 
-        // TODO: implement this (maybe)
-        public void RemoveService(string serviceType) {}
-
-        /// <summary>
-        /// RegisterServiceHook
-        /// </summary>
-        /// <param name="service"></param>
-        /// <param name="hook_name"></param>
-        public void RegisterServiceHook(ButtonService service, string hook_name)
+        internal void RemoveService(string serviceType)
         {
-            // if the entry already exists, Add will throw an ArgumentException
-            // which we can catch and add the service to the existing list instead
-            try
+            ButtonService bs;
+            if (Services.TryGetValue(serviceType, out bs))
             {
-                enabledHooks.Add(hook_name, new List<ButtonService>() { service });
+                Services[serviceType].Unsubscribe();
+                Services.Remove(serviceType);
             }
-            catch (ArgumentException)
-            {
-                enabledHooks[hook_name].Add(service);
-            }
-        }
-
-        /// <summary>
-        /// RemoveServiceHook
-        /// </summary>
-        /// <param name="service"></param>
-        /// <param name="hook_name"></param>
-        public void RemoveServiceHook(ButtonService service, string hook_name)
-        {
-            enabledHooks[hook_name].Remove(service);
-            if (enabledHooks[hook_name].Count == 0)
-                enabledHooks.Remove(hook_name);
         }
 
         #endregion

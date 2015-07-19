@@ -487,7 +487,16 @@ namespace InvisibleHand
         /// methods even if they don't have a simple static
         /// Action for onClick(); obviously the real action
         /// should be added afterwards.
-        public static void None() { }
+        // public static void None() { }
         // yes it's a hack and I'll try to fix it later
     }
+
+
+    // /// because there's no void/none/null type
+    // public sealed class None
+    // {
+    //     private None() { }
+    //     private readonly static None _none = new None();
+    //     public static None none { get { return _none; } }
+    // }
 }

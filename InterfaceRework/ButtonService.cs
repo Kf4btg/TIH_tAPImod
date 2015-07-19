@@ -15,41 +15,19 @@ namespace InvisibleHand
         /// actions will attach.
         protected readonly CoreButton Client;
 
-        public ButtonHooks Hooks;
+        // public ButtonHooks Hooks;
 
         public ButtonService(CoreButton client)
         {
             this.Client = client;
-            Hooks = new ButtonHooks();
+            // Hooks = new ButtonHooks();
         }
 
         /// Register required hooks with Client here
         public abstract void Subscribe();
+        /// Remove registered hooks here
         public abstract void Unsubscribe();
 
-        /// Tell client we're using this hook
-        protected void RegisterHook(string hook_name)
-        {
-            Client.RegisterServiceHook(this, hook_name);
-        }
-        /// register a list of hooks with the client
-        protected void RegisterHooks(params string[] hook_names)
-        {
-            foreach (var h in hook_names)
-                RegisterHook(h);
-        }
-
-        /// Tell client we're no longer using this hook
-        protected void RemoveHook(string hook_name)
-        {
-            Client.RemoveServiceHook(this, hook_name);
-        }
-        /// remove several hooks at once
-        protected void RemoveHooks(params string[] hook_names)
-        {
-            foreach (var h in hook_names)
-                RemoveHook(h);
-        }
     }
 
     public class LockingService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
@@ -74,20 +52,23 @@ namespace InvisibleHand
 
             initialLabel = client.Label;
             lockedLabel = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
-
-            Hooks.preDraw = PreDraw;
-            Hooks.onRightClick = () => IHPlayer.ToggleActionLock(Client.Action);
-            Hooks.postDraw = PostDraw;
-            Hooks.onWorldLoad = OnWorldLoad;
         }
 
         public override void Subscribe()
         {
-            RegisterHooks("onWorldLoad", "onRightClick", "preDraw");
+            Client.Hooks.OnWorldLoad  += OnWorldLoad;
+            Client.Hooks.OnRightClick += () => IHPlayer.ToggleActionLock(Client.Action);
+            Client.Hooks.PreDraw      += PreDraw;
+
+            // RegisterHooks("onWorldLoad", "onRightClick", "preDraw");
         }
         public override void Unsubscribe()
         {
-            RemoveHooks("onWorldLoad", "onRightClick", "preDraw");
+            Client.Hooks.OnWorldLoad  -= OnWorldLoad;
+            Client.Hooks.OnRightClick -= () => IHPlayer.ToggleActionLock(Client.Action);
+            Client.Hooks.PreDraw      -= PreDraw;
+            Client.Hooks.PostDraw -= PostDraw;
+            // RemoveHooks("onWorldLoad", "onRightClick", "preDraw");
         }
 
         private void OnWorldLoad()
@@ -96,13 +77,14 @@ namespace InvisibleHand
 
             if (isLocked)
             {
-                RegisterHook("postDraw");
+                // RegisterHook("postDraw");
+                Client.Hooks.PostDraw += PostDraw;
                 Client.Label = lockedLabel;
             }
             else
             {
                 // List<>.Remove() doesn't fail on missing keys
-                RemoveHook("postDraw");
+                Client.Hooks.PostDraw -= PostDraw;
                 Client.Label = initialLabel;
             }
         }
@@ -116,12 +98,12 @@ namespace InvisibleHand
                 isLocked = !isLocked;
                 if (isLocked)
                 {
-                    RegisterHook("postDraw");
+                    Client.Hooks.PostDraw += PostDraw;
                     Client.Label = lockedLabel;
                 }
                 else
                 {
-                    RemoveHook("postDraw");
+                    Client.Hooks.PostDraw -= PostDraw;
                     Client.Label = initialLabel;
                 }
             }
@@ -152,11 +134,11 @@ namespace InvisibleHand
 
         public override void Subscribe()
         {
-            RegisterHooks("onClick", "onRightClick");
+            // RegisterHooks("onClick", "onRightClick");
         }
         public override void Unsubscribe()
         {
-            RemoveHooks("onClick", "onRightClick");
+            // RemoveHooks("onClick", "onRightClick");
         }
 
         private void sort()

@@ -11,8 +11,18 @@ using System.Reflection;
 namespace InvisibleHand
 {
 
-    public class ButtonHookEventProvider
+    /// because there's no void/none/null type
+    public sealed class None
     {
+        private None() { }
+        private readonly static None _none = new None();
+        public static None none { get { return _none; } }
+    }
+
+
+    public class ButtonHook
+    {
+
         public enum Event
         {
             Click,
@@ -23,6 +33,89 @@ namespace InvisibleHand
             PostDraw,
             WorldLoad
         }
+
+        public abstract class ButtonEvent<Tresult>
+        {
+            private Event eventType;
+
+            public ButtonEvent(Event event_type)
+            {
+                this.eventType = event_type;
+            }
+
+            public abstract Tresult Call();
+
+        }
+
+        public class EventAction : ButtonEvent<None>
+        {
+            private Action eventHandler;
+
+            public EventAction(Event event_type, Action handler) : base(event_type)
+            {
+                this.eventHandler = handler;
+            }
+
+            public override None Call()
+            {
+                eventHandler.Invoke();
+                return None.none;
+            }
+        }
+
+        public class EventAction<Targ> : ButtonEvent<None>
+        {
+            private Action<Targ> eventHandler;
+            private Targ handlerParam;
+
+            public EventAction(Event event_type, Targ param, Action<Targ> handler) : base(event_type)
+            {
+                this.eventHandler = handler;
+                handlerParam = param;
+            }
+
+            public override None Call()
+            {
+                eventHandler.Invoke(handlerParam);
+                return None.none;
+            }
+        }
+
+
+
+        public class EventFunc<Tresult> : ButtonEvent<Tresult>
+        {
+            private Func<Tresult> eventHandler;
+
+            public EventFunc(Event event_type, Func<Tresult> handler) : base(event_type)
+            {
+                this.eventHandler = handler;
+            }
+
+            public override Tresult Call()
+            {
+                return eventHandler.Invoke();
+            }
+        }
+
+        public class EventFunc<Targ, Tresult> : ButtonEvent<Tresult>
+        {
+            private Func<Targ, Tresult> eventHandler;
+            private Targ handlerParam;
+
+            public EventFunc(Event event_type, Targ param, Func<Targ, Tresult> handler) : base(event_type)
+            {
+                this.eventHandler = handler;
+                handlerParam = param;
+            }
+
+            public override Tresult Call()
+            {
+                return eventHandler.Invoke(handlerParam);
+            }
+        }
+
+
     }
 
 

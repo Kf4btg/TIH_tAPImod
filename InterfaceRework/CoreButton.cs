@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using TAPI;
 using Terraria;
-using System.Dynamic;
-using System.Reflection;
 
 namespace InvisibleHand
 {

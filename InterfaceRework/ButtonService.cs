@@ -8,14 +8,12 @@ namespace InvisibleHand
 {
     public abstract class ButtonService
     {
-        /// do I even need this?
+        /// A short string indicating this service's function
         public abstract string ServiceType { get; }
 
         /// The button to which this service's
         /// actions will attach.
         protected readonly CoreButton Client;
-
-        // public ButtonHooks Hooks;
 
         public ButtonService(CoreButton client)
         {
@@ -67,7 +65,7 @@ namespace InvisibleHand
             Client.Hooks.OnWorldLoad  -= OnWorldLoad;
             Client.Hooks.OnRightClick -= () => IHPlayer.ToggleActionLock(Client.Action);
             Client.Hooks.PreDraw      -= PreDraw;
-            Client.Hooks.PostDraw -= PostDraw;
+            Client.Hooks.PostDraw     -= PostDraw;
             // RemoveHooks("onWorldLoad", "onRightClick", "preDraw");
         }
 

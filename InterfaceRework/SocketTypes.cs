@@ -24,16 +24,16 @@ namespace InvisibleHand
                 }
         }
 
-        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)
+        public IconButtonBase(ButtonContainerLayer parent, Vector2 position, Texture2D button_bg ) : base(parent, position)
         {
             ButtonBackground = button_bg;
-            base.SetupDefault(content);
+            DefaultContent = CurrentContent = new TexturedButton();
         }
 
-        protected override void InitEmptySocket()
+        public IconButtonBase(ButtonContainerLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)
         {
-            ButtonBackground = IHBase.ButtonBG;
-            DefaultContent = CurrentContent = new TexturedButton();
+            ButtonBackground = button_bg;
+            SetDefault(content);
         }
 
         protected override void DrawButtonContent(SpriteBatch sb)
@@ -103,7 +103,7 @@ namespace InvisibleHand
         ///<summary>
         /// Create an empty socket at the given position</summary>
         public TextButtonBase
-        (   ButtonLayer parent, Vector2 position,
+        (   ButtonContainerLayer parent, Vector2 position,
             float base_scale = 0.75f,
             float focus_scale = 1.0f,
             float scale_step = 0.05f
@@ -122,11 +122,11 @@ namespace InvisibleHand
         }
 
         public TextButtonBase
-        (   ButtonLayer parent, TextButton content, Vector2 position,
+        (   ButtonContainerLayer parent, TextButton content, Vector2 position,
             float base_scale = 0.75f, float focus_scale = 1.0f, float scale_step = 0.05f
         ) : this(parent, position, base_scale, focus_scale, scale_step)
         {
-            base.SetupDefault(content);
+            base.SetDefault(content);
         }
 
         protected override bool GetIsHovered(Vector2 mouse)

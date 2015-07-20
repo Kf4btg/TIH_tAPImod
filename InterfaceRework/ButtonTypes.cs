@@ -70,13 +70,14 @@ namespace InvisibleHand
         }
 
         public TexturedButton(TIH action,
-                              Color bg_color,
+                              string label = "",
+                              Color? bg_color = null,
                               Texture2D texture = null,
                               Rectangle? default_texels = null,
-                              Rectangle? focused_texels = null,
-                              string label = "") : base(action, label)
+                              Rectangle? focused_texels = null
+                              ) : base(action, label)
         {
-            BackgroundColor = bg_color;
+            BackgroundColor = bg_color ?? Color.White;
             Texture = (texture==null) ? IHBase.ButtonGrid : texture;
 
             InactiveRect = default_texels.HasValue ? default_texels : IHUtils.GetSourceRect(action);

@@ -13,38 +13,32 @@ namespace InvisibleHand
     public class ChestButtonReplacerLayer : ButtonContainerLayer
     {
 
+        protected readonly bool textButtons;
 
         // Constructor
 
-        public ChestButtonReplacerLayer(bool text): base("ChestButtonReplacerLayer", false)
+        public ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
         {
             // Order of operations:
             //  - First, create layer (that's what this is doing)
             //  - Second, create bases and assign to layer
             //	 - Finally, create buttons and assign to bases
-            // This allow assigning references to parent objects down the stack
+            // This allows assigning references to parent objects down the stack
 
-            if (text)
+            textButtons = text;
+        }
+
+        protected override void AddBasesToLayer()
+        {
+
+            if (textButtons)
             {
 
             }
             else
             {
-                // // // // // //
-                // some datas
-                // // // // // //
-
-                // offset of lock indicator
-                var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
-                                            -(float)(int)((float)Constants.ButtonH/2));
-
-                // background tints
-                Color bgColor = Constants.ChestSlotColor * 0.85f;
-                Color saveNameBgColor = Constants.EquipSlotColor * 0.85f;
-
                 // position of first button (right of chests, below coin slots)
                 var pos0 = new Vector2(506, API.main.invBottom + 22);
-
 
                 // // // // // // //
                 // Create the Sockets
@@ -76,12 +70,34 @@ namespace InvisibleHand
                     // Add another half-button-height to prevent overlap
                     pos0.Y + (i * Constants.ButtonH) + (Constants.ButtonH/2) );
                 bases.Add(TIH.CancelEdit, new TextButtonBase(this, getPosFromIndex(slotOrder)));
+            }
+        }
 
+        protected override void AddButtonsToBases()
+        {
+
+            if (textButtons)
+            {
+
+            }
+            else
+            {
+
+                // // // // // //
+                // some datas
+                // // // // // //
+
+                // offset of lock indicator
+                var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW/2),
+                                            -(float)(int)((float)Constants.ButtonH/2));
+
+                // background tints
+                Color bgColor = Constants.ChestSlotColor * 0.85f;
+                Color saveNameBgColor = Constants.EquipSlotColor * 0.85f;
 
                 // // // // // // //
                 // Makin buttons
                 // // // // // // //
-
                 var buttonStack = new Stack<CoreButton>();
 
                 foreach (var tih in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack })
@@ -105,7 +121,6 @@ namespace InvisibleHand
             }
 
         }
-
     }
 
 }

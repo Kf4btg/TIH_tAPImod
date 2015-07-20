@@ -10,30 +10,33 @@ namespace InvisibleHand
     //TODO: transfer over documentation later
     public abstract class ButtonContainerLayer : InterfaceLayer
     {
-        public readonly Dictionary<string,CoreButton> Buttons;
+        protected bool handleMouseInterface;
+        protected float opacity_inactive, opacity_active = 1.0f;
 
+        public readonly Dictionary<string,CoreButton> Buttons;
         public readonly Dictionary<TIH, ButtonSocket<CoreButton>> ButtonBases;
 
         public Rectangle ButtonFrame { get; protected set;}
-        public bool IsHovered {
-            get {
-                return ButtonFrame.Contains(Main.mouse);
-            }
-        }
-
-        public bool handleMouseInterface;
-
-        protected float opacity_inactive, opacity_active = 1.0f;
-
-        //TODO: have this fade in/out?
         public virtual float LayerOpacity { get; protected set; }
 
-        protected ButtonContainerLayer(string name, bool handleMouseInterface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
+        public bool IsHovered
+        {
+            get { return ButtonFrame.Contains(Main.mouse); }
+        }
+
+        protected ButtonContainerLayer(string name, bool handle_mouse_interface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
             ButtonBases = new Dictionary<TIH, ButtonSocket<CoreButton>>();
             Buttons = new Dictionary<string, CoreButton>();
             ButtonFrame = Rectangle.Empty;
-            this.handleMouseInterface = handleMouseInterface;
+            handleMouseInterface = handle_mouse_interface;
+        }
+
+        public void Initialize()
+        {
+            AddBasesToLayer();
+            AddButtonsToBases();
+            UpdateFrame();
         }
 
         internal void UpdateFrame()
@@ -64,22 +67,13 @@ namespace InvisibleHand
         }
 
 
-        /// add the button, using a transform function to get its position
-        public void Add(CoreButton button, Func<TIH, Vector2> getPosition)
-        {
-            // Buttons.Add(button, getPosition(button.action));
-        }
+        // Abstract Methods //
+
+        protected abstract void AddBasesToLayer();
+
+        protected abstract void AddButtonsToBases();
 
     }
-
-
-
-
-
-
-
-
-
 
 
     /// this Class will fade ALL buttons in the loyer in/out as the
@@ -96,7 +90,7 @@ namespace InvisibleHand
         }
 
         /// fade step of 0 will cause instant opacity change;
-        protected FadingButtonLayer(string name, float min_opacity, float max_opacity, float fade_step = 0, bool handleMouseInterface = true) : base(name, handleMouseInterface)
+        protected FadingButtonLayer(string name, float min_opacity, float max_opacity, float fade_step = 0, bool handle_mouse_interface = true) : base(name, handle_mouse_interface)
         {
             opacity_inactive = min_opacity.Clamp();
             opacity_active = max_opacity.Clamp();

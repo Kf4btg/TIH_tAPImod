@@ -8,8 +8,6 @@ namespace InvisibleHand
 {
     public class LockingService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
     {
-        public override string ServiceType { get { return "Lock"; } }
-
         private readonly Color color;
         private readonly Vector2 offset;
 
@@ -20,8 +18,13 @@ namespace InvisibleHand
 
         private readonly ButtonSocket<T> socket;
 
+        private readonly string _serviceType;
+        public override string ServiceType { get { return _serviceType; } }
+
         public LockingService(T client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
         {
+            _serviceType = Enum.GetName(typeof(TIH), client.Action) + "Lock";
+
             socket = client.ButtonBase;
             color = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
@@ -96,24 +99,44 @@ namespace InvisibleHand
     {
         protected readonly ButtonSocket<T> socket;
         protected readonly KState.Special toggleKey;
-        protected readonly T altButton;
+
+        protected abstract T AltButton { get; }
 
 
         public ToggleService(T client, KState.Special toggle_key) :base(client)
         {
             socket = client.ButtonBase;
             toggleKey = toggle_key;
-            altButton = InitAlternateButton(client);
         }
-
-        /// Initialize the alternate button to which the first will toggle when specified key is pressed
-        protected abstract T InitAlternateButton(T original_button);
 
         /// should either override this completely or at the least
         /// call this base version to properly set key-toggle.
         public override void Subscribe()
         {
-            socket.RegisterKeyToggle(toggleKey, altButton);
+            socket.RegisterKeyToggle(toggleKey, AltButton);
+        }
+
+        public override void Unsubscribe()
+        {
+            // TODO: figure out how to unregister key toggle.
+            // Also, make sure socket is displaying original
+            // button and not toggled button when service removed.
+        }
+    }
+
+    /// Generic Toggling Service for two arbitary buttons.
+    public class ButtonToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>, new()
+    {
+        private string _serviceType;
+        private T _altButton;
+
+        public override string ServiceType { get { return _serviceType; } }
+        protected override T AltButton { get {return _altButton;} }
+
+        public ButtonToggleService(T client, T altButton, KState.Special toggle_key) : base(client, toggle_key)
+        {
+            _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
+            _altButton = altButton;
         }
     }
 
@@ -125,44 +148,35 @@ namespace InvisibleHand
 
         private readonly Action sortAction;
 
+        private readonly T reverseButton;
+        protected override T AltButton { get {return reverseButton;} }
+
         // public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
         public SortingToggleService(T client, bool chest, KState.Special toggle_key) : base(client, toggle_key)
         {
+            reverseButton = new T();
+            reverseButton.CopyAttributes(client);
+
             if (chest)
             {
                 sortAction = () => IHPlayer.SortChest();
-                altButton.Hooks.OnClick += () => IHPlayer.SortChest(true);
+                reverseButton.Hooks.OnClick += () => IHPlayer.SortChest(true);
             }
             else
             {
                 sortAction = () => IHPlayer.SortInventory();
-                altButton.Hooks.OnClick += () => IHPlayer.SortInventory(true);
+                reverseButton.Hooks.OnClick += () => IHPlayer.SortInventory(true);
             }
-        }
-
-        protected override T InitAlternateButton(T client)
-        {
-            var newButton = new T();
-            newButton.CopyAttributes(client);
-            return newButton;
         }
 
         public override void Subscribe()
         {
             base.Subscribe(); // registers toggle key
             Client.Hooks.OnClick += sortAction;
-            // socket.RegisterKeyToggle(toggleKey, reverseButton);
         }
         public override void Unsubscribe()
         {
             Client.Hooks.OnClick -= sortAction;
-            // TODO: figure out how to unregister key toggle
-            // Also, make sure socket is displaying original
-            // button and not toggled button when service removed.
         }
     }
-
-
-
-
 }

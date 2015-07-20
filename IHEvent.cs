@@ -1,10 +1,6 @@
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TAPI;
-using Terraria;
 
 namespace InvisibleHand
 {
@@ -13,7 +9,7 @@ namespace InvisibleHand
 	// to have a serious mental block on understanding how an Event-
 	// based system works/is supposed to work.  After a half-dozen failed
 	// iterations of my own event-model, I found that Shockah's SEvent
-	// class did precisely what I wanted in an embarrasingly simple and 
+	// class did precisely what I wanted in an embarrasingly simple and
 	// understandable fashion.  So thanks go to Shockah for this beauty,
 	// mostly unchanged from how I found it.
     public class IHEvent<T> : IEnumerable<T> where T : class
@@ -55,5 +51,5 @@ namespace InvisibleHand
 		}
 	}
 
-    
+
 }

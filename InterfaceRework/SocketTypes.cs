@@ -24,8 +24,6 @@ namespace InvisibleHand
                 }
         }
 
-
-
         public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)
         {
             ButtonBackground = button_bg;
@@ -101,8 +99,6 @@ namespace InvisibleHand
             // button zooms in or out.
             get { return Main.mouseTextColor.toScaledColor(Scale); }
         }
-
-
 
         ///<summary>
         /// Create an empty socket at the given position</summary>

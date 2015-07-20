@@ -175,7 +175,7 @@ namespace InvisibleHand
 
         #endregion
     }
-    
+
     public class ButtonHooks
     {
         // public enum On

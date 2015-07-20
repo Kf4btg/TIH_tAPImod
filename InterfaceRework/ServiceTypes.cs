@@ -92,46 +92,77 @@ namespace InvisibleHand
         }
     }
 
+    public abstract class ToggleService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
+    {
+        protected readonly ButtonSocket<T> socket;
+        protected readonly KState.Special toggleKey;
+        protected readonly T altButton;
+
+
+        public ToggleService(T client, KState.Special toggle_key) :base(client)
+        {
+            socket = client.ButtonBase;
+            toggleKey = toggle_key;
+            altButton = InitAlternateButton(client);
+        }
+
+        /// Initialize the alternate button to which the first will toggle when specified key is pressed
+        protected abstract T InitAlternateButton(T original_button);
+
+        /// should either override this completely or at the least
+        /// call this base version to properly set key-toggle.
+        public override void Subscribe()
+        {
+            socket.RegisterKeyToggle(toggleKey, altButton);
+        }
+    }
+
     /// this class creates a second button and sets the given button's base to switch to it on shift
-    public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
+    // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
+    public class SortingToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>, new()
     {
         public override string ServiceType { get { return "Sort"; } }
 
-        private readonly ButtonSocket<T> socket;
-        private readonly T reverseButton;
         private readonly Action sortAction;
-        private readonly KState.Special toggleKey;
 
-        public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
+        // public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
+        public SortingToggleService(T client, bool chest, KState.Special toggle_key) : base(client, toggle_key)
         {
-            reverseButton = new T();
-            reverseButton.CopyAttributes(client);
-
-            socket = client.ButtonBase;
-
             if (chest)
             {
                 sortAction = () => IHPlayer.SortChest();
-                reverseButton.Hooks.OnClick += () => IHPlayer.SortChest(true);
+                altButton.Hooks.OnClick += () => IHPlayer.SortChest(true);
             }
             else
             {
                 sortAction = () => IHPlayer.SortInventory();
-                reverseButton.Hooks.OnClick += () => IHPlayer.SortInventory(true);
+                altButton.Hooks.OnClick += () => IHPlayer.SortInventory(true);
             }
+        }
 
+        protected override T InitAlternateButton(T client)
+        {
+            var newButton = new T();
+            newButton.CopyAttributes(client);
+            return newButton;
         }
 
         public override void Subscribe()
         {
+            base.Subscribe(); // registers toggle key
             Client.Hooks.OnClick += sortAction;
-            socket.RegisterKeyToggle(toggleKey, reverseButton);
+            // socket.RegisterKeyToggle(toggleKey, reverseButton);
         }
         public override void Unsubscribe()
         {
             Client.Hooks.OnClick -= sortAction;
             // TODO: figure out how to unregister key toggle
+            // Also, make sure socket is displaying original
+            // button and not toggled button when service removed.
         }
     }
+
+
+
 
 }

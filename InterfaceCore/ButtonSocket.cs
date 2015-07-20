@@ -6,10 +6,17 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    public interface IButtonSlot
+    {
+        ButtonContainerLayer ParentLayer { get; }
+        Vector2 Position { get; }
+    }
+
+
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonSocket<T> where T:CoreButton
+    public abstract class ButtonSocket<T> : IButtonSlot where T:CoreButton
     {
         //backing stores & default values
         protected float _minScale = 0.5f;
@@ -19,7 +26,7 @@ namespace InvisibleHand
         protected float _alpha = 1.0f;
 
         /// interface layer this button belongs to
-        public ButtonLayer ParentLayer { get; protected set; }
+        public ButtonContainerLayer ParentLayer { get; protected set; }
 
         /// Get this button's screem coordinates
         public Vector2 Position { get; protected set; }
@@ -84,12 +91,10 @@ namespace InvisibleHand
 
         /// initialize a new, empty socket with blank content;
         /// calls the derived-class specific version of InitEmptySocket()
-        public ButtonSocket(ButtonLayer parent, Vector2 position)
+        public ButtonSocket(ButtonContainerLayer parent, Vector2 position)
         {
             ParentLayer = parent;
             Position = position;
-
-            InitEmptySocket();
         }
 
         // public ButtonSocket(ButtonLayer parent, T content, Vector2 position)
@@ -254,19 +259,17 @@ namespace InvisibleHand
         /// Make this button usable by adding a default button configuration
         /// </summary>
         /// <param name="default_content">Default button</param>
-        public virtual void SetupDefault(T default_content)
+        /// <returns>This socket</returns>
+        public virtual ButtonSocket<T> SetDefault(T default_content)
         {
             this.DefaultContent = this.CurrentContent = default_content;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)default_content.Size.X, (int)default_content.Size.Y);
+
+            return this;
         }
 
         //virtually abstract methods (no default implementation)
-
-        /// <summary>
-        /// Setup this socket in a stable but uninitialized manner
-        /// </summary>
-        protected virtual void InitEmptySocket() {}
 
         ///<summary>
         /// Called every frame while the mouse is hovered over this button

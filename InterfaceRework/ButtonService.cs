@@ -114,41 +114,46 @@ namespace InvisibleHand
         }
     }
 
-    /// this class creates a second button and set's the given button's base to switch to it on shift
+    /// this class creates a second button and sets the given button's base to switch to it on shift
     public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
     {
         public override string ServiceType { get { return "Sort"; } }
 
         private readonly ButtonSocket<T> socket;
         private readonly T reverseButton;
+        private readonly Action sortAction;
+        private readonly KState.Special toggleKey;
 
-        public SorterService(T client, KState.Special toggle_key) : base(client)
+        public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
         {
             reverseButton = new T();
             reverseButton.CopyAttributes(client);
 
+            socket = client.ButtonBase;
+
+            if (chest)
+            {
+                sortAction = () => IHPlayer.SortChest();
+                reverseButton.Hooks.OnClick += () => IHPlayer.SortChest(true);
+            }
+            else
+            {
+                sortAction = () => IHPlayer.SortInventory();
+                reverseButton.Hooks.OnClick += () => IHPlayer.SortInventory(true);
+            }
 
         }
 
         public override void Subscribe()
         {
-            // RegisterHooks("onClick", "onRightClick");
+            Client.Hooks.OnClick += sortAction;
+            socket.RegisterKeyToggle(toggleKey, reverseButton);
         }
         public override void Unsubscribe()
         {
-            // RemoveHooks("onClick", "onRightClick");
+            Client.Hooks.OnClick -= sortAction;
+            // TODO: figure out how to unregister key toggle
         }
-
-        private void sort()
-        {
-
-        }
-
-        private void reverseSort()
-        {
-
-        }
-
     }
 
 }

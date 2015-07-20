@@ -143,7 +143,7 @@ namespace InvisibleHand
         public void RegisterKeyToggle(KState.Special key, T context1, T context2)
         {
             //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
-            var kw2 = new KeyWatcher(KState.Special.Shift, KeyEventProvider.Event.Released, null);
+            var kw2 = new KeyWatcher(key, KeyEventProvider.Event.Released, null);
 
             var kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
             () => {
@@ -158,6 +158,8 @@ namespace InvisibleHand
                 };
 
             // subscribe to default watcher
+            // FIXME: it occurs to me that there might currently be no
+            // way to Un-register this key-toggle
             kw1.Subscribe();
         }
 

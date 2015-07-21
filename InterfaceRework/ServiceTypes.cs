@@ -95,18 +95,24 @@ namespace InvisibleHand
         }
     }
 
-    public abstract class ToggleService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
+    /// Generic Toggling Service for two arbitary buttons.
+    public class ToggleService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
     {
+
         protected readonly ButtonSocket<T> socket;
         protected readonly KState.Special toggleKey;
 
-        protected abstract T AltButton { get; }
+        private string _serviceType;
+        private T _altButton;
 
+        public override string ServiceType { get { return _serviceType; } }
+        protected virtual T AltButton { get {return _altButton;} }
 
-        public ToggleService(T client, KState.Special toggle_key) :base(client)
+        public ToggleService(T client, T altButton, KState.Special toggle_key) : base(client)
         {
             socket = client.ButtonBase;
-            toggleKey = toggle_key;
+            _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
+            _altButton = altButton;
         }
 
         /// should either override this completely or at the least
@@ -124,59 +130,42 @@ namespace InvisibleHand
         }
     }
 
-    /// Generic Toggling Service for two arbitary buttons.
-    public class ButtonToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>
-    {
-        private string _serviceType;
-        private T _altButton;
-
-        public override string ServiceType { get { return _serviceType; } }
-        protected override T AltButton { get {return _altButton;} }
-
-        public ButtonToggleService(T client, T altButton, KState.Special toggle_key) : base(client, toggle_key)
-        {
-            _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
-            _altButton = altButton;
-        }
-    }
-
     /// this class creates a second button and sets the given button's base to switch to it on shift
     // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
-    public class SortingToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>, new()
+    public class SortingToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>
     {
-        public override string ServiceType { get { return "Sort"; } }
+        public override string ServiceType { get { return "SortingToggle"; } }
 
-        private readonly Action sortAction;
-
-        private readonly T reverseButton;
-        protected override T AltButton { get {return reverseButton;} }
+        private Action sortAction;
+        private Action revSortAction;
+        private readonly bool sortChest;
 
         // public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
-        public SortingToggleService(T client, bool chest, KState.Special toggle_key) : base(client, toggle_key)
+        public SortingToggleService(T forward, T reverse, bool chest, KState.Special toggle_key) : base(forward, reverse, toggle_key)
         {
-            reverseButton = new T();
-            reverseButton.CopyAttributes(client);
-
-            if (chest)
-            {
-                sortAction = () => IHPlayer.SortChest();
-                reverseButton.Hooks.OnClick += () => IHPlayer.SortChest(true);
-            }
-            else
-            {
-                sortAction = () => IHPlayer.SortInventory();
-                reverseButton.Hooks.OnClick += () => IHPlayer.SortInventory(true);
-            }
+            sortChest = chest;
         }
 
         public override void Subscribe()
         {
             base.Subscribe(); // registers toggle key
+            if (sortChest)
+            {
+                sortAction = () => IHPlayer.SortChest();
+                revSortAction = () => IHPlayer.SortChest(true);
+            }
+            else
+            {
+                sortAction = () => IHPlayer.SortInventory();
+                revSortAction= () => IHPlayer.SortInventory(true);
+            }
             Client.Hooks.OnClick += sortAction;
+            AltButton.Hooks.OnClick += revSortAction;
         }
         public override void Unsubscribe()
         {
             Client.Hooks.OnClick -= sortAction;
+            AltButton.Hooks.OnClick -= revSortAction;
         }
     }
 }

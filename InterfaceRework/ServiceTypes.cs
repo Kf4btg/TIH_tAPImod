@@ -5,7 +5,7 @@ using TAPI;
 
 namespace InvisibleHand
 {
-    public class LockingService<T> : ButtonService where T : CoreButton, ISocketedButton<T>
+    public class LockingService: ButtonService
     {
         private readonly Color   color;
         private readonly Vector2 offset;
@@ -15,12 +15,12 @@ namespace InvisibleHand
         // private readonly TIH clientAction;
         private bool isLocked;
 
-        private readonly ButtonSocket<T> socket;
+        private readonly IButtonSlot socket;
 
         private readonly string _serviceType;
         public override string ServiceType { get { return _serviceType; } }
 
-        public LockingService(T client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
+        public LockingService(ICoreButton client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
         {
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + "Lock";
 
@@ -95,9 +95,9 @@ namespace InvisibleHand
     }
 
     /// Generic Toggling Service for two arbitary buttons.
-    public class ToggleService<T> : ButtonService where T : CoreButton, ISocketedButton<T>
+    public class ToggleService<T> : ButtonService where T: ISocketedButton<T>
     {
-        protected readonly ButtonSocket<T> socket;
+        protected readonly IButtonContentHandler<T> socket;
         protected readonly KState.Special  toggleKey;
 
         private string _serviceType;
@@ -108,7 +108,7 @@ namespace InvisibleHand
 
         public ToggleService(T client, T altButton, KState.Special toggle_key) : base(client)
         {
-            socket       = client.ButtonBase;
+            socket       = client.Socket;
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
             _altButton   = altButton;
         }
@@ -130,7 +130,7 @@ namespace InvisibleHand
 
     /// this class creates a second button and sets the given button's base to switch to it on shift
     // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
-    public class SortingToggleService<T> : ToggleService<T> where T : CoreButton, ISocketedButton<T>
+    public class SortingToggleService<T>: ToggleService<T> where T: ISocketedButton<T>
     {
         public override string ServiceType { get { return "SortingToggle"; } }
 

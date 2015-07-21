@@ -10,7 +10,7 @@ namespace InvisibleHand
     // TODO: transfer over documentation later
     public abstract class ButtonContainerLayer : InterfaceLayer
     {
-        protected bool  handleMouseInterface;
+        protected bool handleMouseInterface;
         protected float opacity_inactive, opacity_active = 1.0f;
 
         public readonly Dictionary<string,CoreButton> Buttons;

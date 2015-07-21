@@ -9,9 +9,9 @@ namespace InvisibleHand
 
         /// The button to which this service's
         /// actions will attach.
-        protected readonly CoreButton Client;
+        protected readonly ICoreButton Client;
 
-        public ButtonService(CoreButton client)
+        public ButtonService(ICoreButton client)
         {
             this.Client = client;
         }

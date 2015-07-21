@@ -104,25 +104,19 @@ namespace InvisibleHand
                 Func<TIH, Color>  getBGcol = a => a == TIH.SaveName ? Constants.ChestSlotColor * 0.85f : Constants.EquipSlotColor * 0.85f;
                 Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
 
+                var _buttons = new Dictionary<TIH, TexturedButton>();
                 foreach (var tih in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack, TIH.Rename, TIH.SaveName })
                 {
-                    buttonStack.Push(new TexturedButton( action: tih,
+                    _buttons.Add(tih, new TexturedButton( action: tih,
                                                          label:    getLabel(tih),
                                                          tooltip:  getTtip(tih),
                                                          bg_color: getBGcol(tih)
                                                          ));
                 }
-                buttonStack.Push(new TextButton(TIH.CancelEdit, getLabel(TIH.CancelEdit)));
+                var cancelEditButton = new TextButton(TIH.CancelEdit, getLabel(TIH.CancelEdit));
 
-                foreach (var tih in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack, TIH.Rename, TIH.SaveName })
-                {
-                    buttonStack.Push( new TexturedButton (
-                                                action:   tih,
-                                                label:    Constants.DefaultButtonLabels[tih],
-                                                bg_color: tih == TIH.SaveName ? Constants.ChestSlotColor * 0.85f : Constants.EquipSlotColor * 0.85f
-                                                ).With((button) => { button.Tooltip = button.Label + IHUtils.GetKeyTip(button.Action); })
-                    );
-                }
+                _buttons[TIH.SortChest].AddService(new SortingToggleService<TexturedButton>(_buttons[TIH.SortChest], _buttons[TIH.RSortChest], true, KState.Special.Shift));
+
                 // if (button.Action == TIH.QuickStack || button.Action == TIH.DepAll)
                 //     button.AddService(new LockingService<TexturedButton>( button, lockOffset ));
             }

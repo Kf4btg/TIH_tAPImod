@@ -7,8 +7,47 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    public interface ICoreButton
+    {
+        IButtonSlot ButtonBase { get; }
+
+        string ID { get; }
+
+        TIH Action { get; set; }
+        string Label { get; set; }
+        string Tooltip { get; set; }
+        Color Tint { get; set; }
+        Vector2 Size { get; }
+
+        ButtonHooks Hooks { get; }
+        Dictionary<string, ButtonService> Services { get; }
+
+        void OnWorldLoad();
+        void OnClick();
+        void OnRightClick();
+        bool OnMouseEnter();
+        bool OnMouseLeave();
+        bool PreDraw(SpriteBatch sb);
+        void PostDraw(SpriteBatch sb);
+
+    }
+
+    /// Having subclasses of CoreButton ALSO implement this interface seems to be
+    /// the ONLY way to get a reliably type-safe reference to the parent buttonbase
+    public interface ISocketedButton<T> :ICoreButton where T: ISocketedButton<T>
+    {
+        IButtonContentHandler<T> Socket { get; }
+
+        // void Duplicate(out ISocketedButton newCopy);
+    }
+
+
+
+
+
+
     /// re-imagining the ButtonState and IHButton as one object
-    public abstract class CoreButton
+    public abstract class CoreButton : ICoreButton
     {
         // fields //
 
@@ -19,6 +58,8 @@ namespace InvisibleHand
 
         // protected TIH action;
         // protected Color tint;
+
+        public abstract IButtonSlot ButtonBase { get; protected set; }
 
 
         //Properties//

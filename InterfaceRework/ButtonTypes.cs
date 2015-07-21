@@ -7,14 +7,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    /// Having subclasses of CoreButton ALSO implement this interface seems to be
-    /// the ONLY way to get a reliably type-safe reference to the parent buttonbase
-    public interface ISocketedButton<T> where T : CoreButton
-    {
-        ButtonSocket<T> ButtonBase { get; }
-
-        void Duplicate(out T newCopy);
-    }
 
     // ///////////////////////////////////////////////
     /// Icon Button with a texture and ability to vary
@@ -23,23 +15,25 @@ namespace InvisibleHand
     public class TexturedButton : CoreButton, ISocketedButton<TexturedButton>
     {
         // store for implementing ISocketedButton
-        private ButtonSocket<TexturedButton> _parent;
+        private IButtonSlot _parent;
 
-        // protected Texture2D texture;
-        // protected Rectangle? defaultTexels;
-        // protected Rectangle? altTexels;
-        //
-        // protected Color bgColor;
+        public IButtonContentHandler<TexturedButton> Socket { get; }
 
-        // public Texture2D Texture       { get { return texture; }       set { texture       = value; } }
-        // public Rectangle? InactiveRect { get { return defaultTexels; } set { defaultTexels = value; } }
-        // public Rectangle? ActiveRect   { get { return altTexels; }     set { altTexels     = value; } }
-        //
-        // public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
+    // protected Texture2D texture;
+    // protected Rectangle? defaultTexels;
+    // protected Rectangle? altTexels;
+    //
+    // protected Color bgColor;
 
-        // Can I get rid of the backing stores? They were honestly just
-        // for default values, but maybe those are generated for properties too
-        public Texture2D Texture       { get; set; }
+    // public Texture2D Texture       { get { return texture; }       set { texture       = value; } }
+    // public Rectangle? InactiveRect { get { return defaultTexels; } set { defaultTexels = value; } }
+    // public Rectangle? ActiveRect   { get { return altTexels; }     set { altTexels     = value; } }
+    //
+    // public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
+
+    // Can I get rid of the backing stores? They were honestly just
+    // for default values, but maybe those are generated for properties too
+    public Texture2D Texture       { get; set; }
         public Rectangle? InactiveRect { get; set; }
         public Rectangle? ActiveRect   { get; set; }
         public Color BackgroundColor   { get; set; }
@@ -50,7 +44,7 @@ namespace InvisibleHand
         }
 
         /// Get ButtonSocket in which this button is placed
-        public ButtonSocket<TexturedButton> ButtonBase
+        public override IButtonSlot ButtonBase
         {
             get { return _parent; }
             protected set { _parent = value; }
@@ -89,9 +83,9 @@ namespace InvisibleHand
     // ////////////////////////////////////////////////////////////////////////////
     /// Text-only button in the vein of those directly beside the chest in Vanilla
     // ////////////////////////////////////////////////////////////////////////////
-    public class TextButton : CoreButton, ISocketedButton<TextButton>
+    public class TextButton : CoreButton
     {
-        private ButtonSocket<TextButton> _parent;
+        private IButtonSlot _parent;
 
         // Derived size
         public override Vector2 Size
@@ -100,7 +94,7 @@ namespace InvisibleHand
         }
 
         ///ISocketedButton
-        public ButtonSocket<TextButton> ButtonBase
+        public override IButtonSlot ButtonBase
         {
             get { return _parent; }
             protected set { _parent = value; }
@@ -158,11 +152,11 @@ namespace InvisibleHand
             return button;
         }
 
-        public static T Duplicate<T>(this ISocketedButton<T> button) where T: CoreButton
-        {
-            T newButton;
-            button.Duplicate(out newButton);
-            return newButton;
-        }
+        // public static T Duplicate<T>(this ISocketedButton<T> button) where T: CoreButton
+        // {
+        //     T newButton;
+        //     button.Duplicate(out newButton);
+        //     return newButton;
+        // }
     }
 }

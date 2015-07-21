@@ -10,13 +10,39 @@ namespace InvisibleHand
     {
         ButtonContainerLayer ParentLayer { get; }
         Vector2 Position { get; }
+        Vector2 Size { get; }
+        Rectangle ButtonBounds { get; }
+
+        bool IsHovered { get; }
+        float Scale { get; set; }
+        float Alpha { get; set; }
+
+        // void RegisterKeyToggle(KState.Special key, ICoreButton context2);
+        // void RegisterKeyToggle(KState.Special key, ICoreButton context1, ICoreButton context2);
+
+        void Draw(SpriteBatch sb);
+
+    }
+
+    public interface IButtonContentHandler<T> : IButtonSlot where T: ICoreButton
+    {
+        T CurrentContent { get; }
+        T DefaultContent { get; }
+
+        void ChangeContent(T new_content);
+        void Reset();
+
+        void RegisterKeyToggle(KState.Special key, T context2);
+        void RegisterKeyToggle(KState.Special key, T context1, T context2);
+        void SetDefault(T default_content);
+
     }
 
 
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonSocket<T> : IButtonSlot where T:CoreButton
+    public abstract class ButtonSocket<T> : IButtonContentHandler<T> where T: ICoreButton
     {
         //backing stores & default values
         protected float _minScale = 0.5f;
@@ -135,7 +161,7 @@ namespace InvisibleHand
         /// <param name="context2">Corebutton to swap with</param>
         public void RegisterKeyToggle(KState.Special key, T context2)
         {
-            RegisterKeyToggle(key, this.DefaultContent, context2);
+            RegisterKeyToggle(key, DefaultContent, context2);
         }
 
         /// <summary>
@@ -260,13 +286,13 @@ namespace InvisibleHand
         /// </summary>
         /// <param name="default_content">Default button</param>
         /// <returns>This socket</returns>
-        public virtual ButtonSocket<T> SetDefault(T default_content)
+        public void SetDefault(T default_content)
         {
             this.DefaultContent = this.CurrentContent = default_content;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)default_content.Size.X, (int)default_content.Size.Y);
 
-            return this;
+            // return this;
         }
 
         //virtually abstract methods (no default implementation)

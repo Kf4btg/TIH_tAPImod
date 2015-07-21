@@ -1,18 +1,17 @@
-using System;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System;
 using TAPI;
-
 
 namespace InvisibleHand
 {
-    public class LockingService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
+    public class LockingService<T> : ButtonService where T : CoreButton, ISocketedButton<T>
     {
-        private readonly Color color;
+        private readonly Color   color;
         private readonly Vector2 offset;
 
-        private readonly string lockedLabel;
-        private readonly string initialLabel;
+        private readonly string  lockedLabel;
+        private readonly string  initialLabel;
         // private readonly TIH clientAction;
         private bool isLocked;
 
@@ -26,11 +25,11 @@ namespace InvisibleHand
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + "Lock";
 
             socket = client.ButtonBase;
-            color = lock_color ?? Color.Firebrick;
+            color  = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
 
             initialLabel = client.Label;
-            lockedLabel = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
+            lockedLabel  = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
         }
 
         public override void Subscribe()
@@ -96,23 +95,22 @@ namespace InvisibleHand
     }
 
     /// Generic Toggling Service for two arbitary buttons.
-    public class ToggleService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
+    public class ToggleService<T> : ButtonService where T : CoreButton, ISocketedButton<T>
     {
-
         protected readonly ButtonSocket<T> socket;
-        protected readonly KState.Special toggleKey;
+        protected readonly KState.Special  toggleKey;
 
         private string _serviceType;
         private T _altButton;
 
         public override string ServiceType { get { return _serviceType; } }
-        protected virtual T AltButton { get {return _altButton;} }
+        protected virtual T AltButton { get { return _altButton; } }
 
         public ToggleService(T client, T altButton, KState.Special toggle_key) : base(client)
         {
-            socket = client.ButtonBase;
+            socket       = client.ButtonBase;
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
-            _altButton = altButton;
+            _altButton   = altButton;
         }
 
         /// should either override this completely or at the least
@@ -132,7 +130,7 @@ namespace InvisibleHand
 
     /// this class creates a second button and sets the given button's base to switch to it on shift
     // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
-    public class SortingToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>
+    public class SortingToggleService<T> : ToggleService<T> where T : CoreButton, ISocketedButton<T>
     {
         public override string ServiceType { get { return "SortingToggle"; } }
 
@@ -151,20 +149,20 @@ namespace InvisibleHand
             base.Subscribe(); // registers toggle key
             if (sortChest)
             {
-                sortAction = () => IHPlayer.SortChest();
+                sortAction    = () => IHPlayer.SortChest();
                 revSortAction = () => IHPlayer.SortChest(true);
             }
             else
             {
-                sortAction = () => IHPlayer.SortInventory();
-                revSortAction= () => IHPlayer.SortInventory(true);
+                sortAction    = () => IHPlayer.SortInventory();
+                revSortAction = () => IHPlayer.SortInventory(true);
             }
-            Client.Hooks.OnClick += sortAction;
+            Client.Hooks.OnClick    += sortAction;
             AltButton.Hooks.OnClick += revSortAction;
         }
         public override void Unsubscribe()
         {
-            Client.Hooks.OnClick -= sortAction;
+            Client.Hooks.OnClick    -= sortAction;
             AltButton.Hooks.OnClick -= revSortAction;
         }
     }

@@ -1,7 +1,7 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System;
 using TAPI;
 using Terraria;
 
@@ -9,7 +9,7 @@ namespace InvisibleHand
 {
     /// Having subclasses of CoreButton ALSO implement this interface seems to be
     /// the ONLY way to get a reliably type-safe reference to the parent buttonbase
-    public interface ISocketedButton<T> where T: CoreButton
+    public interface ISocketedButton<T> where T : CoreButton
     {
         ButtonSocket<T> ButtonBase { get; }
 
@@ -22,10 +22,8 @@ namespace InvisibleHand
     // ///////////////////////////////////////////////
     public class TexturedButton : CoreButton, ISocketedButton<TexturedButton>
     {
-
-        //store for implementing ISocketedButton
+        // store for implementing ISocketedButton
         private ButtonSocket<TexturedButton> _parent;
-
 
         // protected Texture2D texture;
         // protected Rectangle? defaultTexels;
@@ -39,21 +37,16 @@ namespace InvisibleHand
         //
         // public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
 
-        //Can I get rid of the backing stores? They were honestly just
-        //for default values, but maybe those are generated for properties too
+        // Can I get rid of the backing stores? They were honestly just
+        // for default values, but maybe those are generated for properties too
         public Texture2D Texture       { get; set; }
         public Rectangle? InactiveRect { get; set; }
         public Rectangle? ActiveRect   { get; set; }
-
         public Color BackgroundColor   { get; set; }
-
-
 
         public override Vector2 Size
         {
-            get {
-                return InactiveRect.HasValue ? InactiveRect.Value.Size() : Texture.Size();
-            }
+            get { return InactiveRect.HasValue ? InactiveRect.Value.Size() : Texture.Size(); }
         }
 
         /// Get ButtonSocket in which this button is placed
@@ -65,6 +58,7 @@ namespace InvisibleHand
 
         public TexturedButton(TIH action,
                               string label,
+                              string tooltip = "",
                               Color? bg_color = null,
                               Texture2D texture = null,
                               Rectangle? inactive_rect = null,
@@ -72,17 +66,16 @@ namespace InvisibleHand
                               ) : base(action, label)
         {
             BackgroundColor = bg_color ?? Color.White;
-            Texture = (texture==null) ? IHBase.ButtonGrid : texture;
 
+            Texture      = (texture == null) ? IHBase.ButtonGrid : texture;
             InactiveRect = inactive_rect.HasValue ? inactive_rect : IHUtils.GetSourceRect(action);
-            ActiveRect = active_rect.HasValue ? active_rect : IHUtils.GetSourceRect(action, true);
-
+            ActiveRect   = active_rect.HasValue ? active_rect : IHUtils.GetSourceRect(action, true);
         }
 
 
         public TexturedButton Duplicate()
         {
-            return new TexturedButton(this.Action, this.Label, this.BackgroundColor, this.Texture, this.InactiveRect, this.ActiveRect);
+            return new TexturedButton(this.Action, this.Label, this.Tooltip, this.BackgroundColor, this.Texture, this.InactiveRect, this.ActiveRect);
         }
 
         public void Duplicate(out TexturedButton newTB)
@@ -98,7 +91,6 @@ namespace InvisibleHand
     // ////////////////////////////////////////////////////////////////////////////
     public class TextButton : CoreButton, ISocketedButton<TextButton>
     {
-
         private ButtonSocket<TextButton> _parent;
 
         // Derived size
@@ -125,7 +117,6 @@ namespace InvisibleHand
 
         public TextButton(TIH action, string label = "") : base(action, label)
         {
-
         }
 
         public void Duplicate(out TextButton newButton)
@@ -142,7 +133,7 @@ namespace InvisibleHand
         ///<summary>
         /// Add a ButtonService to this button and subscribe to its hooks
         ///</summary>
-        public static T AddService<T>(this T button, ButtonService service) where T: CoreButton
+        public static T AddService<T>(this T button, ButtonService service) where T : CoreButton
         {
             button.addService(service);
             return button;
@@ -153,14 +144,14 @@ namespace InvisibleHand
         /// </summary>
         /// <example>
         /// <code>
-        /// 	TexturedButton cb = new TexturedButton(TIH.Sort).With( (b) => {
+        ///     TexturedButton cb = new TexturedButton(TIH.Sort).With( (b) => {
         ///          b.Hooks.onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer);
         ///          b.ToolTip = "Sort Me";
         ///          // ... etc.
         ///    })
         /// </code>
         ///</example>
-        public static T With<T>(this T button, Action<T> action) where T: CoreButton
+        public static T With<T>(this T button, Action<T> action) where T : CoreButton
         {
             if (button != null)
                 action(button);
@@ -173,8 +164,5 @@ namespace InvisibleHand
             button.Duplicate(out newButton);
             return newButton;
         }
-
-
     }
-
 }

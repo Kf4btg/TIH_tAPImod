@@ -1,15 +1,13 @@
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 using System;
 using TAPI;
 using Terraria;
 
 namespace InvisibleHand
 {
-
     public class IconButtonBase : ButtonSocket<TexturedButton>
     {
-
         /// Texture resource that will be drawn in the background of this buttonbase.
         /// BgColor property of current button content object is used for tint.
         public Texture2D ButtonBackground { get; set; }
@@ -19,9 +17,8 @@ namespace InvisibleHand
         public Rectangle? SourceRect
         {
             get { return HasMouseFocus ?
-                            CurrentContent.ActiveRect :
-                            CurrentContent.InactiveRect;
-                }
+                         CurrentContent.ActiveRect :
+                         CurrentContent.InactiveRect; }
         }
 
         public IconButtonBase(ButtonContainerLayer parent, Vector2 position, Texture2D button_bg ) : base(parent, position)
@@ -38,13 +35,13 @@ namespace InvisibleHand
 
         protected override void DrawButtonContent(SpriteBatch sb)
         {
-            var opacity = ParentLayer.LayerOpacity*Alpha;
-            //draw button background first
+            var opacity = ParentLayer.LayerOpacity * Alpha;
+            // draw button background first
             // (otherwise button content will be below bg!)
             sb.Draw(ButtonBackground,
                     Position,
                     null,
-                    CurrentContent.BackgroundColor*opacity,
+                    CurrentContent.BackgroundColor * opacity,
                     0f,
                     default(Vector2),
                     Scale,
@@ -55,20 +52,18 @@ namespace InvisibleHand
             sb.Draw(CurrentContent.Texture,
                     Position,
                     SourceRect,
-                    CurrentContent.Tint*opacity,
+                    CurrentContent.Tint * opacity,
                     0f,
                     default(Vector2),
                     Scale,
                     SpriteEffects.None,
                     0f);
         }
-
     }
 
     public class TextButtonBase : ButtonSocket<TextButton>
     {
-
-        //class fields//
+        // class fields//
 
         /// modified position used in scaling/hover calculations
         private Vector2 posMod;
@@ -76,7 +71,7 @@ namespace InvisibleHand
         /// makes the button smoothly grow and shrink as the mouse moves on and off
         private float scaleStep = float.MaxValue;
 
-        //Properties//
+        // Properties//
 
         /// Get the (relative) center of the full-size button
         private Vector2 origin
@@ -103,11 +98,11 @@ namespace InvisibleHand
         ///<summary>
         /// Create an empty socket at the given position</summary>
         public TextButtonBase
-        (   ButtonContainerLayer parent, Vector2 position,
+            ( ButtonContainerLayer parent, Vector2 position,
             float base_scale = 0.75f,
             float focus_scale = 1.0f,
             float scale_step = 0.05f
-        ) : base(parent, position)
+            ) : base(parent, position)
         {
             posMod = Position;
             // 30 is honestly kind of a ridiculously high limit;
@@ -118,44 +113,44 @@ namespace InvisibleHand
 
 
             scaleStep = (_minScale == _maxScale) ? 0 :
-             scale_step;
+                        scale_step;
         }
 
         public TextButtonBase
-        (   ButtonContainerLayer parent, TextButton content, Vector2 position,
+            ( ButtonContainerLayer parent, TextButton content, Vector2 position,
             float base_scale = 0.75f, float focus_scale = 1.0f, float scale_step = 0.05f
-        ) : this(parent, position, base_scale, focus_scale, scale_step)
+            ) : this(parent, position, base_scale, focus_scale, scale_step)
         {
             base.SetDefault(content);
         }
 
         protected override bool GetIsHovered(Vector2 mouse)
         {
-            var o = scaledOrigin; //cache it
-            return (float)mouse.X > (float)posMod.X - o.X &&
-                    (float)mouse.X < (float)posMod.X + o.X &&
-                    (float)mouse.Y > (float)posMod.Y - o.Y &&
-                    (float)mouse.Y < (float)posMod.Y + o.Y;
+            var o = scaledOrigin; // cache it
+            return (float)mouse.X > (float)posMod.X - o.X
+                   && (float)mouse.X < (float)posMod.X + o.X
+                   && (float)mouse.Y > (float)posMod.Y - o.Y
+                   && (float)mouse.Y < (float)posMod.Y + o.Y;
         }
 
         protected override void DrawButtonContent(SpriteBatch sb)
         {
             // var textColor = Main.mouseTextColor.toScaledColor(Scale, CurrentState.tint);
 
-            posMod = Position; //reset
+            posMod    = Position; // reset
             posMod.X += (int)(origin.X * Scale);
 
             sb.DrawString(
-                Main.fontMouseText,        //font
-                CurrentContent.Label,        //string
-                new Vector2(posMod.X, posMod.Y), //position
-                TextColor,                 //color
-                0f,                        //rotation
+                Main.fontMouseText,              // font
+                CurrentContent.Label,            // string
+                new Vector2(posMod.X, posMod.Y), // position
+                TextColor,                       // color
+                0f,                              // rotation
                 origin,
                 Scale,
-                SpriteEffects.None,        //effects
-                0f                         //layerDepth
-            );
+                SpriteEffects.None,        // effects
+                0f                         // layerDepth
+                );
         }
 
         /// Handle mouseInterface, Scale up
@@ -165,16 +160,15 @@ namespace InvisibleHand
             // the ButtonFrame so that the buttons will act like the
             // vanilla versions.
             Main.localPlayer.mouseInterface = true;
-            if (Scale!=_maxScale)
+            if (Scale != _maxScale)
                 Scale += scaleStep;
         }
 
         /// Scale down
         protected override void WhenNotFocused()
         {
-            if (Scale!=_minScale)
+            if (Scale != _minScale)
                 Scale -= scaleStep;
         }
-
     }
 }

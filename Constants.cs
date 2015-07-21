@@ -8,6 +8,8 @@ namespace InvisibleHand
     /// All the actions that the mod can perform
     public enum TIH
     {
+        None,
+
         QuickStack,
         DepAll,
         LootAll,
@@ -346,6 +348,7 @@ namespace InvisibleHand
             DefaultButtonLabels = new Dictionary<TIH, string>
             {
                 //Player Inventory
+                {TIH.None, ""},
                 {TIH.SortInv,    "Sort"},                     //0
                 {TIH.RSortInv,   "Sort (Reverse)"},           //1
                 {TIH.CleanInv,   "Clean Stacks"},             //2
@@ -368,6 +371,7 @@ namespace InvisibleHand
                 // a couple overloads could easily allow for using
                 // plain functions like most of the other actions,
                 // if I care enough.
+                {TIH.None, None},
                 {TIH.SortInv,    () => IHPlayer.SortInventory()},
                 {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},
                 {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},
@@ -487,7 +491,7 @@ namespace InvisibleHand
         /// methods even if they don't have a simple static
         /// Action for onClick(); obviously the real action
         /// should be added afterwards.
-        // public static void None() { }
+        public static void None() { }
         // yes it's a hack and I'll try to fix it later
     }
 

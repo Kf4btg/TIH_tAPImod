@@ -57,8 +57,8 @@ namespace InvisibleHand
                     // order of creation; determines positioning per the transform above
                     TIH.SortChest,
                     TIH.LootAll,
-                    TIH.DepAll,
-                    TIH.QuickStack
+                    TIH.DepAll,  // +smartdep
+                    TIH.QuickStack // + smartloot
                 })
                 {
                     bases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
@@ -100,11 +100,20 @@ namespace InvisibleHand
                 // // // // // // //
                 var buttonStack = new Stack<CoreButton>();
 
+
+                // buttonStack.Push
+                // (
+                //     new TexturedButton
+                // )
+
+
+
                 foreach (var tih in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack })
                 {
-                    buttonStack.Push( new TexturedButton
-                        (
+                    buttonStack.Push(
+                        new TexturedButton (
                             action : tih,
+                            label: Constants.DefaultButtonLabels[tih],
                             bg_color : tih == TIH.SaveName ?
                                                 Constants.ChestSlotColor * 0.85f :
                                                 Constants.EquipSlotColor * 0.85f

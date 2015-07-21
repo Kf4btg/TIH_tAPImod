@@ -95,7 +95,7 @@ namespace InvisibleHand
         }
     }
 
-    public abstract class ToggleService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
+    public abstract class ToggleService<T> : ButtonService where T: CoreButton, ISocketedButton<T>
     {
         protected readonly ButtonSocket<T> socket;
         protected readonly KState.Special toggleKey;
@@ -125,7 +125,7 @@ namespace InvisibleHand
     }
 
     /// Generic Toggling Service for two arbitary buttons.
-    public class ButtonToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>, new()
+    public class ButtonToggleService<T> : ToggleService<T> where T: CoreButton, ISocketedButton<T>
     {
         private string _serviceType;
         private T _altButton;

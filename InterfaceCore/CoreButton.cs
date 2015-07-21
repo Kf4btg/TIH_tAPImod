@@ -82,7 +82,7 @@ namespace InvisibleHand
 
         /// copying all the aspects of the given button
         /// other than hooks, services, and ID
-        public virtual void CopyAttributes(CoreButton other)
+        public virtual void CopyAttributes<T>(T other) where T:CoreButton
         {
             this.Action  = other.Action;
             this.Label   = other.Label;

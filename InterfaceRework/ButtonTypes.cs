@@ -12,6 +12,8 @@ namespace InvisibleHand
     public interface ISocketedButton<T> where T: CoreButton
     {
         ButtonSocket<T> ButtonBase { get; }
+
+        void Duplicate(out T newCopy);
     }
 
     // ///////////////////////////////////////////////
@@ -61,50 +63,32 @@ namespace InvisibleHand
             protected set { _parent = value; }
         }
 
-
-        public TexturedButton() : base()
-        {
-            Texture = IHBase.ButtonBG;
-            BackgroundColor = Color.White;
-
-        }
-
         public TexturedButton(TIH action,
-                              string label = "",
+                              string label,
                               Color? bg_color = null,
                               Texture2D texture = null,
-                              Rectangle? default_texels = null,
-                              Rectangle? focused_texels = null
+                              Rectangle? inactive_rect = null,
+                              Rectangle? active_rect = null
                               ) : base(action, label)
         {
             BackgroundColor = bg_color ?? Color.White;
             Texture = (texture==null) ? IHBase.ButtonGrid : texture;
 
-            InactiveRect = default_texels.HasValue ? default_texels : IHUtils.GetSourceRect(action);
-            ActiveRect = focused_texels.HasValue ? focused_texels : IHUtils.GetSourceRect(action, true);
+            InactiveRect = inactive_rect.HasValue ? inactive_rect : IHUtils.GetSourceRect(action);
+            ActiveRect = active_rect.HasValue ? active_rect : IHUtils.GetSourceRect(action, true);
 
         }
 
-        public override void CopyAttributes(CoreButton other_button)
+
+        public TexturedButton Duplicate()
         {
-            base.CopyAttributes(other_button);
-
-            //being an inherited method, there didn't seem to be
-            // any practical way to make this method require a
-            // TexturedButton; so here we'll check type and
-            // handle the other properties once we're sure
-            if (other_button is TexturedButton)
-            {
-                // have to cast to access properties
-                TexturedButton other = (TexturedButton)other_button;
-                this.Texture = other.Texture;
-                this.InactiveRect = other.InactiveRect;
-                this.ActiveRect = other.ActiveRect;
-                this.BackgroundColor = other.BackgroundColor;
-
-            }
+            return new TexturedButton(this.Action, this.Label, this.BackgroundColor, this.Texture, this.InactiveRect, this.ActiveRect);
         }
 
+        public void Duplicate(out TexturedButton newTB)
+        {
+            newTB = this.Duplicate();
+        }
     }
 
 
@@ -139,14 +123,14 @@ namespace InvisibleHand
         //     }
         // }
 
-        public TextButton() : base()
-        {
-            Label = "Uninitialized";
-        }
-
         public TextButton(TIH action, string label = "") : base(action, label)
         {
 
+        }
+
+        public void Duplicate(out TextButton newButton)
+        {
+            newButton = new TextButton(this.Action, this.Label);
         }
     }
 
@@ -182,6 +166,14 @@ namespace InvisibleHand
                 action(button);
             return button;
         }
+
+        public static T Duplicate<T>(this ISocketedButton<T> button) where T: CoreButton
+        {
+            T newButton;
+            button.Duplicate(out newButton);
+            return newButton;
+        }
+
 
     }
 

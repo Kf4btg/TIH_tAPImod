@@ -27,7 +27,7 @@ namespace InvisibleHand
         public IconButtonBase(ButtonContainerLayer parent, Vector2 position, Texture2D button_bg ) : base(parent, position)
         {
             ButtonBackground = button_bg;
-            DefaultContent = CurrentContent = new TexturedButton();
+            // DefaultContent = CurrentContent = new TexturedButton(TIH.None, "");
         }
 
         public IconButtonBase(ButtonContainerLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)

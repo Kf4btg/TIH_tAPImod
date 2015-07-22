@@ -15,12 +15,18 @@ namespace InvisibleHand
             // allowing us to replace them with customized versions.
             if (IHBase.ModOptions["UseReplacers"])
             {
-                Lang.inter[IHBase.iLA] = Lang.inter[IHBase.iDA] = Lang.inter[IHBase.iQS] = "";
+                var lii = Constants.LangInterIndices;
+
+                Lang.inter[lii[TIH.LootAll]] 
+                = Lang.inter[lii[TIH.DepAll]]
+                = Lang.inter[lii[TIH.QuickStack]] = "";
 
                 // and get rid of the edit-chest stuff if we're using
                 // icons rather than text
                 if (IHBase.ModOptions["IconReplacers"])
-                    Lang.inter[IHBase.iRC] = Lang.inter[IHBase.iSC] = Lang.inter[IHBase.iCE] = "";
+                    Lang.inter[lii[TIH.Rename]]
+                    = Lang.inter[lii[TIH.SaveName]]
+                    = Lang.inter[lii[TIH.CancelEdit]] = "";
             }
 
             // finding a place to do this where the buttons are actually *set correctly*

@@ -342,18 +342,32 @@ namespace InvisibleHand
             "Loot All"                  // 11
         };
 
+        /// holds the index in Terraria.Lang.inter[] corresponding
+        /// to the paired actions; used to get original button lobels.
+        public static readonly Dictionary<TIH, int> LangInterIndices;
+
         public static readonly Dictionary<TIH, string> DefaultButtonLabels;
         public static readonly Dictionary<TIH, Action> DefaultClickActions;
 
         public static readonly Dictionary<string, int> ButtonGridIndex;
         public static readonly Dictionary<TIH, int>    ButtonGridIndexByActionType;
 
-        /// maps labels to the modoption defining their keybind
-        public static readonly Dictionary<string, string> ButtonLabelToKBOption;
+        /// maps actions to the modoption defining their keybind
         public static readonly Dictionary<TIH, string>    ButtonActionToKeyBindOption;
 
         static Constants()
         {
+            LangInterIndices = new Dictionary<TIH, int>
+            {
+                {TIH.LootAll,    29},
+                {TIH.DepAll,     30},
+                {TIH.QuickStack, 31},
+                {TIH.Rename,     61},
+                {TIH.SaveName,   47},
+                {TIH.CancelEdit, 63}
+            };
+
+
             DefaultButtonLabels = new Dictionary<TIH, string>
             {
                 // Player Inventory

@@ -65,13 +65,13 @@ namespace InvisibleHand
         public Stack<string> ButtonUpdates { get; private set; }
 
         // indices in Lang.inter[]
-        internal const int iLA = 29;
-        internal const int iDA = 30;
-        internal const int iQS = 31;
+        // internal const int iLA = 29;
+        // internal const int iDA = 30;
+        // internal const int iQS = 31;
         // rename, save, cancel edit chest
-        internal const int iRC = 61;
-        internal const int iSC = 47;
-        internal const int iCE = 63;
+        // internal const int iRC = 61;
+        // internal const int iSC = 47;
+        // internal const int iCE = 63;
 
         public override void OnLoad()
         {
@@ -80,17 +80,25 @@ namespace InvisibleHand
             ActionKeys    = new Dictionary<string, Keys>();
             ButtonKeyTips = new Dictionary<string, string>();
 
-            // TODO: put this behind a modoption
-            OriginalButtonLabels = new Dictionary<TIH, string>
-            {
-                { TIH.LootAll,    Lang.inter[iLA] },
-                { TIH.DepAll,     Lang.inter[iDA] },
-                { TIH.QuickStack, Lang.inter[iQS] },
+            OriginalButtonLabels = new Dictionary<TIH, string>();
 
-                { TIH.Rename,     Lang.inter[iRC] },
-                { TIH.SaveName,   Lang.inter[iSC] },
-                { TIH.CancelEdit, Lang.inter[iCE] }
-            };
+            // pull values out of Lang.inter to populate OBL
+            foreach (var kvp in Constants.LangInterIndices)
+            {
+                OriginalButtonLabels[kvp.Key] = Lang.inter[kvp.Value];
+            }
+
+            // TODO: put this behind a modoption
+            // OriginalButtonLabels = new Dictionary<TIH, string>()
+            // {
+            //     { TIH.LootAll,    Lang.inter[lii[]] },
+            //     { TIH.DepAll,     Lang.inter[iDA] },
+            //     { TIH.QuickStack, Lang.inter[iQS] },
+            //
+            //     { TIH.Rename,     Lang.inter[iRC] },
+            //     { TIH.SaveName,   Lang.inter[iSC] },
+            //     { TIH.CancelEdit, Lang.inter[iCE] }
+            // };
         }
 
         public override void OnAllModsLoaded()

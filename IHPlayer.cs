@@ -38,6 +38,7 @@ namespace InvisibleHand
         public override void Save(BinBuffer bb)
         {
 
+            var lii = Constants.LangInterIndices;
             if (IHBase.ModOptions["UseReplacers"])
             {
                 // reset original chest-button strings if we're quitting to main
@@ -47,16 +48,16 @@ namespace InvisibleHand
                 // immediately before player save. So:
                 if (Main.gameMenu)
                 {
-                    Lang.inter[IHBase.iLA] = IHBase.OriginalButtonLabels[TIH.LootAll];
-                    Lang.inter[IHBase.iDA] = IHBase.OriginalButtonLabels[TIH.DepAll];
-                    Lang.inter[IHBase.iQS] = IHBase.OriginalButtonLabels[TIH.QuickStack];
+                    Lang.inter[lii[TIH.LootAll]] = IHBase.OriginalButtonLabels[TIH.LootAll];
+                    Lang.inter[lii[TIH.DepAll]] = IHBase.OriginalButtonLabels[TIH.DepAll];
+                    Lang.inter[lii[TIH.QuickStack]] = IHBase.OriginalButtonLabels[TIH.QuickStack];
 
 
                     if (IHBase.ModOptions["IconReplacers"])
                     {
-                        Lang.inter[IHBase.iRC] = IHBase.OriginalButtonLabels[TIH.Rename];
-                        Lang.inter[IHBase.iSC] = IHBase.OriginalButtonLabels[TIH.SaveName];
-                        Lang.inter[IHBase.iCE] = IHBase.OriginalButtonLabels[TIH.CancelEdit];
+                        Lang.inter[lii[TIH.Rename]] = IHBase.OriginalButtonLabels[TIH.Rename];
+                        Lang.inter[lii[TIH.SaveName]] = IHBase.OriginalButtonLabels[TIH.SaveName];
+                        Lang.inter[lii[TIH.CancelEdit]] = IHBase.OriginalButtonLabels[TIH.CancelEdit];
                     }
                 }
                 // should take care of it and make sure the strings are set

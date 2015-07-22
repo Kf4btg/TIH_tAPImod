@@ -35,6 +35,8 @@ namespace InvisibleHand
         public override void Subscribe()
         {
             Client.Hooks.OnWorldLoad  += OnWorldLoad;
+            IHBase.Instance.ButtonUpdates.Push(Client.ID);
+            
             Client.Hooks.OnRightClick += () => IHPlayer.ToggleActionLock(Client.Action);
             Client.Hooks.PreDraw      += PreDraw;
 

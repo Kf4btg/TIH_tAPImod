@@ -336,6 +336,9 @@ namespace InvisibleHand
                 SetDefault(button);
             else
                 AssociatedButtons[button.ID] = button;
+
+            // bubble up the stack
+            ParentLayer.AddButton(button);
         }
 
         /// Associate multiple buttons with this base.

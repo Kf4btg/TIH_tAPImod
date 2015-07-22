@@ -13,7 +13,7 @@ namespace InvisibleHand
         protected bool handleMouseInterface;
         protected float opacity_inactive, opacity_active = 1.0f;
 
-        public readonly Dictionary<string,CoreButton> Buttons;
+        public readonly Dictionary<string,ICoreButton> Buttons;
         public readonly Dictionary<TIH, IButtonSlot> ButtonBases;
 
         public Rectangle ButtonFrame { get; protected set; }
@@ -27,7 +27,7 @@ namespace InvisibleHand
         protected ButtonContainerLayer(string name, bool handle_mouse_interface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
             ButtonBases = new Dictionary<TIH, IButtonSlot>();
-            Buttons     = new Dictionary<string, CoreButton>();
+            Buttons     = new Dictionary<string, ICoreButton>();
             ButtonFrame = Rectangle.Empty;
             handleMouseInterface = handle_mouse_interface;
         }
@@ -64,6 +64,14 @@ namespace InvisibleHand
             if (handleMouseInterface && IsHovered)
                 Main.localPlayer.mouseInterface = true;
             DrawButtons(sb);
+        }
+
+        // receive button from base //
+        public void AddButton(ICoreButton b)
+        {
+            Buttons[b.ID] = b;
+            //bubble up
+            IHBase.Instance.ButtonStore.Add(b.ID, b);
         }
 
 

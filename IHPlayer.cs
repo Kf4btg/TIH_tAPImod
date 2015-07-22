@@ -230,6 +230,19 @@ namespace InvisibleHand
                 );
         }
 
+        /// performs the most appropriate sort action
+        public static void Sort(bool reverse = false)
+        {
+            if ( Main.localPlayer.chest == -1 )
+                IHOrganizer.SortPlayerInv(Main.localPlayer,
+                reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
+            else
+                Instance.DoChestUpdateAction( () =>
+                    IHOrganizer.SortChest(Main.localPlayer.chestItems,
+                    reverse ^ IHBase.ModOptions["ReverseSortChest"])
+                );
+        }
+
         public static void CleanInventoryStacks()
         {
             if ( Main.localPlayer.chest == -1 )

@@ -10,6 +10,13 @@ namespace InvisibleHand
     {
         None,
 
+        // smarted button creation should
+        // eliminate the need for separate
+        // inventory/chest sort actions.
+        Sort,
+        ReverseSort,
+        // The same is likely true for Clean... as well
+
         QuickStack,
         DepAll,
         LootAll,
@@ -99,7 +106,7 @@ namespace InvisibleHand
 
         public static readonly Color InvSlotColor   = new Color( 63,  65, 151, 255);  // bluish
         public static readonly Color ChestSlotColor = new Color(104,  52,  52, 255);  // reddish
-        public static readonly Color BankSlotColor  = new Color(130,  62, 102, 255); // pinkish
+        public static readonly Color BankSlotColor  = new Color(130,  62, 102, 255);  // pinkish
         public static readonly Color EquipSlotColor = new Color( 50, 106,  46, 255);  // greenish
 
         // width and height of button
@@ -351,6 +358,9 @@ namespace InvisibleHand
             {
                 // Player Inventory
                 {TIH.None, ""},
+                {TIH.Sort,       "Sort"},                     // 0
+                {TIH.ReverseSort,"Sort (Reverse)"},           // 1
+
                 {TIH.SortInv,    "Sort"},                     // 0
                 {TIH.RSortInv,   "Sort (Reverse)"},           // 1
                 {TIH.CleanInv,   "Clean Stacks"},             // 2
@@ -374,6 +384,10 @@ namespace InvisibleHand
                 // plain functions like most of the other actions,
                 // if I care enough.
                 {TIH.None, None},
+
+                {TIH.Sort,       () => IHPlayer.Sort()},
+                {TIH.ReverseSort,() => IHPlayer.Sort(true)},
+
                 {TIH.SortInv,    () => IHPlayer.SortInventory()},
                 {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},
                 {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},
@@ -396,9 +410,11 @@ namespace InvisibleHand
             */
             ButtonGridIndexByActionType = new Dictionary<TIH, int>
             {
+                {TIH.Sort,       0},
                 {TIH.SortInv,    0},
                 {TIH.SortChest,  0},
 
+                {TIH.ReverseSort,1},
                 {TIH.RSortInv,   1},
                 {TIH.RSortChest, 1},
 
@@ -436,11 +452,13 @@ namespace InvisibleHand
                 {TIH.QuickStack, "quickStack"},
                 {TIH.SmartLoot,  "quickStack"},
 
+                {TIH.Sort,       "sort"},
+                {TIH.ReverseSort,"sort"},
                 {TIH.SortInv,    "sort"},
                 {TIH.SortChest,  "sort"},
                 {TIH.RSortInv,   "sort"},
                 {TIH.RSortChest, "sort"}
-                // edit chest doesn't get a keyboard shortcut.
+                // edit chest doesn't get a keyboard shortcut. So there.
             };
         }
 

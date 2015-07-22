@@ -34,15 +34,6 @@ namespace InvisibleHand
 
     }
 
-    /// Having subclasses of CoreButton ALSO implement this interface seems to be
-    /// the only way to get a reliably type-safe reference to the parent buttonbase
-    public interface ISocketedButton<T> :ICoreButton where T: ISocketedButton<T>
-    {
-        IButtonContentHandler<T> Socket { get; }
-
-        // void Duplicate(out ISocketedButton newCopy);
-    }
-
     /// re-imagining the ButtonState and IHButton as one object
     public abstract class CoreButton : ICoreButton
     {
@@ -82,12 +73,13 @@ namespace InvisibleHand
         /// Derived size
         public abstract Vector2 Size { get; }
 
-        public abstract IButtonSlot ButtonBase { get; }
+        public virtual IButtonSlot ButtonBase { get; protected set; }
 
 
         // Constructors
-        protected CoreButton(TIH action, string label = "")
+        protected CoreButton(IButtonSlot parent, TIH action, string label = "")
         {
+            ButtonBase = parent;
             Action   = action;
             Label    = label;
             Hooks    = new ButtonHooks();
@@ -99,6 +91,7 @@ namespace InvisibleHand
         ///<remarks>Probaby going to get rid of this</remarks>
         public virtual void CopyAttributes<T>(T other) where T:ICoreButton
         {
+            this.ButtonBase = other.ButtonBase;
             this.Action  = other.Action;
             this.Label   = other.Label;
             this.Tooltip = other.Tooltip;

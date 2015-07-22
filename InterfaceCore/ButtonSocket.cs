@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using System;
 using TAPI;
 using Terraria;
@@ -17,14 +18,15 @@ namespace InvisibleHand
         float Scale { get; set; }
         float Alpha { get; set; }
 
-        // void RegisterKeyToggle(KState.Special key, ICoreButton context2);
-        // void RegisterKeyToggle(KState.Special key, ICoreButton context1, ICoreButton context2);
+        void RegisterKeyToggle(KState.Special key, string button_id);
+        void RegisterKeyToggle(KState.Special key, string button_a_id, string button_b_id);
+
 
         void Draw(SpriteBatch sb);
 
     }
 
-    public interface IButtonContentHandler<T> : IButtonSlot where T: ICoreButton
+    public interface IButtonSocket<T> : IButtonSlot where T: ICoreButton
     {
         T CurrentContent { get; }
         T DefaultContent { get; }
@@ -32,9 +34,10 @@ namespace InvisibleHand
         void ChangeContent(T new_content);
         void Reset();
 
-        void RegisterKeyToggle(KState.Special key, T context2);
-        void RegisterKeyToggle(KState.Special key, T context1, T context2);
+        // void RegisterKeyToggle(KState.Special key, T context2);
+        // void RegisterKeyToggle(KState.Special key, T context1, T context2);
         void SetDefault(T default_content);
+        void AddButton(T newButton);
 
     }
 
@@ -42,7 +45,7 @@ namespace InvisibleHand
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonSocket<T> : IButtonContentHandler<T> where T: ICoreButton
+    public abstract class ButtonSocket<T> : IButtonSocket<T> where T: ICoreButton
     {
         //backing stores & default values
         protected float _minScale = 0.5f;
@@ -97,6 +100,9 @@ namespace InvisibleHand
             set { _alpha = value.Clamp(BaseAlpha); }
         }
 
+
+        public Dictionary<string, T> AssociatedButtons { get; protected set; }
+
         //virtual properties//
 
         ///Get the original button for this socket;
@@ -117,10 +123,12 @@ namespace InvisibleHand
 
         /// initialize a new, empty socket with blank content;
         /// calls the derived-class specific version of InitEmptySocket()
-        public ButtonSocket(ButtonContainerLayer parent, Vector2 position)
+        protected ButtonSocket(ButtonContainerLayer parent, Vector2 position)
         {
             ParentLayer = parent;
             Position = position;
+
+            AssociatedButtons = new Dictionary<string, T>();
         }
 
         // public ButtonSocket(ButtonLayer parent, T content, Vector2 position)
@@ -140,6 +148,10 @@ namespace InvisibleHand
         {
             CurrentContent = new_content;
         }
+        public void ChangeContent(string new_content_id)
+        {
+            ChangeContent(AssociatedButtons[new_content_id]);
+        }
         /// <summary>
         /// return this Socket to its default configuration
         /// </summary>
@@ -148,17 +160,34 @@ namespace InvisibleHand
             ChangeContent(DefaultContent);
         }
 
-        // allows registering key toggle w/ just the context (button) IDs
-        // public void RegisterKeyToggle(KState.Special key, string context1ID, string context2ID)
-        // {
-        //     RegisterKeyToggle(key, IHBase.Instance.ButtonRepo[context1ID], IHBase.Instance.ButtonRepo[context2ID]);
-        // }
 
         /// <summary>
         /// register a key toggle for this base's default context
         /// </summary>
         /// <param name="key">Activation key, e.g. Shift</param>
-        /// <param name="context2">Corebutton to swap with</param>
+        /// <param name="button_id">ID of button to swap with</param>
+        public void RegisterKeyToggle(KState.Special key, string button_id)
+        {
+            RegisterKeyToggle(key, DefaultContent, AssociatedButtons[button_id]);
+        }
+
+        /// <summary>
+        /// Set up key-event-subscribers that will toggle between the 2 contexts
+        /// when the player holds or releases the button.
+        /// </summary>
+        /// <param name="key">Key (ctrl | shift | alt) on which to toggle content</param>
+        /// <param name="button_a_id">ID of default button to display</param>
+        /// <param name="button_b_id">ID of button displayed while <paramref name="key "/> is held down.</param>
+        public void RegisterKeyToggle(KState.Special key, string button_a_id, string button_b_id)
+        {
+            RegisterKeyToggle(key, AssociatedButtons[button_a_id], AssociatedButtons[button_b_id]);
+        }
+
+        /// <summary>
+        /// register a key toggle for this base's default context
+        /// </summary>
+        /// <param name="key">Activation key, e.g. Shift</param>
+        /// <param name="context2">Button to swap with</param>
         public void RegisterKeyToggle(KState.Special key, T context2)
         {
             RegisterKeyToggle(key, DefaultContent, context2);
@@ -285,14 +314,40 @@ namespace InvisibleHand
         /// Make this button usable by adding a default button configuration
         /// </summary>
         /// <param name="default_content">Default button</param>
-        /// <returns>This socket</returns>
         public void SetDefault(T default_content)
         {
-            this.DefaultContent = this.CurrentContent = default_content;
+            AssociatedButtons[default_content.ID] = default_content;
+            DefaultContent = CurrentContent = default_content;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)default_content.Size.X, (int)default_content.Size.Y);
 
             // return this;
+        }
+
+        /// Associate a new button with this base.
+        /// If no other buttons have previously been associated,
+        /// make it the default content.
+        public void AddButton(T button)
+        {
+            if (AssociatedButtons.Count == 0)
+                SetDefault(button);
+            else
+                AssociatedButtons[button.ID] = button;
+        }
+
+        /// Associate multiple buttons with this base.
+        /// The first button in the parameter list becomes
+        /// the default content if no other buttons have
+        /// yet been added.
+        public void AddButtons(params T[] buttons)
+        {
+            foreach (T button in buttons)
+                AddButton(button);
+        }
+
+        public void RemoveButtonAssociation(string buttonID)
+        {
+            AssociatedButtons.Remove(buttonID);
         }
 
         //virtually abstract methods (no default implementation)

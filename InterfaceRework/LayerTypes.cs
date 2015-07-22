@@ -17,16 +17,12 @@ namespace InvisibleHand
     {
         protected readonly bool textButtons;
 
-        private enum btnType { Text, Textured }
-
         // Constructor
 
         public ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
         {
             textButtons = text;
         }
-
-
 
         protected override void AddBasesToLayer()
         {
@@ -70,19 +66,6 @@ namespace InvisibleHand
             }
         }
 
-        // private void addButton(btnType type, TIH action, int creationOrder, Func<int, Vector2> mapOrderToPosition)
-        // {
-        //     switch(type)
-        //     {
-        //         case btnType.Text:
-        //             ButtonBases.Add(action, new TextButtonBase(this, mapOrderToPosition(creationOrder)));
-        //             break;
-        //         case btnType.Textured:
-        //             ButtonBases.Add(action, new IconButtonBase(this, mapOrderToPosition(creationOrder), IHBase.ButtonBG));
-        //             break;
-        //     }
-        // }
-
         protected override void AddButtonsToBases()
         {
             if (textButtons)
@@ -98,20 +81,9 @@ namespace InvisibleHand
                 var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW / 2),
                                             -(float)(int)((float)Constants.ButtonH / 2));
 
-                // background tints
-                Color bgColor         = Constants.ChestSlotColor * 0.85f;
-                Color saveNameBgColor = Constants.EquipSlotColor * 0.85f;
-
                 // // // // // // //
                 // Makin buttons
                 // // // // // // //
-                var buttonStack = new Stack<CoreButton>();
-
-
-                // buttonStack.Push
-                // (
-                //     new TexturedButton
-                // )
 
                 Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
                 Func<TIH, Color>  getBGcol = a => a == TIH.SaveName
@@ -119,29 +91,38 @@ namespace InvisibleHand
                                                     : Constants.EquipSlotColor * 0.85f;
                 Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
 
-                Func<TIH, TexturedButton> getButton
-                    = (a) => new TexturedButton(action: a, label: getLabel(a), tooltip: getTtip(a), bg_color: getBGcol(a));
+                Func<TIH, TIH, TexturedButton> getButton
+                    = (base_by_action, a)
+                    => TexturedButton.New( (ButtonSocket<TexturedButton>)ButtonBases[base_by_action],
+                                           action: a,
+                                           label: getLabel(a),
+                                           tooltip: getTtip(a),
+                                           bg_color: getBGcol(a) );
 
-                var sort  = getButton(TIH.SortChest);
-                var rsort = getButton(TIH.RSortChest);
-                var loot  = getButton(TIH.LootAll);
-                var dep   = getButton(TIH.DepAll);
-                var sdep  = getButton(TIH.SmartDep);
-                var qstk  = getButton(TIH.QuickStack);
-                var sloot = getButton(TIH.SmartLoot);
-                var ren   = getButton(TIH.Rename);
-                var save  = getButton(TIH.SaveName);
+                // Btn obj            Socket Action   Button Action
+                // -------            -------------   -------------
+                var sort  = getButton(TIH.SortChest,  TIH.SortChest);
+                var rsort = getButton(TIH.SortChest,  TIH.RSortChest);
+                var loot  = getButton(TIH.LootAll,    TIH.LootAll);
+                var depo  = getButton(TIH.DepAll,     TIH.DepAll);
+                var sdep  = getButton(TIH.DepAll,     TIH.SmartDep);
+                var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
+                var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
+                var rena  = getButton(TIH.Rename,     TIH.Rename);
+                var save  = getButton(TIH.Rename,     TIH.SaveName);
 
-                var cancel = new TextButton(TIH.CancelEdit, getLabel(TIH.CancelEdit));
+                var cancel = TextButton.New(
+                             (ButtonSocket<TextButton>)ButtonBases[TIH.CancelEdit],
+                             TIH.CancelEdit, getLabel(TIH.CancelEdit) );
 
 
                 // Add Services //
 
-                sort.AddService(new SortingToggleService<TexturedButton>(sort, rsort, true, KState.Special.Shift));
+                sort.AddSortToggle(rsort, sort_chest: true);
 
-                dep.MakeLocking().AddToggle(sdep);
-                qstk.MakeLocking().AddToggle(sloot);
-                
+                depo.MakeLocking().AddToggle(sdep);
+                qstk.MakeLocking().AddToggle(sloo);
+
 
                 // var _buttons = new Dictionary<TIH, TexturedButton>();
                 // foreach (var t in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack, TIH.Rename, TIH.SaveName })

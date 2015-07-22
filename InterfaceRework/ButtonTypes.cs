@@ -7,15 +7,14 @@ using Terraria;
 
 namespace InvisibleHand
 {
-
     // ///////////////////////////////////////////////
     /// Icon Button with a texture and ability to vary
     /// its appearance when hovered with the mouse.
     // ///////////////////////////////////////////////
-    public class TexturedButton : CoreButton, ISocketedButton<TexturedButton>
+    public class TexturedButton : CoreButton
     {
         // store for implementing ISocketedButton
-        private IButtonContentHandler<TexturedButton> _parent;
+        // private IButtonSlot _parent;
 
         public Texture2D Texture       { get; set; }
         public Rectangle? InactiveRect { get; set; }
@@ -28,26 +27,27 @@ namespace InvisibleHand
         }
 
         /// Get ButtonSocket in which this button is placed
-        public override IButtonSlot ButtonBase
-        {
-            get { return _parent; }
-        }
+        // public override IButtonSlot ButtonBase
+        // {
+        //     get { return _parent; }
+        // }
 
-        public IButtonContentHandler<TexturedButton> Socket
-        {
-            get { return _parent; }
-            protected set { _parent = value; }
-        }
+        // public IButtonContentHandler<TexturedButton> Socket
+        // {
+        //     get { return _parent; }
+        //     protected set { _parent = value; }
+        // }
 
 
-        public TexturedButton(TIH action,
+        protected TexturedButton(IButtonSocket<TexturedButton> parent,
+                              TIH action,
                               string label,
                               string tooltip           = "",
                               Color? bg_color          = null,
                               Texture2D texture        = null,
                               Rectangle? inactive_rect = null,
                               Rectangle? active_rect   = null
-                              ) : base(action, label)
+                              ) : base(parent, action, label)
         {
             BackgroundColor = bg_color ?? Color.White;
 
@@ -56,16 +56,44 @@ namespace InvisibleHand
             ActiveRect   = active_rect.HasValue ? active_rect : IHUtils.GetSourceRect(action, true);
         }
 
-
-        public TexturedButton Duplicate()
+        /// <summary>
+        /// Create a new TexturedButton instance with the given properties
+        /// and automatically associate it with its base.
+        /// </summary>
+        /// <param name="parent"> </param>
+        /// <param name="action"> </param>
+        /// <param name="label"> </param>
+        /// <param name="tooltip"> </param>
+        /// <param name="bg_color"> </param>
+        /// <param name="texture"> </param>
+        /// <param name="inactive_rect"> </param>
+        /// <param name="active_rect"> </param>
+        /// <returns>The newly created TexturedButton</returns>
+        public static TexturedButton New(IButtonSocket<TexturedButton> parent,
+                                  TIH action,
+                                  string label,
+                                  string tooltip           = "",
+                                  Color? bg_color          = null,
+                                  Texture2D texture        = null,
+                                  Rectangle? inactive_rect = null,
+                                  Rectangle? active_rect   = null)
         {
-            return new TexturedButton(this.Action, this.Label, this.Tooltip, this.BackgroundColor, this.Texture, this.InactiveRect, this.ActiveRect);
+            var newThis = new TexturedButton(parent, action, label, tooltip, bg_color, texture, inactive_rect, active_rect);
+
+            parent.AddButton(newThis);
+            return newThis;
         }
 
-        public void Duplicate(out TexturedButton newTB)
-        {
-            newTB = this.Duplicate();
-        }
+
+        // public TexturedButton Duplicate()
+        // {
+        //     return new TexturedButton(this.Action, this.Label, this.Tooltip, this.BackgroundColor, this.Texture, this.InactiveRect, this.ActiveRect);
+        // }
+        //
+        // public void Duplicate(out TexturedButton newTB)
+        // {
+        //     newTB = this.Duplicate();
+        // }
     }
 
 
@@ -75,34 +103,43 @@ namespace InvisibleHand
     // ////////////////////////////////////////////////////////////////////////////
     public class TextButton : CoreButton
     {
-        private IButtonContentHandler<TexturedButton> _parent;
-
         // Derived size
         public override Vector2 Size
         {
             get { return Main.fontMouseText.MeasureString(Label); }
         }
 
-        ///ISocketedButton
-        public override IButtonSlot ButtonBase
-        {
-            get { return _parent; }
-        }
 
-        public IButtonContentHandler<TexturedButton> Socket
-        {
-            get { return _parent; }
-            protected set { _parent = value; }
-        }
+        // public IButtonContentHandler<TexturedButton> Socket
+        // {
+        //     get { return _parent; }
+        //     protected set { _parent = value; }
+        // }
 
-        public TextButton(TIH action, string label = "") : base(action, label)
+        protected TextButton(IButtonSocket<TextButton> parent, TIH action, string label = "") : base(parent, action, label)
         {
         }
 
-        public void Duplicate(out TextButton newButton)
+        /// <summary>
+        /// Create a new TextButton instance with the given properties
+        /// and automatically associate it with its base.</summary>
+        /// <param name="parent"> </param>
+        /// <param name="action"> </param>
+        /// <param name="label"> </param>
+        /// <returns>The newly created TextButton</returns>
+        public static TextButton New(IButtonSocket<TextButton> parent, TIH action, string label = "")
         {
-            newButton = new TextButton(this.Action, this.Label);
+            var newThis = new TextButton(parent, action, label);
+
+            parent.AddButton(newThis);
+            return newThis;
         }
+
+        //
+        // public void Duplicate(out TextButton newButton)
+        // {
+        //     newButton = new TextButton(this.Action, this.Label);
+        // }
     }
 
     /// intended to use in a fluent-interface type of way;
@@ -119,14 +156,19 @@ namespace InvisibleHand
             return button;
         }
 
-        public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]") where T: CoreButton
+        public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]") where T: ICoreButton
         {
             return button.AddNewService(new LockingService(button, lock_offset, lock_color, locked_string));
         }
 
-        public static T AddToggle<T>(this T button, T toggle_to_button, KState.Special toggle_key = KState.Special.Shift) where T: ISocketedButton<T>
+        public static T AddToggle<T>(this T button, T toggle_to_button, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
         {
-            return button.AddNewService(new ToggleService<T>(button, toggle_to_button, toggle_key));
+            return button.AddNewService(new ToggleService(button, toggle_to_button, toggle_key));
+        }
+
+        public static T AddSortToggle<T>(this T button, T reverse_button, bool sort_chest, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
+        {
+            return button.AddNewService(new SortingToggleService(button, reverse_button, sort_chest, toggle_key));
         }
 
         /// <summary>

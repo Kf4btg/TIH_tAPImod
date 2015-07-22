@@ -96,20 +96,20 @@ namespace InvisibleHand
     }
 
     /// Generic Toggling Service for two arbitary buttons.
-    public class ToggleService<T> : ButtonService where T: ISocketedButton<T>
+    public class ToggleService : ButtonService
     {
-        protected readonly IButtonContentHandler<T> socket;
+        protected readonly IButtonSlot socket;
         protected readonly KState.Special toggleKey;
 
         private string _serviceType;
-        private T _altButton;
+        private ICoreButton _altButton;
 
         public override string ServiceType { get { return _serviceType; } }
-        protected virtual T AltButton { get { return _altButton; } }
+        protected virtual ICoreButton AltButton { get { return _altButton; } }
 
-        public ToggleService(T client, T altButton, KState.Special toggle_key) : base(client)
+        public ToggleService(ICoreButton client, ICoreButton altButton, KState.Special toggle_key) : base(client)
         {
-            socket       = client.Socket;
+            // socket       = client.Socket;
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
             _altButton   = altButton;
         }
@@ -118,7 +118,7 @@ namespace InvisibleHand
         /// call this base version to properly set key-toggle.
         public override void Subscribe()
         {
-            socket.RegisterKeyToggle(toggleKey, AltButton);
+            Client.ButtonBase.RegisterKeyToggle(toggleKey, AltButton.ID);
         }
 
         public override void Unsubscribe()
@@ -131,7 +131,7 @@ namespace InvisibleHand
 
     /// this class creates a second button and sets the given button's base to switch to it on shift
     // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
-    public class SortingToggleService<T>: ToggleService<T> where T: ISocketedButton<T>
+    public class SortingToggleService : ToggleService
     {
         public override string ServiceType { get { return "SortingToggle"; } }
 
@@ -140,7 +140,7 @@ namespace InvisibleHand
         private readonly bool sortChest;
 
         // public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
-        public SortingToggleService(T forward, T reverse, bool chest, KState.Special toggle_key) : base(forward, reverse, toggle_key)
+        public SortingToggleService(ICoreButton forward, ICoreButton reverse, bool chest, KState.Special toggle_key) : base(forward, reverse, toggle_key)
         {
             sortChest = chest;
         }
@@ -169,20 +169,18 @@ namespace InvisibleHand
     }
 
     /// Listens to a given game propery and changes state automatically
-    public class DynamicToggleService<T>: ButtonService where T: ISocketedButton<T>
+    public class DynamicToggleService: ButtonService
     {
-        protected readonly IButtonContentHandler<T> socket;
         private readonly Action<bool> inMainState;
 
         private string _serviceType;
 
         public override string ServiceType { get { return _serviceType; } }
-        private T AltButton { get; set; }
+        private ICoreButton AltButton { get; set; }
 
-        public DynamicToggleService(T button_if_true, T button_if_false, Action<bool> check_game_state) : base(button_if_true)
+        public DynamicToggleService(ICoreButton button_if_true, ICoreButton button_if_false, Action<bool> check_game_state) : base(button_if_true)
         {
             _serviceType = Enum.GetName(typeof(TIH), button_if_true.Action) + Enum.GetName(typeof(TIH), button_if_false.Action) + "DynamicToggle";
-            socket = button_if_true.Socket;
 
             inMainState = check_game_state;
             AltButton = button_if_false;

@@ -39,9 +39,34 @@ namespace InvisibleHand
             else addIconButtons();
         }
 
+        // // // // // // //
+        // Create the Sockets
+        // // // // // // //
+
         private void addTextBases()
         {
+            // position of first button (right of chests, below coin slots)
+            var pos0 = new Vector2(506, API.main.invBottom + 40);
+            // let's try moving it up a bit to account for extra button
+            // var pos0 = new Vector2(506, API.main.invBottom + 30);
 
+            // a transform to calculate the position of the socket from the
+            // order in which it is created (each offset by button height)
+            Func<int,Vector2> getPosFromIndex
+                = (i) => new Vector2( pos0.X, pos0.Y + (i * 26) );
+            int slotOrder = 0;
+
+            foreach (var action in new[]
+            {   // order of creation; determines positioning per the transform above
+                // TIH.Sort,
+                TIH.LootAll,
+                TIH.DepAll,    // +smartdep
+                TIH.QuickStack, // + smartloot
+                // TIH.Rename
+            }) ButtonBases.Add(action, new TextButtonBase(this, getPosFromIndex(slotOrder++)));
+
+            // create but don't yet add base for Cancel Button
+            // CancelEditBase = new TextButtonBase(this, getPosFromIndex(slotOrder));
         }
 
         private void addIconBases()
@@ -49,21 +74,15 @@ namespace InvisibleHand
             // position of first button (right of chests, below coin slots)
             var pos0 = new Vector2(506, API.main.invBottom + 22);
 
-            // // // // // // //
-            // Create the Sockets
-            // // // // // // //
-
             // a transform to calculate the position of the socket from the
             // order in which it is created (each offset by button height)
             Func<int,Vector2> getPosFromIndex
                 = (i) => new Vector2( pos0.X, pos0.Y + (i * Constants.ButtonH) );
             int slotOrder = 0;
 
-            // Dictionary uses IButtonSlot type as one of the buttons is still text
-            var bases = new Dictionary<TIH, IButtonSlot>();
             foreach (var action in new[]
             {   // order of creation; determines positioning per the transform above
-                TIH.SortChest,
+                TIH.Sort,
                 TIH.LootAll,
                 TIH.DepAll,    // +smartdep
                 TIH.QuickStack, // + smartloot
@@ -79,25 +98,54 @@ namespace InvisibleHand
                             pos0.Y + (slotOrder * Constants.ButtonH) + (Constants.ButtonH / 2) ));
         }
 
+        // // // // // // //
+        // Makin buttons
+        // // // // // // //
+
         private void addTextButtons()
         {
+            // just feels right, man.
+            var lockOffset = new Vector2(-20, -18);
+
+            // get original or default label
+            Func<TIH, string> getLabel = a => a.DefaultLabelForAction(true) + a.GetKeyTip();
+
+            // put it all together, add to base
+            Func<TIH, TIH, TextButton> getButton
+                = (base_by_action, a)
+                => TextButton.New( (ButtonSocket<TextButton>)ButtonBases[base_by_action],
+                                       action: a,
+                                       label: getLabel(a)
+                                       );
+
+            // Btn obj            Socket Action   Button Action
+            // -------            -------------   -------------
+            // var sort  = getButton(TIH.Sort,       TIH.Sort);
+            // var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
+
+
+            var loot  = getButton(TIH.LootAll,    TIH.LootAll);
+            var depo  = getButton(TIH.DepAll,     TIH.DepAll);
+            var sdep  = getButton(TIH.DepAll,     TIH.SmartDep);
+            var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
+            var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
+
+            // * we're going to leave the vanilla buttons for these
+            // var rena  = getButton(TIH.Rename,     TIH.Rename);
+            // var save  = getButton(TIH.Rename,     TIH.SaveName);
+
+            depo.MakeLocking().AddToggle(sdep);
+            qstk.MakeLocking().AddToggle(sloo);
 
         }
 
         private void addIconButtons()
         {
 
-                // // // // // //
-                // some datas
-                // // // // // //
 
                 // offset of lock indicator
                 var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW / 2),
                                             -(float)(int)((float)Constants.ButtonH / 2));
-
-                // // // // // // //
-                // Makin buttons
-                // // // // // // //
 
                 Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
                 Func<TIH, Color>  getBGcol = a => a == TIH.SaveName
@@ -115,8 +163,8 @@ namespace InvisibleHand
 
                 // Btn obj            Socket Action   Button Action
                 // -------            -------------   -------------
-                var sort  = getButton(TIH.SortChest,  TIH.SortChest);
-                var rsort = getButton(TIH.SortChest,  TIH.RSortChest);
+                var sort  = getButton(TIH.Sort,       TIH.Sort);
+                var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
                 var loot  = getButton(TIH.LootAll,    TIH.LootAll);
                 var depo  = getButton(TIH.DepAll,     TIH.DepAll);
                 var sdep  = getButton(TIH.DepAll,     TIH.SmartDep);
@@ -125,9 +173,7 @@ namespace InvisibleHand
                 var rena  = getButton(TIH.Rename,     TIH.Rename);
                 var save  = getButton(TIH.Rename,     TIH.SaveName);
 
-                var cancel = TextButton.New(
-                             (ButtonSocket<TextButton>)ButtonBases[TIH.CancelEdit],
-                             TIH.CancelEdit, getLabel(TIH.CancelEdit) );
+                var cancel = TextButton.New( CancelEditBase, TIH.CancelEdit, getLabel(TIH.CancelEdit) );
 
 
                 // Add Services //

@@ -142,7 +142,109 @@ namespace InvisibleHand
 
     #endregion
 
-    // misc
+    #region TIH action exts
+
+        /// <summary>
+        /// DefaultLabelForAction
+        /// </summary>
+        /// <param name="action"> </param>
+        /// <param name="use_originals">If true, will return the value pulled from Terraria's code for that action. </param>
+        /// <returns>Corresponding label for the action or the empty string "" if one could not be found.</returns>
+        public static string DefaultLabelForAction(this TIH action, bool use_originals)
+        {
+            if (use_originals)
+            {
+                switch (action)
+                {
+                    case TIH.LootAll:
+                    case TIH.DepAll:
+                    case TIH.QuickStack:
+                    case TIH.Rename:
+                    case TIH.SaveName:
+                    case TIH.CancelEdit:
+                        return IHBase.OriginalButtonLabels[action];
+                }
+            }
+
+            string label;
+            if (Constants.DefaultButtonLabels.TryGetValue(action, out label))
+                return label;
+
+            return "";
+        }
+
+        /// returns the key-bind (as a string) for the button with the given action.
+        /// return value will be something like "(X)"
+        public static string GetKeyTip(this TIH action)
+        {
+            // return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
+            string kbopt;
+            if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
+                return IHBase.ButtonKeyTips[kbopt];
+
+            return "";
+        }
+
+    #endregion
+
+
+    /// intended to use in a fluent-interface type of way;
+    /// these are generic so that a separate class so that the proper
+    /// subtype will be returned rather than a generic CoreButton
+    #region ButtonService helpers
+
+
+        ///<summary>
+        /// Add a ButtonService to this button and subscribe to its hooks
+        ///</summary>
+        public static T AddNewService<T>(this T button, ButtonService service) where T : ICoreButton
+        {
+            button.AddService(service);
+            return button;
+        }
+
+        public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]") where T: ICoreButton
+        {
+            return button.AddNewService(new LockingService(button, lock_offset, lock_color, locked_string));
+        }
+
+        public static T AddToggle<T>(this T button, T toggle_to_button, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
+        {
+            return button.AddNewService(new ToggleService(button, toggle_to_button, toggle_key));
+        }
+
+        public static T AddSortToggle<T>(this T button, T reverse_button, bool sort_chest, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
+        {
+            return button.AddNewService(new SortingToggleService(button, reverse_button, sort_chest, toggle_key));
+        }
+
+        public static T AddDynamicToggle<T>(this T button, T button_when_false, Func<bool> check_game_state) where T: ICoreButton
+        {
+            return button.AddNewService(new DynamicToggleService(button, button_when_false, check_game_state));
+        }
+
+        /// <summary>
+        /// use this to help with creating buttons; e.g.:
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///     TexturedButton cb = new TexturedButton(TIH.Sort).With( (b) => {
+        ///          b.Hooks.onClick = () => IHOrganizer.SortPlayerInv(Main.localPlayer);
+        ///          b.ToolTip = "Sort Me";
+        ///          // ... etc.
+        ///    })
+        /// </code>
+        ///</example>
+        public static T With<T>(this T button, Action<T> action) where T : ICoreButton
+        {
+            if (button != null)
+                action(button);
+            return button;
+        }
+
+    #endregion
+
+    #region misc
         ///play the given sound effect;
         public static void Play(this Sound s, int x = -1, int y = -1, int style = 1)
         {
@@ -157,5 +259,7 @@ namespace InvisibleHand
         {
             return MathHelper.Clamp(value, min, max);
         }
+
+    #endregion
     }
 }

@@ -138,6 +138,11 @@ namespace InvisibleHand
                     SetKeyHint(option.name, option.Value.ToString());
                     break;
 
+                // show letter of key bind in button names/tooltips
+                case "showKeyBind":
+                    ModOptions["ShowKeyBind"] = (bool)option.Value;
+                    break;
+
                 // slot-locking
                 case "enableLocking":
                     ModOptions["LockingEnabled"] = (bool)option.Value;
@@ -193,7 +198,7 @@ namespace InvisibleHand
                             ModOptions["IconReplacers"] = false;
                             break;
                         case "Buttons":
-                            ModOptions["UseReplacers"] = 
+                            ModOptions["UseReplacers"] =
                             ModOptions["IconReplacers"] = true;
                             ModOptions["TextReplacers"] = false;
                             break;

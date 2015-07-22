@@ -171,35 +171,44 @@ namespace InvisibleHand
     /// Listens to a given game propery and changes state automatically
     public class DynamicToggleService: ButtonService
     {
-        private readonly Action<bool> inMainState;
+        private readonly Func<bool> gameState;
+        private bool inMain;
 
         private string _serviceType;
 
         public override string ServiceType { get { return _serviceType; } }
         private ICoreButton AltButton { get; set; }
 
-        public DynamicToggleService(ICoreButton button_if_true, ICoreButton button_if_false, Action<bool> check_game_state) : base(button_if_true)
+        public DynamicToggleService(ICoreButton button_if_true, ICoreButton button_if_false, Func<bool> check_game_state) : base(button_if_true)
         {
             _serviceType = Enum.GetName(typeof(TIH), button_if_true.Action) + Enum.GetName(typeof(TIH), button_if_false.Action) + "DynamicToggle";
 
-            inMainState = check_game_state;
+            gameState = check_game_state;
             AltButton = button_if_false;
+
         }
 
         public override void Subscribe()
         {
-
+            Client.Hooks.PostDraw += postDraw;
+            inMain = gameState();
+            Client.ButtonBase.ChangeContent(inMain ? Client.ID : AltButton.ID);
         }
 
         public override void Unsubscribe()
         {
-
+            Client.Hooks.PostDraw -= postDraw;
+            Client.ButtonBase.ChangeContent(Client.ID);
         }
 
         // check in post draw so as not to switch content mid-frame
-        private void postDraw()
+        private void postDraw(SpriteBatch sb)
         {
-
+            if (gameState() != inMain)
+            {
+                inMain = !inMain;
+                Client.ButtonBase.ChangeContent(inMain ? Client.ID : AltButton.ID);
+            }
         }
     }
 

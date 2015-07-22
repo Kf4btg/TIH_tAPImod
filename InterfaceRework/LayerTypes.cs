@@ -123,21 +123,6 @@ namespace InvisibleHand
                 depo.MakeLocking().AddToggle(sdep);
                 qstk.MakeLocking().AddToggle(sloo);
 
-
-                // var _buttons = new Dictionary<TIH, TexturedButton>();
-                // foreach (var t in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack, TIH.Rename, TIH.SaveName })
-                // {
-                //     _buttons.Add(tih, new TexturedButton(action:   tih,
-                //                                          label:    getLabel(tih),
-                //                                          tooltip:  getTtip(tih),
-                //                                          bg_color: getBGcol(tih)
-                //                                          ));
-                // }
-
-                // _buttons[TIH.SortChest].AddService(new SortingToggleService<TexturedButton>(_buttons[TIH.SortChest], _buttons[TIH.RSortChest], true, KState.Special.Shift));
-
-                // if (button.Action == TIH.QuickStack || button.Action == TIH.DepAll)
-                //     button.AddService(new LockingService<TexturedButton>( button, lockOffset ));
             }
         }
     }

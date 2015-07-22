@@ -29,52 +29,64 @@ namespace InvisibleHand
 
         protected override void AddBasesToLayer()
         {
-            if (textButtons)
-            {
-            }
-            else
-            {
-                // position of first button (right of chests, below coin slots)
-                var pos0 = new Vector2(506, API.main.invBottom + 22);
-
-                // // // // // // //
-                // Create the Sockets
-                // // // // // // //
-
-                // a transform to calculate the position of the socket from the
-                // order in which it is created (each offset by button height)
-                Func<int,Vector2> getPosFromIndex
-                    = (i) => new Vector2( pos0.X, pos0.Y + (i * Constants.ButtonH) );
-                int slotOrder = 0;
-
-                // Dictionary uses IButtonSlot type as one of the buttons is still text
-                var bases = new Dictionary<TIH, IButtonSlot>();
-                foreach (var action in new[]
-                {   // order of creation; determines positioning per the transform above
-                    TIH.SortChest,
-                    TIH.LootAll,
-                    TIH.DepAll,    // +smartdep
-                    TIH.QuickStack, // + smartloot
-                    TIH.Rename
-                }) ButtonBases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
-
-                // Now create the base for the Cancel Edit Button (a text button),
-                // but don't add it to the list yet because it only appears
-                // under certain conditions (handle in AddButtonsToBases())
-
-                CancelEditBase = new TextButtonBase(this, new Vector2(pos0.X,
-                                // Add another half-button-height to prevent overlap
-                                pos0.Y + (slotOrder * Constants.ButtonH) + (Constants.ButtonH / 2) ));
-            }
+            if (textButtons) addTextBases();
+            else addIconBases();
         }
 
         protected override void AddButtonsToBases()
         {
-            if (textButtons)
-            {
-            }
-            else
-            {
+            if (textButtons) addTextButtons();
+            else addIconButtons();
+        }
+
+        private void addTextBases()
+        {
+
+        }
+
+        private void addIconBases()
+        {
+            // position of first button (right of chests, below coin slots)
+            var pos0 = new Vector2(506, API.main.invBottom + 22);
+
+            // // // // // // //
+            // Create the Sockets
+            // // // // // // //
+
+            // a transform to calculate the position of the socket from the
+            // order in which it is created (each offset by button height)
+            Func<int,Vector2> getPosFromIndex
+                = (i) => new Vector2( pos0.X, pos0.Y + (i * Constants.ButtonH) );
+            int slotOrder = 0;
+
+            // Dictionary uses IButtonSlot type as one of the buttons is still text
+            var bases = new Dictionary<TIH, IButtonSlot>();
+            foreach (var action in new[]
+            {   // order of creation; determines positioning per the transform above
+                TIH.SortChest,
+                TIH.LootAll,
+                TIH.DepAll,    // +smartdep
+                TIH.QuickStack, // + smartloot
+                TIH.Rename
+            }) ButtonBases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
+
+            // Now create the base for the Cancel Edit Button (a text button),
+            // but don't add it to the list yet because it only appears
+            // under certain conditions (handle in AddButtonsToBases())
+
+            CancelEditBase = new TextButtonBase(this, new Vector2(pos0.X,
+                            // Add another half-button-height to prevent overlap
+                            pos0.Y + (slotOrder * Constants.ButtonH) + (Constants.ButtonH / 2) ));
+        }
+
+        private void addTextButtons()
+        {
+
+        }
+
+        private void addIconButtons()
+        {
+
                 // // // // // //
                 // some datas
                 // // // // // //
@@ -154,12 +166,6 @@ namespace InvisibleHand
                     }
                     return true;
                 });
-
-            }
-
         }
-
-
-
     }
 }

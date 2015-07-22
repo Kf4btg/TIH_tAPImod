@@ -17,6 +17,9 @@ namespace InvisibleHand
     {
         protected readonly bool textButtons;
 
+        private bool showCancel;
+        private TextButtonBase CancelEditBase;
+
         // Constructor
 
         public ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
@@ -55,14 +58,13 @@ namespace InvisibleHand
                     TIH.Rename
                 }) ButtonBases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
 
-                // Now add the base for the Cancel Edit Button, a text button which
-                // only appears under certain conditions.
-                getPosFromIndex = (i) => new Vector2(
-                                pos0.X,
-                                // Add another half-button-height to prevent overlap
-                                pos0.Y + (i * Constants.ButtonH) + (Constants.ButtonH / 2) );
+                // Now create the base for the Cancel Edit Button (a text button),
+                // but don't add it to the list yet because it only appears
+                // under certain conditions (handle in AddButtonsToBases())
 
-                ButtonBases.Add(TIH.CancelEdit, new TextButtonBase(this, getPosFromIndex(slotOrder)));
+                CancelEditBase = new TextButtonBase(this, new Vector2(pos0.X,
+                                // Add another half-button-height to prevent overlap
+                                pos0.Y + (slotOrder * Constants.ButtonH) + (Constants.ButtonH / 2) ));
             }
         }
 
@@ -123,7 +125,41 @@ namespace InvisibleHand
                 depo.MakeLocking().AddToggle(sdep);
                 qstk.MakeLocking().AddToggle(sloo);
 
+                // make Rename Chest button change to Save Name button
+                // when clicked (and vice-versa). Also show/hide Cancel button
+                rena.AddDynamicToggle(save, () =>
+                {
+                    // Need to know if the player has clicked the Rename Chest button
+                    if (Main.editChest)
+                    {
+                        if (!showCancel) // cancel button not shown, need to change that
+                        {
+                            // add cancel base to the layer's list of bases so it gets drawn
+                            // (don't throw an error if it's already there)
+                            ButtonBases[TIH.CancelEdit] = CancelEditBase;
+                            showCancel = true;
+                        }
+                        // since the save button is the "show when false" button,
+                        // we have to return false when Main.Edit is true, and true
+                        // when it is false.
+                        // Which is exactly what we'll do,
+                        // rather than checking the negation.
+                        return false;
+                    }
+                    if (showCancel) // need to hide cancel button
+                    {
+                        // remove from the base list so no calls to Draw() reach it
+                        ButtonBases.Remove(TIH.CancelEdit);
+                        showCancel = false;
+                    }
+                    return true;
+                });
+
             }
+
         }
+
+
+
     }
 }

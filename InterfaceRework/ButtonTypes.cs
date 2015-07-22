@@ -171,6 +171,11 @@ namespace InvisibleHand
             return button.AddNewService(new SortingToggleService(button, reverse_button, sort_chest, toggle_key));
         }
 
+        public static T AddDynamicToggle<T>(this T button, T button_when_false, Func<bool> check_game_state) where T: ICoreButton
+        {
+            return button.AddNewService(new DynamicToggleService(button, button_when_false, check_game_state));
+        }
+
         /// <summary>
         /// use this to help with creating buttons; e.g.:
         /// </summary>

@@ -24,7 +24,6 @@ namespace InvisibleHand
         void ChangeContent(String button_id);
         void Reset();
 
-
         void Draw(SpriteBatch sb);
 
     }
@@ -38,7 +37,7 @@ namespace InvisibleHand
 
         // void RegisterKeyToggle(KState.Special key, T context2);
         // void RegisterKeyToggle(KState.Special key, T context1, T context2);
-        void SetDefault(T default_content);
+        // void SetDefault(T default_content);
         void AddButton(T newButton);
 
     }
@@ -155,7 +154,7 @@ namespace InvisibleHand
         {
             ChangeContent(AssociatedButtons[new_content_id]);
         }
-        
+
         /// <summary>
         /// return this Socket to its default configuration
         /// </summary>

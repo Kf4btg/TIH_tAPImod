@@ -113,10 +113,20 @@ namespace InvisibleHand
         ///<summary>
         /// Add a ButtonService to this button and subscribe to its hooks
         ///</summary>
-        public static T AddService<T>(this T button, ButtonService service) where T : CoreButton
+        public static T AddNewService<T>(this T button, ButtonService service) where T : ICoreButton
         {
-            button.addService(service);
+            button.AddService(service);
             return button;
+        }
+
+        public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]") where T: CoreButton
+        {
+            return button.AddNewService(new LockingService(button, lock_offset, lock_color, locked_string));
+        }
+
+        public static T AddToggle<T>(this T button, T toggle_to_button, KState.Special toggle_key = KState.Special.Shift) where T: ISocketedButton<T>
+        {
+            return button.AddNewService(new ToggleService<T>(button, toggle_to_button, toggle_key));
         }
 
         /// <summary>

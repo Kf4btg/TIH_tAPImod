@@ -167,4 +167,42 @@ namespace InvisibleHand
             AltButton.Hooks.OnClick -= revSortAction;
         }
     }
+
+    /// Listens to a given game propery and changes state automatically
+    public class DynamicToggleService<T>: ButtonService where T: ISocketedButton<T>
+    {
+        protected readonly IButtonContentHandler<T> socket;
+        private readonly Action<bool> inMainState;
+
+        private string _serviceType;
+
+        public override string ServiceType { get { return _serviceType; } }
+        private T AltButton { get; set; }
+
+        public DynamicToggleService(T button_if_true, T button_if_false, Action<bool> check_game_state) : base(button_if_true)
+        {
+            _serviceType = Enum.GetName(typeof(TIH), button_if_true.Action) + Enum.GetName(typeof(TIH), button_if_false.Action) + "DynamicToggle";
+            socket = button_if_true.Socket;
+
+            inMainState = check_game_state;
+            AltButton = button_if_false;
+        }
+
+        public override void Subscribe()
+        {
+
+        }
+
+        public override void Unsubscribe()
+        {
+
+        }
+
+        // check in post draw so as not to switch content mid-frame
+        private void postDraw()
+        {
+
+        }
+    }
+
 }

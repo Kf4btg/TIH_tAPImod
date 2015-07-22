@@ -22,6 +22,8 @@ namespace InvisibleHand
         ButtonHooks Hooks { get; }
         Dictionary<string, ButtonService> Services { get; }
 
+        void AddService(ButtonService bs);
+
         void OnWorldLoad();
         void OnClick();
         void OnRightClick();
@@ -179,7 +181,7 @@ namespace InvisibleHand
 
     #region serviceManagement
 
-        internal void addService(ButtonService bs)
+        public void AddService(ButtonService bs)
         {
             //NOTE: should this worry about catching/avoiding
             //a "key already exists" ArgumentException?

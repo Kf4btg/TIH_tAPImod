@@ -17,12 +17,16 @@ namespace InvisibleHand
     {
         protected readonly bool textButtons;
 
+        private enum btnType { Text, Textured }
+
         // Constructor
 
         public ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
         {
             textButtons = text;
         }
+
+
 
         protected override void AddBasesToLayer()
         {
@@ -47,26 +51,37 @@ namespace InvisibleHand
                 // Dictionary uses IButtonSlot type as one of the buttons is still text
                 var bases = new Dictionary<TIH, IButtonSlot>();
                 foreach (var action in new[]
-                {
-                    // order of creation; determines positioning per the transform above
+                {   // order of creation; determines positioning per the transform above
                     TIH.SortChest,
                     TIH.LootAll,
                     TIH.DepAll,    // +smartdep
-                    TIH.QuickStack // + smartloot
-                })
-                {
-                    bases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
-                }
+                    TIH.QuickStack, // + smartloot
+                    TIH.Rename
+                }) ButtonBases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
 
                 // Now add the base for the Cancel Edit Button, a text button which
                 // only appears under certain conditions.
-                getPosFromIndex = (i) =>
-                    new Vector2( pos0.X,
+                getPosFromIndex = (i) => new Vector2(
+                                pos0.X,
                                 // Add another half-button-height to prevent overlap
                                 pos0.Y + (i * Constants.ButtonH) + (Constants.ButtonH / 2) );
-                bases.Add(TIH.CancelEdit, new TextButtonBase(this, getPosFromIndex(slotOrder)));
+
+                ButtonBases.Add(TIH.CancelEdit, new TextButtonBase(this, getPosFromIndex(slotOrder)));
             }
         }
+
+        // private void addButton(btnType type, TIH action, int creationOrder, Func<int, Vector2> mapOrderToPosition)
+        // {
+        //     switch(type)
+        //     {
+        //         case btnType.Text:
+        //             ButtonBases.Add(action, new TextButtonBase(this, mapOrderToPosition(creationOrder)));
+        //             break;
+        //         case btnType.Textured:
+        //             ButtonBases.Add(action, new IconButtonBase(this, mapOrderToPosition(creationOrder), IHBase.ButtonBG));
+        //             break;
+        //     }
+        // }
 
         protected override void AddButtonsToBases()
         {
@@ -104,18 +119,41 @@ namespace InvisibleHand
                                                     : Constants.EquipSlotColor * 0.85f;
                 Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
 
-                var _buttons = new Dictionary<TIH, TexturedButton>();
-                foreach (var tih in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack, TIH.Rename, TIH.SaveName })
-                {
-                    _buttons.Add(tih, new TexturedButton( action: tih,
-                                                         label:    getLabel(tih),
-                                                         tooltip:  getTtip(tih),
-                                                         bg_color: getBGcol(tih)
-                                                         ));
-                }
-                var cancelEditButton = new TextButton(TIH.CancelEdit, getLabel(TIH.CancelEdit));
+                Func<TIH, TexturedButton> getButton
+                    = (a) => new TexturedButton(action: a, label: getLabel(a), tooltip: getTtip(a), bg_color: getBGcol(a));
 
-                _buttons[TIH.SortChest].AddService(new SortingToggleService<TexturedButton>(_buttons[TIH.SortChest], _buttons[TIH.RSortChest], true, KState.Special.Shift));
+                var sort  = getButton(TIH.SortChest);
+                var rsort = getButton(TIH.RSortChest);
+                var loot  = getButton(TIH.LootAll);
+                var dep   = getButton(TIH.DepAll);
+                var sdep  = getButton(TIH.SmartDep);
+                var qstk  = getButton(TIH.QuickStack);
+                var sloot = getButton(TIH.SmartLoot);
+                var ren   = getButton(TIH.Rename);
+                var save  = getButton(TIH.SaveName);
+
+                var cancel = new TextButton(TIH.CancelEdit, getLabel(TIH.CancelEdit));
+
+
+                // Add Services //
+
+                sort.AddService(new SortingToggleService<TexturedButton>(sort, rsort, true, KState.Special.Shift));
+
+                dep.MakeLocking().AddToggle(sdep);
+                qstk.MakeLocking().AddToggle(sloot);
+                
+
+                // var _buttons = new Dictionary<TIH, TexturedButton>();
+                // foreach (var t in new[] { TIH.SortChest, TIH.RSortChest, TIH.LootAll, TIH.DepAll, TIH.QuickStack, TIH.Rename, TIH.SaveName })
+                // {
+                //     _buttons.Add(tih, new TexturedButton(action:   tih,
+                //                                          label:    getLabel(tih),
+                //                                          tooltip:  getTtip(tih),
+                //                                          bg_color: getBGcol(tih)
+                //                                          ));
+                // }
+
+                // _buttons[TIH.SortChest].AddService(new SortingToggleService<TexturedButton>(_buttons[TIH.SortChest], _buttons[TIH.RSortChest], true, KState.Special.Shift));
 
                 // if (button.Action == TIH.QuickStack || button.Action == TIH.DepAll)
                 //     button.AddService(new LockingService<TexturedButton>( button, lockOffset ));

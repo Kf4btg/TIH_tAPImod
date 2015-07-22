@@ -14,7 +14,7 @@ namespace InvisibleHand
         protected float opacity_inactive, opacity_active = 1.0f;
 
         public readonly Dictionary<string,CoreButton> Buttons;
-        public readonly Dictionary<TIH, ButtonSocket<CoreButton>> ButtonBases;
+        public readonly Dictionary<TIH, IButtonSlot> ButtonBases;
 
         public Rectangle ButtonFrame { get; protected set; }
         public virtual float LayerOpacity { get; protected set; }
@@ -26,7 +26,7 @@ namespace InvisibleHand
 
         protected ButtonContainerLayer(string name, bool handle_mouse_interface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
-            ButtonBases = new Dictionary<TIH, ButtonSocket<CoreButton>>();
+            ButtonBases = new Dictionary<TIH, IButtonSlot>();
             Buttons     = new Dictionary<string, CoreButton>();
             ButtonFrame = Rectangle.Empty;
             handleMouseInterface = handle_mouse_interface;

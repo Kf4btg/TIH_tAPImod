@@ -7,9 +7,12 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    /// TextReplacer and IconReplacer will inherit from this class;
-    /// This is intended to allow other code to simply request the type
-    /// "ReplacerButtons" without worrying about which variety is returned.
+    // Order of operations:
+    //  - First, create layer (that's what this is doing)
+    //  - Second, create bases and assign to layer
+    //	 - Finally, create buttons and assign to bases
+    // This allows assigning references to parent objects down the stack
+
     public class ChestButtonReplacerLayer : ButtonContainerLayer
     {
         protected readonly bool textButtons;
@@ -18,12 +21,6 @@ namespace InvisibleHand
 
         public ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
         {
-            // Order of operations:
-            //  - First, create layer (that's what this is doing)
-            //  - Second, create bases and assign to layer
-            //	 - Finally, create buttons and assign to bases
-            // This allows assigning references to parent objects down the stack
-
             textButtons = text;
         }
 
@@ -63,9 +60,10 @@ namespace InvisibleHand
 
                 // Now add the base for the Cancel Edit Button, a text button which
                 // only appears under certain conditions.
-                getPosFromIndex = (i) => new Vector2( pos0.X,
-                                                      // Add another half-button-height to prevent overlap
-                                                      pos0.Y + (i * Constants.ButtonH) + (Constants.ButtonH / 2) );
+                getPosFromIndex = (i) =>
+                    new Vector2( pos0.X,
+                                // Add another half-button-height to prevent overlap
+                                pos0.Y + (i * Constants.ButtonH) + (Constants.ButtonH / 2) );
                 bases.Add(TIH.CancelEdit, new TextButtonBase(this, getPosFromIndex(slotOrder)));
             }
         }
@@ -86,7 +84,7 @@ namespace InvisibleHand
                                             -(float)(int)((float)Constants.ButtonH / 2));
 
                 // background tints
-                Color bgColor = Constants.ChestSlotColor * 0.85f;
+                Color bgColor         = Constants.ChestSlotColor * 0.85f;
                 Color saveNameBgColor = Constants.EquipSlotColor * 0.85f;
 
                 // // // // // // //
@@ -101,7 +99,9 @@ namespace InvisibleHand
                 // )
 
                 Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
-                Func<TIH, Color>  getBGcol = a => a == TIH.SaveName ? Constants.ChestSlotColor * 0.85f : Constants.EquipSlotColor * 0.85f;
+                Func<TIH, Color>  getBGcol = a => a == TIH.SaveName
+                                                    ? Constants.ChestSlotColor * 0.85f
+                                                    : Constants.EquipSlotColor * 0.85f;
                 Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
 
                 var _buttons = new Dictionary<TIH, TexturedButton>();

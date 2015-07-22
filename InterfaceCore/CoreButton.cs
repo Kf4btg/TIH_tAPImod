@@ -33,18 +33,13 @@ namespace InvisibleHand
     }
 
     /// Having subclasses of CoreButton ALSO implement this interface seems to be
-    /// the ONLY way to get a reliably type-safe reference to the parent buttonbase
+    /// the only way to get a reliably type-safe reference to the parent buttonbase
     public interface ISocketedButton<T> :ICoreButton where T: ISocketedButton<T>
     {
         IButtonContentHandler<T> Socket { get; }
 
         // void Duplicate(out ISocketedButton newCopy);
     }
-
-
-
-
-
 
     /// re-imagining the ButtonState and IHButton as one object
     public abstract class CoreButton : ICoreButton
@@ -53,26 +48,18 @@ namespace InvisibleHand
 
         private string _label = "";
         private string _tooltip = "";
-
         private string _id = String.Empty;
-
-        // protected TIH action;
-        // protected Color tint;
-
-        public abstract IButtonSlot ButtonBase { get; protected set; }
-
 
         //Properties//
 
-        // public TIH Action     { get { return action; }  set { action  = value; } }
-        // public Color Tint     { get { return tint; }    set { tint    = value; } }
-
-        /// can change the overall color of the button texture or text
+        /// Get or change the overall color of the button texture or text
         public Color Tint     { get; set; }
+        /// Get or set this button's associated action
         public TIH Action     { get; set; }
+        /// Get or set this button's label
         public string Label   { get { return _label; }   set { _label   = value; } }
+        /// Get or set this button's Tooltip
         public string Tooltip { get { return _tooltip; } set { _tooltip = value; } }
-
 
         /// Unique (well, effectively...), randomly-generated ID
         public string ID
@@ -93,44 +80,28 @@ namespace InvisibleHand
         /// Derived size
         public abstract Vector2 Size { get; }
 
-        /// blank button not intended for use other than by services
-        public CoreButton()
+        public abstract IButtonSlot ButtonBase { get; }
+
+
+        // Constructors
+        protected CoreButton(TIH action, string label = "")
         {
-            Hooks = new ButtonHooks();
+            Action   = action;
+            Label    = label;
+            Hooks    = new ButtonHooks();
             Services = new Dictionary<string, ButtonService>();
         }
 
-        // Constructors
-        public CoreButton(TIH action, string label = "") : this()
-        {
-            Action = action;
-            if (label == "") Label = Constants.DefaultButtonLabels[action];
-            else Label = label;
-            Tooltip = Label;
-
-        }
-
-        /// create this button by copying all the aspects of the given button
-        /// other than hooks and services
-        // public CoreButton(CoreButton other, bool copyHooks = false, bool copyServices = false) : this(other.Action, other.Label)
-        // {
-        //     if (copyHooks)
-        //         foreach (var h in other.Hooks)
-        //         {
-        //             if (h.Value != null) Hooks[h.Key] = h.Value;
-        //         }
-        // }
-
         /// copying all the aspects of the given button
         /// other than hooks, services, and ID
-        public virtual void CopyAttributes<T>(T other) where T:CoreButton
+        ///<remarks>Probaby going to get rid of this</remarks>
+        public virtual void CopyAttributes<T>(T other) where T:ICoreButton
         {
             this.Action  = other.Action;
             this.Label   = other.Label;
             this.Tooltip = other.Tooltip;
             this.Tint    = other.Tint;
         }
-
 
     #region hooks
         // //////////////////////////////////////////////////////////
@@ -176,9 +147,14 @@ namespace InvisibleHand
             return result;
         }
 
-        ///<returns>False if any hooks returned false, indicating
+        ///!
+        /// <summary>
+        /// Executed before any part of this button is drawn.
+        /// </summary>
+        /// <param name="sb">Drawing SpriteBatch</param>
+        /// <returns>False if any hooks returned false, indicating
         /// not to continue with the rest of the ButtonSocket's Draw() Command
-        /// and immediately skip to the PostDraw hook.
+        /// and immediately skip to the PostDraw hook.</returns>
         public virtual bool PreDraw(SpriteBatch sb)
         {
             bool result = true;
@@ -189,6 +165,11 @@ namespace InvisibleHand
             return result;
         }
 
+        ///!
+        /// <summary>
+        /// Called after the button has been drawn completely.
+        /// </summary>
+        /// <param name="sb">Drawing SpriteBatch</param>
         public virtual void PostDraw(SpriteBatch sb)
         {
             foreach (var callHook in Hooks.PreDraw)
@@ -200,18 +181,27 @@ namespace InvisibleHand
 
         internal void addService(ButtonService bs)
         {
+            //NOTE: should this worry about catching/avoiding
+            //a "key already exists" ArgumentException?
+            //I'd say under normal operation that shouldn't happen,
+            //and would mean either A) a poorly-coded service,
+            //or B) trying to add a redundant service to a button
             Services.Add(bs.ServiceType, bs);
             bs.Subscribe();
         }
 
-        internal void RemoveService(string serviceType)
+        //
+        internal bool RemoveService(string serviceType)
         {
             ButtonService bs;
             if (Services.TryGetValue(serviceType, out bs))
             {
                 Services[serviceType].Unsubscribe();
                 Services.Remove(serviceType);
+                return true;
             }
+            return false;
+
         }
 
         #endregion

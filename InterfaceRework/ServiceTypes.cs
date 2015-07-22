@@ -90,7 +90,8 @@ namespace InvisibleHand
 
         private void PostDraw(SpriteBatch sb)
         {
-            sb.Draw(IHBase.LockedIcon, socket.Position + offset, Client.Tint * socket.ParentLayer.LayerOpacity * socket.Alpha);
+            sb.Draw(IHBase.LockedIcon, socket.Position + offset,
+                    Client.Tint * socket.ParentLayer.LayerOpacity * socket.Alpha);
         }
     }
 
@@ -98,7 +99,7 @@ namespace InvisibleHand
     public class ToggleService<T> : ButtonService where T: ISocketedButton<T>
     {
         protected readonly IButtonContentHandler<T> socket;
-        protected readonly KState.Special  toggleKey;
+        protected readonly KState.Special toggleKey;
 
         private string _serviceType;
         private T _altButton;

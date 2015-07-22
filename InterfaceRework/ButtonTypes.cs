@@ -15,25 +15,9 @@ namespace InvisibleHand
     public class TexturedButton : CoreButton, ISocketedButton<TexturedButton>
     {
         // store for implementing ISocketedButton
-        private IButtonSlot _parent;
+        private IButtonContentHandler<TexturedButton> _parent;
 
-        public IButtonContentHandler<TexturedButton> Socket { get; }
-
-    // protected Texture2D texture;
-    // protected Rectangle? defaultTexels;
-    // protected Rectangle? altTexels;
-    //
-    // protected Color bgColor;
-
-    // public Texture2D Texture       { get { return texture; }       set { texture       = value; } }
-    // public Rectangle? InactiveRect { get { return defaultTexels; } set { defaultTexels = value; } }
-    // public Rectangle? ActiveRect   { get { return altTexels; }     set { altTexels     = value; } }
-    //
-    // public Color BgColor           { get { return bgColor; }       set { bgColor       = value; } }
-
-    // Can I get rid of the backing stores? They were honestly just
-    // for default values, but maybe those are generated for properties too
-    public Texture2D Texture       { get; set; }
+        public Texture2D Texture       { get; set; }
         public Rectangle? InactiveRect { get; set; }
         public Rectangle? ActiveRect   { get; set; }
         public Color BackgroundColor   { get; set; }
@@ -47,16 +31,22 @@ namespace InvisibleHand
         public override IButtonSlot ButtonBase
         {
             get { return _parent; }
+        }
+
+        public IButtonContentHandler<TexturedButton> Socket
+        {
+            get { return _parent; }
             protected set { _parent = value; }
         }
 
+
         public TexturedButton(TIH action,
                               string label,
-                              string tooltip = "",
-                              Color? bg_color = null,
-                              Texture2D texture = null,
+                              string tooltip           = "",
+                              Color? bg_color          = null,
+                              Texture2D texture        = null,
                               Rectangle? inactive_rect = null,
-                              Rectangle? active_rect = null
+                              Rectangle? active_rect   = null
                               ) : base(action, label)
         {
             BackgroundColor = bg_color ?? Color.White;
@@ -85,7 +75,7 @@ namespace InvisibleHand
     // ////////////////////////////////////////////////////////////////////////////
     public class TextButton : CoreButton
     {
-        private IButtonSlot _parent;
+        private IButtonContentHandler<TexturedButton> _parent;
 
         // Derived size
         public override Vector2 Size
@@ -97,17 +87,13 @@ namespace InvisibleHand
         public override IButtonSlot ButtonBase
         {
             get { return _parent; }
-            protected set { _parent = value; }
         }
 
-        // public override void CopyAttributes(CoreButton other)
-        // {
-        //     base.CopyAttributes(other);
-        //     if (other is TextButton)
-        //     {
-        //         TextButton ob = (TextButton)other;
-        //     }
-        // }
+        public IButtonContentHandler<TexturedButton> Socket
+        {
+            get { return _parent; }
+            protected set { _parent = value; }
+        }
 
         public TextButton(TIH action, string label = "") : base(action, label)
         {
@@ -145,7 +131,7 @@ namespace InvisibleHand
         ///    })
         /// </code>
         ///</example>
-        public static T With<T>(this T button, Action<T> action) where T : CoreButton
+        public static T With<T>(this T button, Action<T> action) where T : ICoreButton
         {
             if (button != null)
                 action(button);

@@ -49,21 +49,17 @@ namespace InvisibleHand
         /// original values to replace them with newer, better buttons.
         public static Dictionary<TIH, string> OriginalButtonLabels { get; private set; }
 
-        // public ButtonLayer invButtons;
-        // public ButtonLayer chestButtons;
-        // public ButtonLayer replacerButtons;
-
         public ButtonLayer ReplacerButtons { get; private set; }
         public ButtonLayer InventoryButtons { get; private set; }
 
-        /// keep track of ALL existing button contexts here.
-        /// TODO: there has to be a better way to key these things
-        /// than with their label.
-        // public Dictionary<string, IHButton> ButtonRepo { get; private set; }
-        /// updated version, stores by unique id
+        /// keep track of ALL existing button contexts here, by unique ID
         public Dictionary<string, ICoreButton> ButtonStore { get; private set; }
 
-        ///the ids of those that need a state-update:
+        /// the ids of buttons needing a state-update (i.e. OnWorldLoad call)
+        // TODO: probably should just call OnWorldLoad for every button in the ButtonStore
+        // rather than relying on this collection to get calls to them. It won't matter
+        // to the ones that don't have any hooks for it, and there shouldn't ever be so many
+        // buttons that this would call a huge slowdown.
         public Stack<string> ButtonUpdates { get; private set; }
 
         public override void OnLoad()
@@ -98,21 +94,16 @@ namespace InvisibleHand
         private void InitButtons()
         {
             KEP           = new KeyEventProvider();
-            // ButtonRepo    = new Dictionary<string, IHButton>();
             ButtonStore   = new Dictionary<string, ICoreButton>();
             ButtonUpdates = new Stack<string>();
 
             // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
-            // invButtons   = ButtonFactory.BuildButtons("Inventory");
-            // chestButtons = ButtonFactory.BuildButtons("Chest");
+            InventoryButtons = PlayerInventoryButtons.New();
 
             // if (ModOptions["TextReplacers"])
                 ReplacerButtons = ChestButtonReplacerLayer.New(ModOptions["TextReplacers"]);
-            // replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
             // else if (ModOptions["IconReplacers"])
-            // replacerButtons = ButtonFactory.BuildButtons("IconReplacer");
 
-            InventoryButtons = PlayerInventoryButtons.New();
         }
 
         /// Store the Key assigned for each action as a hint

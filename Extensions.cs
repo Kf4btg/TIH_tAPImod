@@ -137,7 +137,6 @@ namespace InvisibleHand
             var c = (int)((byte)((float)b * mult));
             return TAPI.Extensions.Multiply(new Color(c, c, c, c), tint);
             // Terraria.Utils.Multiply(textColor, tint),
-
         }
 
     #endregion
@@ -177,7 +176,6 @@ namespace InvisibleHand
         /// return value will be something like "(X)"
         public static string GetKeyTip(this TIH action)
         {
-            // return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
             string kbopt;
             if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
                 return IHBase.ButtonKeyTips[kbopt];

@@ -104,18 +104,27 @@ namespace InvisibleHand
         // those of subscribed services.
         // //////////////////////////////////////////////////////////
 
+        /// <summary>
+        /// Called once when the player enters a world; use to set initial state 
+        /// </summary>
         public virtual void OnWorldLoad()
         {
             foreach (var callHook in Hooks.OnWorldLoad)
                 callHook();
         }
 
+        /// <summary>
+        /// Action(s) this button performs when clicked with the left mouse button.
+        /// </summary>
         public virtual void OnClick()
         {
             foreach (var callHook in Hooks.OnClick)
                 callHook();
         }
 
+        /// <summary>
+        /// Action(s) this button performs when clicked with the right mouse button.
+        /// </summary>
         public virtual void OnRightClick()
         {
             foreach (var callHook in Hooks.OnRightClick)
@@ -142,7 +151,6 @@ namespace InvisibleHand
             return result;
         }
 
-        ///!
         /// <summary>
         /// Executed before any part of this button is drawn.
         /// </summary>
@@ -160,7 +168,6 @@ namespace InvisibleHand
             return result;
         }
 
-        ///!
         /// <summary>
         /// Called after the button has been drawn completely.
         /// </summary>
@@ -185,7 +192,6 @@ namespace InvisibleHand
             bs.Subscribe();
         }
 
-        //
         internal bool RemoveService(string serviceType)
         {
             ButtonService bs;
@@ -196,7 +202,6 @@ namespace InvisibleHand
                 return true;
             }
             return false;
-
         }
 
         #endregion
@@ -204,17 +209,6 @@ namespace InvisibleHand
 
     public class ButtonHooks
     {
-        // public enum On
-        // {
-        //     Click,
-        //     RightClick,
-        //     MouseEnter,
-        //     MouseLeave,
-        //     PreDraw,
-        //     PostDraw,
-        //     WorldLoad
-        // }
-
         public IHEvent<Action> OnClick, OnRightClick, OnWorldLoad;
         public IHEvent<Action<SpriteBatch>> PostDraw;
         public IHEvent<Func<bool>> OnMouseEnter, OnMouseLeave;

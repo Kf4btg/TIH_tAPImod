@@ -74,7 +74,6 @@ namespace InvisibleHand
             IHBase.Instance.ButtonStore.Add(b.ID, b);
         }
 
-
         // Abstract Methods //
 
         protected abstract void AddBasesToLayer();

@@ -462,18 +462,6 @@ namespace InvisibleHand
             }
         }
 
-        /**********************************************************
-        *   Wrapper functions
-        */
-
-        //plays the "item moved" sound
-        public static void RingBell(int o1 = -1, int o2 = -1, int o3 = 1)
-        {
-            // Main.PlaySound(7, o1, o2, o3);
-            // Main.PlaySound(Sounds.ItemMoved, o1, o2, o3);
-            Sound.ItemMoved.Play();
-        }
-
         // calls the NetMessage.sendData method for the current chest
         // at the given index. Called on all of loot, deposit, stack
         public static void SendNetMessage(int index)
@@ -513,7 +501,6 @@ namespace InvisibleHand
         /// return value will be something like "(X)"
         public static string GetKeyTip(TIH action)
         {
-            // return IHBase.ButtonKeyTips[Constants.ButtonActionToKeyBindOption[action]];
             string kbopt;
             if (Constants.ButtonActionToKeyBindOption.TryGetValue(action, out kbopt))
                 return IHBase.ButtonKeyTips[kbopt];
@@ -521,18 +508,10 @@ namespace InvisibleHand
             return "";
         }
 
-        /// adds a button to the main button collection with a unique ID
-        // public static void AddToButtonRepo(IHButton btn)
-        // {
-        //     IHBase.Instance.ButtonRepo.Add(btn.ID, btn);
-        // }
-
         public static void AddToButtonStore(ICoreButton btn)
         {
             IHBase.Instance.ButtonStore.Add(btn.ID, btn);
         }
-
-
     #endregion
 
     }// \class

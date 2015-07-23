@@ -6,7 +6,7 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public class IconButtonBase : ButtonSocket<TexturedButton>, IButtonSlot
+    public class IconButtonBase : ButtonSlot<TexturedButton>
     {
         /// Texture resource that will be drawn in the background of this buttonbase.
         /// BgColor property of current button content object is used for tint.
@@ -61,7 +61,7 @@ namespace InvisibleHand
         }
     }
 
-    public class TextButtonBase : ButtonSocket<TextButton>, IButtonSlot
+    public class TextButtonBase : ButtonSlot<TextButton>
     {
         // class fields//
 

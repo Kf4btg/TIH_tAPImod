@@ -4,7 +4,7 @@ namespace InvisibleHand
 {
     public abstract class ButtonService
     {
-        /// A short string indicating this service's function
+        /// A simple, descriptive string indicating this service's function
         public abstract string ServiceType { get; }
 
         /// The button to which this service's

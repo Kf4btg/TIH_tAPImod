@@ -123,7 +123,7 @@ namespace InvisibleHand
             // put it all together, add to base
             Func<TIH, TIH, TextButton> getButton
                 = (base_by_action, a)
-                => TextButton.New( (ButtonSocket<TextButton>)ButtonBases[base_by_action],
+                => TextButton.New( (ButtonSlot<TextButton>)ButtonBases[base_by_action],
                                        action: a,
                                        label: getLabel(a)
                                        );
@@ -165,7 +165,7 @@ namespace InvisibleHand
 
                 Func<TIH, TIH, TexturedButton> getButton
                     = (base_by_action, a)
-                    => TexturedButton.New( (ButtonSocket<TexturedButton>)ButtonBases[base_by_action],
+                    => TexturedButton.New( (ButtonSlot<TexturedButton>)ButtonBases[base_by_action],
                                            action: a,
                                            label: getLabel(a),
                                            tooltip: getTtip(a),
@@ -280,7 +280,7 @@ namespace InvisibleHand
 
             Func<TIH, TIH, TexturedButton> getButton
                 = (base_by_action, a)
-                => TexturedButton.New((ButtonSocket<TexturedButton>)ButtonBases[base_by_action],
+                => TexturedButton.New((ButtonSlot<TexturedButton>)ButtonBases[base_by_action],
                                        action: a,
                                        label: getLabel(a),
                                        tooltip: getTtip(a),

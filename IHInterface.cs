@@ -18,16 +18,11 @@ namespace InvisibleHand
             {
                 if (Main.localPlayer.chest != -1)
                 {
-
-                    // InterfaceLayer.Add(list, IHBase.Instance.chestButtons, InterfaceLayer.LayerInventory, true);
                     // --haven't made a replacement for the separate chestbuttons yet
-
-                    // InterfaceLayer.Add(list, IHBase.Instance.replacerButtons, InterfaceLayer.LayerInventory, true);
                     InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
                 }
                 else
                 {
-                    // InterfaceLayer.Add(list, IHBase.Instance.invButtons, InterfaceLayer.LayerInventory, true);
                     InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
                 }
             }
@@ -66,7 +61,6 @@ namespace InvisibleHand
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
                     IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
-                    // Main.PlaySound(22); // the actual "lock" sound
                     Sound.Lock.Play();
                 }
             }

@@ -36,7 +36,6 @@ namespace InvisibleHand
                 // grab the next button that has been queued for update
                 string btn = IHBase.Instance.ButtonUpdates.Pop();
                 // and call it's update hook
-                // IHBase.Instance.ButtonRepo[btn].OnUpdate();
                 IHBase.Instance.ButtonStore[btn].OnWorldLoad();
             }
         }

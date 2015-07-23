@@ -25,7 +25,6 @@ namespace InvisibleHand
         void Reset();
 
         void Draw(SpriteBatch sb);
-
     }
 
     public interface IButtonSocket<T> : IButtonSlot where T: ICoreButton
@@ -35,25 +34,24 @@ namespace InvisibleHand
 
         void ChangeContent(T new_content);
 
-        // void RegisterKeyToggle(KState.Special key, T context2);
-        // void RegisterKeyToggle(KState.Special key, T context1, T context2);
-        // void SetDefault(T default_content);
         void AddButton(T newButton);
-
     }
-
 
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonSocket<T> : IButtonSocket<T> where T: ICoreButton
+    public abstract class ButtonSlot<T> : IButtonSocket<T> where T: ICoreButton
     {
-        //backing stores & default values
+        //backing stores & default values //
         protected float _minScale = 0.5f;
         protected float _maxScale = 1.0f;
         protected float _scale = 1.0f;
         protected float _baseAlpha = 0.85f;
         protected float _alpha = 1.0f;
+
+        // ///////////////////////////////// //
+        //            Properties             //
+        // ///////////////////////////////// //
 
         /// interface layer this button belongs to
         public ButtonLayer ParentLayer { get; protected set; }
@@ -63,12 +61,11 @@ namespace InvisibleHand
         /// Get the bounding rectangle for this socket.
         public Rectangle ButtonBounds { get; protected set; }
 
-        /// Get an indication of whether this button is currently
-        /// focused by the mouse. Differs from IsHovered in that
-        /// this is a switch which is set when the mouse first enters
-        /// or leaves the button, rather than calculating the
-        /// hover status on each call. Used to activate OnMouseEnter/Leave,
-        /// and is faster to call from an external class.
+        /// Get an indication of whether this button is currently focused by the
+        /// mouse. Differs from IsHovered in that this is a switch which is set
+        /// when the mouse first enters or leaves the button, rather than
+        /// calculating the hover status on each call. Used to activate
+        /// OnMouseEnter/Leave, and is faster to call from an external class.
         public bool HasMouseFocus { get; protected set; }
 
         /// Get whether or not this button is currently hovered by the mouse
@@ -101,7 +98,6 @@ namespace InvisibleHand
             set { _alpha = value.Clamp(BaseAlpha); }
         }
 
-
         public Dictionary<string, T> AssociatedButtons { get; protected set; }
 
         //virtual properties//
@@ -120,11 +116,14 @@ namespace InvisibleHand
             get { return ButtonBounds.Size(); }
         }
 
-        //Constructor//
+
+        // ////////////////////////////// //
+        //          Constructor           //
+        // ////////////////////////////// //
 
         /// initialize a new, empty socket with blank content;
         /// calls the derived-class specific version of InitEmptySocket()
-        protected ButtonSocket(ButtonLayer parent, Vector2 position)
+        protected ButtonSlot(ButtonLayer parent, Vector2 position)
         {
             ParentLayer = parent;
             Position = position;
@@ -132,40 +131,65 @@ namespace InvisibleHand
             AssociatedButtons = new Dictionary<string, T>();
         }
 
-        // public ButtonSocket(ButtonLayer parent, T content, Vector2 position)
-        // {
-        //     parentLayer = parent;
-        //     this.DefaultContent = this.CurrentContent = content;
-        //
-        //     ButtonBounds = new Rectangle((int)position.X, (int)position.Y, (int)content.Size.X, (int)content.Size.Y);
-        // }
+        // ////////////////////////////// //
+        //            Methods             //
+        // ////////////////////////////// //
 
+        /// Associate a new button with this base. If no other buttons have
+        /// previously been associated, make it the default content.
+        public void AddButton(T button)
+        {
+            if (AssociatedButtons.Count == 0)
+                SetDefault(button);
+            else
+                AssociatedButtons[button.ID] = button;
+
+            // bubble up the stack
+            ParentLayer.AddButton(button);
+        }
+
+        /// Associate multiple buttons with this base. The first button in the
+        /// parameter list becomes the default content if no other buttons have
+        /// yet been added.
+        public void AddButtons(params T[] buttons)
+        {
+            foreach (T button in buttons)
+                AddButton(button);
+        }
+
+        public void RemoveButtonAssociation(string buttonID)
+        {
+            AssociatedButtons.Remove(buttonID);
+        }
 
         /// <summary>
         /// Replace current button configuration
         /// </summary>
-        /// <param name="new_content">The button to swap into this socket</param>
+        /// <param name="new_content">The button to swap into this slot</param>
         public void ChangeContent(T new_content)
         {
             CurrentContent = new_content;
         }
 
+        /// <summary>
+        /// Replace current button configuration
+        /// </summary>
+        /// <param name="new_content_id">Id of button to swap into this slot</param>
         public void ChangeContent(string new_content_id)
         {
             ChangeContent(AssociatedButtons[new_content_id]);
         }
 
         /// <summary>
-        /// return this Socket to its default configuration
+        /// return this slot to its default configuration
         /// </summary>
         public void Reset()
         {
             ChangeContent(DefaultContent);
         }
 
-
         /// <summary>
-        /// register a key toggle for this base's default context
+        /// register a key toggle for this slot's default context
         /// </summary>
         /// <param name="key">Activation key, e.g. Shift</param>
         /// <param name="button_id">ID of button to swap with</param>
@@ -175,19 +199,20 @@ namespace InvisibleHand
         }
 
         /// <summary>
-        /// Set up key-event-subscribers that will toggle between the 2 contexts
-        /// when the player holds or releases the button.
+        /// Set up key-event-subscribers that will toggle between the
+        /// 2 contexts when the player holds or releases the button.
         /// </summary>
         /// <param name="key">Key (ctrl | shift | alt) on which to toggle content</param>
         /// <param name="button_a_id">ID of default button to display</param>
-        /// <param name="button_b_id">ID of button displayed while <paramref name="key "/> is held down.</param>
+        /// <param name="button_b_id">ID of button displayed while
+        /// <paramref name="key "/> is held down.</param>
         public void RegisterKeyToggle(KState.Special key, string button_a_id, string button_b_id)
         {
             RegisterKeyToggle(key, AssociatedButtons[button_a_id], AssociatedButtons[button_b_id]);
         }
 
         /// <summary>
-        /// register a key toggle for this base's default context
+        /// register a key toggle for this slot's default context
         /// </summary>
         /// <param name="key">Activation key, e.g. Shift</param>
         /// <param name="context2">Button to swap with</param>
@@ -205,7 +230,8 @@ namespace InvisibleHand
         /// <param name="context2">Button displayed while <paramref name="key "/> is held down.</param>
         public void RegisterKeyToggle(KState.Special key, T context1, T context2)
         {
-            //have to initialize (rather than just declare) this to prevent compile-time error in kw1 declaration
+            // have to initialize (rather than just declare) this to prevent compile-time
+            // error in kw1 declaration
             var kw2 = new KeyWatcher(key, KeyEventProvider.Event.Released, null);
 
             var kw1 = new KeyWatcher(key, KeyEventProvider.Event.Pressed,
@@ -242,14 +268,13 @@ namespace InvisibleHand
 
         #region virtual methods
 
-        /// <summary>
-        /// Handles hover-check, hover events, etc.
-        /// </summary><remarks>
-        /// Most of these events can be changed individually
-        /// by overriding their respective hooks, but, for more
-        /// fine-grained control, you can subclass and override
-        /// this entire method. Be careful to make sure all the
-        /// necessary hooks are called from the derived version.</remarks>
+        /// <summary> Handles hover-check, hover events, etc.
+        /// </summary>
+        /// <remarks> Most of these events can be changed individually
+        /// by overriding their respective hooks, but, for more fine-grained
+        /// control, you can subclass and override this entire method. Be
+        /// careful to make sure all the necessary hooks are called from the
+        /// derived version.</remarks>
         protected virtual void OnDrawBase()
         {
             if (IsHovered)
@@ -314,47 +339,18 @@ namespace InvisibleHand
         }
 
         /// <summary>
-        /// Make this button usable by adding a default button configuration
+        /// Make this button usable by adding a default button configuration.
+        /// The Button added here defines the button's boundaries.
         /// </summary>
         /// <param name="default_content">Default button</param>
-        public void SetDefault(T default_content)
+        protected virtual void SetDefault(T default_content)
         {
             AssociatedButtons[default_content.ID] = default_content;
             DefaultContent = CurrentContent = default_content;
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)default_content.Size.X, (int)default_content.Size.Y);
-
-            // return this;
         }
 
-        /// Associate a new button with this base.
-        /// If no other buttons have previously been associated,
-        /// make it the default content.
-        public void AddButton(T button)
-        {
-            if (AssociatedButtons.Count == 0)
-                SetDefault(button);
-            else
-                AssociatedButtons[button.ID] = button;
-
-            // bubble up the stack
-            ParentLayer.AddButton(button);
-        }
-
-        /// Associate multiple buttons with this base.
-        /// The first button in the parameter list becomes
-        /// the default content if no other buttons have
-        /// yet been added.
-        public void AddButtons(params T[] buttons)
-        {
-            foreach (T button in buttons)
-                AddButton(button);
-        }
-
-        public void RemoveButtonAssociation(string buttonID)
-        {
-            AssociatedButtons.Remove(buttonID);
-        }
 
         //virtually abstract methods (no default implementation)
 
@@ -379,5 +375,4 @@ namespace InvisibleHand
         /// <param name="sb">Spritebatch which performs the drawing</param>
         protected abstract void DrawButtonContent(SpriteBatch sb);
     }
-
 }

@@ -18,11 +18,18 @@ namespace InvisibleHand
             {
                 if (Main.localPlayer.chest != -1)
                 {
-                    InterfaceLayer.Add(list, IHBase.Instance.chestButtons, InterfaceLayer.LayerInventory, true);
-                    InterfaceLayer.Add(list, IHBase.Instance.replacerButtons, InterfaceLayer.LayerInventory, true);
+
+                    // InterfaceLayer.Add(list, IHBase.Instance.chestButtons, InterfaceLayer.LayerInventory, true);
+                    // --haven't made a replacement for the separate chestbuttons yet
+
+                    // InterfaceLayer.Add(list, IHBase.Instance.replacerButtons, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
                 }
                 else
-                    InterfaceLayer.Add(list, IHBase.Instance.invButtons, InterfaceLayer.LayerInventory, true);
+                {
+                    // InterfaceLayer.Add(list, IHBase.Instance.invButtons, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
+                }
             }
         }
 

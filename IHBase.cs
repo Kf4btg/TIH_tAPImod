@@ -49,29 +49,22 @@ namespace InvisibleHand
         /// original values to replace them with newer, better buttons.
         public static Dictionary<TIH, string> OriginalButtonLabels { get; private set; }
 
-        public ButtonLayer invButtons;
-        public ButtonLayer chestButtons;
-        public ButtonLayer replacerButtons;
+        // public ButtonLayer invButtons;
+        // public ButtonLayer chestButtons;
+        // public ButtonLayer replacerButtons;
 
         public ButtonLayer ReplacerButtons { get; private set; }
+        public ButtonLayer InventoryButtons { get; private set; }
 
         /// keep track of ALL existing button contexts here.
         /// TODO: there has to be a better way to key these things
         /// than with their label.
-        public Dictionary<string, IHButton> ButtonRepo { get; private set; }
+        // public Dictionary<string, IHButton> ButtonRepo { get; private set; }
         /// updated version, stores by unique id
         public Dictionary<string, ICoreButton> ButtonStore { get; private set; }
+
         ///the ids of those that need a state-update:
         public Stack<string> ButtonUpdates { get; private set; }
-
-        // indices in Lang.inter[]
-        // internal const int iLA = 29;
-        // internal const int iDA = 30;
-        // internal const int iQS = 31;
-        // rename, save, cancel edit chest
-        // internal const int iRC = 61;
-        // internal const int iSC = 47;
-        // internal const int iCE = 63;
 
         public override void OnLoad()
         {
@@ -82,23 +75,13 @@ namespace InvisibleHand
 
             OriginalButtonLabels = new Dictionary<TIH, string>();
 
+            // TODO: put this behind a modoption
             // pull values out of Lang.inter to populate OBL
             foreach (var kvp in Constants.LangInterIndices)
             {
                 OriginalButtonLabels[kvp.Key] = Lang.inter[kvp.Value];
             }
 
-            // TODO: put this behind a modoption
-            // OriginalButtonLabels = new Dictionary<TIH, string>()
-            // {
-            //     { TIH.LootAll,    Lang.inter[lii[]] },
-            //     { TIH.DepAll,     Lang.inter[iDA] },
-            //     { TIH.QuickStack, Lang.inter[iQS] },
-            //
-            //     { TIH.Rename,     Lang.inter[iRC] },
-            //     { TIH.SaveName,   Lang.inter[iSC] },
-            //     { TIH.CancelEdit, Lang.inter[iCE] }
-            // };
         }
 
         public override void OnAllModsLoaded()
@@ -115,18 +98,21 @@ namespace InvisibleHand
         private void InitButtons()
         {
             KEP           = new KeyEventProvider();
-            ButtonRepo    = new Dictionary<string, IHButton>();
+            // ButtonRepo    = new Dictionary<string, IHButton>();
             ButtonStore   = new Dictionary<string, ICoreButton>();
             ButtonUpdates = new Stack<string>();
 
             // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
-            invButtons   = ButtonFactory.BuildButtons("Inventory");
-            chestButtons = ButtonFactory.BuildButtons("Chest");
+            // invButtons   = ButtonFactory.BuildButtons("Inventory");
+            // chestButtons = ButtonFactory.BuildButtons("Chest");
 
-            if (ModOptions["TextReplacers"])
-                replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
-            else if (ModOptions["IconReplacers"])
-                replacerButtons = ButtonFactory.BuildButtons("IconReplacer");
+            // if (ModOptions["TextReplacers"])
+                ReplacerButtons = ChestButtonReplacerLayer.New(ModOptions["TextReplacers"]);
+            // replacerButtons = ButtonFactory.BuildButtons("TextReplacer");
+            // else if (ModOptions["IconReplacers"])
+            // replacerButtons = ButtonFactory.BuildButtons("IconReplacer");
+
+            InventoryButtons = PlayerInventoryButtons.New();
         }
 
         /// Store the Key assigned for each action as a hint
@@ -206,19 +192,24 @@ namespace InvisibleHand
                             break;
                     }
                     break;
+
+                // replace the vanilla LA/DA/QS buttons with new...
                 case "replaceButtons":
                     switch((string)option.Value)
                     {
+                        // Text buttons, like the originals
                         case "Text":
                             ModOptions["UseReplacers"]
                             = ModOptions["TextReplacers"] = true;
                             ModOptions["IconReplacers"]   = false;
                             break;
+                        // Icon buttons, with pictures
                         case "Buttons":
                             ModOptions["UseReplacers"]
                             = ModOptions["IconReplacers"] = true;
                             ModOptions["TextReplacers"]   = false;
                             break;
+                        // Don't replace them at all
                         case "None":
                             ModOptions["UseReplacers"]
                             = ModOptions["TextReplacers"]

@@ -21,13 +21,13 @@ namespace InvisibleHand
                          CurrentContent.InactiveRect; }
         }
 
-        public IconButtonBase(ButtonContainerLayer parent, Vector2 position, Texture2D button_bg ) : base(parent, position)
+        public IconButtonBase(ButtonLayer parent, Vector2 position, Texture2D button_bg ) : base(parent, position)
         {
             ButtonBackground = button_bg;
             // DefaultContent = CurrentContent = new TexturedButton(TIH.None, "");
         }
 
-        public IconButtonBase(ButtonContainerLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)
+        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)
         {
             ButtonBackground = button_bg;
             SetDefault(content);
@@ -98,7 +98,7 @@ namespace InvisibleHand
         ///<summary>
         /// Create an empty socket at the given position</summary>
         public TextButtonBase
-            ( ButtonContainerLayer parent, Vector2 position,
+            ( ButtonLayer parent, Vector2 position,
             float base_scale = 0.75f,
             float focus_scale = 1.0f,
             float scale_step = 0.05f
@@ -117,7 +117,7 @@ namespace InvisibleHand
         }
 
         public TextButtonBase
-            ( ButtonContainerLayer parent, TextButton content, Vector2 position,
+            ( ButtonLayer parent, TextButton content, Vector2 position,
             float base_scale = 0.75f, float focus_scale = 1.0f, float scale_step = 0.05f
             ) : this(parent, position, base_scale, focus_scale, scale_step)
         {

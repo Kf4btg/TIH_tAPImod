@@ -15,7 +15,7 @@ namespace InvisibleHand
             // allowing us to replace them with customized versions.
             if (IHBase.ModOptions["UseReplacers"])
             {
-                var lii = Constants.LangInterIndices;
+                var lii = Constants.LangInterIndices; // easier to read
 
                   Lang.inter[lii[TIH.LootAll]]
                 = Lang.inter[lii[TIH.DepAll]]
@@ -36,7 +36,8 @@ namespace InvisibleHand
                 // grab the next button that has been queued for update
                 string btn = IHBase.Instance.ButtonUpdates.Pop();
                 // and call it's update hook
-                IHBase.Instance.ButtonRepo[btn].OnUpdate();
+                // IHBase.Instance.ButtonRepo[btn].OnUpdate();
+                IHBase.Instance.ButtonStore[btn].OnWorldLoad();
             }
         }
     }

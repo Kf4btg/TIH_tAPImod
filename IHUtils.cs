@@ -522,10 +522,16 @@ namespace InvisibleHand
         }
 
         /// adds a button to the main button collection with a unique ID
-        public static void AddToButtonRepo(IHButton btn)
+        // public static void AddToButtonRepo(IHButton btn)
+        // {
+        //     IHBase.Instance.ButtonRepo.Add(btn.ID, btn);
+        // }
+
+        public static void AddToButtonStore(ICoreButton btn)
         {
-            IHBase.Instance.ButtonRepo.Add(btn.ID, btn);
+            IHBase.Instance.ButtonStore.Add(btn.ID, btn);
         }
+
 
     #endregion
 

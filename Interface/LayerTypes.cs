@@ -13,7 +13,7 @@ namespace InvisibleHand
     //	 - Finally, create buttons and assign to bases
     // This allows assigning references to parent objects down the stack
 
-    public class ChestButtonReplacerLayer : ButtonContainerLayer
+    public class ChestButtonReplacerLayer : ButtonLayer
     {
         protected readonly bool textButtons;
 
@@ -235,7 +235,7 @@ namespace InvisibleHand
     }
 
     //TODO: move to new file
-    public class PlayerInventoryButtons : ButtonContainerLayer
+    public class PlayerInventoryButtons : ButtonLayer
     {
         PlayerInventoryButtons() : base("PlayerInventoryButtons")
         {}

@@ -48,57 +48,57 @@ namespace InvisibleHand
 
     #region buttonExtensions
 
-        public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
-        {
-            if (state.texture == null)
-            {
-                // this creates the text-pulse effect of vanilla
-                var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
-
-                // TODO: maybe don't ignore Alpha. Also, see if it's
-                // practical/if-there's-actually-a-need-for supporting
-                // tinting the text (TAPI.Extensions.Multiply(textcolor, tint))
-                sb.DrawString(
-                        Main.fontMouseText,     //font
-                        state.label,            //string
-                        bBase.Position,         //position
-                        textColor,              //color
-                        0f,                     //rotation
-                        default(Vector2),       //origin
-                        bBase.Scale,            //scale
-                        SpriteEffects.None,     //effects
-                        0f                      //layerDepth
-                     );
-            }
-            else
-                sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint * bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
-        }
-
-        public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
-        {
-            var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
-
-            if (state.texture==null)
-                sb.DrawString(
-                        Main.fontMouseText,     //font
-                        state.label,            //string
-                        bBase.Position,         //position
-                        // overrideColor*bBase.Alpha, //color
-                        TAPI.Extensions.Multiply(textColor, overrideColor),
-                        0f,                     //rotation
-                        default(Vector2),       //origin
-                        bBase.Scale,            //scale
-                        SpriteEffects.None,     //effects
-                        0f                      //layerDepth
-                     );
-            else
-                sb.Draw(state.texture, bBase.Position, bBase.SourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
-        }
-
-        public static void DrawButtonBG(this SpriteBatch sb, ButtonBase bb, Texture2D bgTex, Color bgColor)
-        {
-            sb.Draw(bgTex, bb.Position, null, bgColor*bb.Alpha, 0f, default(Vector2), bb.Scale, SpriteEffects.None, 0f);
-        }
+        // public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
+        // {
+        //     if (state.texture == null)
+        //     {
+        //         // this creates the text-pulse effect of vanilla
+        //         var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
+        //
+        //         // TODO: maybe don't ignore Alpha. Also, see if it's
+        //         // practical/if-there's-actually-a-need-for supporting
+        //         // tinting the text (TAPI.Extensions.Multiply(textcolor, tint))
+        //         sb.DrawString(
+        //                 Main.fontMouseText,     //font
+        //                 state.label,            //string
+        //                 bBase.Position,         //position
+        //                 textColor,              //color
+        //                 0f,                     //rotation
+        //                 default(Vector2),       //origin
+        //                 bBase.Scale,            //scale
+        //                 SpriteEffects.None,     //effects
+        //                 0f                      //layerDepth
+        //              );
+        //     }
+        //     else
+        //         sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint * bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+        // }
+        //
+        // public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
+        // {
+        //     var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
+        //
+        //     if (state.texture==null)
+        //         sb.DrawString(
+        //                 Main.fontMouseText,     //font
+        //                 state.label,            //string
+        //                 bBase.Position,         //position
+        //                 // overrideColor*bBase.Alpha, //color
+        //                 TAPI.Extensions.Multiply(textColor, overrideColor),
+        //                 0f,                     //rotation
+        //                 default(Vector2),       //origin
+        //                 bBase.Scale,            //scale
+        //                 SpriteEffects.None,     //effects
+        //                 0f                      //layerDepth
+        //              );
+        //     else
+        //         sb.Draw(state.texture, bBase.Position, bBase.SourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
+        // }
+        //
+        // public static void DrawButtonBG(this SpriteBatch sb, ButtonBase bb, Texture2D bgTex, Color bgColor)
+        // {
+        //     sb.Draw(bgTex, bb.Position, null, bgColor*bb.Alpha, 0f, default(Vector2), bb.Scale, SpriteEffects.None, 0f);
+        // }
 
         public static bool IsHovered(this Rectangle frame)
         {

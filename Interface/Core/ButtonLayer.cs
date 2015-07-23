@@ -8,7 +8,7 @@ using Terraria;
 namespace InvisibleHand
 {
     // TODO: transfer over documentation later
-    public abstract class ButtonContainerLayer : InterfaceLayer
+    public abstract class ButtonLayer : InterfaceLayer
     {
         protected bool handleMouseInterface;
         protected float opacity_inactive, opacity_active = 1.0f;
@@ -24,7 +24,7 @@ namespace InvisibleHand
             get { return ButtonFrame.Contains(Main.mouse); }
         }
 
-        protected ButtonContainerLayer(string name, bool handle_mouse_interface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
+        protected ButtonLayer(string name, bool handle_mouse_interface = true) : base(IHBase.Instance.mod.InternalName + ":" + name)
         {
             ButtonBases = new Dictionary<TIH, IButtonSlot>();
             Buttons     = new Dictionary<string, ICoreButton>();
@@ -85,7 +85,7 @@ namespace InvisibleHand
 
     /// this Class will fade ALL buttons in the loyer in/out as the
     /// LAYER itself is hovered/unhovered;
-    public abstract class FadingButtonLayer : ButtonContainerLayer
+    public abstract class FadingButtonLayer : ButtonLayer
     {
         protected readonly float fadeStep;
 

@@ -9,7 +9,7 @@ namespace InvisibleHand
 {
     public interface IButtonSlot
     {
-        ButtonContainerLayer ParentLayer { get; }
+        ButtonLayer ParentLayer { get; }
         Vector2 Position { get; }
         Vector2 Size { get; }
         Rectangle ButtonBounds { get; }
@@ -56,7 +56,7 @@ namespace InvisibleHand
         protected float _alpha = 1.0f;
 
         /// interface layer this button belongs to
-        public ButtonContainerLayer ParentLayer { get; protected set; }
+        public ButtonLayer ParentLayer { get; protected set; }
 
         /// Get this button's screem coordinates
         public Vector2 Position { get; protected set; }
@@ -124,7 +124,7 @@ namespace InvisibleHand
 
         /// initialize a new, empty socket with blank content;
         /// calls the derived-class specific version of InitEmptySocket()
-        protected ButtonSocket(ButtonContainerLayer parent, Vector2 position)
+        protected ButtonSocket(ButtonLayer parent, Vector2 position)
         {
             ParentLayer = parent;
             Position = position;

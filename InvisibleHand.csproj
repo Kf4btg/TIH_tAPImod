@@ -85,7 +85,8 @@
     <Compile Include="KeyEventProvider.cs" />
     <Compile Include="Interface\ButtonTypes.cs" />
     <Compile Include="Interface\EditChest.cs" />
-    <Compile Include="Interface\LayerTypes.cs" />
+    <Compile Include="Interface\ChestButtonReplacerLayer.cs" />
+    <Compile Include="Interface\InventoryButtonLayer.cs" />
     <Compile Include="Interface\ServiceTypes.cs" />
     <Compile Include="Interface\SocketTypes.cs" />
     <Compile Include="Interface\Core\ButtonLayer.cs" />

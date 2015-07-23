@@ -98,7 +98,7 @@ namespace InvisibleHand
             ButtonUpdates = new Stack<string>();
 
             // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
-            InventoryButtons = PlayerInventoryButtons.New();
+            InventoryButtons = InventoryButtonLayer.New();
 
             // if (ModOptions["TextReplacers"])
                 ReplacerButtons = ChestButtonReplacerLayer.New(ModOptions["TextReplacers"]);

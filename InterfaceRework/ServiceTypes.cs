@@ -5,6 +5,47 @@ using TAPI;
 
 namespace InvisibleHand
 {
+
+    /// adds the default OnClick to this button based
+    /// on on its Action property. Set right_click to
+    /// true to make the action happen on right click
+    /// instead of left.
+    public class DefaultClickService: ButtonService
+    {
+        private readonly bool rightClick;
+
+        private readonly string _serviceType;
+        public override string ServiceType { get { return _serviceType; } }
+
+        public DefaultClickService(ICoreButton client, bool right_click = false) : base(client)
+        {
+            rightClick = right_click;
+
+            _serviceType = "Default" + Enum.GetName(typeof(TIH), client.Action)
+                           + (right_click ? "RightClick" : "Click");
+
+
+        }
+
+        public override void Subscribe()
+        {
+            if (rightClick)
+                Client.Hooks.OnRightClick += Constants.DefaultClickActions[Client.Action];
+            else
+                Client.Hooks.OnClick += Constants.DefaultClickActions[Client.Action];
+
+        }
+
+        public override void Unsubscribe()
+        {
+            if (rightClick)
+                Client.Hooks.OnRightClick -= Constants.DefaultClickActions[Client.Action];
+            else
+                Client.Hooks.OnClick -= Constants.DefaultClickActions[Client.Action];
+        }
+
+    }
+
     public class LockingService: ButtonService
     {
         private readonly Color   color;
@@ -36,7 +77,7 @@ namespace InvisibleHand
         {
             Client.Hooks.OnWorldLoad  += OnWorldLoad;
             IHBase.Instance.ButtonUpdates.Push(Client.ID);
-            
+
             Client.Hooks.OnRightClick += () => IHPlayer.ToggleActionLock(Client.Action);
             Client.Hooks.PreDraw      += PreDraw;
 

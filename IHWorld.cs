@@ -17,14 +17,14 @@ namespace InvisibleHand
             {
                 var lii = Constants.LangInterIndices;
 
-                Lang.inter[lii[TIH.LootAll]] 
+                  Lang.inter[lii[TIH.LootAll]]
                 = Lang.inter[lii[TIH.DepAll]]
                 = Lang.inter[lii[TIH.QuickStack]] = "";
 
                 // and get rid of the edit-chest stuff if we're using
                 // icons rather than text
                 if (IHBase.ModOptions["IconReplacers"])
-                    Lang.inter[lii[TIH.Rename]]
+                      Lang.inter[lii[TIH.Rename]]
                     = Lang.inter[lii[TIH.SaveName]]
                     = Lang.inter[lii[TIH.CancelEdit]] = "";
             }

@@ -203,6 +203,14 @@ namespace InvisibleHand
             return button;
         }
 
+        /// Activates the button's default OnClick action
+        /// on_right_click = true makes the action happen
+        /// on a right click rather than a left.
+        public static T EnableDefault<T>(this T button, bool on_right_click = false) where T : ICoreButton
+        {
+            return button.AddNewService(new DefaultClickService(button, on_right_click));
+        }
+
         public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]") where T: ICoreButton
         {
             return button.AddNewService(new LockingService(button, lock_offset, lock_color, locked_string));

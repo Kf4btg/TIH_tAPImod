@@ -35,6 +35,7 @@ namespace InvisibleHand
 
         protected override void AddButtonsToBases()
         {
+            //DON'T FORGET TO ENABLE CLICK ACTIONS!!
             if (textButtons) addTextButtons();
             else addIconButtons();
         }
@@ -134,15 +135,15 @@ namespace InvisibleHand
             // var rena  = getButton(TIH.Rename,     TIH.Rename);
             // var save  = getButton(TIH.Rename,     TIH.SaveName);
 
-            depo.MakeLocking().AddToggle(sdep);
-            qstk.MakeLocking().AddToggle(sloo);
+            loot.EnableDefault();
+
+            depo.EnableDefault().MakeLocking().AddToggle(sdep.EnableDefault());
+            qstk.EnableDefault().MakeLocking().AddToggle(sloo.EnableDefault());
 
         }
 
         private void addIconButtons()
         {
-
-
                 // offset of lock indicator
                 var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW / 2),
                                             -(float)(int)((float)Constants.ButtonH / 2));
@@ -178,14 +179,23 @@ namespace InvisibleHand
 
                 // Add Services //
 
+                // sort enables default action for sort/rsort by ... default.
                 sort.AddSortToggle(rsort, sort_chest: true);
 
-                depo.MakeLocking().AddToggle(sdep);
-                qstk.MakeLocking().AddToggle(sloo);
+                // add default click, let rClick lock it, and make shift switch buttons
+                depo.EnableDefault().MakeLocking().AddToggle(sdep.EnableDefault());
+                qstk.EnableDefault().MakeLocking().AddToggle(sloo.EnableDefault());
+
+                // these just need their default actions enabled.
+                loot.EnableDefault();
+                cancel.EnableDefault();
 
                 // make Rename Chest button change to Save Name button
-                // when clicked (and vice-versa). Also show/hide Cancel button
-                rena.AddDynamicToggle(save, () =>
+                // when clicked, and vice-versa. Well, technically, the buttons
+                // will switch automatically when Main.editChest changes state,
+                // but since that's what clicking these buttons does...
+                // Also, exploit this check to show/hide Cancel button as needed.
+                rena.EnableDefault().AddDynamicToggle(save.EnableDefault(), () =>
                 {
                     // Need to know if the player has clicked the Rename Chest button
                     if (Main.editChest)
@@ -212,6 +222,68 @@ namespace InvisibleHand
                     }
                     return true;
                 });
+        }
+    }
+
+    //TODO: move to new file
+    public class PlayerInventoryButtons : ButtonContainerLayer
+    {
+        public PlayerInventoryButtons() : base("PlayerInventoryButtons")
+        {}
+
+        protected override void AddBasesToLayer()
+        {
+            // only two buttons right now; they're just above
+            // the coin and ammo slots.
+            var positions = new Vector2[] {
+                new Vector2(496, 28),
+                new Vector2(532, 28)
+            };
+
+            // Func<int,Vector2> getPosFromIndex = (i) => positions[i];;
+
+            int slotOrder = 0;
+
+            foreach (var tih in new[] {
+                TIH.Sort,
+                TIH.CleanInv
+                })
+                ButtonBases.Add(tih, new IconButtonBase(this, positions[slotOrder++], IHBase.ButtonBG));
+                // ButtonBases.Add(tih, new IconButtonBase(this, getPosFromIndex(slotOrder++)));
+        }
+
+        protected override void AddButtonsToBases()
+        {
+            var bgColor = Constants.InvSlotColor * 0.8f;
+
+            Func<TIH, string> getLabel = a => a.DefaultLabelForAction(true);
+
+            Func<TIH, string> getTtip  = a => getLabel(a) + a.GetKeyTip();
+
+            Func<TIH, TIH, TexturedButton> getButton
+                = (base_by_action, a)
+                => TexturedButton.New((ButtonSocket<TexturedButton>)ButtonBases[base_by_action],
+                                       action: a,
+                                       label: getLabel(a),
+                                       tooltip: getTtip(a),
+                                       bg_color: bgColor);
+
+            // put buttons together
+            var sort  = getButton(TIH.Sort,       TIH.Sort);
+            var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
+            var clean = getButton(TIH.CleanInv,   TIH.CleanInv);
+
+            // add services/actions
+
+            sort.AddSortToggle(rsort, sort_chest: false);
+
+            clean.EnableDefault();
+
+
+
+
+
+
         }
     }
 }

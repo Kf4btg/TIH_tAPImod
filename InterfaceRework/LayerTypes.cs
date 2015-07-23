@@ -22,9 +22,18 @@ namespace InvisibleHand
 
         // Constructor
 
-        public ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
+        ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
         {
             textButtons = text;
+        }
+
+        /// Use a generator function to seamlessly create and initialize a new
+        /// instance of this Button Layer.
+        public static ChestButtonReplacerLayer New(bool text)
+        {
+            var newThis = new ChestButtonReplacerLayer(text);
+            newThis.Initialize();
+            return newThis;
         }
 
         protected override void AddBasesToLayer()
@@ -228,8 +237,17 @@ namespace InvisibleHand
     //TODO: move to new file
     public class PlayerInventoryButtons : ButtonContainerLayer
     {
-        public PlayerInventoryButtons() : base("PlayerInventoryButtons")
+        PlayerInventoryButtons() : base("PlayerInventoryButtons")
         {}
+
+        /// Use a generator function to seamlessly create and initialize a new
+        /// instance of this Button Layer.
+        public static PlayerInventoryButtons New()
+        {
+            var newThis = new PlayerInventoryButtons();
+            newThis.Initialize();
+            return newThis;
+        }
 
         protected override void AddBasesToLayer()
         {

@@ -6,10 +6,9 @@ using TAPI;
 namespace InvisibleHand
 {
 
-    /// adds the default OnClick to this button based
-    /// on on its Action property. Set right_click to
-    /// true to make the action happen on right click
-    /// instead of left.
+    /// adds the default OnClick to this button based on on its Action property.
+    /// Set right_click to true to make the action happen on right click instead
+    /// of left.
     public class DefaultClickService: ButtonService
     {
         private readonly bool rightClick;
@@ -91,7 +90,7 @@ namespace InvisibleHand
 
             if (isLocked)
             {
-                Client.Hooks.PostDraw += PostDraw;
+                Client.Hooks.PostDraw += PostDraw; // draw lock indicator
                 Client.Label = lockedLabel;
             }
             else
@@ -162,36 +161,22 @@ namespace InvisibleHand
         }
     }
 
-    /// this class creates a second button and sets the given button's base to switch to it on shift
-    // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
+    /// Register a key-toggle between sort/rev-sort and set appropriate click actions
     public class SortingToggleService : ToggleService
     {
-        // public override string ServiceType { get { return "SortingToggle"; } }
-
         private Action sortAction;
         private Action revSortAction;
-        // private readonly bool sortChest;
 
-        // public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
         public SortingToggleService(ICoreButton forward, ICoreButton reverse, KState.Special toggle_key) : base(forward, reverse, toggle_key)
         {
+            sortAction = () => IHPlayer.Sort();
+            revSortAction = () => IHPlayer.Sort(true);
         }
 
         public override void Subscribe()
         {
             base.Subscribe(); // registers toggle key
-            // if (sortChest)
-            // {
-            //     sortAction    = () => IHPlayer.SortChest();
-            //     revSortAction = () => IHPlayer.SortChest(true);
-            // }
-            // else
-            // {
-            //     sortAction    = () => IHPlayer.SortInventory();
-            //     revSortAction = () => IHPlayer.SortInventory(true);
-            // }
-            sortAction = () => IHPlayer.Sort();
-            revSortAction = () => IHPlayer.Sort(true);
+
             Client.Hooks.OnClick    += sortAction;
             AltButton.Hooks.OnClick += revSortAction;
         }

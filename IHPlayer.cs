@@ -228,10 +228,10 @@ namespace InvisibleHand
         }
 
         /// <summary>
-        /// Performs QuickStack or SmartLoot action
+        /// Performs QuickStack or SmartLoot action if an appropriate container is open.
         /// </summary>
         /// <param name="smartLoot">Perform SmartLoot action instead </param>
-        public static void QuickStack(bool smartLoot)
+        public static void QuickStack(bool smartLoot = false)
         {
             if ( Main.localPlayer.chest == -1 ) return;
 
@@ -242,10 +242,10 @@ namespace InvisibleHand
         }
 
         /// <summary>
-        /// Performs DepositAll or smartDeposit action
+        /// Performs DepositAll or smartDeposit action if an appropriate container is open.
         /// </summary>
         /// <param name="smartDeposit">Perform smartDeposit action instead </param>
-        public static void DepositAll(bool smartDeposit)
+        public static void DepositAll(bool smartDeposit = false)
         {
             if ( Main.localPlayer.chest == -1 ) return;
 

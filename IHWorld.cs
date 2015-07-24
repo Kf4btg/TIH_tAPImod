@@ -18,7 +18,7 @@ namespace InvisibleHand
                 var lii = Constants.LangInterIndices; // easier to read
 
                   Lang.inter[lii[TIH.LootAll]]
-                = Lang.inter[lii[TIH.DepAll]]
+                = Lang.inter[lii[TIH.DepositAll]]
                 = Lang.inter[lii[TIH.QuickStack]] = "";
 
                 // and get rid of the edit-chest stuff if we're using

@@ -15,21 +15,16 @@ namespace InvisibleHand
         // inventory/chest sort actions.
         Sort,
         ReverseSort,
-        // The same is likely true for Clean... as well
+        // The same is likely true for CleanXX as well
 
         QuickStack,
-        DepAll,
+        DepositAll,
         LootAll,
 
-        SortInv,
-        RSortInv,
         CleanInv,
-
-        SortChest,
-        RSortChest,
         CleanChest,
 
-        SmartDep,
+        SmartDeposit,
         SmartLoot,
 
         // simply for replacing the button with a visually-consistent
@@ -360,7 +355,7 @@ namespace InvisibleHand
             LangInterIndices = new Dictionary<TIH, int>
             {
                 {TIH.LootAll,    29},
-                {TIH.DepAll,     30},
+                {TIH.DepositAll,     30},
                 {TIH.QuickStack, 31},
                 {TIH.Rename,     61},
                 {TIH.SaveName,   47},
@@ -375,17 +370,13 @@ namespace InvisibleHand
                 {TIH.Sort,       "Sort"},                     // 0
                 {TIH.ReverseSort,"Sort (Reverse)"},           // 1
 
-                {TIH.SortInv,    "Sort"},                     // 0
-                {TIH.RSortInv,   "Sort (Reverse)"},           // 1
                 {TIH.CleanInv,   "Clean Stacks"},             // 2
                 {TIH.CleanChest, "Clean Chest Stacks"},       // 2
                 // Chests
-                {TIH.SortChest,  "Sort Chest"},               // 3
-                {TIH.RSortChest, "Sort Chest (Reverse)"},     // 4
                 {TIH.SmartLoot,  "Restock"},                  // 5
                 {TIH.QuickStack, "Quick Stack"},              // 6
-                {TIH.SmartDep,   "Smart Deposit"},            // 8
-                {TIH.DepAll,     "Deposit All"},              // 9
+                {TIH.SmartDeposit,   "Smart Deposit"},            // 8
+                {TIH.DepositAll,     "Deposit All"},              // 9
                 {TIH.LootAll,    "Loot All"},                 // 11
                 {TIH.Rename,     "Rename"},
                 {TIH.SaveName,   "Save"}
@@ -402,17 +393,13 @@ namespace InvisibleHand
                 {TIH.Sort,       () => IHPlayer.Sort()},
                 {TIH.ReverseSort,() => IHPlayer.Sort(true)},
 
-                {TIH.SortInv,    () => IHPlayer.SortInventory()},
-                {TIH.RSortInv,   () => IHPlayer.SortInventory(true)},
                 {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},
                 {TIH.CleanChest, IHPlayer.CleanChestStacks},
                 // Chests
-                {TIH.SortChest,  () => IHPlayer.SortChest()},
-                {TIH.RSortChest, () => IHPlayer.SortChest(true)},
                 {TIH.SmartLoot,  IHSmartStash.SmartLoot},
                 {TIH.QuickStack, IHUtils.DoQuickStack},
-                {TIH.SmartDep,   IHSmartStash.SmartDeposit},
-                {TIH.DepAll,     IHUtils.DoDepositAll},
+                {TIH.SmartDeposit,   IHSmartStash.SmartDeposit},
+                {TIH.DepositAll,     IHUtils.DoDepositAll},
                 {TIH.LootAll,    IHUtils.DoLootAll},
                 {TIH.Rename,     EditChest.DoChestEdit},
                 {TIH.SaveName,   EditChest.DoChestEdit},
@@ -425,18 +412,14 @@ namespace InvisibleHand
             ButtonGridIndexByActionType = new Dictionary<TIH, int>
             {
                 {TIH.Sort,       0},
-                {TIH.SortInv,    0},
-                {TIH.SortChest,  0},
 
                 {TIH.ReverseSort,1},
-                {TIH.RSortInv,   1},
-                {TIH.RSortChest, 1},
 
                 {TIH.LootAll,    2},
 
-                {TIH.DepAll,     3},
+                {TIH.DepositAll,     3},
 
-                {TIH.SmartDep,   4},
+                {TIH.SmartDeposit,   4},
 
                 {TIH.CleanInv,   5},
                 {TIH.CleanChest, 5},
@@ -458,8 +441,8 @@ namespace InvisibleHand
                 {TIH.CleanInv,   "cleanStacks"},
                 {TIH.CleanChest, "cleanStacks"},
 
-                {TIH.DepAll,     "depositAll"},
-                {TIH.SmartDep,   "depositAll"},
+                {TIH.DepositAll,     "depositAll"},
+                {TIH.SmartDeposit,   "depositAll"},
 
                 {TIH.LootAll,    "lootAll"},
 
@@ -468,10 +451,6 @@ namespace InvisibleHand
 
                 {TIH.Sort,       "sort"},
                 {TIH.ReverseSort,"sort"},
-                {TIH.SortInv,    "sort"},
-                {TIH.SortChest,  "sort"},
-                {TIH.RSortInv,   "sort"},
-                {TIH.RSortChest, "sort"}
                 // edit chest doesn't get a keyboard shortcut. So there.
             };
         }

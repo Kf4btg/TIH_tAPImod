@@ -49,7 +49,7 @@ namespace InvisibleHand
                 if (Main.gameMenu)
                 {
                     Lang.inter[lii[TIH.LootAll]] = IHBase.OriginalButtonLabels[TIH.LootAll];
-                    Lang.inter[lii[TIH.DepAll]] = IHBase.OriginalButtonLabels[TIH.DepAll];
+                    Lang.inter[lii[TIH.DepositAll]] = IHBase.OriginalButtonLabels[TIH.DepositAll];
                     Lang.inter[lii[TIH.QuickStack]] = IHBase.OriginalButtonLabels[TIH.QuickStack];
 
 

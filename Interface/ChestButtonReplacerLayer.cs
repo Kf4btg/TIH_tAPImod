@@ -70,7 +70,7 @@ namespace InvisibleHand
             {   // order of creation; determines positioning per the transform above
                 // TIH.Sort,
                 TIH.LootAll,
-                TIH.DepAll,    // +smartdep
+                TIH.DepositAll,    // +smartdep
                 TIH.QuickStack, // + smartloot
                 // TIH.Rename
             }) ButtonBases.Add(action, new TextButtonBase(this, getPosFromIndex(slotOrder++)));
@@ -94,7 +94,7 @@ namespace InvisibleHand
             {   // order of creation; determines positioning per the transform above
                 TIH.Sort,
                 TIH.LootAll,
-                TIH.DepAll,    // +smartdep
+                TIH.DepositAll,    // +smartdep
                 TIH.QuickStack, // + smartloot
                 TIH.Rename
             }) ButtonBases.Add(action, new IconButtonBase(this, getPosFromIndex(slotOrder++), IHBase.ButtonBG));
@@ -135,8 +135,8 @@ namespace InvisibleHand
 
 
             var loot  = getButton(TIH.LootAll,    TIH.LootAll);
-            var depo  = getButton(TIH.DepAll,     TIH.DepAll);
-            var sdep  = getButton(TIH.DepAll,     TIH.SmartDep);
+            var depo  = getButton(TIH.DepositAll,     TIH.DepositAll);
+            var sdep  = getButton(TIH.DepositAll,     TIH.SmartDeposit);
             var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
             var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
 
@@ -176,8 +176,8 @@ namespace InvisibleHand
                 var sort  = getButton(TIH.Sort,       TIH.Sort);
                 var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
                 var loot  = getButton(TIH.LootAll,    TIH.LootAll);
-                var depo  = getButton(TIH.DepAll,     TIH.DepAll);
-                var sdep  = getButton(TIH.DepAll,     TIH.SmartDep);
+                var depo  = getButton(TIH.DepositAll, TIH.DepositAll);
+                var sdep  = getButton(TIH.DepositAll, TIH.SmartDeposit);
                 var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
                 var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
                 var rena  = getButton(TIH.Rename,     TIH.Rename);

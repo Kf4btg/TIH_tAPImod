@@ -156,7 +156,7 @@ namespace InvisibleHand
                 switch (action)
                 {
                     case TIH.LootAll:
-                    case TIH.DepAll:
+                    case TIH.DepositAll:
                     case TIH.QuickStack:
                     case TIH.Rename:
                     case TIH.SaveName:

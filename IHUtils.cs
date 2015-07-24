@@ -45,7 +45,7 @@ namespace InvisibleHand
             if (player.chest == -1) return;
             bool sendNetMsg = player.chest > -1;
 
-            if (IHPlayer.ActionLocked(player, TIH.DepAll))
+            if (IHPlayer.ActionLocked(player, TIH.DepositAll))
             {
                 for (int i=R_START; i >= R_END; i--)
                 {
@@ -477,6 +477,7 @@ namespace InvisibleHand
 
         /* ************************************************
         *	 Unrelated to any of the above, these methods assist in the GUI/buttons part of the mod.
+        *	 TODO: make these extension methods.
         */
 
         /// get source texels based on an index (defined in Constants class).

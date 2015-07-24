@@ -34,7 +34,6 @@ namespace InvisibleHand
         bool OnMouseLeave();
         bool PreDraw(SpriteBatch sb);
         void PostDraw(SpriteBatch sb);
-
     }
 
     /// re-imagining the ButtonState and IHButton as one object
@@ -55,6 +54,7 @@ namespace InvisibleHand
         public TIH Action     { get; set; }
         /// Get or set this button's label
         public string Label   { get { return _label; }   set { _label   = value; } }
+        
         /// Get or set this button's Tooltip
         public virtual string Tooltip
         {

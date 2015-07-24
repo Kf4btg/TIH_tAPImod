@@ -283,13 +283,6 @@ namespace InvisibleHand
             WhenNotFocused();
         }
 
-        protected virtual void DrawTooltip()
-        {
-            API.main.MouseText(CurrentContent.Tooltip);
-            Main.mouseText = true;
-        }
-
-
         /// <summary>
         /// Determines whether the mouse is hovered over this button's
         /// screen-area, accounting for the button's current scale.

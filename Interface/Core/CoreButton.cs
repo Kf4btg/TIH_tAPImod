@@ -9,6 +9,7 @@ namespace InvisibleHand
 {
     public interface ICoreButton
     {
+
         IButtonSlot ButtonBase { get; }
 
         string ID { get; }
@@ -16,6 +17,8 @@ namespace InvisibleHand
         TIH Action { get; set; }
         string Label { get; set; }
         string Tooltip { get; set; }
+        bool ShowTooltip { get; set; }
+
         Color Tint { get; set; }
         Vector2 Size { get; }
 
@@ -42,6 +45,7 @@ namespace InvisibleHand
         private string _label = "";
         private string _tooltip = "";
         private string _id = String.Empty;
+        private bool   _showTooltip;
 
         //Properties//
 
@@ -52,7 +56,22 @@ namespace InvisibleHand
         /// Get or set this button's label
         public string Label   { get { return _label; }   set { _label   = value; } }
         /// Get or set this button's Tooltip
-        public string Tooltip { get { return _tooltip; } set { _tooltip = value; } }
+        public string Tooltip
+        {
+            get { return _tooltip; }
+            // set ShowTooltip = true when setting tooltip,
+            // or false when unsetting it.
+            set { _showTooltip = (value!=""); _tooltip = value; }
+        }
+
+        /// Whether the tooltip should be drawn on hover
+        public bool ShowTooltip
+        {
+            get { return _showTooltip; }
+            // set to true iff Tooltip is not empty
+            set { _showTooltip = Tooltip=="" ? false : value; }
+        }
+
 
         /// Unique (well, effectively...), randomly-generated ID
         public string ID
@@ -94,8 +113,9 @@ namespace InvisibleHand
             this.ButtonBase = other.ButtonBase;
             this.Action  = other.Action;
             this.Label   = other.Label;
-            this.Tooltip = other.Tooltip;
             this.Tint    = other.Tint;
+            this.Tooltip = other.Tooltip;
+            this.ShowTooltip = other.ShowTooltip;
         }
 
     #region hooks
@@ -105,7 +125,7 @@ namespace InvisibleHand
         // //////////////////////////////////////////////////////////
 
         /// <summary>
-        /// Called once when the player enters a world; use to set initial state 
+        /// Called once when the player enters a world; use to set initial state
         /// </summary>
         public virtual void OnWorldLoad()
         {

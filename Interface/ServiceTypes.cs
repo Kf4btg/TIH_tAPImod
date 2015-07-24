@@ -23,8 +23,6 @@ namespace InvisibleHand
 
             _serviceType = "Default" + Enum.GetName(typeof(TIH), client.Action)
                            + (right_click ? "RightClick" : "Click");
-
-
         }
 
         public override void Subscribe()
@@ -33,7 +31,6 @@ namespace InvisibleHand
                 Client.Hooks.OnRightClick += Constants.DefaultClickActions[Client.Action];
             else
                 Client.Hooks.OnClick += Constants.DefaultClickActions[Client.Action];
-
         }
 
         public override void Unsubscribe()
@@ -43,7 +40,6 @@ namespace InvisibleHand
             else
                 Client.Hooks.OnClick -= Constants.DefaultClickActions[Client.Action];
         }
-
     }
 
     public class LockingService: ButtonService
@@ -80,8 +76,6 @@ namespace InvisibleHand
 
             Client.Hooks.OnRightClick += () => IHPlayer.ToggleActionLock(Client.Action);
             Client.Hooks.PreDraw      += PreDraw;
-
-            // RegisterHooks("onWorldLoad", "onRightClick", "preDraw");
         }
         public override void Unsubscribe()
         {
@@ -89,7 +83,6 @@ namespace InvisibleHand
             Client.Hooks.OnRightClick -= () => IHPlayer.ToggleActionLock(Client.Action);
             Client.Hooks.PreDraw      -= PreDraw;
             Client.Hooks.PostDraw     -= PostDraw;
-            // RemoveHooks("onWorldLoad", "onRightClick", "preDraw");
         }
 
         private void OnWorldLoad()
@@ -98,7 +91,6 @@ namespace InvisibleHand
 
             if (isLocked)
             {
-                // RegisterHook("postDraw");
                 Client.Hooks.PostDraw += PostDraw;
                 Client.Label = lockedLabel;
             }
@@ -141,7 +133,6 @@ namespace InvisibleHand
     /// Generic Toggling Service for two arbitary buttons.
     public class ToggleService : ButtonService
     {
-        protected readonly IButtonSlot socket;
         protected readonly KState.Special toggleKey;
 
         private string _serviceType;
@@ -152,7 +143,6 @@ namespace InvisibleHand
 
         public ToggleService(ICoreButton client, ICoreButton altButton, KState.Special toggle_key) : base(client)
         {
-            // socket       = client.Socket;
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
             _altButton   = altButton;
         }
@@ -228,7 +218,6 @@ namespace InvisibleHand
 
             gameState = check_game_state;
             AltButton = button_if_false;
-
         }
 
         public override void Subscribe()

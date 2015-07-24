@@ -23,7 +23,7 @@ namespace InvisibleHand
             get { return InactiveRect.HasValue ? InactiveRect.Value.Size() : Texture.Size(); }
         }
 
-        protected TexturedButton(IButtonSocket<TexturedButton> parent,
+        protected TexturedButton(ButtonSlot<TexturedButton> parent,
                               TIH action,
                               string label,
                               string tooltip           = "",
@@ -53,7 +53,7 @@ namespace InvisibleHand
         /// <param name="inactive_rect"> </param>
         /// <param name="active_rect"> </param>
         /// <returns>The newly created TexturedButton</returns>
-        public static TexturedButton New(IButtonSocket<TexturedButton> parent,
+        public static TexturedButton New(ButtonSlot<TexturedButton> parent,
                                   TIH action,
                                   string label,
                                   string tooltip           = "",
@@ -80,7 +80,7 @@ namespace InvisibleHand
             get { return Main.fontMouseText.MeasureString(Label); }
         }
 
-        protected TextButton(IButtonSocket<TextButton> parent, TIH action, string label = "")
+        protected TextButton(ButtonSlot<TextButton> parent, TIH action, string label = "")
             : base(parent, action, label) { }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace InvisibleHand
         /// <param name="action"> </param>
         /// <param name="label"> </param>
         /// <returns>The newly created TextButton</returns>
-        public static TextButton New(IButtonSocket<TextButton> parent, TIH action, string label = "")
+        public static TextButton New(ButtonSlot<TextButton> parent, TIH action, string label = "")
         {
             var newThis = new TextButton(parent, action, label);
 

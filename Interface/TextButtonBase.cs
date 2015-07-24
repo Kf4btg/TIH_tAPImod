@@ -6,61 +6,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    public class IconButtonBase : ButtonSlot<TexturedButton>
-    {
-        /// Texture resource that will be drawn in the background of this buttonbase.
-        /// BgColor property of current button content object is used for tint.
-        public Texture2D ButtonBackground { get; set; }
-
-        /// this will actively set the Source Texels based on whether or not the mouse is currently over this button.
-        /// If both rects are null, then the entire texture will be drawn as per default
-        public Rectangle? SourceRect
-        {
-            get { return HasMouseFocus ?
-                         CurrentContent.ActiveRect :
-                         CurrentContent.InactiveRect; }
-        }
-
-        public IconButtonBase(ButtonLayer parent, Vector2 position, Texture2D button_bg ) : base(parent, position)
-        {
-            ButtonBackground = button_bg;
-            // DefaultContent = CurrentContent = new TexturedButton(TIH.None, "");
-        }
-
-        public IconButtonBase(ButtonLayer parent, TexturedButton content, Vector2 position, Texture2D button_bg ) : base(parent, position)
-        {
-            ButtonBackground = button_bg;
-            SetDefault(content);
-        }
-
-        protected override void DrawButtonContent(SpriteBatch sb)
-        {
-            var opacity = ParentLayer.LayerOpacity * Alpha;
-            // draw button background first
-            // (otherwise button content will be below bg!)
-            sb.Draw(ButtonBackground,
-                    Position,
-                    null,
-                    CurrentContent.BackgroundColor * opacity,
-                    0f,
-                    default(Vector2),
-                    Scale,
-                    SpriteEffects.None,
-                    0f);
-
-            // and now the real button stuff
-            sb.Draw(CurrentContent.Texture,
-                    Position,
-                    SourceRect,
-                    CurrentContent.Tint * opacity,
-                    0f,
-                    default(Vector2),
-                    Scale,
-                    SpriteEffects.None,
-                    0f);
-        }
-    }
-
     public class TextButtonBase : ButtonSlot<TextButton>
     {
         // class fields//
@@ -69,7 +14,7 @@ namespace InvisibleHand
         private Vector2 posMod;
 
         /// makes the button smoothly grow and shrink as the mouse moves on and off
-        private float scaleStep = float.MaxValue;
+        private float scaleStep;
 
         // Properties//
 
@@ -114,14 +59,6 @@ namespace InvisibleHand
 
             scaleStep = (_minScale == _maxScale) ? 0 :
                         scale_step;
-        }
-
-        public TextButtonBase
-            ( ButtonLayer parent, TextButton content, Vector2 position,
-            float base_scale = 0.75f, float focus_scale = 1.0f, float scale_step = 0.05f
-            ) : this(parent, position, base_scale, focus_scale, scale_step)
-        {
-            base.SetDefault(content);
         }
 
         protected override bool GetIsHovered(Vector2 mouse)

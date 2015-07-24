@@ -88,10 +88,11 @@
     <Compile Include="Interface\ChestButtonReplacerLayer.cs" />
     <Compile Include="Interface\InventoryButtonLayer.cs" />
     <Compile Include="Interface\ServiceTypes.cs" />
-    <Compile Include="Interface\SocketTypes.cs" />
+    <Compile Include="Interface\IconButtonBase.cs" />
+    <Compile Include="Interface\TextButtonBase.cs" />
     <Compile Include="Interface\Core\ButtonLayer.cs" />
     <Compile Include="Interface\Core\ButtonService.cs" />
-    <Compile Include="Interface\Core\ButtonSocket.cs" />
+    <Compile Include="Interface\Core\ButtonSlot.cs" />
     <Compile Include="Interface\Core\CoreButton.cs" />
     <Compile Include="DynamicQuery\Dynamic.cs" />
   </ItemGroup>

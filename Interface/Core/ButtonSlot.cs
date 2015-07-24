@@ -27,20 +27,10 @@ namespace InvisibleHand
         void Draw(SpriteBatch sb);
     }
 
-    public interface IButtonSocket<T> : IButtonSlot where T: ICoreButton
-    {
-        T CurrentContent { get; }
-        T DefaultContent { get; }
-
-        void ChangeContent(T new_content);
-
-        void AddButton(T newButton);
-    }
-
     /// Implementations need to override at least DrawButtonContent;
     /// everything else has a default impl. to use if applicable
     /// Scale and Alpha properties are present, but aren't used by default
-    public abstract class ButtonSlot<T> : IButtonSocket<T> where T: ICoreButton
+    public abstract class ButtonSlot<T> : IButtonSlot where T: ICoreButton
     {
         //backing stores & default values //
         protected float _minScale = 0.5f;

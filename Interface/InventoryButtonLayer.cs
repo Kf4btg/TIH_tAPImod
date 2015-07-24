@@ -36,7 +36,7 @@ namespace InvisibleHand
 
             foreach (var tih in new[] {
                 TIH.Sort,
-                TIH.CleanInv
+                TIH.CleanStacks
                 })
                 ButtonBases.Add(tih, new IconButtonBase(this, positions[slotOrder++], IHBase.ButtonBG));
                 // ButtonBases.Add(tih, new IconButtonBase(this, getPosFromIndex(slotOrder++)));
@@ -61,11 +61,11 @@ namespace InvisibleHand
             // put buttons together
             var sort  = getButton(TIH.Sort,       TIH.Sort);
             var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
-            var clean = getButton(TIH.CleanInv,   TIH.CleanInv);
+            var clean = getButton(TIH.CleanStacks,   TIH.CleanStacks);
 
             // add services/actions
 
-            sort.AddSortToggle(rsort, sort_chest: false);
+            sort.AddSortToggle(rsort);
 
             clean.EnableDefault();
         }

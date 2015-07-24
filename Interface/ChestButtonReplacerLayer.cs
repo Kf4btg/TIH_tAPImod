@@ -189,7 +189,7 @@ namespace InvisibleHand
                 // Add Services //
 
                 // sort enables default action for sort/rsort by ... default.
-                sort.AddSortToggle(rsort, sort_chest: true);
+                sort.AddSortToggle(rsort);
 
                 // add default click, let rClick lock it, and make shift switch buttons
                 depo.EnableDefault().MakeLocking().AddToggle(sdep.EnableDefault());

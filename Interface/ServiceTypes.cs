@@ -166,31 +166,32 @@ namespace InvisibleHand
     // public class SorterService<T> : ButtonService where T: CoreButton, ISocketedButton<T>, new()
     public class SortingToggleService : ToggleService
     {
-        public override string ServiceType { get { return "SortingToggle"; } }
+        // public override string ServiceType { get { return "SortingToggle"; } }
 
         private Action sortAction;
         private Action revSortAction;
-        private readonly bool sortChest;
+        // private readonly bool sortChest;
 
         // public SorterService(T client, bool chest, KState.Special toggle_key) : base(client)
-        public SortingToggleService(ICoreButton forward, ICoreButton reverse, bool chest, KState.Special toggle_key) : base(forward, reverse, toggle_key)
+        public SortingToggleService(ICoreButton forward, ICoreButton reverse, KState.Special toggle_key) : base(forward, reverse, toggle_key)
         {
-            sortChest = chest;
         }
 
         public override void Subscribe()
         {
             base.Subscribe(); // registers toggle key
-            if (sortChest)
-            {
-                sortAction    = () => IHPlayer.SortChest();
-                revSortAction = () => IHPlayer.SortChest(true);
-            }
-            else
-            {
-                sortAction    = () => IHPlayer.SortInventory();
-                revSortAction = () => IHPlayer.SortInventory(true);
-            }
+            // if (sortChest)
+            // {
+            //     sortAction    = () => IHPlayer.SortChest();
+            //     revSortAction = () => IHPlayer.SortChest(true);
+            // }
+            // else
+            // {
+            //     sortAction    = () => IHPlayer.SortInventory();
+            //     revSortAction = () => IHPlayer.SortInventory(true);
+            // }
+            sortAction = () => IHPlayer.Sort();
+            revSortAction = () => IHPlayer.Sort(true);
             Client.Hooks.OnClick    += sortAction;
             AltButton.Hooks.OnClick += revSortAction;
         }

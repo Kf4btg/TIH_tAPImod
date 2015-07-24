@@ -219,9 +219,9 @@ namespace InvisibleHand
             return button.AddNewService(new ToggleService(button, toggle_to_button, toggle_key));
         }
 
-        public static T AddSortToggle<T>(this T button, T reverse_button, bool sort_chest, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
+        public static T AddSortToggle<T>(this T button, T reverse_button, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
         {
-            return button.AddNewService(new SortingToggleService(button, reverse_button, sort_chest, toggle_key));
+            return button.AddNewService(new SortingToggleService(button, reverse_button, toggle_key));
         }
 
         public static T AddDynamicToggle<T>(this T button, T button_when_false, Func<bool> check_game_state) where T: ICoreButton

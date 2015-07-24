@@ -10,19 +10,14 @@ namespace InvisibleHand
     {
         None,
 
-        // smarted button creation should
-        // eliminate the need for separate
-        // inventory/chest sort actions.
         Sort,
         ReverseSort,
-        // The same is likely true for CleanXX as well
 
         QuickStack,
         DepositAll,
         LootAll,
 
-        CleanInv,
-        CleanChest,
+        CleanStacks,
 
         SmartDeposit,
         SmartLoot,
@@ -355,7 +350,7 @@ namespace InvisibleHand
             LangInterIndices = new Dictionary<TIH, int>
             {
                 {TIH.LootAll,    29},
-                {TIH.DepositAll,     30},
+                {TIH.DepositAll, 30},
                 {TIH.QuickStack, 31},
                 {TIH.Rename,     61},
                 {TIH.SaveName,   47},
@@ -367,19 +362,18 @@ namespace InvisibleHand
             {
                 // Player Inventory
                 {TIH.None, ""},
-                {TIH.Sort,       "Sort"},                     // 0
-                {TIH.ReverseSort,"Sort (Reverse)"},           // 1
+                {TIH.Sort,         "Sort"},                     // 0
+                {TIH.ReverseSort,  "Sort (Reverse)"},           // 1
 
-                {TIH.CleanInv,   "Clean Stacks"},             // 2
-                {TIH.CleanChest, "Clean Chest Stacks"},       // 2
+                {TIH.CleanStacks,     "Clean Stacks"},             // 2
                 // Chests
-                {TIH.SmartLoot,  "Restock"},                  // 5
-                {TIH.QuickStack, "Quick Stack"},              // 6
-                {TIH.SmartDeposit,   "Smart Deposit"},            // 8
-                {TIH.DepositAll,     "Deposit All"},              // 9
-                {TIH.LootAll,    "Loot All"},                 // 11
-                {TIH.Rename,     "Rename"},
-                {TIH.SaveName,   "Save"}
+                {TIH.SmartLoot,    "Restock"},                  // 5
+                {TIH.QuickStack,   "Quick Stack"},              // 6
+                {TIH.SmartDeposit, "Smart Deposit"},            // 8
+                {TIH.DepositAll,   "Deposit All"},              // 9
+                {TIH.LootAll,      "Loot All"},                 // 11
+                {TIH.Rename,       "Rename"},
+                {TIH.SaveName,     "Save"}
             };
 
             DefaultClickActions = new Dictionary<TIH, Action>
@@ -390,20 +384,19 @@ namespace InvisibleHand
                 // if I care enough.
                 {TIH.None, None},
 
-                {TIH.Sort,       () => IHPlayer.Sort()},
-                {TIH.ReverseSort,() => IHPlayer.Sort(true)},
+                {TIH.Sort,         () => IHPlayer.Sort()},
+                {TIH.ReverseSort,  () => IHPlayer.Sort(true)},
 
-                {TIH.CleanInv,   IHPlayer.CleanInventoryStacks},
-                {TIH.CleanChest, IHPlayer.CleanChestStacks},
+                {TIH.CleanStacks,     IHPlayer.CleanStacks},
                 // Chests
-                {TIH.SmartLoot,  IHSmartStash.SmartLoot},
-                {TIH.QuickStack, IHUtils.DoQuickStack},
-                {TIH.SmartDeposit,   IHSmartStash.SmartDeposit},
-                {TIH.DepositAll,     IHUtils.DoDepositAll},
-                {TIH.LootAll,    IHUtils.DoLootAll},
-                {TIH.Rename,     EditChest.DoChestEdit},
-                {TIH.SaveName,   EditChest.DoChestEdit},
-                {TIH.CancelEdit, EditChest.CancelRename}
+                {TIH.SmartLoot,    IHSmartStash.SmartLoot},
+                {TIH.QuickStack,   IHUtils.DoQuickStack},
+                {TIH.SmartDeposit, IHSmartStash.SmartDeposit},
+                {TIH.DepositAll,   IHUtils.DoDepositAll},
+                {TIH.LootAll,      IHUtils.DoLootAll},
+                {TIH.Rename,       EditChest.DoChestEdit},
+                {TIH.SaveName,     EditChest.DoChestEdit},
+                {TIH.CancelEdit,   EditChest.CancelRename}
             };
 
             /************************************************
@@ -411,25 +404,24 @@ namespace InvisibleHand
             */
             ButtonGridIndexByActionType = new Dictionary<TIH, int>
             {
-                {TIH.Sort,       0},
+                {TIH.Sort,         0},
 
-                {TIH.ReverseSort,1},
+                {TIH.ReverseSort,  1},
 
-                {TIH.LootAll,    2},
+                {TIH.LootAll,      2},
 
-                {TIH.DepositAll,     3},
+                {TIH.DepositAll,   3},
 
-                {TIH.SmartDeposit,   4},
+                {TIH.SmartDeposit, 4},
 
-                {TIH.CleanInv,   5},
-                {TIH.CleanChest, 5},
+                {TIH.CleanStacks,     5},
 
-                {TIH.QuickStack, 6},
+                {TIH.QuickStack,   6},
 
-                {TIH.SmartLoot,  7},
+                {TIH.SmartLoot,    7},
 
-                {TIH.Rename,     8},
-                {TIH.SaveName,   8}
+                {TIH.Rename,       8},
+                {TIH.SaveName,     8}
             };
 
             /*************************************************
@@ -438,8 +430,7 @@ namespace InvisibleHand
             */
             ButtonActionToKeyBindOption = new Dictionary<TIH, string>()
             {
-                {TIH.CleanInv,   "cleanStacks"},
-                {TIH.CleanChest, "cleanStacks"},
+                {TIH.CleanStacks,   "cleanStacks"},
 
                 {TIH.DepositAll,     "depositAll"},
                 {TIH.SmartDeposit,   "depositAll"},
@@ -455,12 +446,8 @@ namespace InvisibleHand
             };
         }
 
-        /// this lets buttons go through the ButtonFactory
-        /// methods even if they don't have a simple static
-        /// Action for onClick(); obviously the real action
-        /// should be added afterwards.
+        // a hack; don't know if it's necessary
         public static void None() { }
-        // yes it's a hack and I'll try to fix it later
     }
 
 

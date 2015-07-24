@@ -120,54 +120,37 @@ namespace InvisibleHand
                 // Sort inventory/chest
                 if (IHBase.ActionKeys["sort"].Pressed())
                 {
-                    // NOTE: this used to check player.chestItems==null, but I once got a
-                    // "object reference not set to instance of object" or whatever kind of error
-                    // with that check elsewhere in the code. This should be safer and have the exact same result.
-                    if ( player.chest == -1 ) // no valid chest open, sort player inventory
-                    {
-                        // shift-pressed XOR Reverse-sort-mod-option:
-                        //   this will reverse the sort IFF exactly one of these two bools is true
-                        IHOrganizer.SortPlayerInv(player,
-                                KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortPlayer"]);
-                        return;
-                    }
-                    // else call sort on the Item[] array returned by chestItems
-                    DoChestUpdateAction( () => {
-                        IHOrganizer.SortChest(player.chestItems,
-                                KState.Special.Shift.Down() ^ IHBase.ModOptions["ReverseSortChest"]);
-                    });
+                    Sort(KState.Special.Shift.Down());
                 }
 
                 //Consolidate Stacks
                 else if (IHBase.ActionKeys["cleanStacks"].Pressed())
                 {
-                    if ( player.chest == -1 )
-                    {
-                        IHOrganizer.ConsolidateStacks(player.inventory, 0, 50);
-                        return;
-                    }
-                    DoChestUpdateAction( () => { IHOrganizer.ConsolidateStacks(player.chestItems); } );
+                    CleanStacks();
                 }
-                else {
+                else
+                {
                     if ( player.chest == -1 ) return; //no action w/o open container
 
                     // smartloot or quickstack
                     if (IHBase.ActionKeys["quickStack"].Pressed()) {
-                        if (KState.Special.Shift.Down())
-                            DoChestUpdateAction( IHSmartStash.SmartLoot );
-                        else
-                            DoChestUpdateAction( () => { IHUtils.DoQuickStack(player); } );
+                        QuickStack(KState.Special.Shift.Down());
+                        // if (KState.Special.Shift.Down())
+                        //     DoChestUpdateAction( IHSmartStash.SmartLoot );
+                        // else
+                        //     DoChestUpdateAction( () => { IHUtils.DoQuickStack(player); } );
                     }
                     // smart-deposit or deposit-all
                     else if (IHBase.ActionKeys["depositAll"].Pressed()) {
-                        if (KState.Special.Shift.Down())
-                            DoChestUpdateAction( IHSmartStash.SmartDeposit );
-                        else
-                            DoChestUpdateAction( () => { IHUtils.DoDepositAll(player); } );
+                        DepositAll(KState.Special.Shift.Down());
+                        // if (KState.Special.Shift.Down())
+                        //     DoChestUpdateAction( IHSmartStash.SmartDeposit );
+                        // else
+                        //     DoChestUpdateAction( () => { IHUtils.DoDepositAll(player); } );
                     }
                     // loot all
                     else if (IHBase.ActionKeys["lootAll"].Pressed())
-                        DoChestUpdateAction( () => { IHUtils.DoLootAll(player); } );
+                        DoChestUpdateAction( IHUtils.DoLootAll );
                 }
 
             }
@@ -215,47 +198,61 @@ namespace InvisibleHand
             }
         }
 
-        public static void SortInventory(bool reverse = false)
-        {
-            if ( Main.localPlayer.chest == -1 )
-                IHOrganizer.SortPlayerInv(Main.localPlayer,
-                reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
-        }
-
-        public static void SortChest(bool reverse = false)
-        {
-            if ( Main.localPlayer.chest != -1 )
-                Instance.DoChestUpdateAction( () =>
-                    IHOrganizer.SortChest(Main.localPlayer.chestItems,
-                    reverse ^ IHBase.ModOptions["ReverseSortChest"])
-                );
-        }
-
         /// performs the most appropriate sort action
         public static void Sort(bool reverse = false)
         {
-            if ( Main.localPlayer.chest == -1 )
+            // NOTE: this used to check player.chestItems==null, but I once got a
+            // "object reference not set to instance of object" or whatever kind of error
+            // with that check elsewhere in the code. This should be safer and have the exact same result.
+            if ( Main.localPlayer.chest == -1 ) // no valid chest open, sort player inventory
+                // shift-pressed XOR Reverse-sort-mod-option:
+                //   this will reverse the sort IFF exactly one of these two bools is true
                 IHOrganizer.SortPlayerInv(Main.localPlayer,
-                reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
+                    reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
             else
+                // call sort on the Item[] array returned by chestItems
                 Instance.DoChestUpdateAction( () =>
                     IHOrganizer.SortChest(Main.localPlayer.chestItems,
                     reverse ^ IHBase.ModOptions["ReverseSortChest"])
                 );
         }
 
-        public static void CleanInventoryStacks()
+        /// performs the most appropriate clean action
+        public static void CleanStacks()
         {
             if ( Main.localPlayer.chest == -1 )
-                IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory);
+                IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50);
+            else
+                Instance.DoChestUpdateAction(
+                    () => IHOrganizer.ConsolidateStacks(Main.localPlayer.chestItems));
         }
 
-        public static void CleanChestStacks()
+        /// <summary>
+        /// Performs QuickStack or SmartLoot action
+        /// </summary>
+        /// <param name="smartLoot">Perform SmartLoot action instead </param>
+        public static void QuickStack(bool smartLoot)
         {
-            if ( Main.localPlayer.chest != -1 )
-                Instance.DoChestUpdateAction( () =>
-                    IHOrganizer.ConsolidateStacks(Main.localPlayer.chestItems)
-                );
+            if ( Main.localPlayer.chest == -1 ) return;
+
+            if (smartLoot)
+                Instance.DoChestUpdateAction( IHSmartStash.SmartLoot );
+            else
+                Instance.DoChestUpdateAction( IHUtils.DoQuickStack );
+        }
+
+        /// <summary>
+        /// Performs DepositAll or smartDeposit action
+        /// </summary>
+        /// <param name="smartDeposit">Perform smartDeposit action instead </param>
+        public static void DepositAll(bool smartDeposit)
+        {
+            if ( Main.localPlayer.chest == -1 ) return;
+
+            if (smartDeposit)
+                Instance.DoChestUpdateAction( IHSmartStash.SmartDeposit );
+            else
+                Instance.DoChestUpdateAction( IHUtils.DoDepositAll );
         }
 
         /// Only valid for the 40 Player inventory slots below the hotbar.

@@ -34,6 +34,16 @@ namespace InvisibleHand
             return true;
         }
 
+        /// Used to draw Button Tooltips so they don't appear under other elements
+        public override void PostDrawInventory(SpriteBatch sb)
+        {
+            while (IHBase.Instance.ButtonTooltips.Count > 0)
+            {
+                API.main.MouseText(IHBase.Instance.ButtonTooltips.Pop());
+                Main.mouseText = true;
+            }
+        }
+
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
             if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(Main.localPlayer, slot.index))

@@ -48,6 +48,14 @@ namespace InvisibleHand
             }
         }
 
+        // receive button from base //
+        public void AddButton(ICoreButton b)
+        {
+            Buttons[b.ID] = b;
+            //bubble up
+            IHBase.Instance.ButtonStore.Add(b.ID, b);
+        }
+
         protected virtual void DrawButtons(SpriteBatch sb)
         {
             // KeyValuePair<TIH, ButtonBase>
@@ -64,14 +72,6 @@ namespace InvisibleHand
             if (handleMouseInterface && IsHovered)
                 Main.localPlayer.mouseInterface = true;
             DrawButtons(sb);
-        }
-
-        // receive button from base //
-        public void AddButton(ICoreButton b)
-        {
-            Buttons[b.ID] = b;
-            //bubble up
-            IHBase.Instance.ButtonStore.Add(b.ID, b);
         }
 
         // Abstract Methods //

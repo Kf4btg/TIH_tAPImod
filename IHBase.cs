@@ -55,6 +55,11 @@ namespace InvisibleHand
         /// keep track of ALL existing button contexts here, by unique ID
         public Dictionary<string, ICoreButton> ButtonStore { get; private set; }
 
+        /// Called in ModInterface.PostDrawInventory to draw tooltips of hovered buttons
+        /// (there should only be one, but still...)
+        public Stack<string> ButtonTooltips { get; private set; }
+
+
         /// the ids of buttons needing a state-update (i.e. OnWorldLoad call)
         // TODO: probably should just call OnWorldLoad for every button in the ButtonStore
         // rather than relying on this collection to get calls to them. It won't matter
@@ -96,6 +101,7 @@ namespace InvisibleHand
             KEP           = new KeyEventProvider();
             ButtonStore   = new Dictionary<string, ICoreButton>();
             ButtonUpdates = new Stack<string>();
+            ButtonTooltips = new Stack<string>();
 
             // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
             InventoryButtons = InventoryButtonLayer.New();

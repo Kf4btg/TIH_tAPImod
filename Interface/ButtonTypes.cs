@@ -33,6 +33,7 @@ namespace InvisibleHand
                               Rectangle? active_rect   = null
                               ) : base(parent, action, label)
         {
+            Tooltip = tooltip; // this should set ShowTooltip = true automatically if not ""
             BackgroundColor = bg_color ?? Color.White;
 
             Texture      = (texture == null) ? IHBase.ButtonGrid : texture;

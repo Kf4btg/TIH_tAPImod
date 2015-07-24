@@ -56,20 +56,20 @@ namespace InvisibleHand
         /// Get or set this button's label
         public string Label   { get { return _label; }   set { _label   = value; } }
         /// Get or set this button's Tooltip
-        public string Tooltip
+        public virtual string Tooltip
         {
             get { return _tooltip; }
             // set ShowTooltip = true when setting tooltip,
             // or false when unsetting it.
-            set { _showTooltip = (value!=""); _tooltip = value; }
+            set { _showTooltip = (value != ""); _tooltip = value; }
         }
 
         /// Whether the tooltip should be drawn on hover
-        public bool ShowTooltip
+        public virtual bool ShowTooltip
         {
             get { return _showTooltip; }
             // set to true iff Tooltip is not empty
-            set { _showTooltip = Tooltip=="" ? false : value; }
+            set { _showTooltip = (Tooltip == "") ? false : value; }
         }
 
 

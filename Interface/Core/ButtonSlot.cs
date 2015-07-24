@@ -283,6 +283,13 @@ namespace InvisibleHand
             WhenNotFocused();
         }
 
+        protected virtual void DrawTooltip()
+        {
+            API.main.MouseText(CurrentContent.Tooltip);
+            Main.mouseText = true;
+        }
+
+
         /// <summary>
         /// Determines whether the mouse is hovered over this button's
         /// screen-area, accounting for the button's current scale.
@@ -346,8 +353,14 @@ namespace InvisibleHand
 
         ///<summary>
         /// Called every frame while the mouse is hovered over this button
+        /// By default, queues the the current button's tooltip, if any,
+        /// to be drawn in the PostDrawInventory phase
         ///</summary>
-        protected virtual void WhenFocused() {}
+        protected virtual void WhenFocused()
+        {
+            if (CurrentContent.ShowTooltip)
+                IHBase.Instance.ButtonTooltips.Push(CurrentContent.Tooltip);
+        }
 
         ///<summary>
         /// Called during every frame that the button is visible

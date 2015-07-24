@@ -50,6 +50,7 @@ namespace InvisibleHand
             specialProviders.TryAdd(key, new Notifier());
         }
 
+        private bool isPressed;
         //call this from one of the "Updates-every-frame" hooks to send events to listeners (e.g. buttons) on a key change
         public void Update()
         {
@@ -58,7 +59,7 @@ namespace InvisibleHand
             //         { kvp.Value.UpdateSubscribers(); }}
 
             bool wasPressed;
-            bool isPressed;
+            // bool isPressed;
             foreach (var kvp in specialProviders)
                 {
                     isPressed = kvp.Key.Down();

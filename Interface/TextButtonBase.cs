@@ -93,6 +93,9 @@ namespace InvisibleHand
         /// Handle mouseInterface, Scale up
         protected override void WhenFocused()
         {
+            // We don't have any tooltips for these as yet, so don't call base
+            // base.WhenFocused();
+
             // handling mouseInterface individually rather than by
             // the ButtonFrame so that the buttons will act like the
             // vanilla versions.

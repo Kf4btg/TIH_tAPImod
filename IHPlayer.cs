@@ -271,7 +271,7 @@ namespace InvisibleHand
         {
             if (slotIndex<10 || slotIndex>49) return;
 
-            Instance.lockedSlots[slotIndex - 10] = Instance.lockedSlots[slotIndex - 10];
+            Instance.lockedSlots[slotIndex - 10] = !Instance.lockedSlots[slotIndex - 10];
         }
 
         /// <returns>True if indicated action is set to respect locked slots.</returns>

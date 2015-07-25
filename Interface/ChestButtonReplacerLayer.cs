@@ -65,27 +65,16 @@ namespace InvisibleHand
         private void addTextBases()
         {
             // position of first button (right of chests, below coin slots)
-            // var pos0 = new Vector2(506, API.main.invBottom + 40);
-            // let's try moving it up a bit to account for extra button
-            // var pos0 = new Vector2(506, API.main.invBottom + 30);
-
-            // a transform to calculate the position of the socket from the
-            // order in which it is created (each offset by button height)
-            // Func<int,Vector2> getPosFromIndex
-            //     = (i) => new Vector2( pos0.X, pos0.Y + (i * 26) );
 
             int slotOrder = 0;
             foreach (var action in new[]
             {   // order of creation; determines positioning per the ButtonPlot transform
                 // TIH.Sort,
-                TIH.LootAll,
+                TIH.LootAll,        // + sort/rsort
                 TIH.DepositAll,    // +smartdep
                 TIH.QuickStack, // + smartloot
                 // TIH.Rename
             }) ButtonBases.Add(action, new TextButtonBase(this, PlotPosition(Constants.TextReplacersPlot, slotOrder++)));
-
-            // create but don't yet add base for Cancel Button
-            // CancelEditBase = new TextButtonBase(this, getPosFromIndex(slotOrder));
         }
 
         private void addIconBases()
@@ -133,13 +122,11 @@ namespace InvisibleHand
                                        label: getLabel(a)
                                        );
 
-
-            // not using these just now.
-            // var sort  = getButton(TIH.Sort,       TIH.Sort);
             // var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
 
-
             var loot  = getButton(TIH.LootAll,    TIH.LootAll);
+            var sort  = getButton(TIH.LootAll,       TIH.Sort);
+
             var depo  = getButton(TIH.DepositAll, TIH.DepositAll);
             var sdep  = getButton(TIH.DepositAll, TIH.SmartDeposit);
             var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
@@ -149,7 +136,11 @@ namespace InvisibleHand
             // var rena  = getButton(TIH.Rename,     TIH.Rename);
             // var save  = getButton(TIH.Rename,     TIH.SaveName);
 
-            loot.EnableDefault();
+
+            // here's an idea: Have LootAll toggle to Sort on shift.
+            // Sort will reverse-sort on right-click.
+            sort.EnableDefault().Hooks.OnRightClick += () => IHPlayer.Sort(true);
+            loot.EnableDefault().AddToggle(sort);
 
             depo.EnableDefault().MakeLocking(lockOffset).AddToggle(sdep.EnableDefault());
             qstk.EnableDefault().MakeLocking(lockOffset).AddToggle(sloo.EnableDefault());

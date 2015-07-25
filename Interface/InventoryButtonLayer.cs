@@ -25,10 +25,13 @@ namespace InvisibleHand
         {
             // only two buttons right now; they're just above
             // the coin and ammo slots.
-            var positions = new Vector2[] {
-                new Vector2(496, 28),
-                new Vector2(532, 28)
-            };
+            // var positions = new Vector2[] {
+            //     new Vector2(496, 28),
+            //     new Vector2(532, 28)
+            // };
+
+            var plot = Constants.InventoryButtonsPlot;
+            Func<int,Vector2> plotPosition = (i) => ChestButtonReplacerLayer.PlotPosition(plot, i);
 
             // Func<int,Vector2> getPosFromIndex = (i) => positions[i];;
 
@@ -38,7 +41,7 @@ namespace InvisibleHand
                 TIH.Sort,
                 TIH.CleanStacks
                 })
-                ButtonBases.Add(tih, new IconButtonBase(this, positions[slotOrder++], IHBase.ButtonBG));
+                ButtonBases.Add(tih, new IconButtonBase(this, plotPosition(slotOrder++), IHBase.ButtonBG));
                 // ButtonBases.Add(tih, new IconButtonBase(this, getPosFromIndex(slotOrder++)));
         }
 

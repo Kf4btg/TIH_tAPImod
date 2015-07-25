@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System;
+using TAPI;
 using Terraria.ID;
 
 namespace InvisibleHand
@@ -102,6 +103,16 @@ namespace InvisibleHand
         // width and height of button
         public const int ButtonW = 32;
         public const int ButtonH = 32;
+
+        public static readonly ButtonPlot IconReplacersPlot
+            = new ButtonPlot(506, API.main.invBottom + 22,
+                               0, ButtonH + 2);
+
+        public static readonly ButtonPlot TextReplacersPlot
+             = new ButtonPlot(506, API.main.invBottom + 40, 0, 26);
+
+        public static readonly ButtonPlot InventoryButtonsPlot
+            = new ButtonPlot(496, 28, ButtonW + 4, 0);
 
         ///the ItemCat Enum defines the actual Sort Order of the categories,
         /// but this defines in which order an item will be checked against
@@ -332,6 +343,12 @@ namespace InvisibleHand
             "Loot All"                  // 11
         };
 
+
+        // ///////////////////////////////// //
+        //          Dictionaries             //
+        // ///////////////////////////////// //
+
+
         /// holds the index in Terraria.Lang.inter[] corresponding
         /// to the paired actions; used to get original button lobels.
         public static readonly Dictionary<TIH, int> LangInterIndices;
@@ -448,6 +465,24 @@ namespace InvisibleHand
 
         // a hack; don't know if it's necessary
         public static void None() { }
+    }
+
+    public struct ButtonPlot
+    {
+        public Vector2 Origin;
+        public Vector2 Offset;
+
+        public ButtonPlot(Vector2 origin, Vector2 offset)
+        {
+            this.Origin = origin;
+            this.Offset = offset;
+        }
+
+        public ButtonPlot(float origin_x, float origin_y, float offset_x, float offset_y)
+        {
+            this.Origin = new Vector2(origin_x, origin_y);
+            this.Offset = new Vector2(offset_x, offset_y);
+        }
     }
 
 

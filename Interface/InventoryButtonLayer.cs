@@ -25,15 +25,9 @@ namespace InvisibleHand
         {
             // only two buttons right now; they're just above
             // the coin and ammo slots.
-            // var positions = new Vector2[] {
-            //     new Vector2(496, 28),
-            //     new Vector2(532, 28)
-            // };
 
             var plot = Constants.InventoryButtonsPlot;
             Func<int,Vector2> plotPosition = (i) => ChestButtonReplacerLayer.PlotPosition(plot, i);
-
-            // Func<int,Vector2> getPosFromIndex = (i) => positions[i];;
 
             int slotOrder = 0;
 
@@ -42,7 +36,6 @@ namespace InvisibleHand
                 TIH.CleanStacks
                 })
                 ButtonBases.Add(tih, new IconButtonBase(this, plotPosition(slotOrder++), IHBase.ButtonBG));
-                // ButtonBases.Add(tih, new IconButtonBase(this, getPosFromIndex(slotOrder++)));
         }
 
         protected override void AddButtonsToBases()
@@ -51,7 +44,11 @@ namespace InvisibleHand
 
             Func<TIH, string> getLabel = a => a.DefaultLabelForAction(true);
 
-            Func<TIH, string> getTtip  = a => getLabel(a) + a.GetKeyTip();
+            Func<TIH, string> getTtip;
+            if (IHBase.ModOptions["ShowTooltips"])
+                getTtip  = a => getLabel(a) + (IHBase.ModOptions["ShowKeyBind"] ? a.GetKeyTip() : "");
+            else
+                getTtip = a => "";
 
             Func<TIH, TIH, TexturedButton> getButton
                 = (base_by_action, a)

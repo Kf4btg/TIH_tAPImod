@@ -92,6 +92,12 @@ namespace InvisibleHand
                 );
         }
 
+        /// Immediately return button to minimum scale
+        public void ResetScale()
+        {
+            Scale = _minScale;
+        }
+
         /// Handle mouseInterface, Scale up
         protected override void WhenFocused()
         {

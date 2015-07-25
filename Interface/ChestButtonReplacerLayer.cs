@@ -7,12 +7,6 @@ using Terraria;
 
 namespace InvisibleHand
 {
-    // Order of operations:
-    //  - First, create layer (that's what this is doing)
-    //  - Second, create bases and assign to layer
-    //	 - Finally, create buttons and assign to bases
-    // This allows assigning references to parent objects down the stack
-
     public class ChestButtonReplacerLayer : ButtonLayer
     {
         protected readonly bool iconButtons;

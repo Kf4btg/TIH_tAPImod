@@ -405,7 +405,7 @@ namespace InvisibleHand
                 {TIH.Sort,         () => IHPlayer.Sort()},
                 {TIH.ReverseSort,  () => IHPlayer.Sort(true)},
 
-                {TIH.CleanStacks,     IHPlayer.CleanStacks},
+                {TIH.CleanStacks,  IHPlayer.CleanStacks},
                 // Chests
                 {TIH.SmartLoot,    IHSmartStash.SmartLoot},
                 {TIH.QuickStack,   IHUtils.DoQuickStack},

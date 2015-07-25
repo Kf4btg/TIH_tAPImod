@@ -192,11 +192,11 @@ namespace InvisibleHand
         }
     }
 
-    /// Listens to a given game propery and changes state automatically
+    /// Listens to a given game property and changes state automatically
     public class DynamicToggleService: ButtonService
     {
         private readonly Func<bool> gameState;
-        private bool inMain;
+        private bool prevGameState; // state of game property in the previous frame
 
         private string _serviceType;
 
@@ -214,24 +214,27 @@ namespace InvisibleHand
         public override void Subscribe()
         {
             Client.Hooks.PostDraw += postDraw;
-            inMain = gameState();
-            Client.ButtonBase.ChangeContent(inMain ? Client.ID : AltButton.ID);
+            AltButton.Hooks.PostDraw += postDraw;
+            prevGameState = gameState();
+            Client.ButtonBase.ChangeContent(prevGameState ? Client.ID : AltButton.ID);
         }
 
         public override void Unsubscribe()
         {
             Client.Hooks.PostDraw -= postDraw;
+            AltButton.Hooks.PostDraw -= postDraw;
             Client.ButtonBase.ChangeContent(Client.ID);
         }
 
         // check in post draw so as not to switch content mid-frame
         private void postDraw(SpriteBatch sb)
         {
-            if (gameState() != inMain)
+            bool gs = gameState();
+            if (gs != prevGameState)
             {
-                inMain = !inMain;
-                Client.ButtonBase.ChangeContent(inMain ? Client.ID : AltButton.ID);
+                Client.ButtonBase.ChangeContent(gs ? Client.ID : AltButton.ID);
             }
+            prevGameState = gs;
         }
     }
 

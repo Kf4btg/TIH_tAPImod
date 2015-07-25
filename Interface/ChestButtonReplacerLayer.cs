@@ -95,39 +95,26 @@ namespace InvisibleHand
 
         private void addIconBases()
         {
-            // position of first button (right of chests, below coin slots)
-            // var pos0 = new Vector2(506, API.main.invBottom + 22);
+            // position of first button = right of chests, below coin slots
             var plot = Constants.IconReplacersPlot;
 
-            // a transform to calculate the position of the socket from the
-            // order in which it is created (each offset by button height)
-            // Func<int,Vector2> PlotPosition
-            //     // = (i) => new Vector2( pos0.X, pos0.Y + (i * Constants.ButtonH) );
-            //     = (i) => new Vector2( plot.X, plot.Y + (i * Constants.ButtonH) );
-
             int slotOrder = 0;
-
             foreach (var action in new[]
             {   // order of creation; determines positioning per the ButtonPlot transform
                 TIH.Sort,
                 TIH.LootAll,
                 TIH.DepositAll,    // +smartdep
-                TIH.QuickStack, // + smartloot
+                TIH.QuickStack,    // +smartloot
                 TIH.Rename
             }) ButtonBases.Add(action, new IconButtonBase(this, PlotPosition(plot, slotOrder++), IHBase.ButtonBG));
 
             // Now create the base for the Cancel Edit Button (a text button),
-            // but don't add it to the list yet because it only appears
-            // under certain conditions (handle in AddButtonsToBases())
-
+            // but don't add it to the list yet because it only appears under
+            // certain conditions (handle in AddButtonsToBases())
 
             // Add another half-button-height to prevent overlap
             var nudge = new Vector2(0, Constants.ButtonH / 2);
             CancelEditBase = new TextButtonBase(this, PlotPosition(plot, slotOrder) + nudge);
-
-            // CancelEditBase = new TextButtonBase(this, new Vector2(pos0.X,
-            //                 // Add another half-button-height to prevent overlap
-            //                 pos0.Y + (slotOrder * Constants.ButtonH) + (Constants.ButtonH / 2) ));
         }
 
         // // // // // // //
@@ -168,8 +155,8 @@ namespace InvisibleHand
 
             loot.EnableDefault();
 
-            depo.EnableDefault().MakeLocking().AddToggle(sdep.EnableDefault());
-            qstk.EnableDefault().MakeLocking().AddToggle(sloo.EnableDefault());
+            depo.EnableDefault().MakeLocking(lockOffset).AddToggle(sdep.EnableDefault());
+            qstk.EnableDefault().MakeLocking(lockOffset).AddToggle(sloo.EnableDefault());
 
         }
 
@@ -181,8 +168,8 @@ namespace InvisibleHand
 
                 Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
                 Func<TIH, Color>  getBGcol = (a) => (a == TIH.SaveName)
-                                                    ? Constants.ChestSlotColor * 0.85f
-                                                    : Constants.EquipSlotColor * 0.85f;
+                                                    ? Constants.EquipSlotColor * 0.85f
+                                                    : Constants.ChestSlotColor * 0.85f;
                 Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
 
                 Func<TIH, TIH, TexturedButton> getButton

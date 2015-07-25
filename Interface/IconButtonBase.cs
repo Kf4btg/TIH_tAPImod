@@ -29,7 +29,7 @@ namespace InvisibleHand
         protected override void DrawButtonContent(SpriteBatch sb)
         {
             var opacity = ParentLayer.LayerOpacity * Alpha;
-            // opacity = 1.0f;
+
             // draw button background first
             // (otherwise button content will be below bg!)
             sb.Draw(ButtonBackground,                           // texture

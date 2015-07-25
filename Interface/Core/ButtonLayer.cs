@@ -11,7 +11,7 @@ namespace InvisibleHand
     public abstract class ButtonLayer : InterfaceLayer
     {
         protected bool handleMouseInterface;
-        protected float opacity_inactive, opacity_active = 1.0f;
+        protected float opacity_inactive = 1.0f, opacity_active = 1.0f;
 
         public readonly Dictionary<string,ICoreButton> Buttons;
         public readonly Dictionary<TIH, IButtonSlot> ButtonBases;
@@ -104,7 +104,7 @@ namespace InvisibleHand
             opacity_active   = max_opacity.Clamp();
             fadeStep = fade_step == 0 ? opacity_active - opacity_inactive : fade_step;
 
-            LayerOpacity = opacity_active;
+            LayerOpacity = opacity_inactive;
         }
 
         protected override void OnDraw(SpriteBatch sb)

@@ -128,7 +128,7 @@ namespace InvisibleHand
         private void PostDraw(SpriteBatch sb)
         {
             sb.Draw(IHBase.LockedIcon, Client.ButtonBase.Position + offset,
-                    Client.Tint * Client.ButtonBase.ParentLayer.LayerOpacity * Client.ButtonBase.Alpha);
+                    color * Client.ButtonBase.ParentLayer.LayerOpacity * Client.ButtonBase.Alpha);
         }
     }
 

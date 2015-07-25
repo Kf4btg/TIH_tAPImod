@@ -218,10 +218,8 @@ namespace InvisibleHand
                 sort.AddSortToggle(rsort);
 
                 // add default click, let rClick lock it, and make shift switch buttons
-                depo.EnableDefault();
-                depo.MakeLocking(lockOffset, Color.Firebrick);
-                depo.AddToggle(sdep.EnableDefault());
-                qstk.EnableDefault().MakeLocking().AddToggle(sloo.EnableDefault());
+                depo.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sdep.EnableDefault());
+                qstk.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sloo.EnableDefault());
 
                 // these just need their default actions enabled.
                 loot.EnableDefault();

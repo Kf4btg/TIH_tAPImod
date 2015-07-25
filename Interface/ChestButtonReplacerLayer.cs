@@ -216,6 +216,7 @@ namespace InvisibleHand
 
                 // sort enables default action for sort/rsort by ... default.
                 sort.AddSortToggle(rsort);
+                // ButtonBases[TIH.Sort].RegisterKeyToggle(KState.Special.Shift, sort.ID, rsort.ID);
 
                 // add default click, let rClick lock it, and make shift switch buttons
                 depo.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sdep.EnableDefault());

@@ -336,9 +336,9 @@ namespace InvisibleHand
         protected virtual void SetDefault(T default_content)
         {
             AssociatedButtons[default_content.ID] = default_content;
-            // CurrentContent = DefaultContent = default_content;
-            DefaultContent = AssociatedButtons[default_content.ID];
-            CurrentContent = AssociatedButtons[default_content.ID];
+            CurrentContent = DefaultContent = default_content;
+            // DefaultContent = AssociatedButtons[default_content.ID];
+            // CurrentContent = AssociatedButtons[default_content.ID];
 
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)default_content.Size.X, (int)default_content.Size.Y);
         }

@@ -143,10 +143,12 @@ namespace InvisibleHand
         public override string ServiceType { get { return _serviceType; } }
         protected virtual ICoreButton AltButton { get { return _altButton; } }
 
-        public ToggleService(ICoreButton client, ICoreButton altButton, KState.Special toggle_key) : base(client)
+        public ToggleService(ICoreButton client, ICoreButton altButton, KState.Special toggle_key = KState.Special.Shift) : base(client)
         {
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + Enum.GetName(typeof(TIH), altButton.Action) + "Toggle";
             _altButton   = altButton;
+
+            toggleKey = toggle_key;
         }
 
         /// should either override this completely or at the least

@@ -106,7 +106,7 @@ namespace InvisibleHand
                 TIH.DepositAll,    // +smartdep
                 TIH.QuickStack,    // +smartloot
                 TIH.Rename
-            }) ButtonBases.Add(action, new IconButtonBase(this, PlotPosition(plot, slotOrder++), IHBase.ButtonBG));
+            }) ButtonBases.Add(action, new ChestIconBase(this, PlotPosition(plot, slotOrder++), IHBase.ButtonBG));
 
             // Now create the base for the Cancel Edit Button (a text button),
             // but don't add it to the list yet because it only appears under
@@ -144,8 +144,8 @@ namespace InvisibleHand
 
 
             var loot  = getButton(TIH.LootAll,    TIH.LootAll);
-            var depo  = getButton(TIH.DepositAll,     TIH.DepositAll);
-            var sdep  = getButton(TIH.DepositAll,     TIH.SmartDeposit);
+            var depo  = getButton(TIH.DepositAll, TIH.DepositAll);
+            var sdep  = getButton(TIH.DepositAll, TIH.SmartDeposit);
             var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
             var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
 
@@ -162,62 +162,61 @@ namespace InvisibleHand
 
         private void addIconButtons()
         {
-                // offset of lock indicator
-                var lockOffset = new Vector2((float)(int)((float)Constants.ButtonW / 2),
-                                            -(float)(int)((float)Constants.ButtonH / 2));
+            // offset of lock indicator
+            var lockOffset = new Vector2(-(float)(int)((float)Constants.ButtonW / 2),
+                                         -(float)(int)((float)Constants.ButtonH / 2) + 4);
 
-                Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
-                Func<TIH, Color>  getBGcol = (a) => (a == TIH.SaveName)
-                                                    ? Constants.EquipSlotColor * 0.85f
-                                                    : Constants.ChestSlotColor * 0.85f;
-                Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
+            Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
+            Func<TIH, Color>  getBGcol = (a) => (a == TIH.SaveName)
+                                                ? Constants.EquipSlotColor * 0.85f
+                                                : Constants.ChestSlotColor * 0.85f;
+            Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
 
-                Func<TIH, TIH, TexturedButton> getButton
-                    = (base_by_action, a)
-                    => TexturedButton.New( (ButtonSlot<TexturedButton>)ButtonBases[base_by_action],
-                                           action: a,
-                                           label: getLabel(a),
-                                           tooltip: getTtip(a),
-                                           bg_color: getBGcol(a),
-                                           texture: IHBase.ButtonGrid,
-                                           inactive_rect: IHUtils.GetSourceRect(a),
-                                           active_rect: IHUtils.GetSourceRect(a, true)
-                                           );
+            Func<TIH, TIH, TexturedButton> getButton
+                = (base_by_action, a)
+                => TexturedButton.New( (ButtonSlot<TexturedButton>)ButtonBases[base_by_action],
+                                       action: a,
+                                       label: getLabel(a),
+                                       tooltip: getTtip(a),
+                                       bg_color: getBGcol(a),
+                                       texture: IHBase.ButtonGrid,
+                                       inactive_rect: IHUtils.GetSourceRect(a),
+                                       active_rect: IHUtils.GetSourceRect(a, true)
+                                       );
 
-                // Btn obj            Socket Action   Button Action
-                // -------            -------------   -------------
-                var sort  = getButton(TIH.Sort,       TIH.Sort);
-                var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
-                var loot  = getButton(TIH.LootAll,    TIH.LootAll);
-                var depo  = getButton(TIH.DepositAll, TIH.DepositAll);
-                var sdep  = getButton(TIH.DepositAll, TIH.SmartDeposit);
-                var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
-                var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
-                var rena  = getButton(TIH.Rename,     TIH.Rename);
-                var save  = getButton(TIH.Rename,     TIH.SaveName);
+            // Btn obj            Socket Action   Button Action
+            // -------            -------------   -------------
+            var sort  = getButton(TIH.Sort,       TIH.Sort);
+            var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
+            var loot  = getButton(TIH.LootAll,    TIH.LootAll);
+            var depo  = getButton(TIH.DepositAll, TIH.DepositAll);
+            var sdep  = getButton(TIH.DepositAll, TIH.SmartDeposit);
+            var qstk  = getButton(TIH.QuickStack, TIH.QuickStack);
+            var sloo  = getButton(TIH.QuickStack, TIH.SmartLoot);
+            var rena  = getButton(TIH.Rename,     TIH.Rename);
+            var save  = getButton(TIH.Rename,     TIH.SaveName);
 
-                var cancel = TextButton.New( CancelEditBase, TIH.CancelEdit, getLabel(TIH.CancelEdit) );
+            var cancel = TextButton.New( CancelEditBase, TIH.CancelEdit, getLabel(TIH.CancelEdit) );
 
 
-                // Add Services //
+            // Add Services //
 
-                // sort enables default action for sort/rsort by ... default.
-                sort.AddSortToggle(rsort);
-                // ButtonBases[TIH.Sort].RegisterKeyToggle(KState.Special.Shift, sort.ID, rsort.ID);
+            // sort enables default action for sort/rsort by ... default.
+            sort.AddSortToggle(rsort);
 
-                // add default click, let rClick lock it, and make shift switch buttons
-                depo.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sdep.EnableDefault());
-                qstk.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sloo.EnableDefault());
+            // add default click, let rClick lock it, and make shift switch buttons
+            depo.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sdep.EnableDefault());
+            qstk.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sloo.EnableDefault());
 
-                // these just need their default actions enabled.
-                loot.EnableDefault();
-                cancel.EnableDefault();
+            // these just need their default actions enabled.
+            loot.EnableDefault();
+            cancel.EnableDefault();
 
-                // make Rename Chest button change to Save Name button
-                // when clicked, and vice-versa. Well, technically, the buttons
-                // will switch automatically when Main.editChest changes state,
-                // but since that's what clicking these buttons does...
-                save.EnableDefault().AddDynamicToggle(rena.EnableDefault(), () => Main.editChest);
+            // make Rename Chest button change to Save Name button when
+            // clicked, and vice-versa. Well, technically, the buttons will
+            // switch automatically when Main.editChest changes state, but
+            // since that's what clicking these buttons does...
+            save.EnableDefault().AddDynamicToggle(rena.EnableDefault(), () => Main.editChest);
         }
 
         protected override void DrawButtons(SpriteBatch sb)
@@ -227,7 +226,6 @@ namespace InvisibleHand
             // draw the cancel button if needed
             if (Main.editChest)
                 CancelEditBase.Draw(sb);
-
         }
     }
 }

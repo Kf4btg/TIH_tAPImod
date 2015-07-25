@@ -54,4 +54,41 @@ namespace InvisibleHand
                     0f);
         }
     }
+
+    /// fancy fading! Also handles mouseInterface.
+    /// actually...ixnay on the fancy fading. for now at least.
+    public class ChestIconBase : IconButtonBase
+    {
+        private float maxAlpha;
+        private float alphaStep;
+
+        public ChestIconBase(ButtonLayer parent, Vector2 position, Texture2D button_bg,
+        float base_alpha = 0.75f,
+        float focus_alpha = 1.0f,
+        float alpha_step = 0.01f ) : base(parent, position, button_bg)
+        {
+            // BaseAlpha = base_alpha;
+            // maxAlpha = focus_alpha.Clamp(BaseAlpha, 1.0f);
+            //
+            // alpha_step = (BaseAlpha == maxAlpha) ? 0 : alpha_step.Clamp(0.001f, (maxAlpha - BaseAlpha));
+
+            // Alpha = BaseAlpha;
+        }
+
+        protected override void WhenFocused()
+        {
+            base.WhenFocused(); // draws tooltips
+
+            Main.localPlayer.mouseInterface = true;
+            // if (Alpha != maxAlpha)
+            //     Alpha += alphaStep;
+        }
+
+        // protected override void WhenNotFocused()
+        // {
+        //     if (Alpha != BaseAlpha)
+        //         Alpha -= alphaStep;
+        // }
+
+    }
 }

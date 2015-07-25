@@ -47,15 +47,6 @@
             "default": "R"
         },
         {
-            "name": "showKeyBind",
-            "displayName": "Show Key Tips",
-            "type": "Boolean",
-            "notify": true,
-            "notifyOnChange": true,
-            "sync": false,
-            "default": true
-        },
-        {
             "name": "enableLocking",
             "displayName": "Enable Slot Locking",
             "type": "Boolean",
@@ -105,17 +96,30 @@
         },
         {
             "name": "replaceButtons",
-            "displayName": "Replacements",
-            "type": "List",
+            "displayName": "Use Chest Buttons",
+            "type": "Boolean",
             "notify": true,
             "notifyOnChange": true,
             "sync": false,
-            "list": [
-                "None",
-                "Text",
-                "Buttons"
-            ],
-            "default": 1
+            "default": false
+        },
+        {
+            "name": "showKeyBind",
+            "displayName": "Show KeyBind Hints",
+            "type": "Boolean",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": true
+        },
+        {
+            "name": "showTooltips",
+            "displayName": "Show Button Tooltips",
+            "type": "Boolean",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": true
         }
     ]
 }

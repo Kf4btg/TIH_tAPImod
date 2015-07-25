@@ -22,9 +22,10 @@ namespace InvisibleHand
 
         // Constructor
 
-        ChestButtonReplacerLayer(bool text) : base("ChestButtonReplacerLayer", false)
+        ///<param name="icons">Use the icon replacers</param>
+        ChestButtonReplacerLayer(bool icons) : base("ChestButtonReplacerLayer", false)
         {
-            textButtons = text;
+            textButtons = !icons;
         }
 
         /// Use a generator function to seamlessly create and initialize a new
@@ -127,7 +128,8 @@ namespace InvisibleHand
             var lockOffset = new Vector2(-20, -18);
 
             // get original or default label
-            Func<TIH, string> getLabel = a => a.DefaultLabelForAction(true) + a.GetKeyTip();
+            Func<TIH, string> getLabel = a => a.DefaultLabelForAction(true)
+                + (IHBase.ModOptions["ShowKeyBind"] ? a.GetKeyTip() : "");
 
             // put it all together, add to base
             Func<TIH, TIH, TextButton> getButton
@@ -137,8 +139,8 @@ namespace InvisibleHand
                                        label: getLabel(a)
                                        );
 
-            // Btn obj            Socket Action   Button Action
-            // -------            -------------   -------------
+
+            // not using these just now. 
             // var sort  = getButton(TIH.Sort,       TIH.Sort);
             // var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
 
@@ -163,14 +165,22 @@ namespace InvisibleHand
         private void addIconButtons()
         {
             // offset of lock indicator
-            var lockOffset = new Vector2(-(float)(int)((float)Constants.ButtonW / 2),
+            var lockOffset = new Vector2(-(float)(int)((float)Constants.ButtonW / 2) - 4,
                                          -(float)(int)((float)Constants.ButtonH / 2) + 4);
 
             Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
             Func<TIH, Color>  getBGcol = (a) => (a == TIH.SaveName)
                                                 ? Constants.EquipSlotColor * 0.85f
                                                 : Constants.ChestSlotColor * 0.85f;
-            Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
+            Func<TIH, string> getTtip;
+
+            if (IHBase.ModOptions["ShowTooltips"])
+                if (IHBase.ModOptions["ShowKeyBind"])
+                    getTtip = a => getLabel(a) + IHUtils.GetKeyTip(a);
+                else
+                    getTtip = a => getLabel(a);
+            else
+                getTtip = a => "";
 
             Func<TIH, TIH, TexturedButton> getButton
                 = (base_by_action, a)

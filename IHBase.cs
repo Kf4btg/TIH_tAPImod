@@ -106,7 +106,7 @@ namespace InvisibleHand
             InventoryButtons = InventoryButtonLayer.New();
 
             // if (ModOptions["TextReplacers"])
-                ReplacerButtons = ChestButtonReplacerLayer.New(ModOptions["TextReplacers"]);
+            ReplacerButtons = ChestButtonReplacerLayer.New(ModOptions["UseReplacers"]);
             // else if (ModOptions["IconReplacers"])
 
         }
@@ -130,12 +130,22 @@ namespace InvisibleHand
                 case "depositAll":
                 case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
-                    SetKeyHint(option.name, option.Value.ToString());
+                    SetKeyHint(option.name, option.Value.ToString(), " [", "]");
                     break;
 
                 // show letter of key bind in button names/tooltips
                 case "showKeyBind":
                     ModOptions["ShowKeyBind"] = (bool)option.Value;
+                    break;
+
+                // replace the vanilla LA/DA/QS buttons with new icon buttons
+                case "replaceButtons":
+                        ModOptions["UseReplacers"]  = (bool)option.Value;
+                        break;
+
+                // show tooltips when hovering replacer buttons
+                case "showTooltips":
+                    ModOptions["ShowTooltips"]  = (bool)option.Value;
                     break;
 
                 // slot-locking
@@ -189,30 +199,6 @@ namespace InvisibleHand
                     }
                     break;
 
-                // replace the vanilla LA/DA/QS buttons with new...
-                case "replaceButtons":
-                    switch((string)option.Value)
-                    {
-                        // Text buttons, like the originals
-                        case "Text":
-                            ModOptions["UseReplacers"]
-                            = ModOptions["TextReplacers"] = true;
-                            ModOptions["IconReplacers"]   = false;
-                            break;
-                        // Icon buttons, with pictures
-                        case "Buttons":
-                            ModOptions["UseReplacers"]
-                            = ModOptions["IconReplacers"] = true;
-                            ModOptions["TextReplacers"]   = false;
-                            break;
-                        // Don't replace them at all
-                        case "None":
-                            ModOptions["UseReplacers"]
-                            = ModOptions["TextReplacers"]
-                            = ModOptions["IconReplacers"] = false;
-                            break;
-                    }
-                    break;
             }
         }
     }

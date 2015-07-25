@@ -27,15 +27,13 @@ namespace InvisibleHand
             // the coin and ammo slots.
 
             var plot = Constants.InventoryButtonsPlot;
-            Func<int,Vector2> plotPosition = (i) => ChestButtonReplacerLayer.PlotPosition(plot, i);
-
             int slotOrder = 0;
 
             foreach (var tih in new[] {
                 TIH.Sort,
                 TIH.CleanStacks
                 })
-                ButtonBases.Add(tih, new IconButtonBase(this, plotPosition(slotOrder++), IHBase.ButtonBG));
+                ButtonBases.Add(tih, new IconButtonBase(this, plot.GetPosition(slotOrder++), IHBase.ButtonBG));
         }
 
         protected override void AddButtonsToBases()
@@ -71,7 +69,8 @@ namespace InvisibleHand
             rsort.Hooks.OnRightClick += () => IHPlayer.Sort();
 
             // TODO: make right-click throw all of the player's items on the ground.
-            // Haha j/k. maybe.
+            // Haha j/k.
+            //           Maybe.
             clean.EnableDefault();
         }
     }

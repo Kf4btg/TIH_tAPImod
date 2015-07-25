@@ -48,33 +48,17 @@ namespace InvisibleHand
         // Create the Sockets
         // // // // // // //
 
-        //TODO: standardize this maybe? And put somewhere else.
-        /// Plot and return the position of a button based on the origin position
-        /// given in the ButtonPlot, shifted by the plot's Offset Vector
-        /// a number of times equal to the index (order number).
-        /// <example><code>
-        /// ButtonPlot bp = new ButtonPlot(10, 20, 0, 15);
-        /// Vector2 pos_buttonTheFirst = PlotPosition(bp, 0); // returns (10, 20): the initial position
-        /// Vector2 pos_buttonTheThird = PlotPosition(bp, 2); // returns (10, 50): X=(10 + 2*0), Y=(20 + 2*15)
-        ///</code></example>
-        public static Vector2 PlotPosition(ButtonPlot plot, int index)
-        {
-            return plot.Origin + index * plot.Offset;
-        }
-
         private void addTextBases()
         {
-            // position of first button (right of chests, below coin slots)
+            // position buttons right of chests, below coin slots
 
             int slotOrder = 0;
             foreach (var action in new[]
             {   // order of creation; determines positioning per the ButtonPlot transform
-                // TIH.Sort,
-                TIH.LootAll,        // + sort/rsort
-                TIH.DepositAll,    // +smartdep
-                TIH.QuickStack, // + smartloot
-                // TIH.Rename
-            }) ButtonBases.Add(action, new TextButtonBase(this, PlotPosition(Constants.TextReplacersPlot, slotOrder++)));
+                TIH.LootAll,       // + sort/rsort
+                TIH.DepositAll,    // + smartdep
+                TIH.QuickStack,    // + smartloot
+            }) ButtonBases.Add(action, new TextButtonBase(this, Constants.TextReplacersPlot.GetPosition(slotOrder++) ));
         }
 
         private void addIconBases()
@@ -87,10 +71,10 @@ namespace InvisibleHand
             {   // order of creation; determines positioning per the ButtonPlot transform
                 TIH.Sort,
                 TIH.LootAll,
-                TIH.DepositAll,    // +smartdep
-                TIH.QuickStack,    // +smartloot
+                TIH.DepositAll,    // + smartdep
+                TIH.QuickStack,    // + smartloot
                 TIH.Rename
-            }) ButtonBases.Add(action, new ChestIconBase(this, PlotPosition(plot, slotOrder++), IHBase.ButtonBG));
+            }) ButtonBases.Add(action, new ChestIconBase(this, plot.GetPosition(slotOrder++), IHBase.ButtonBG));
 
             // Now create the base for the Cancel Edit Button (a text button),
             // but don't add it to the list yet because it only appears under
@@ -98,7 +82,7 @@ namespace InvisibleHand
 
             // Add another half-button-height to prevent overlap
             var nudge = new Vector2(0, Constants.ButtonH / 2);
-            CancelEditBase = new TextButtonBase(this, PlotPosition(plot, slotOrder) + nudge);
+            CancelEditBase = new TextButtonBase(this, plot.GetPosition(slotOrder) + nudge);
         }
 
         // // // // // // //

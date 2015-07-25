@@ -464,6 +464,19 @@ namespace InvisibleHand
             this.Origin = new Vector2(origin_x, origin_y);
             this.Offset = new Vector2(offset_x, offset_y);
         }
+
+        /// Plot and return the position of a button based on the origin position
+        /// given in the ButtonPlot, shifted by the plot's Offset Vector
+        /// a number of times equal to the index (order number).
+        /// <example><code>
+        /// ButtonPlot bp = new ButtonPlot(10, 20, 0, 15);
+        /// Vector2 pos_buttonTheFirst = bp.GetPosition(0); // returns (10, 20): the initial position
+        /// Vector2 pos_buttonTheThird = bp.GetPosition(2); // returns (10, 50): X=(10 + 2*0), Y=(20 + 2*15)
+        ///</code></example>
+        public Vector2 GetPosition(int index)
+        {
+            return Origin + index * Offset;
+        }
     }
 
     // /// because there's no void/none/null type

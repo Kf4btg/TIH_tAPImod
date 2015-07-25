@@ -247,7 +247,14 @@ namespace InvisibleHand
             IHPlayer mp = player.GetSubClass<IHPlayer>();
             // subtract 10 since our array only contains 40 items and
             // we're ignoring the first 10 actual slots (the hotbar).
-            return slotIndex>9 && slotIndex<50 && mp.lockedSlots[slotIndex-10];
+            return slotIndex > 9 && slotIndex < 50 && mp.lockedSlots[slotIndex - 10];
+        }
+
+        /// Only valid for the 40 Player inventory slots below the hotbar.
+        /// <returns>True if indicated slot is locked</returns>
+        public static bool SlotLocked(int slotIndex)
+        {
+            return slotIndex > 9 && slotIndex < 50 && Instance.lockedSlots[slotIndex - 10];
         }
 
         /// Locks/unlocks indicated slot depending on current status.
@@ -256,7 +263,15 @@ namespace InvisibleHand
             if (slotIndex<10 || slotIndex>49) return;
             IHPlayer mp = player.GetSubClass<IHPlayer>();
 
-            mp.lockedSlots[slotIndex-10]=!mp.lockedSlots[slotIndex-10];
+            mp.lockedSlots[slotIndex - 10] = !mp.lockedSlots[slotIndex - 10];
+        }
+
+        /// Locks/unlocks indicated slot depending on current status.
+        public static void ToggleLock(int slotIndex)
+        {
+            if (slotIndex<10 || slotIndex>49) return;
+
+            Instance.lockedSlots[slotIndex - 10] = Instance.lockedSlots[slotIndex - 10];
         }
 
         /// <returns>True if indicated action is set to respect locked slots.</returns>

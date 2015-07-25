@@ -70,7 +70,7 @@ namespace InvisibleHand
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
-                    if (IHPlayer.SlotLocked(Main.localPlayer, i) || container[i].IsBlank()) continue;
+                    if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
 
                     itemList.Add(container[i].Clone());
                     count++;
@@ -158,14 +158,14 @@ namespace InvisibleHand
                 getIndex = x => range.Item2 - x;
                 getIter = x => x-1;
                 getCond = x => x >= range.Item1;
-                getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(Main.localPlayer, x);
+                getWhileCond = x => x>range.Item1 && IHPlayer.SlotLocked(x);
             }
             else 	// use incrementing iterators
             {
                 getIndex = y => range.Item1 + y;
                 getIter = y => y+1;
                 getCond = y => y <= range.Item2;
-                getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(Main.localPlayer, y);
+                getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
             }
 
             int filled = 0;
@@ -178,7 +178,7 @@ namespace InvisibleHand
                     // this would throw an exception if range.Item1+filled somehow went over 49,
                     // but if the categorizer and slot-locker are functioning correctly,
                     // that _shouldn't_ be possible. Shouldn't. Probably.
-                    while (IHPlayer.SlotLocked(Main.localPlayer, getIndex(filled)))
+                    while (IHPlayer.SlotLocked(getIndex(filled)))
                     {
                         filled++;
                     }
@@ -190,7 +190,7 @@ namespace InvisibleHand
                 for (int i=getIndex(filled); getCond(i); i=getIter(i))
                 {
                     // find the first unlocked slot.
-                    if (IHPlayer.SlotLocked(Main.localPlayer, i)) continue;
+                    if (IHPlayer.SlotLocked(i)) continue;
 
                     container[i] = new Item();
                 }

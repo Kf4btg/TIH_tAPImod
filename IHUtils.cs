@@ -45,11 +45,11 @@ namespace InvisibleHand
             if (player.chest == -1) return;
             bool sendNetMsg = player.chest > -1;
 
-            if (IHPlayer.ActionLocked(player, TIH.DepositAll))
+            if (IHPlayer.ActionLocked(TIH.DepositAll))
             {
                 for (int i=R_START; i >= R_END; i--)
                 {
-                    if (IHPlayer.SlotLocked(player, i) ||  player.inventory[i].IsBlank()) continue;
+                    if (IHPlayer.SlotLocked(i) ||  player.inventory[i].IsBlank()) continue;
                     MoveItemToChest(i, sendNetMsg);
                 }
                 Recipe.FindRecipes(); // !ref:Main:#22640.36#
@@ -89,7 +89,7 @@ namespace InvisibleHand
 
                     // ok I have no idea what this does but it's part of the original
                     // loot-all code so I added it as well.
-                    if (sendNetMsg) SendNetMessage(i);
+                    // if (sendNetMsg) SendNetMessage(i);
                 }
             }
             Recipe.FindRecipes(); // !ref:Main:#22640.36#
@@ -112,7 +112,7 @@ namespace InvisibleHand
             var inventory = player.inventory;
             var container = player.chestItems;
             bool sendMessage = player.chest > -1;
-            var checkLocks  = IHPlayer.ActionLocked(player, TIH.QuickStack);  //boolean
+            var checkLocks  = IHPlayer.ActionLocked(TIH.QuickStack);  //boolean
 
 
             for (int iC = 0; iC < Chest.maxItems; iC++)                                         // go through entire chest inventory.
@@ -121,7 +121,7 @@ namespace InvisibleHand
                 {                                                                               //for each item in inventory (including coins, ammo, hotbar),
                     for (int iP=0; iP<58; iP++)
                     {
-                        if (checkLocks && IHPlayer.SlotLocked(player, iP)) continue;            // if we're checking locks ignore the locked ones
+                        if (checkLocks && IHPlayer.SlotLocked(iP)) continue;            // if we're checking locks ignore the locked ones
 
                         if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
                         {
@@ -138,7 +138,7 @@ namespace InvisibleHand
                                 container[iC] = inventory[iP].Clone();                          // move inv item to chest slot
                                 inventory[iP] = new Item();                                     // and reset inv slot
                             }
-                            if (sendMessage) SendNetMessage(iC);                                //send net message if regular chest
+                            // if (sendMessage) SendNetMessage(iC);                                //send net message if regular chest
                         }
                     }
                 }
@@ -201,7 +201,7 @@ namespace InvisibleHand
             //else, success!
             Sound.ItemMoved.Play();
             slot.MyItem = new Item();
-            if (sendMessage) SendNetMessage(retIdx);
+            // if (sendMessage) SendNetMessage(retIdx);
             return true;
         }
 
@@ -222,7 +222,7 @@ namespace InvisibleHand
             // reminder: ShiftToPlayer returns true if original item ends up empty
             if (cItem.Matches(ItemCat.AMMO)) {
                 if (cItem.maxStack > 1
-                && cItem.stack==cItem.maxStack
+                && cItem.stack == cItem.maxStack
                 && ShiftToPlayer(ref slot, 54, 57, sendMessage, false)) //ammo goes top-to-bottom
                     return true;
             }
@@ -260,10 +260,9 @@ namespace InvisibleHand
             int retIdx = MoveToFirstEmpty( slot.MyItem, Main.localPlayer.inventory, iStart, iCheck, iNext );
             if (retIdx >= 0)
             {
-                // RingBell();
                 Sound.ItemMoved.Play();
                 slot.MyItem = new Item();
-                if (sendMessage) SendNetMessage(retIdx);
+                // if (sendMessage) SendNetMessage(retIdx);
                 return true;
             }
             return false;
@@ -303,12 +302,11 @@ namespace InvisibleHand
 
             if (retIdx > -2) // >=partial success
             {
-                // RingBell();
                 Sound.ItemMoved.Play();
                 if (retIdx > -1) // =full success!
                 {
                     Main.localPlayer.inventory[iPlayer] = new Item();
-                    if (sendMessage) SendNetMessage(retIdx);
+                    // if (sendMessage) SendNetMessage(retIdx);
                     return true;
                 }
             }
@@ -338,8 +336,8 @@ namespace InvisibleHand
             else      { iStart = 0;      iCheck = i => i < Chest.maxItems; iNext  = i => i+1; }
 
             int j=-1;
-            int stackB4 = item.stack;
-            if (item.maxStack > 1) //search container for matching non-maxed stacks
+            int stackB4 = item.stack; // save current stack amount
+            if (item.maxStack > 1) // search container for matching non-maxed stacks
                 j = TryStackMerge(ref item, container, sendMessage, iStart, iCheck, iNext);
 
             if (j<0) //remaining stack or non-stackable
@@ -347,6 +345,7 @@ namespace InvisibleHand
                 j = MoveToFirstEmpty(item, container, iStart, iCheck, iNext);
 
                 if (j<0) //no empty slots
+                    // compare stack amt. now to stack amt. before TryStackMerge, etc.
                     return stackB4==item.stack ? -2 : -1; //exit status
             }
             return j;
@@ -365,7 +364,7 @@ namespace InvisibleHand
         /// <param name="iStart"></param>
         /// <param name="iCheck"></param>
         /// <param name="iNext"></param>
-        /// <returns>bigger than -1 if move succeeded; -1 if failed</returns>
+        /// <returns>bigger than -1 if move succeeded (index in destination to which item was moved); -1 if failed</returns>
         public static int MoveToFirstEmpty(Item item, Item[] dest, int iStart, Func<int, bool> iCheck, Func<int,int> iNext)
         {
             for (int i=iStart; iCheck(i); i=iNext(i)) //!ref:Main:#22416.00#
@@ -395,7 +394,7 @@ namespace InvisibleHand
                         dest[i] = item.Clone(); // move inv item to chest slot
                         return i;  // return index to indicate that item slot should be reset
                     }
-                    if (sendMessage) SendNetMessage(i); //still have to send this apparently
+                    // if (sendMessage) SendNetMessage(i); //still have to send this apparently
                 }
             } // if we manage to exit this loop, there is still some stack remaining:
             return -1;

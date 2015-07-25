@@ -32,21 +32,23 @@ namespace InvisibleHand
 
             if (IHBase.ModOptions["LockingEnabled"]) //slot locking on
             {
-                for (int i=49; i>=10; i--)  // reverse through player inv
+                for (int i = 49; i >= 10; i--)  // reverse through player inv
                 {
-                    if ( !pInventory[i].IsBlank() && !IHPlayer.SlotLocked(Main.localPlayer, i) &&
-                        catList.Contains(pInventory[i].GetCategory()) )
-                            IHUtils.MoveItemToChest(i, sendNetMsg);
-                }//end loop
+                    if (!pInventory[i].IsBlank() && !IHPlayer.SlotLocked(i)
+                        && catList.Contains(pInventory[i].GetCategory()))
+                    {
+                        IHUtils.MoveItemToChest(i, sendNetMsg);
+                    }
+                }
             }
             else //no locking
             {
-                for (int i=49; i>=10; i--)
+                for (int i = 49; i >= 10; i--)
                 {
                     // if chest contains a matching category
-                    if ( !pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()) )
+                    if (!pInventory[i].IsBlank() && catList.Contains(pInventory[i].GetCategory()))
                         IHUtils.MoveItemToChest(i, sendNetMsg);
-                }//end loop
+                }
             }
             Recipe.FindRecipes();
         }
@@ -57,7 +59,7 @@ namespace InvisibleHand
         *
         *   The code actually works out to be a bit of a combination of the
         *   QuickStack and LootAll methods.
-        *   Also based a fair bit on Player.GetItem()
+        *   Also based a fair amount on Player.GetItem()
         *   !ref:Player:#4497.00#
         */
         public static void SmartLoot()
@@ -85,7 +87,6 @@ namespace InvisibleHand
                     {   //...for a matching item stack...
                         if (!chestItems[j].IsBlank() && chestItems[j].IsTheSameAs(pInventory[index]))
                         {
-                            // IHUtils.RingBell();
                             Sound.ItemMoved.Play();
                             //...and merge it to the Player's inventory
 
@@ -96,16 +97,16 @@ namespace InvisibleHand
                             if (chestItems[j].stack<=0)
                             {
                                 chestItems[j] = new Item(); //reset this item if all stack transferred
-                                if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
+                                // if (sendNetMsg) IHUtils.SendNetMessage(j); //only for non-bank chest
                                 break;
                             }
-                            if (sendNetMsg) IHUtils.SendNetMessage(j);
+                            // if (sendNetMsg) IHUtils.SendNetMessage(j);
                         }
-                    }// </while>
+                    }
                 }
-            }// </for outer>
+            }
             //when all is said and done, check for newly available recipes.
             Recipe.FindRecipes();
-        } // </smartloot>
-    } // </class>
-} // </namespace>
+        }
+    }
+}

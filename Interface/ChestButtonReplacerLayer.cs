@@ -229,34 +229,17 @@ namespace InvisibleHand
                 // when clicked, and vice-versa. Well, technically, the buttons
                 // will switch automatically when Main.editChest changes state,
                 // but since that's what clicking these buttons does...
-                // Also, exploit this check to show/hide Cancel button as needed.
-                rena.EnableDefault().AddDynamicToggle(save.EnableDefault(), () =>
-                {
-                    // Need to know if the player has clicked the Rename Chest button
-                    if (Main.editChest)
-                    {
-                        if (!showCancel) // cancel button not shown, need to change that
-                        {
-                            // add cancel base to the layer's list of bases so it gets drawn
-                            // (don't throw an error if it's already there)
-                            ButtonBases[TIH.CancelEdit] = CancelEditBase;
-                            showCancel = true;
-                        }
-                        // since the save button is the "show when false" button,
-                        // we have to return false when Main.Edit is true, and true
-                        // when it is false.
-                        // Which is exactly what we'll do,
-                        // rather than checking the negation.
-                        return false;
-                    }
-                    if (showCancel) // need to hide cancel button
-                    {
-                        // remove from the base list so no calls to Draw() reach it
-                        ButtonBases.Remove(TIH.CancelEdit);
-                        showCancel = false;
-                    }
-                    return true;
-                });
+                save.EnableDefault().AddDynamicToggle(rena.EnableDefault(), () => Main.editChest);
+        }
+
+        protected override void DrawButtons(SpriteBatch sb)
+        {
+            base.DrawButtons(sb);
+
+            // draw the cancel button if needed
+            if (Main.editChest)
+                CancelEditBase.Draw(sb);
+
         }
     }
 }

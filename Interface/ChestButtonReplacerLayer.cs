@@ -219,7 +219,7 @@ namespace InvisibleHand
 
                 // add default click, let rClick lock it, and make shift switch buttons
                 depo.EnableDefault();
-                depo.MakeLocking();
+                depo.MakeLocking(lockOffset, Color.Firebrick);
                 depo.AddToggle(sdep.EnableDefault());
                 qstk.EnableDefault().MakeLocking().AddToggle(sloo.EnableDefault());
 

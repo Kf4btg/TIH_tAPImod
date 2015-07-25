@@ -51,8 +51,6 @@ namespace InvisibleHand
         // private readonly TIH clientAction;
         private bool isLocked;
 
-        private readonly IButtonSlot socket;
-
         private readonly string _serviceType;
         public override string ServiceType { get { return _serviceType; } }
 
@@ -60,7 +58,6 @@ namespace InvisibleHand
         {
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + "Lock";
 
-            socket = client.ButtonBase;
             color  = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
 
@@ -124,8 +121,8 @@ namespace InvisibleHand
 
         private void PostDraw(SpriteBatch sb)
         {
-            sb.Draw(IHBase.LockedIcon, socket.Position + offset,
-                    Client.Tint * socket.ParentLayer.LayerOpacity * socket.Alpha);
+            sb.Draw(IHBase.LockedIcon, Client.ButtonBase.Position + offset,
+                    Client.Tint * Client.ButtonBase.ParentLayer.LayerOpacity * Client.ButtonBase.Alpha);
         }
     }
 

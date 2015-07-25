@@ -324,24 +324,24 @@ namespace InvisibleHand
                     TileID.Pumpkins  /*Pumpkin Seed*/
             });                      // get the rest by EndsWith("Seeds")
 
-
-        public static readonly string[] ButtonLabels =
-        {
-            // Player Inventory
-            "Sort",                     // 0
-            "Sort (Reverse)",           // 1
-            "Clean Stacks",             // 2
-            // Chests
-            "Sort Chest",               // 3
-            "Sort Chest (Reverse)",     // 4
-            "Restock",                  // 5
-            "Quick Stack",              // 6
-            "Quick Stack (Locked)",     // 7
-            "Smart Deposit",            // 8
-            "Deposit All",              // 9
-            "Deposit All (Locked)",     // 10
-            "Loot All"                  // 11
-        };
+        //
+        // public static readonly string[] ButtonLabels =
+        // {
+        //     // Player Inventory
+        //     "Sort",                     // 0
+        //     "Sort (Reverse)",           // 1
+        //     "Clean Stacks",             // 2
+        //     // Chests
+        //     "Sort Chest",               // 3
+        //     "Sort Chest (Reverse)",     // 4
+        //     "Restock",                  // 5
+        //     "Quick Stack",              // 6
+        //     "Quick Stack (Locked)",     // 7
+        //     "Smart Deposit",            // 8
+        //     "Deposit All",              // 9
+        //     "Deposit All (Locked)",     // 10
+        //     "Loot All"                  // 11
+        // };
 
 
         // ///////////////////////////////// //
@@ -390,7 +390,8 @@ namespace InvisibleHand
                 {TIH.DepositAll,   "Deposit All"},              // 9
                 {TIH.LootAll,      "Loot All"},                 // 11
                 {TIH.Rename,       "Rename"},
-                {TIH.SaveName,     "Save"}
+                {TIH.SaveName,     "Save"},
+                {TIH.CancelEdit,   "Cancel"}
             };
 
             DefaultClickActions = new Dictionary<TIH, Action>

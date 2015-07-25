@@ -30,6 +30,8 @@ namespace InvisibleHand
             Buttons     = new Dictionary<string, ICoreButton>();
             ButtonFrame = Rectangle.Empty;
             handleMouseInterface = handle_mouse_interface;
+
+            LayerOpacity = opacity_inactive;
         }
 
         public void Initialize()
@@ -101,6 +103,8 @@ namespace InvisibleHand
             opacity_inactive = min_opacity.Clamp();
             opacity_active   = max_opacity.Clamp();
             fadeStep = fade_step == 0 ? opacity_active - opacity_inactive : fade_step;
+
+            LayerOpacity = opacity_active;
         }
 
         protected override void OnDraw(SpriteBatch sb)

@@ -82,7 +82,6 @@ namespace InvisibleHand
             {
                 OriginalButtonLabels[kvp.Key] = Lang.inter[kvp.Value];
             }
-
         }
 
         public override void OnAllModsLoaded()

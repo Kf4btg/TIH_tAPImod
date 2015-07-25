@@ -180,7 +180,7 @@ namespace InvisibleHand
                                             -(float)(int)((float)Constants.ButtonH / 2));
 
                 Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
-                Func<TIH, Color>  getBGcol = a => a == TIH.SaveName
+                Func<TIH, Color>  getBGcol = (a) => (a == TIH.SaveName)
                                                     ? Constants.ChestSlotColor * 0.85f
                                                     : Constants.EquipSlotColor * 0.85f;
                 Func<TIH, string> getTtip  = a => getLabel(a) + IHUtils.GetKeyTip(a);
@@ -191,7 +191,11 @@ namespace InvisibleHand
                                            action: a,
                                            label: getLabel(a),
                                            tooltip: getTtip(a),
-                                           bg_color: getBGcol(a) );
+                                           bg_color: getBGcol(a),
+                                           texture: IHBase.ButtonGrid,
+                                           inactive_rect: IHUtils.GetSourceRect(a),
+                                           active_rect: IHUtils.GetSourceRect(a, true)
+                                           );
 
                 // Btn obj            Socket Action   Button Action
                 // -------            -------------   -------------

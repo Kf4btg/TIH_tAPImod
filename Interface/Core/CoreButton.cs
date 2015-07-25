@@ -54,7 +54,7 @@ namespace InvisibleHand
         public TIH Action     { get; set; }
         /// Get or set this button's label
         public string Label   { get { return _label; }   set { _label   = value; } }
-        
+
         /// Get or set this button's Tooltip
         public virtual string Tooltip
         {
@@ -76,8 +76,9 @@ namespace InvisibleHand
         /// Unique (well, effectively...), randomly-generated ID
         public string ID
         {
+            get; protected set;
             //generate on first access
-            get { return _id == String.Empty ? UICore.GenerateHoverID() : _id; }
+            // get { return _id == String.Empty ? _id = UICore.GenerateHoverID() : _id; }
         }
 
         /// Get hook container
@@ -96,13 +97,16 @@ namespace InvisibleHand
 
 
         // Constructors
-        protected CoreButton(IButtonSlot parent, TIH action, string label = "")
+        protected CoreButton(IButtonSlot parent, TIH action, string label = "", Color? tint = null)
         {
             ButtonBase = parent;
             Action   = action;
             Label    = label;
             Hooks    = new ButtonHooks();
             Services = new Dictionary<string, ButtonService>();
+            Tint = tint ?? Color.White;
+
+            ID = UICore.GenerateHoverID();
         }
 
         /// copying all the aspects of the given button

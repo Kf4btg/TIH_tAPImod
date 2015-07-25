@@ -16,14 +16,14 @@ namespace InvisibleHand
         {
             if (Main.playerInventory)
             {
-                if (Main.localPlayer.chest != -1)
+                if (Main.localPlayer.chest == -1)
                 {
-                    // --haven't made a replacement for the separate chestbuttons yet
-                    InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
+                    InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
                 }
                 else
                 {
-                    InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
+                    // --haven't made a replacement for the separate chestbuttons yet
+                    InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
                 }
             }
         }
@@ -37,6 +37,8 @@ namespace InvisibleHand
         /// Used to draw Button Tooltips so they don't appear under other elements
         public override void PostDrawInventory(SpriteBatch sb)
         {
+            // there's probably only ever going to be one, but this is an easy
+            // way to ensure it's reset every frame
             while (IHBase.Instance.ButtonTooltips.Count > 0)
             {
                 API.main.MouseText(IHBase.Instance.ButtonTooltips.Pop());

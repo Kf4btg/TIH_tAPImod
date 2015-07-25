@@ -29,17 +29,18 @@ namespace InvisibleHand
         protected override void DrawButtonContent(SpriteBatch sb)
         {
             var opacity = ParentLayer.LayerOpacity * Alpha;
+            // opacity = 1.0f;
             // draw button background first
             // (otherwise button content will be below bg!)
-            sb.Draw(ButtonBackground,
-                    Position,
-                    null,
-                    CurrentContent.BackgroundColor * opacity,
-                    0f,
-                    default(Vector2),
-                    Scale,
-                    SpriteEffects.None,
-                    0f);
+            sb.Draw(ButtonBackground,                           // texture
+                    Position,                                   // position
+                    null,                                       // sourceRectangle (null=all)
+                    CurrentContent.BackgroundColor * opacity,   // color
+                    0f,                                         // rotation
+                    default(Vector2),                           // origin
+                    Scale,                                      // scale
+                    SpriteEffects.None,                         // effects
+                    0f);                                        // layerdepth
 
             // and now the real button stuff
             sb.Draw(CurrentContent.Texture,

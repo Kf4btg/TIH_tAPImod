@@ -1,3 +1,10 @@
+1.2.0-rc3
+    -   Total rework of button system.  Was a huge effort, but the end result isn't largely noticeable on the front end.  However, should improve maintainability and perhaps support customization in the future.
+    -   Replaced vanilla text buttons with enhanced versions that support the new functions of the mod.
+    -   Added an option to have graphical buttons instead of the original text buttons.
+    -   Removed the separate chest buttons (at least for now).
+    -   Added keybind-tip to button names/tooltips.
+
 1.2.0-rc2
     -   Improved multiplayer support:
         -   Changed the way textures are loaded to hopefully reduce conflicts with the dedicated server.

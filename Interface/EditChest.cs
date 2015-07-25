@@ -6,9 +6,9 @@ namespace InvisibleHand
     public static class EditChest
     {
         /// Edit a chest's label. Essentially copied verbatim from vanilla code.
-        /// Luckily most everything in it is a static variable.
-        /// Can be called for either save or rename buttons
-        /// and will perform the appropriate action.
+        /// Luckily most everything in it is a static variable. Can be called
+        /// for either save or rename buttons and will perform the appropriate
+        /// action.
         public static void DoChestEdit()
         {
             if (!Main.editChest)  //enter rename phase
@@ -40,20 +40,19 @@ namespace InvisibleHand
                     Main.chest[current].name = Main.npcChatText;
                     if (Main.netMode == 1)
                     {
+                        // I'm hoping this handles whatever server-syncing
+                        // stuff needs to happen.
                         Main.localPlayer.editedChestName = true;
                     }
                 }
             }
         }
 
-        // public static void CancelRename(ButtonLayer container, TIH defaultAction)
         public static void CancelRename()
         {
             Sound.MouseOver.Play();
             Main.editChest = false;
 		    Main.npcChatText = string.Empty;
-
-            // container.Buttons[defaultAction].Reset();
         }
     }
 }

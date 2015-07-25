@@ -8,7 +8,7 @@ namespace InvisibleHand
 {
     public class TextButtonBase : ButtonSlot<TextButton>
     {
-        // class fields//
+        // class fields //
 
         /// modified position used in scaling/hover calculations
         private Vector2 posMod;
@@ -38,6 +38,10 @@ namespace InvisibleHand
             // intensity of the text color fade up and down as the
             // button zooms in or out.
             get { return Main.mouseTextColor.toScaledColor(Scale); }
+
+            // NOTE: calling .toScaledColor(Scale, CurrentContent.Tint)
+            // would allow for tweaking the overall color of the text,
+            // should we ever want to do that.
         }
 
         ///<summary>
@@ -63,6 +67,9 @@ namespace InvisibleHand
             Scale = base_scale;
         }
 
+        /// this calculates the shifting button-hover area
+        /// as the text both changes in size and is simultaneously
+        /// shifted to keep its left edge stationary.
         protected override bool GetIsHovered(Vector2 mouse)
         {
             var o = scaledOrigin; // cache it
@@ -74,9 +81,11 @@ namespace InvisibleHand
 
         protected override void DrawButtonContent(SpriteBatch sb)
         {
-            // var textColor = Main.mouseTextColor.toScaledColor(Scale, CurrentState.tint);
+            // reset so we can run calculations again.
+            posMod    = Position;
 
-            posMod    = Position; // reset
+            // we shift the left edge of the button as it grows so that
+            // it appears to be anchored there.
             posMod.X += (int)(origin.X * Scale);
 
             sb.DrawString(
@@ -92,7 +101,7 @@ namespace InvisibleHand
                 );
         }
 
-        /// Immediately return button to minimum scale
+        /// Immediately returns this slot to minimum scale
         public void ResetScale()
         {
             Scale = _minScale;

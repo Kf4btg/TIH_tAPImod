@@ -13,6 +13,7 @@ namespace InvisibleHand
             // that the default buttons for these actions (that
             // appear to the right of an open chest) do not display,
             // allowing us to replace them with customized versions.
+
             var lii = Constants.LangInterIndices; // easier to read
 
               Lang.inter[lii[TIH.LootAll]]
@@ -28,14 +29,15 @@ namespace InvisibleHand
                     = Lang.inter[lii[TIH.CancelEdit]] = "";
             }
 
-            // finding a place to do this where the buttons are actually *set correctly*
-            // upon initial load was...difficult. I hope it doesn't bork on the server.
+            // finding a place to do this where the buttons are actually
+            // *set correctly* upon initial load was...difficult. I hope it
+            // doesn't bork on the server.
             while (IHBase.Instance.ButtonUpdates.Count>0)
             {
                 // grab the next button that has been queued for update
-                string btn = IHBase.Instance.ButtonUpdates.Pop();
+                string btnID = IHBase.Instance.ButtonUpdates.Pop();
                 // and call it's update hook
-                IHBase.Instance.ButtonStore[btn].OnWorldLoad();
+                IHBase.Instance.ButtonStore[btnID].OnWorldLoad();
             }
         }
     }

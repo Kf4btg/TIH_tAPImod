@@ -174,16 +174,16 @@ namespace InvisibleHand
                 // copy the sorted items back to the original container
                 foreach (var item in itemSorter)
                 {
-                    // find the first unlocked slot.
-                    // this would throw an exception if range.Item1+filled somehow went over 49,
-                    // but if the categorizer and slot-locker are functioning correctly,
-                    // that _shouldn't_ be possible. Shouldn't. Probably.
+                    // find the first unlocked slot. this would throw an
+                    // exception if range.Item1+filled somehow went over 49, but
+                    // if the categorizer and slot-locker are functioning
+                    // correctly, that _shouldn't_ be possible. Shouldn't.
+                    // Probably.
                     while (IHPlayer.SlotLocked(getIndex(filled)))
                     {
                         filled++;
                     }
                     container[getIndex(filled++)] = item.Clone();
-                    // Main.PlaySound(7, -1, -1, 1);
                     Sound.ItemMoved.Play();
                 }
                 // and the rest of the slots should be empty
@@ -200,7 +200,6 @@ namespace InvisibleHand
                 foreach ( var item in itemSorter)
                 {
                     container[getIndex(filled++)] = item.Clone();
-                    // Main.PlaySound(7, -1, -1, 1);
                     Sound.ItemMoved.Play();
                 }
                 // and the rest of the slots should be empty
@@ -232,14 +231,13 @@ namespace InvisibleHand
                 if (!item.IsBlank() && item.stack < item.maxStack)
                 {
                     // search the remaining slots for other stacks of this item
-                    // StackItems(ref item, container, i+1, range.Item2);
                     StackItems(ref item, container, range.Item1, i-1);
                 }
             }
         }
 
-        // called by ConsolidateStacks, this takes a single item and searches a subset of the original
-        // range for other non-max stacks of that item
+        /// called by ConsolidateStacks, this takes a single item and searches a
+        /// subset of the original range for other non-max stacks of that item
         private static void StackItems(ref Item item, Item[] container, int rangeStart, int rangeEnd)
         {
             for (int j=rangeEnd; j>=rangeStart; j--) //iterate in reverse
@@ -259,5 +257,5 @@ namespace InvisibleHand
                 }//\matching stack
             }//\go through container range
         }//\StackItems()
-    }//\class
-}//\namespace
+    }
+}

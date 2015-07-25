@@ -297,7 +297,6 @@ namespace InvisibleHand
         public static void ToggleActionLock(TIH actionID)
         {
             Instance.LockedActions[actionID] = !Instance.LockedActions[actionID];
-
         }
 
     }

@@ -28,6 +28,8 @@ namespace InvisibleHand
 
         protected override void DrawButtonContent(SpriteBatch sb)
         {
+            // take button's alpha and paren't opacity into account
+            // (yes maybe those should be named the same but whatever)
             var opacity = ParentLayer.LayerOpacity * Alpha;
 
             // draw button background first
@@ -56,7 +58,14 @@ namespace InvisibleHand
     }
 
     /// fancy fading! Also handles mouseInterface.
-    /// actually...ixnay on the fancy fading. for now at least.
+    /// actually...forget the fancy fading. for now at least.
+    // I'd prefer the button fade from the inactive state to
+    // active (i.e. the color eases in & out), but I think
+    // that might involve drawing an additional texture layer
+    // and doing some sprite blending or just some very carefully
+    // calculated synchronizization of alpha values. Either way,
+    // it likely won't be straight-forward and I wonder about
+    // the performance hit. For future investigation.
     public class ChestIconBase : IconButtonBase
     {
         private float maxAlpha;

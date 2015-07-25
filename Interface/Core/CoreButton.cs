@@ -7,9 +7,12 @@ using Terraria;
 
 namespace InvisibleHand
 {
+    /// This interface describes the overall universal structure and
+    /// capabilities of a button in this mod.  Most methods that deal
+    /// with buttons (and don't care precisely how they're drawn),
+    /// take this type as a parameter.
     public interface ICoreButton
     {
-
         IButtonSlot ButtonBase { get; }
 
         string ID { get; }
@@ -36,7 +39,12 @@ namespace InvisibleHand
         void PostDraw(SpriteBatch sb);
     }
 
-    /// re-imagining the ButtonState and IHButton as one object
+    // re-imagining the ButtonState and IHButton as one object
+    /// This is a convenience class which provides default
+    /// implementations and some helper methods for classes
+    /// implementing ICoreButton. Ideally anything that takes
+    /// ICoreButton as a parameter type could equivalently
+    /// accept this class instead.
     public abstract class CoreButton : ICoreButton
     {
         // fields //
@@ -77,8 +85,6 @@ namespace InvisibleHand
         public string ID
         {
             get; protected set;
-            //generate on first access
-            // get { return _id == String.Empty ? _id = UICore.GenerateHoverID() : _id; }
         }
 
         /// Get hook container
@@ -106,23 +112,9 @@ namespace InvisibleHand
             ID = UICore.GenerateHoverID();
         }
 
-        /// copying all the aspects of the given button
-        /// other than hooks, services, and ID
-        ///<remarks>Probaby going to get rid of this</remarks>
-        public virtual void CopyAttributes<T>(T other) where T:ICoreButton
-        {
-            this.ButtonBase = other.ButtonBase;
-            this.Action  = other.Action;
-            this.Label   = other.Label;
-            this.Tint    = other.Tint;
-            this.Tooltip = other.Tooltip;
-            this.ShowTooltip = other.ShowTooltip;
-        }
-
     #region hooks
         // //////////////////////////////////////////////////////////
-        // Handle hooks attached directly to this button and also
-        // those of subscribed services.
+        // Handle hook events attached to this Button's Hooks interface.
         // //////////////////////////////////////////////////////////
 
         /// <summary>
@@ -228,6 +220,12 @@ namespace InvisibleHand
         #endregion
     }
 
+    /// This class is like a substrate: an area on the CoreButton
+    /// where outside vectors can bond events, thus changing the
+    /// behavior of the button. It is a wrapper for all a
+    /// button's possible events, and all functionality of a button
+    /// will be added by registering event-handlers with one of the
+    /// hooks contained within.
     public class ButtonHooks
     {
         public IHEvent<Action> OnClick, OnRightClick, OnWorldLoad;

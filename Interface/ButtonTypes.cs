@@ -43,7 +43,7 @@ namespace InvisibleHand
 
         /// <summary>
         /// Create a new TexturedButton instance with the given properties
-        /// and automatically associate it with its base.
+        /// and automatically associate it with its base (ButtonSlot).
         /// </summary>
         /// <param name="parent"> </param>
         /// <param name="action"> </param>

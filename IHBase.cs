@@ -129,7 +129,7 @@ namespace InvisibleHand
                 case "depositAll":
                 case "lootAll":
                     ActionKeys[option.name] = (Keys)option.Value;
-                    SetKeyHint(option.name, option.Value.ToString(), " [", "]");
+                    SetKeyHint(option.name, option.Value.ToString());
                     break;
 
                 // show letter of key bind in button names/tooltips

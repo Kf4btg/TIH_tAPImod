@@ -106,8 +106,7 @@ namespace InvisibleHand
                                        label: getLabel(a)
                                        );
 
-            // var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
-
+            // putting these 2 on same base; see below
             var loot  = getButton(TIH.LootAll,    TIH.LootAll);
             var sort  = getButton(TIH.LootAll,       TIH.Sort);
 
@@ -121,21 +120,20 @@ namespace InvisibleHand
             // var save  = getButton(TIH.Rename,     TIH.SaveName);
 
 
-            // here's an idea: Have LootAll toggle to Sort on shift.
+            // here's an IDEA: Have LootAll toggle to Sort on shift.
             // Sort will reverse-sort on right-click.
             sort.EnableDefault().Hooks.OnRightClick += () => IHPlayer.Sort(true);
             loot.EnableDefault().AddToggle(sort);
 
             depo.EnableDefault().MakeLocking(lockOffset).AddToggle(sdep.EnableDefault());
             qstk.EnableDefault().MakeLocking(lockOffset).AddToggle(sloo.EnableDefault());
-
         }
 
         private void addIconButtons()
         {
             // offset of lock indicator
             var lockOffset = new Vector2(-(float)(int)((float)Constants.ButtonW / 2) - 4,
-                                         -(float)(int)((float)Constants.ButtonH / 2) + 4);
+                                         -(float)(int)((float)Constants.ButtonH / 2) + 8);
 
             Func<TIH, string> getLabel = a => Constants.DefaultButtonLabels[a];
             Func<TIH, Color>  getBGcol = (a) => (a == TIH.SaveName)
@@ -194,7 +192,9 @@ namespace InvisibleHand
             // these just need their default actions enabled.
             loot.EnableDefault().Hooks.OnRightClick += () => IHPlayer.CleanStacks();  //why not
             cancel.EnableDefault();
-            // this prevents the Cancel text from being too big when the player goes back into the rename interface
+            // this prevents the "Cancel" text from being too big when the player
+            // goes back into the rename interface (though it seems the vanilla
+            // "Cancel" text behaves the same way...improvement!)
             cancel.Hooks.OnClick += CancelEditBase.ResetScale;
 
             // make Rename Chest button change to Save Name button when

@@ -7,8 +7,8 @@ namespace InvisibleHand
 {
 
     /// adds the default OnClick to this button based on on its Action property.
-    /// Set right_click to true to make the action happen on right click instead
-    /// of left.
+    /// Set right_click to true to make the action activate with a right click
+    /// rather than a left.
     public class DefaultClickService: ButtonService
     {
         private readonly bool rightClick;
@@ -48,6 +48,11 @@ namespace InvisibleHand
 
         // private readonly string  lockedLabel;
         // private readonly string  initialLabel;
+
+        // // should we cache these for performance reasons?
+        // // Benefit is probably small, if any.
+        // // Compiler may do that, anyway.
+        // private readonly ButtonSlot buttonBase;
         // private readonly TIH clientAction;
         private bool isLocked;
 
@@ -99,7 +104,8 @@ namespace InvisibleHand
             }
             else
             {
-                // List<>.Remove() doesn't fail on missing keys
+                // List<>.Remove() doesn't fail on missing keys,
+                // so this is safe
                 Client.Hooks.PostDraw -= PostDraw;
                 // Client.Label = initialLabel;
             }
@@ -107,8 +113,8 @@ namespace InvisibleHand
 
         private bool PreDraw(SpriteBatch sb)
         {
-            // Func<bool> isActive = () => IHPlayer.ActionLocked(Main.localPlayer, toLock);
-            // don't run unless there's a change to avoid calling Reg/Rem Hook every frame
+            // don't run unless there's a change to avoid adding/removing
+            // the event every frame
             if (IHPlayer.ActionLocked(Client.Action) != isLocked)
             {
                 isLocked = !isLocked;
@@ -196,12 +202,14 @@ namespace InvisibleHand
     /// Listens to a given game property and changes state automatically
     public class DynamicToggleService: ButtonService
     {
+        // get current state of watched game property (or whatever)
         private readonly Func<bool> gameState;
-        private bool prevGameState; // state of game property in the previous frame
+        // state of game property in the previous frame
+        private bool prevGameState;
 
         private string _serviceType;
-
         public override string ServiceType { get { return _serviceType; } }
+
         private ICoreButton AltButton { get; set; }
 
         public DynamicToggleService(ICoreButton button_if_true, ICoreButton button_if_false, Func<bool> check_game_state) : base(button_if_true)

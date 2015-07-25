@@ -87,8 +87,6 @@ namespace InvisibleHand
                 {
                     container[i] = player.GetItem(player.whoAmI, container[i]);
 
-                    // ok I have no idea what this does but it's part of the original
-                    // loot-all code so I added it as well.
                     // if (sendNetMsg) SendNetMessage(i);
                 }
             }
@@ -121,7 +119,7 @@ namespace InvisibleHand
                 {                                                                               //for each item in inventory (including coins, ammo, hotbar),
                     for (int iP=0; iP<58; iP++)
                     {
-                        if (checkLocks && IHPlayer.SlotLocked(iP)) continue;            // if we're checking locks ignore the locked ones
+                        if (checkLocks && IHPlayer.SlotLocked(iP)) continue;                    // if we're checking locks ignore the locked ones
 
                         if (container[iC].IsTheSameAs(inventory[iP]))                           //if chest item matches inv. item...
                         {
@@ -138,7 +136,7 @@ namespace InvisibleHand
                                 container[iC] = inventory[iP].Clone();                          // move inv item to chest slot
                                 inventory[iP] = new Item();                                     // and reset inv slot
                             }
-                            // if (sendMessage) SendNetMessage(iC);                                //send net message if regular chest
+                            // if (sendMessage) SendNetMessage(iC);                             //send net message if regular chest
                         }
                     }
                 }
@@ -184,13 +182,17 @@ namespace InvisibleHand
             // if we didn't find an empty slot...
             if (retIdx < 0)
             {
-                if (pItem.maxStack == 1) return false; //we can't stack it, so we already know there's no place for it.
+                //we can't stack it, so we already know there's no place for it.
+                if (pItem.maxStack == 1) return false;
 
                 retIdx = MoveItemP2C(ref pItem, Main.localPlayer.chestItems, sendMessage);
 
+                // still didn't find an empty slot...
                 if (retIdx < 0)
                 {
-                    if (retIdx == -1)  // partial success (stack amt changed), but we don't want to reset the item.
+                    // ...but, partial success (stack amt changed), though we
+                    // don't want to reset the item.
+                    if (retIdx == -1)
                     {
                         Sound.ItemMoved.Play();
                         Recipe.FindRecipes();
@@ -205,7 +207,7 @@ namespace InvisibleHand
             return true;
         }
 
-        // MoveChestSlotItem - moves item from chest/guide slot to player inventory
+        /// MoveChestSlotItem - moves item from chest/guide slot to player inventory
         public static bool ShiftToPlayer(ref ItemSlot slot, bool sendMessage)
         {
             //TODO: check for quest fish (item.uniqueStack && player.HasItem(item.type))
@@ -239,7 +241,7 @@ namespace InvisibleHand
             return (slot.MyItem.IsBlank());
         }
 
-        // attempts to move an item to an empty slot (returns success status)
+        /// attempts to move an item to an empty slot (returns success status)
         private static bool ShiftToPlayer(ref ItemSlot slot, int ixStart, int ixStop, bool sendMessage, bool desc)
         {
             int iStart;
@@ -394,7 +396,7 @@ namespace InvisibleHand
                         dest[i] = item.Clone(); // move inv item to chest slot
                         return i;  // return index to indicate that item slot should be reset
                     }
-                    // if (sendMessage) SendNetMessage(i); //still have to send this apparently
+                    // if (sendMessage) SendNetMessage(i);
                 }
             } // if we manage to exit this loop, there is still some stack remaining:
             return -1;
@@ -446,21 +448,26 @@ namespace InvisibleHand
             // stack contains 100 items && item matches copper/silver/gold item-type id
             if (container[i].stack == 100 && (container[i].type == 71 || container[i].type == 72 || container[i].type == 73))
             {
-                container[i].SetDefaults(container[i].type + 1); //replace stack with 1 coin of next-higher type
+                //replace stack with 1 coin of next-higher type
+                container[i].SetDefaults(container[i].type + 1);
+
+                // search the rest of the container for more coins of this type and move it there if found.
                 for (int j = 0; j < container.Length; j++)
-                {   // search the rest of the container for more coins of this type and move it there if found.
+                {
                     if (container[j].IsTheSameAs(container[i]) && j != i && container[j].type == container[i].type && container[j].stack < container[j].maxStack)
                     {
                         container[j].stack++;
                         container[i] = new Item();
-                        DoContainerCoins(container, j); //recursive call as move may have maxed new stack
+
+                        //recursively call this method again as move may have maxed new stack
+                        DoContainerCoins(container, j);
                     }
                 }
             }
         }
 
-        // calls the NetMessage.sendData method for the current chest
-        // at the given index. Called on all of loot, deposit, stack
+        /// calls the NetMessage.sendData method for the current chest
+        /// at the given index. Called on all of loot, deposit, stack
         public static void SendNetMessage(int index)
         {
             if (Main.netMode == 1)
@@ -468,6 +475,7 @@ namespace InvisibleHand
                 NetMessage.SendData(32, -1, -1, "", Main.localPlayer.chest, (float)index, 0, 0, 0);
             }
         }
+
     #endregion
 
     #region gui_stuff
@@ -482,8 +490,8 @@ namespace InvisibleHand
         public static Rectangle? RectFromGridIndex(int gIndex, bool active=false)
         {
             return active ?
-                new Rectangle(Constants.ButtonW+2,(Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH) : //mouse-over
-                new Rectangle(0, (Constants.ButtonH+2)*gIndex,Constants.ButtonW, Constants.ButtonH); //inactive
+                new Rectangle(Constants.ButtonW + 2, (Constants.ButtonH + 2) * gIndex, Constants.ButtonW, Constants.ButtonH) : //mouse-over
+                new Rectangle(0, (Constants.ButtonH + 2) * gIndex, Constants.ButtonW, Constants.ButtonH); //inactive
         }
 
         ///Get source Texels for the button based what @action it performs
@@ -506,11 +514,13 @@ namespace InvisibleHand
             return "";
         }
 
+        /// add Button to main mod-wide collection of all extant buttons
         public static void AddToButtonStore(ICoreButton btn)
         {
             IHBase.Instance.ButtonStore.Add(btn.ID, btn);
         }
+
     #endregion
 
-    }// \class
+    }
 }

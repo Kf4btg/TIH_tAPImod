@@ -33,11 +33,11 @@ namespace InvisibleHand
     public abstract class ButtonSlot<T> : IButtonSlot where T: ICoreButton
     {
         //backing stores & default values //
-        protected float _minScale = 0.5f;
-        protected float _maxScale = 1.0f;
-        protected float _scale = 1.0f;
+        protected float _minScale  = 0.5f;
+        protected float _maxScale  = 1.0f;
+        protected float _scale     = 1.0f;
         protected float _baseAlpha = 0.85f;
-        protected float _alpha = 1.0f;
+        protected float _alpha     = 1.0f;
 
         // ///////////////////////////////// //
         //            Properties             //
@@ -238,7 +238,8 @@ namespace InvisibleHand
 
             // subscribe to default watcher
             // FIXME: it occurs to me that there might currently be no
-            // way to Un-register this key-toggle
+            // way to Un-register this key-toggle. But I've never really
+            // needed to do that yet, sooo....
             kw1.Subscribe();
         }
 
@@ -343,9 +344,6 @@ namespace InvisibleHand
             ButtonBounds = new Rectangle((int)Position.X, (int)Position.Y, (int)default_content.Size.X, (int)default_content.Size.Y);
         }
 
-
-        //virtually abstract methods (no default implementation)
-
         ///<summary>
         /// Called every frame while the mouse is hovered over this button
         /// By default, queues the the current button's tooltip, if any,
@@ -356,6 +354,9 @@ namespace InvisibleHand
             if (CurrentContent.ShowTooltip)
                 IHBase.Instance.ButtonTooltips.Push(CurrentContent.Tooltip);
         }
+
+
+        //virtually abstract methods (no default implementation)
 
         ///<summary>
         /// Called during every frame that the button is visible

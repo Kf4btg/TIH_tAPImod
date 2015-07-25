@@ -46,23 +46,24 @@ namespace InvisibleHand
         private readonly Color   color;
         private readonly Vector2 offset;
 
-        private readonly string  lockedLabel;
-        private readonly string  initialLabel;
+        // private readonly string  lockedLabel;
+        // private readonly string  initialLabel;
         // private readonly TIH clientAction;
         private bool isLocked;
 
         private readonly string _serviceType;
         public override string ServiceType { get { return _serviceType; } }
 
-        public LockingService(ICoreButton client, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]" ) : base(client)
+        public LockingService(ICoreButton client, Vector2? lock_offset = null, Color? lock_color = null, string locked_suffix = "[Locked]" ) : base(client)
         {
             _serviceType = Enum.GetName(typeof(TIH), client.Action) + "Lock";
 
             color  = lock_color ?? Color.Firebrick;
             offset = lock_offset ?? default(Vector2);
 
-            initialLabel = client.Label;
-            lockedLabel  = (locked_string == "") ? client.Label : client.Label + " " + locked_string;
+            // we're not doing the suffix thing right now.
+            // initialLabel = client.Label;
+            // lockedLabel  = (locked_suffix == "") ? client.Label : client.Label + " " + locked_suffix;
         }
 
         public override void Subscribe()
@@ -94,13 +95,13 @@ namespace InvisibleHand
             if (isLocked)
             {
                 Client.Hooks.PostDraw += PostDraw; // draw lock indicator
-                Client.Label = lockedLabel;
+                // Client.Label = lockedLabel;
             }
             else
             {
                 // List<>.Remove() doesn't fail on missing keys
                 Client.Hooks.PostDraw -= PostDraw;
-                Client.Label = initialLabel;
+                // Client.Label = initialLabel;
             }
         }
 
@@ -114,12 +115,12 @@ namespace InvisibleHand
                 if (isLocked)
                 {
                     Client.Hooks.PostDraw += PostDraw;
-                    Client.Label = lockedLabel;
+                    // Client.Label = lockedLabel;
                 }
                 else
                 {
                     Client.Hooks.PostDraw -= PostDraw;
-                    Client.Label = initialLabel;
+                    // Client.Label = initialLabel;
                 }
             }
             return true;

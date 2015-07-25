@@ -142,9 +142,10 @@ namespace InvisibleHand
         /// Takes an Action and will perform it wrapped in some net update code if we are a client. Otherwise it just does whatever it is.
         /// </summary>
         /// <param name="action">An Action (a lambda with no output)</param>
-        protected void DoChestUpdateAction(Action action)
+        public static void DoChestUpdateAction(Action action)
         {
 
+            var player = Main.localPlayer;
             // check net status and make sure a non-bank chest is open
             // (bank-chests, i.e. piggy-bank & safe, are handled solely client-side)
             if (Main.netMode == 1 && player.chest > -1)
@@ -193,7 +194,7 @@ namespace InvisibleHand
                     reverse ^ IHBase.ModOptions["ReverseSortPlayer"]);
             else
                 // call sort on the Item[] array returned by chestItems
-                Instance.DoChestUpdateAction( () =>
+                DoChestUpdateAction( () =>
                     IHOrganizer.SortChest(Main.localPlayer.chestItems,
                     reverse ^ IHBase.ModOptions["ReverseSortChest"])
                 );
@@ -205,7 +206,7 @@ namespace InvisibleHand
             if ( Main.localPlayer.chest == -1 )
                 IHOrganizer.ConsolidateStacks(Main.localPlayer.inventory, 0, 50);
             else
-                Instance.DoChestUpdateAction(
+                DoChestUpdateAction(
                     () => IHOrganizer.ConsolidateStacks(Main.localPlayer.chestItems));
         }
 
@@ -218,9 +219,9 @@ namespace InvisibleHand
             if ( Main.localPlayer.chest == -1 ) return;
 
             if (smartLoot)
-                Instance.DoChestUpdateAction( IHSmartStash.SmartLoot );
+                DoChestUpdateAction( IHSmartStash.SmartLoot );
             else
-                Instance.DoChestUpdateAction( IHUtils.DoQuickStack );
+                DoChestUpdateAction( IHUtils.DoQuickStack );
         }
 
         /// <summary>
@@ -232,9 +233,9 @@ namespace InvisibleHand
             if ( Main.localPlayer.chest == -1 ) return;
 
             if (smartDeposit)
-                Instance.DoChestUpdateAction( IHSmartStash.SmartDeposit );
+                DoChestUpdateAction( IHSmartStash.SmartDeposit );
             else
-                Instance.DoChestUpdateAction( IHUtils.DoDepositAll );
+                DoChestUpdateAction( IHUtils.DoDepositAll );
         }
 
         /// Only valid for the 40 Player inventory slots below the hotbar.

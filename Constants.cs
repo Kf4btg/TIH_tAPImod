@@ -109,7 +109,7 @@ namespace InvisibleHand
                                0, ButtonH + 2);
 
         public static readonly ButtonPlot TextReplacersPlot
-             = new ButtonPlot(506, API.main.invBottom + 40, 0, 26);
+            = new ButtonPlot(506, API.main.invBottom + 40, 0, 26);
 
         public static readonly ButtonPlot InventoryButtonsPlot
             = new ButtonPlot(496, 28, ButtonW + 4, 0);
@@ -165,11 +165,13 @@ namespace InvisibleHand
             ItemCat.OTHER
         };
 
-        // A large number of "Tile"-type items will share a .createTile attribute with items that fulfill a similar purpose.
-        // This gives us a handy way to sort and possibly even categorize these item types.
+        // A large number of "Tile"-type items will share a .createTile
+        // attribute with items that fulfill a similar purpose. This gives us a
+        // handy way to sort and possibly even categorize these item types.
         /** ***********************************************************************
-        Create several hashsets to quickly check values of "item.createTile" to aid in categorization/sorting.
-        Initialize them here with an anonymous array to avoid the resizing penalty of .Add()
+        Create several hashsets to quickly check values of "item.createTile" to
+        aid in categorization/sorting. Initialize them here with an anonymous
+        array to avoid the resizing penalty of .Add()
         */
         public static readonly HashSet<int>
             TileGroupFurniture = new HashSet<int>(new int[] {
@@ -320,28 +322,9 @@ namespace InvisibleHand
         public static readonly HashSet<int>
             TileGroupSeed = new HashSet<int>(new int[] {
                     TileID.ImmatureHerbs,
-                    TileID.Saplings, /*Acorn*/
-                    TileID.Pumpkins  /*Pumpkin Seed*/
+                    TileID.Saplings, // Acorn
+                    TileID.Pumpkins  // Pumpkin Seed
             });                      // get the rest by EndsWith("Seeds")
-
-        //
-        // public static readonly string[] ButtonLabels =
-        // {
-        //     // Player Inventory
-        //     "Sort",                     // 0
-        //     "Sort (Reverse)",           // 1
-        //     "Clean Stacks",             // 2
-        //     // Chests
-        //     "Sort Chest",               // 3
-        //     "Sort Chest (Reverse)",     // 4
-        //     "Restock",                  // 5
-        //     "Quick Stack",              // 6
-        //     "Quick Stack (Locked)",     // 7
-        //     "Smart Deposit",            // 8
-        //     "Deposit All",              // 9
-        //     "Deposit All (Locked)",     // 10
-        //     "Loot All"                  // 11
-        // };
 
 
         // ///////////////////////////////// //
@@ -356,7 +339,6 @@ namespace InvisibleHand
         public static readonly Dictionary<TIH, string> DefaultButtonLabels;
         public static readonly Dictionary<TIH, Action> DefaultClickActions;
 
-        public static readonly Dictionary<string, int> ButtonGridIndex;
         public static readonly Dictionary<TIH, int>    ButtonGridIndexByActionType;
 
         /// maps actions to the modoption defining their keybind
@@ -379,16 +361,16 @@ namespace InvisibleHand
             {
                 // Player Inventory
                 {TIH.None, ""},
-                {TIH.Sort,         "Sort"},                     // 0
-                {TIH.ReverseSort,  "Sort (Reverse)"},           // 1
+                {TIH.Sort,         "Sort"},
+                {TIH.ReverseSort,  "Sort (Reverse)"},
 
-                {TIH.CleanStacks,     "Clean Stacks"},             // 2
+                {TIH.CleanStacks,     "Clean Stacks"},
                 // Chests
-                {TIH.SmartLoot,    "Restock"},                  // 5
-                {TIH.QuickStack,   "Quick Stack"},              // 6
-                {TIH.SmartDeposit, "Smart Deposit"},            // 8
-                {TIH.DepositAll,   "Deposit All"},              // 9
-                {TIH.LootAll,      "Loot All"},                 // 11
+                {TIH.SmartLoot,    "Restock"},
+                {TIH.QuickStack,   "Quick Stack"},
+                {TIH.SmartDeposit, "Smart Deposit"},
+                {TIH.DepositAll,   "Deposit All"},
+                {TIH.LootAll,      "Loot All"},
                 {TIH.Rename,       "Rename"},
                 {TIH.SaveName,     "Save"},
                 {TIH.CancelEdit,   "Cancel"}
@@ -396,17 +378,12 @@ namespace InvisibleHand
 
             DefaultClickActions = new Dictionary<TIH, Action>
             {
-                // Player Inventory
-                // a couple overloads could easily allow for using
-                // plain functions like most of the other actions,
-                // if I care enough.
-                {TIH.None, None},
+                {TIH.None, None},  // now unused. Remove?
 
                 {TIH.Sort,         () => IHPlayer.Sort()},
                 {TIH.ReverseSort,  () => IHPlayer.Sort(true)},
-
                 {TIH.CleanStacks,  IHPlayer.CleanStacks},
-                // Chests
+                // Chest-only
                 {TIH.SmartLoot,    IHSmartStash.SmartLoot},
                 {TIH.QuickStack,   IHUtils.DoQuickStack},
                 {TIH.SmartDeposit, IHSmartStash.SmartDeposit},
@@ -432,14 +409,14 @@ namespace InvisibleHand
 
                 {TIH.SmartDeposit, 4},
 
-                {TIH.CleanStacks,     5},
+                {TIH.CleanStacks,  5},
 
                 {TIH.QuickStack,   6},
 
                 {TIH.SmartLoot,    7},
 
                 {TIH.Rename,       8},
-                {TIH.SaveName,     8}
+                {TIH.SaveName,     8}   // this just varies by background color from Rename
             };
 
             /*************************************************
@@ -468,6 +445,9 @@ namespace InvisibleHand
         public static void None() { }
     }
 
+    /// silly struct for defining the position of the first button in a set of
+    /// buttons and the offset that will be used to calculate the position of
+    /// any further buttons.
     public struct ButtonPlot
     {
         public Vector2 Origin;
@@ -485,7 +465,6 @@ namespace InvisibleHand
             this.Offset = new Vector2(offset_x, offset_y);
         }
     }
-
 
     // /// because there's no void/none/null type
     // public sealed class None

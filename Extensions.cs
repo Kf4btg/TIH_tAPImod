@@ -48,58 +48,6 @@ namespace InvisibleHand
 
     #region buttonExtensions
 
-        // public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state)
-        // {
-        //     if (state.texture == null)
-        //     {
-        //         // this creates the text-pulse effect of vanilla
-        //         var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
-        //
-        //         // TODO: maybe don't ignore Alpha. Also, see if it's
-        //         // practical/if-there's-actually-a-need-for supporting
-        //         // tinting the text (TAPI.Extensions.Multiply(textcolor, tint))
-        //         sb.DrawString(
-        //                 Main.fontMouseText,     //font
-        //                 state.label,            //string
-        //                 bBase.Position,         //position
-        //                 textColor,              //color
-        //                 0f,                     //rotation
-        //                 default(Vector2),       //origin
-        //                 bBase.Scale,            //scale
-        //                 SpriteEffects.None,     //effects
-        //                 0f                      //layerDepth
-        //              );
-        //     }
-        //     else
-        //         sb.Draw(state.texture, bBase.Position, bBase.SourceRect, state.tint * bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
-        // }
-        //
-        // public static void DrawIHButton(this SpriteBatch sb, ButtonBase bBase, ButtonState state, Color overrideColor)
-        // {
-        //     var textColor = Main.mouseTextColor.toScaledColor(bBase.Scale);
-        //
-        //     if (state.texture==null)
-        //         sb.DrawString(
-        //                 Main.fontMouseText,     //font
-        //                 state.label,            //string
-        //                 bBase.Position,         //position
-        //                 // overrideColor*bBase.Alpha, //color
-        //                 TAPI.Extensions.Multiply(textColor, overrideColor),
-        //                 0f,                     //rotation
-        //                 default(Vector2),       //origin
-        //                 bBase.Scale,            //scale
-        //                 SpriteEffects.None,     //effects
-        //                 0f                      //layerDepth
-        //              );
-        //     else
-        //         sb.Draw(state.texture, bBase.Position, bBase.SourceRect, overrideColor*bBase.Alpha, 0f, default(Vector2), bBase.Scale, SpriteEffects.None, 0f);
-        // }
-        //
-        // public static void DrawButtonBG(this SpriteBatch sb, ButtonBase bb, Texture2D bgTex, Color bgColor)
-        // {
-        //     sb.Draw(bgTex, bb.Position, null, bgColor*bb.Alpha, 0f, default(Vector2), bb.Scale, SpriteEffects.None, 0f);
-        // }
-
         public static bool IsHovered(this Rectangle frame)
         {
             return frame.Contains(Main.mouseX, Main.mouseY);
@@ -147,8 +95,10 @@ namespace InvisibleHand
         /// DefaultLabelForAction
         /// </summary>
         /// <param name="action"> </param>
-        /// <param name="use_originals">If true, will return the value pulled from Terraria's code for that action. </param>
-        /// <returns>Corresponding label for the action or the empty string "" if one could not be found.</returns>
+        /// <param name="use_originals">If true, will return the value pulled
+        /// from Terraria's code for that action. </param>
+        /// <returns>Corresponding label for the action or the empty string ""
+        /// if one could not be found.</returns>
         public static string DefaultLabelForAction(this TIH action, bool use_originals)
         {
             if (use_originals)
@@ -172,8 +122,8 @@ namespace InvisibleHand
             return "";
         }
 
-        /// returns the key-bind (as a string) for the button with the given action.
-        /// return value will be something like "(X)"
+        /// returns the key-bind (as a string) for the button with the given
+        /// action. return value will be something like "(X)"
         public static string GetKeyTip(this TIH action)
         {
             string kbopt;
@@ -186,11 +136,9 @@ namespace InvisibleHand
     #endregion
 
 
-    /// intended to use in a fluent-interface type of way;
-    /// these are generic so that a separate class so that the proper
-    /// subtype will be returned rather than a generic CoreButton
+    /// intended to use in a fluent-interface type of way; these are generic so
+    /// that the proper subtype will be returned rather than a generic CoreButton
     #region ButtonService helpers
-
 
         ///<summary>
         /// Add a ButtonService to this button and subscribe to its hooks
@@ -201,29 +149,33 @@ namespace InvisibleHand
             return button;
         }
 
-        /// Activates the button's default OnClick action
-        /// on_right_click = true makes the action happen
-        /// on a right click rather than a left.
+        /// Activates the button's default OnClick action; on_right_click = true
+        /// makes the action happen on a right click rather than a left.
         public static T EnableDefault<T>(this T button, bool on_right_click = false) where T : ICoreButton
         {
             return button.AddNewService(new DefaultClickService(button, on_right_click));
         }
 
+        /// Cause this button to lock/unlock its corresponding action when right-clicked
         public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "") where T: ICoreButton
         {
             return button.AddNewService(new LockingService(button, lock_offset, lock_color, locked_string));
         }
 
+        /// Allow this button to toggle to another button
         public static T AddToggle<T>(this T button, T toggle_to_button, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
         {
             return button.AddNewService(new ToggleService(button, toggle_to_button, toggle_key));
         }
 
+        /// Specialized version of AddToggle for connecting sort/reverse-sort buttons
         public static T AddSortToggle<T>(this T button, T reverse_button, KState.Special toggle_key = KState.Special.Shift) where T: ICoreButton
         {
             return button.AddNewService(new SortingToggleService(button, reverse_button, toggle_key));
         }
 
+        /// Have the button toggle to a different button automatically based on defined condition.
+        /// Important!! Make sure to add this service to the other button, too, unless you want to get stuck there!
         public static T AddDynamicToggle<T>(this T button, T button_when_false, Func<bool> check_game_state) where T: ICoreButton
         {
             return button.AddNewService(new DynamicToggleService(button, button_when_false, check_game_state));

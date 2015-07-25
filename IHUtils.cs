@@ -192,7 +192,6 @@ namespace InvisibleHand
                 {
                     if (retIdx == -1)  // partial success (stack amt changed), but we don't want to reset the item.
                     {
-                        // RingBell();
                         Sound.ItemMoved.Play();
                         Recipe.FindRecipes();
                     }
@@ -200,7 +199,6 @@ namespace InvisibleHand
                 }
             }
             //else, success!
-            // RingBell();
             Sound.ItemMoved.Play();
             slot.MyItem = new Item();
             if (sendMessage) SendNetMessage(retIdx);

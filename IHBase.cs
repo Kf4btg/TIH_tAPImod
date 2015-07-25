@@ -76,7 +76,6 @@ namespace InvisibleHand
 
             OriginalButtonLabels = new Dictionary<TIH, string>();
 
-            // TODO: put this behind a modoption
             // pull values out of Lang.inter to populate OBL
             foreach (var kvp in Constants.LangInterIndices)
             {

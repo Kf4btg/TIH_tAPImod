@@ -87,9 +87,6 @@ namespace InvisibleHand
         /// Subscribed Services
         public Dictionary<string, ButtonService> Services { get; protected set; }
 
-        /// hooks requested by services
-        protected Dictionary<String, List<ButtonService>> enabledHooks { get; set; }
-
         /// Derived size
         public abstract Vector2 Size { get; }
 
@@ -198,7 +195,7 @@ namespace InvisibleHand
         /// <param name="sb">Drawing SpriteBatch</param>
         public virtual void PostDraw(SpriteBatch sb)
         {
-            foreach (var callHook in Hooks.PreDraw)
+            foreach (var callHook in Hooks.PostDraw)
                 callHook(sb);
         }
         #endregion

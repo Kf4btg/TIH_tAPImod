@@ -47,7 +47,7 @@ namespace InvisibleHand
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)
         {
-            if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(Main.localPlayer, slot.index))
+            if (IHBase.ModOptions["LockingEnabled"] && slot.type == "Inventory" && IHPlayer.SlotLocked(slot.index))
             {
                 sb.Draw(IHBase.LockedIcon,      // the texture to draw
                             slot.pos,           // (Vector2) location in screen coords to draw sprite
@@ -71,19 +71,56 @@ namespace InvisibleHand
             {
                 if (slot.type == "Inventory" && slot.index >= 10) //not in the hotbar
                 {
-                    IHPlayer.ToggleLock(Main.localPlayer, slot.index); //toggle lock state
+                    IHPlayer.ToggleLock(slot.index); //toggle lock state
                     Sound.Lock.Play();
                 }
             }
             return false;
         }
 
-        /************************************************************************
-        *   An implementation of the "Shift-click to move item between containers"
-        *   concept. Possibly temporary, though it includes the feature of working
-        *   with the craft-guide and reforge slots, which I really like.
-        */
-        // Shift + Left Click on item slot to move it between inventory and chest
+        // TODO: Here are my thoughts on making sure shift-click syncs correctly with
+        // the server: obviously, blindly placing the NetMessage update calls
+        // wherever it seemed like Vanilla indicated they should go didn't work.
+        // Now that I have a better understanding of what all that rigamarole is
+        // supposed to do, I think that the most efficient way to handle this
+        // would be to have any function that modifies a slot or slots in a
+        // container record or return a list of the indices of those slots.
+        // Numerous methods in IHUtils already return an int to indicate the
+        // effect of their run, but only under certain conditions does that int
+        // indicate the affected index. Other return statuses (statii?) could
+        // indicate a modified slot or even multiple slots, but since I didn't
+        // think I had any immediate need to know which slots those were, that
+        // information was not recorded.
+
+        // Now, it wouldn't be too hard to whip up a small data-transfer-object
+        // that can be passed between method calls and hold both the return
+        // status as it is now and a record of any slots which were modified
+        // along the way; this would prevent us from having to take a
+        // sledgehammer approach like we did with the calls that modify
+        // chest-item-slot en-masse. While the sledge may be the best or
+        // most-effective tool when many slots are likely to be modified at
+        // once, this shift-click isn't likely to affect more than a few during
+        // any one run, and looping over the entire container atleast twice for
+        // each click is probably something we should avoid if we can.
+
+        // Of course this is all obvious and I'm just being verbose for
+        // absolute-clarity's sake. My point--and the catch--is that even
+        // though the DTO would be simple to create and use, the code in IHUtils
+        // is much more of a tangled mass of spaghetti-code than I realized, and
+        // tracing down every spot where we'd need to make changes (though
+        // likely small) to the code to integrate the object will be a delicate
+        // job very prone to breaking things in unexpected ways. At least with
+        // my luch it would be.  Anyway, that's why, for now, I'm going to take
+        // the sledgehammer to this and hope it doesn't affect performance too
+        // badly.
+
+        /// <summary>
+        /// Shift + Left Click on item slot to move it between inventory and chest
+        /// </summary>
+        /// <param name="slot"> </param>
+        /// <param name="release"> </param>
+        /// <returns>True if shift not held while left-clicking, or if no applicable
+        /// recipient is present to move item into. </returns>
         public override bool PreItemSlotLeftClick(ItemSlot slot, ref bool release)
         {
             if (!(bool)IHBase.Instance.options["enableShiftMove"].Value) return true;
@@ -95,14 +132,24 @@ namespace InvisibleHand
                     // Moving inventory item -> chest
                     if (slot.type == "Inventory" || slot.type == "Coin" || slot.type == "Ammo")
                     {
-                        if (IHUtils.ShiftToChest(ref slot))
-                            Recipe.FindRecipes(); // !ref:Main:#22640.36#
+                        IHPlayer.DoChestUpdateAction(
+                        () => {
+                            if (IHUtils.ShiftToChest(ref slot))
+                                Recipe.FindRecipes(); // !ref:Main:#22640.36#
+                        });
                     }
                     // Moving chest item -> inventory
                     else if (slot.type == "Chest")
                     {
                         if (IHUtils.ShiftToPlayer(ref slot, Main.localPlayer.chest>-1))
+                        {
                             Recipe.FindRecipes();
+
+                            // We can take the easy route here since there's only
+                            // one chest slot that could have been affected.
+                            if (Main.netMode == 1 && Main.localPlayer.chest > -1) //non-bank
+                                IHUtils.SendNetMessage(slot.index);
+                        }
                     }
                     return false;
                 }
@@ -112,7 +159,6 @@ namespace InvisibleHand
                     {
                         if (slot.MyItem.material && !slot.MyItem.notMaterial)
                         {
-                            // IHUtils.RingBell();
                             Sound.ItemMoved.Play();
                             Main.guideItem = slot.MyItem.Clone();
                             slot.MyItem    = new Item();
@@ -133,7 +179,6 @@ namespace InvisibleHand
                     {
                         if (slot.MyItem.maxStack == 1 && Prefix.CanHavePrefix(slot.MyItem))
                         {
-                            // IHUtils.RingBell();
                             Sound.ItemMoved.Play();
                             Main.reforgeItem = slot.MyItem.Clone();
                             slot.MyItem = new Item();

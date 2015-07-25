@@ -70,15 +70,21 @@ namespace InvisibleHand
             Client.Hooks.OnWorldLoad  += OnWorldLoad;
             IHBase.Instance.ButtonUpdates.Push(Client.ID);
 
-            Client.Hooks.OnRightClick += () => IHPlayer.ToggleActionLock(Client.Action);
+            Client.Hooks.OnRightClick += ToggleLock;
             Client.Hooks.PreDraw      += PreDraw;
         }
         public override void Unsubscribe()
         {
             Client.Hooks.OnWorldLoad  -= OnWorldLoad;
-            Client.Hooks.OnRightClick -= () => IHPlayer.ToggleActionLock(Client.Action);
+            Client.Hooks.OnRightClick -= ToggleLock;
             Client.Hooks.PreDraw      -= PreDraw;
             Client.Hooks.PostDraw     -= PostDraw;
+        }
+
+        private void ToggleLock()
+        {
+            Sound.Lock.Play();
+            IHPlayer.ToggleActionLock(Client.Action);
         }
 
         private void OnWorldLoad()

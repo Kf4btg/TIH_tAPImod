@@ -66,7 +66,12 @@ namespace InvisibleHand
             // add services/actions
 
             sort.AddSortToggle(rsort);
+            //for funsies let's just make that whole toggle thing pointless
+            sort.Hooks.OnRightClick += () => IHPlayer.Sort(true);
+            rsort.Hooks.OnRightClick += () => IHPlayer.Sort();
 
+            // TODO: make right-click throw all of the player's items on the ground.
+            // Haha j/k. maybe.
             clean.EnableDefault();
         }
     }

@@ -207,14 +207,20 @@ namespace InvisibleHand
 
             // sort enables default action for sort/rsort by ... default.
             sort.AddSortToggle(rsort);
+            //for funsies let's just make that whole toggle thing pointless
+            sort.Hooks.OnRightClick += () => IHPlayer.Sort(true);
+            rsort.Hooks.OnRightClick += () => IHPlayer.Sort();
+
 
             // add default click, let rClick lock it, and make shift switch buttons
             depo.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sdep.EnableDefault());
             qstk.EnableDefault().MakeLocking(lockOffset, Color.Firebrick).AddToggle(sloo.EnableDefault());
 
             // these just need their default actions enabled.
-            loot.EnableDefault();
+            loot.EnableDefault().Hooks.OnRightClick += () => IHPlayer.CleanStacks();  //why not
             cancel.EnableDefault();
+            // this prevents the Cancel text from being too big when the player goes back into the rename interface
+            cancel.Hooks.OnClick += CancelEditBase.ResetScale;
 
             // make Rename Chest button change to Save Name button when
             // clicked, and vice-versa. Well, technically, the buttons will

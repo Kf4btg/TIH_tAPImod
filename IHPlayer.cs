@@ -20,7 +20,6 @@ namespace InvisibleHand
 
         public override void Initialize()
         {
-
             Instance = this;
 
             // MUST use "new", as tAPI derps with clearing (quoth: Miraimai)
@@ -37,35 +36,27 @@ namespace InvisibleHand
 
         public override void Save(BinBuffer bb)
         {
-
-            var lii = Constants.LangInterIndices;
-            if (IHBase.ModOptions["UseReplacers"])
+            if (Main.gameMenu)
             {
+                var lii = Constants.LangInterIndices;
                 // reset original chest-button strings if we're quitting to main
                 // menu, which should be indicated by checking:
                 //     if (Main.gameMenu == true)
                 // as this is set during the SaveAndQuit() method of the worldgen
                 // immediately before player save. So:
-                if (Main.gameMenu)
+                Lang.inter[lii[TIH.LootAll]] = IHBase.OriginalButtonLabels[TIH.LootAll];
+                Lang.inter[lii[TIH.DepositAll]] = IHBase.OriginalButtonLabels[TIH.DepositAll];
+                Lang.inter[lii[TIH.QuickStack]] = IHBase.OriginalButtonLabels[TIH.QuickStack];
+
+                if (IHBase.ModOptions["UseReplacers"])
                 {
-                    Lang.inter[lii[TIH.LootAll]] = IHBase.OriginalButtonLabels[TIH.LootAll];
-                    Lang.inter[lii[TIH.DepositAll]] = IHBase.OriginalButtonLabels[TIH.DepositAll];
-                    Lang.inter[lii[TIH.QuickStack]] = IHBase.OriginalButtonLabels[TIH.QuickStack];
-
-
-                    if (IHBase.ModOptions["IconReplacers"])
-                    {
-                        Lang.inter[lii[TIH.Rename]] = IHBase.OriginalButtonLabels[TIH.Rename];
-                        Lang.inter[lii[TIH.SaveName]] = IHBase.OriginalButtonLabels[TIH.SaveName];
-                        Lang.inter[lii[TIH.CancelEdit]] = IHBase.OriginalButtonLabels[TIH.CancelEdit];
-                    }
+                    Lang.inter[lii[TIH.Rename]] = IHBase.OriginalButtonLabels[TIH.Rename];
+                    Lang.inter[lii[TIH.SaveName]] = IHBase.OriginalButtonLabels[TIH.SaveName];
+                    Lang.inter[lii[TIH.CancelEdit]] = IHBase.OriginalButtonLabels[TIH.CancelEdit];
                 }
                 // should take care of it and make sure the strings are set
                 // correctly if the mod is unloaded/the replacer-button option
                 // is disabled.
-
-
-
             }
             // if (!IHBase.oLockingEnabled) return; //maybe?
 
@@ -135,24 +126,15 @@ namespace InvisibleHand
                     // smartloot or quickstack
                     if (IHBase.ActionKeys["quickStack"].Pressed()) {
                         QuickStack(KState.Special.Shift.Down());
-                        // if (KState.Special.Shift.Down())
-                        //     DoChestUpdateAction( IHSmartStash.SmartLoot );
-                        // else
-                        //     DoChestUpdateAction( () => { IHUtils.DoQuickStack(player); } );
                     }
                     // smart-deposit or deposit-all
                     else if (IHBase.ActionKeys["depositAll"].Pressed()) {
                         DepositAll(KState.Special.Shift.Down());
-                        // if (KState.Special.Shift.Down())
-                        //     DoChestUpdateAction( IHSmartStash.SmartDeposit );
-                        // else
-                        //     DoChestUpdateAction( () => { IHUtils.DoDepositAll(player); } );
                     }
                     // loot all
                     else if (IHBase.ActionKeys["lootAll"].Pressed())
                         DoChestUpdateAction( IHUtils.DoLootAll );
                 }
-
             }
         }
 

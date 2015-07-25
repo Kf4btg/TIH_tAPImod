@@ -13,17 +13,16 @@ namespace InvisibleHand
             // that the default buttons for these actions (that
             // appear to the right of an open chest) do not display,
             // allowing us to replace them with customized versions.
+            var lii = Constants.LangInterIndices; // easier to read
+
+              Lang.inter[lii[TIH.LootAll]]
+            = Lang.inter[lii[TIH.DepositAll]]
+            = Lang.inter[lii[TIH.QuickStack]] = "";
+
+            // and get rid of the edit-chest stuff if we're using
+            // icons rather than text
             if (IHBase.ModOptions["UseReplacers"])
             {
-                var lii = Constants.LangInterIndices; // easier to read
-
-                  Lang.inter[lii[TIH.LootAll]]
-                = Lang.inter[lii[TIH.DepositAll]]
-                = Lang.inter[lii[TIH.QuickStack]] = "";
-
-                // and get rid of the edit-chest stuff if we're using
-                // icons rather than text
-                if (IHBase.ModOptions["IconReplacers"])
                       Lang.inter[lii[TIH.Rename]]
                     = Lang.inter[lii[TIH.SaveName]]
                     = Lang.inter[lii[TIH.CancelEdit]] = "";

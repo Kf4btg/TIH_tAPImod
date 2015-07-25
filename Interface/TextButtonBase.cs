@@ -59,6 +59,8 @@ namespace InvisibleHand
 
             scaleStep = (_minScale == _maxScale) ? 0 :
                         scale_step;
+
+            Scale = base_scale;
         }
 
         protected override bool GetIsHovered(Vector2 mouse)

@@ -209,7 +209,7 @@ namespace InvisibleHand
             return button.AddNewService(new DefaultClickService(button, on_right_click));
         }
 
-        public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "[Locked]") where T: ICoreButton
+        public static T MakeLocking<T>(this T button, Vector2? lock_offset = null, Color? lock_color = null, string locked_string = "") where T: ICoreButton
         {
             return button.AddNewService(new LockingService(button, lock_offset, lock_color, locked_string));
         }

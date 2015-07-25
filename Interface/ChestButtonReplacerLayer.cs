@@ -15,7 +15,7 @@ namespace InvisibleHand
 
     public class ChestButtonReplacerLayer : ButtonLayer
     {
-        protected readonly bool textButtons;
+        protected readonly bool iconButtons;
 
         private bool showCancel;
         private TextButtonBase CancelEditBase;
@@ -25,7 +25,7 @@ namespace InvisibleHand
         ///<param name="icons">Use the icon replacers</param>
         ChestButtonReplacerLayer(bool icons) : base("ChestButtonReplacerLayer", false)
         {
-            textButtons = !icons;
+            iconButtons = icons;
         }
 
         /// Use a generator function to seamlessly create and initialize a new
@@ -39,14 +39,14 @@ namespace InvisibleHand
 
         protected override void AddBasesToLayer()
         {
-            if (textButtons) addTextBases();
+            if (!iconButtons) addTextBases();
             else addIconBases();
         }
 
         protected override void AddButtonsToBases()
         {
             //DON'T FORGET TO ENABLE CLICK ACTIONS!!
-            if (textButtons) addTextButtons();
+            if (!iconButtons) addTextButtons();
             else addIconButtons();
         }
 
@@ -140,7 +140,7 @@ namespace InvisibleHand
                                        );
 
 
-            // not using these just now. 
+            // not using these just now.
             // var sort  = getButton(TIH.Sort,       TIH.Sort);
             // var rsort = getButton(TIH.Sort,       TIH.ReverseSort);
 
@@ -234,7 +234,7 @@ namespace InvisibleHand
             base.DrawButtons(sb);
 
             // draw the cancel button if needed
-            if (Main.editChest)
+            if (iconButtons && Main.editChest)
                 CancelEditBase.Draw(sb);
         }
     }

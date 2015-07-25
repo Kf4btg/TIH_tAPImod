@@ -4,6 +4,7 @@
     -   Added an option to have graphical buttons instead of the original text buttons.
     -   Removed the separate chest buttons (at least for now).
     -   Added keybind-tip to button names/tooltips.
+    -   Added modoptions to show/hide tooltips, show/hide keybind-hints
 
 1.2.0-rc2
     -   Improved multiplayer support:

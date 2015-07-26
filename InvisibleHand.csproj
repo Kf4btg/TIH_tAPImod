@@ -83,6 +83,7 @@
     <Compile Include="IHUtils.cs" />
     <Compile Include="IHWorld.cs" />
     <Compile Include="KeyEventProvider.cs" />
+    <Compile Include="SoundManager.cs" />
     <Compile Include="Interface\ButtonTypes.cs" />
     <Compile Include="Interface\EditChest.cs" />
     <Compile Include="Interface\ChestButtonReplacerLayer.cs" />

@@ -68,6 +68,8 @@ namespace InvisibleHand
                 API.main.MouseText(IHBase.Instance.ButtonTooltips.Pop());
                 Main.mouseText = true;
             }
+            // play queued sounds at this time
+            SoundManager.PlayQueuedSounds();
         }
 
         public override void PostDrawItemSlotBackground(SpriteBatch sb, ItemSlot slot)

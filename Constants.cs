@@ -78,17 +78,6 @@ namespace InvisibleHand
         OTHER
     }
 
-    public enum Sound
-    {
-        // just because it causes issues when there's no value for 0
-        // in an enum; 0 is the dig sound, but this mod doesn't use it
-        Dig       =  0,
-        ItemMoved =  7,
-        MouseOver = 12,
-        Coins     = 18,
-        Lock      = 22
-    }
-
     public static class Constants
     {
         // pulled from Main.DrawInventory  !ref:Main:#22137.0#

@@ -204,9 +204,9 @@ namespace InvisibleHand
 
     #region misc
         ///play the given sound effect;
-        public static void Play(this Sound s, int x = -1, int y = -1, int style = 1)
+        public static void Play(this Sound s)
         {
-            Main.PlaySound((int)s, x, y, style);
+            SoundManager.Queue(s);
         }
 
         ///<param name="min">Minimum value boundary; default is 0</param>

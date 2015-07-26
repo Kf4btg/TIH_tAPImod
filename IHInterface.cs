@@ -9,22 +9,47 @@ using Terraria;
 
 namespace InvisibleHand
 {
+
     public class IHInterface : ModInterface
     {
+
+        private static Action<List<InterfaceLayer>> addLayers;
+
+        public static void Initialize()
+        {
+            if (IHBase.ModOptions["InvButtons"])
+                addLayers = (list) =>
+                {
+                    if (Main.localPlayer.chest != -1)
+                        InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
+                        // --haven't made a replacement for the separate chestbuttons yet
+                    else
+                        InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
+                };
+            else
+                addLayers = (list) =>
+                {
+                    if (Main.localPlayer.chest != -1)
+                        InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
+                };
+        }
+
         public override void ModifyInterfaceLayerList(List<InterfaceLayer> list)
         {
             if (Main.playerInventory)
             {
-                if (Main.localPlayer.chest == -1)
-                {
-                    InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
-                }
-                else
-                {
-                    // --haven't made a replacement for the separate chestbuttons yet
-                    InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
-                }
+                addLayers(list);
             }
+                // if (Main.localPlayer.chest != -1)
+                // {
+                //     // --haven't made a replacement for the separate chestbuttons yet
+                //     InterfaceLayer.Add(list, IHBase.Instance.ReplacerButtons, InterfaceLayer.LayerInventory, true);
+                // }
+                // else
+                // {
+                //
+                //     InterfaceLayer.Add(list, IHBase.Instance.InventoryButtons, InterfaceLayer.LayerInventory, true);
+                // }
         }
 
         public override bool PreDrawInventory(SpriteBatch sb)

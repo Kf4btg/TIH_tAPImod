@@ -102,11 +102,15 @@ namespace InvisibleHand
             ButtonTooltips = new Stack<string>();
 
             // TODO: does doing this here also make the mp-server freak out (since it'll be loading textures)?
-            InventoryButtons = InventoryButtonLayer.New();
+            if (ModOptions["InvButtons"])
+                InventoryButtons = InventoryButtonLayer.New();
 
             // if (ModOptions["TextReplacers"])
             ReplacerButtons = ChestButtonReplacerLayer.New(ModOptions["UseReplacers"]);
             // else if (ModOptions["IconReplacers"])
+
+            // Initialize the action ModifyInterfaceLayerList will use
+            IHInterface.Initialize();
 
         }
 
@@ -141,6 +145,11 @@ namespace InvisibleHand
                 case "replaceButtons":
                         ModOptions["UseReplacers"]  = (bool)option.Value;
                         break;
+
+                // show sort/clean buttons above coin/ammo slot
+                case "invButtons":
+                    ModOptions["InvButtons"] = (bool)option.Value;
+                    break;
 
                 // show tooltips when hovering replacer buttons
                 case "showTooltips":

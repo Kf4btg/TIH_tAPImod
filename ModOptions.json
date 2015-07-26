@@ -104,6 +104,15 @@
             "default": false
         },
         {
+            "name": "invButtons",
+            "displayName": "Inventory Buttons",
+            "type": "Boolean",
+            "notify": true,
+            "notifyOnChange": true,
+            "sync": false,
+            "default": true
+        },
+        {
             "name": "showKeyBind",
             "displayName": "Show KeyBind Hints",
             "type": "Boolean",

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-// using System.Linq.Expressions;
 using System.Linq.Dynamic;
 using Terraria;
 
@@ -9,8 +8,8 @@ namespace InvisibleHand
 {
     public static class IHOrganizer
     {
-        // this will sort the categorized items first by category, then by
-        // more specific traits. Sorting Rules defined in CategoryDef class.
+        /// this will sort the categorized items first by category, then by
+        /// more specific traits. Sorting Rules defined in CategoryDef class.
         public static List<Item> OrganizeItems(List<Item> source)
         {
             if (source == null) return null;
@@ -39,25 +38,33 @@ namespace InvisibleHand
             return sortedList;
         }
 
-        /** ***********************************************************************
-        *  GetItemCopies - Construct a list containing cloned copies of items in the given
-        *   container, skipping blank (and optionally locked) slots.
-        *
-        *  @param container: The Item[] array containing the items in questions
-        *  @param chest : whether the container is a chest (otherwise the player inventory)
-        *  @param rangeStart: index within container to start copying
-        *  @param rangeEnd: index within container to stop copying
-        *
-        *  @returns: the list, or null if no items were added.
-        */
-        public static List<Item> GetItemCopies(Item[] container, bool chest, int rangeStart, int rangeEnd)
+       /// <summary>
+       /// Construct a list containing cloned copies of items in the given container, skipping blank (and optionally locked) slots.
+       /// </summary>
+       /// <param name="source_container">The Item[] array of the container</param>
+       /// <param name="source_is_chest">Is the source container a chest? </param>
+       /// <param name="rangeStart">index in source to start looking for items </param>
+       /// <param name="rangeEnd">index in source to stop looking for items </param>
+       /// <returns> The new list of copied items, or null if no items were
+       /// applicable to be copied (NOT an empty list!).</returns>
+        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, int rangeStart, int rangeEnd)
         {
-            return GetItemCopies(container, chest, new Tuple<int, int>(rangeStart, rangeEnd));
+            return GetItemCopies(source_container, source_is_chest, new Tuple<int, int>(rangeStart, rangeEnd));
         }
 
-        public static List<Item> GetItemCopies(Item[] container, bool chest, Tuple<int,int> range = null)
+        /// <summary>
+        /// Construct a list containing cloned copies of items in the given
+        /// container, skipping blank (and optionally locked) slots.
+        /// </summary>
+        /// <param name="source_container">The Item[] array of the container</param>
+        /// <param name="source_is_chest">Is the source container a chest? </param>
+        /// <param name="range">Starting and ending indices defining the subset of the
+        /// source's slots to be searched for items.</param>
+        /// <returns> The new list of copied items, or null if no items were
+        /// applicable to be copied (NOT an empty list!).</returns>
+        public static List<Item> GetItemCopies(Item[] source_container, bool source_is_chest, Tuple<int,int> range = null)
         {
-            if (range == null) range = new Tuple<int,int>(0, container.Length -1);
+            if (range == null) range = new Tuple<int,int>(0, source_container.Length -1);
 
             // initialize the list that will hold the copied items
             var itemList = new List<Item>();
@@ -66,13 +73,13 @@ namespace InvisibleHand
 
             // get copies of viable items from container.
             // will need a different list if locking is enabled
-            if (!chest && IHBase.ModOptions["LockingEnabled"])
+            if (!source_is_chest && IHBase.ModOptions["LockingEnabled"])
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
-                    if (IHPlayer.SlotLocked(i) || container[i].IsBlank()) continue;
+                    if (IHPlayer.SlotLocked(i) || source_container[i].IsBlank()) continue;
 
-                    itemList.Add(container[i].Clone());
+                    itemList.Add(source_container[i].Clone());
                     count++;
                 }
             }
@@ -80,19 +87,21 @@ namespace InvisibleHand
             {
                 for (int i=range.Item1; i<=range.Item2; i++)
                 {
-                    if (!container[i].IsBlank()) itemList.Add(container[i].Clone());
+                    if (!source_container[i].IsBlank())
+                        itemList.Add(source_container[i].Clone());
                     count++;
                 }
             }
+            // return null if no items were copied to new list
             return count > 0 ? itemList : null;
         }
 
-        /*************************************************************************
-        *  SortPlayerInv - perform the sort operation on the items in the player's
-        *	inventory, excluding the hotbar and optionally any slots marked as locked
-        *
-        *  @param player: The player whose inventory to sort.
-        *  @param reverse: whether to reverse the list of item once it's sorted
+        /**
+          SortPlayerInv - perform the sort operation on the items in the player's
+        	inventory, excluding the hotbar and optionally any slots marked as locked
+
+          @param player: The player whose inventory to sort.
+          @param reverse: whether to reverse the list of item once it's sorted
         */
         public static void SortPlayerInv(Player player, bool reverse=false)
         {
@@ -115,17 +124,17 @@ namespace InvisibleHand
             SortChest(chest.item, reverse);
         }
 
-        /*************************************************************************
-        *  Sort Container
-        *
-        *  @param container: The container whose contents to sort.
-        *  @param chest : whether the container is a chest (otherwise the player inventory)
-        *  @param rangeStart: starting index of the sort operation
-        *  @param rangeEnd: end index of the sort operation
-        *
-        *  Omitting both range arguments will sort the entire container.
+        /**
+          Sort Container
 
-        FIXME: the "item-moved" sound plays even if the order doesn't change.
+          @param container: The container whose contents to sort.
+          @param chest : whether the container is a chest (otherwise the player inventory)
+          @param rangeStart: starting index of the sort operation
+          @param rangeEnd: end index of the sort operation
+
+          Omitting both range arguments will sort the entire container.
+
+        FIXME (maybe?): the "item-moved" sound plays even if the order doesn't change.
         */
         public static void Sort(Item[] container, bool chest, bool reverse, int rangeStart, int rangeEnd)
         {
@@ -141,10 +150,10 @@ namespace InvisibleHand
             var checkLocks = IHBase.ModOptions["LockingEnabled"]; //boolean
 
             // get copies of the items and send them off to be sorted
-            var itemSorter = OrganizeItems(GetItemCopies(container, chest, range));
-            if (itemSorter == null) return;
+            var sortedItemList = OrganizeItems(GetItemCopies(container, chest, range));
+            if (sortedItemList == null) return;
 
-            if (reverse) itemSorter.Reverse(); //reverse on user request
+            if (reverse) sortedItemList.Reverse(); //reverse on user request
 
             // depending on user settings, decide if we copy items to end or beginning of container
             var fillFromEnd = chest ? IHBase.ModOptions["RearSortChest"] : IHBase.ModOptions["RearSortPlayer"]; //boolean
@@ -168,11 +177,12 @@ namespace InvisibleHand
                 getWhileCond = y => y<range.Item2 && IHPlayer.SlotLocked(y);
             }
 
-            int filled = 0;
-            if (!chest && checkLocks) // move these checks out of the loop
+            int filled = 0; // num of slots filled (or locked) so far
+            if (!chest && checkLocks) // player inv with locking enabled
             {
                 // copy the sorted items back to the original container
-                foreach (var item in itemSorter)
+                // (overwriting the current, unsorted contents)
+                foreach (var item in sortedItemList)
                 {
                     // find the first unlocked slot. this would throw an
                     // exception if range.Item1+filled somehow went over 49, but
@@ -180,9 +190,10 @@ namespace InvisibleHand
                     // correctly, that _shouldn't_ be possible. Shouldn't.
                     // Probably.
                     while (IHPlayer.SlotLocked(getIndex(filled)))
-                    {
                         filled++;
-                    }
+
+                    // now that we've found an unlocked slot, clone
+                    // the next sorted item into it.
                     container[getIndex(filled++)] = item.Clone();
                     Sound.ItemMoved.Play();
                 }
@@ -197,7 +208,7 @@ namespace InvisibleHand
             }
             else // just run through 'em all
             {
-                foreach ( var item in itemSorter)
+                foreach ( var item in sortedItemList)
                 {
                     container[getIndex(filled++)] = item.Clone();
                     Sound.ItemMoved.Play();
@@ -249,6 +260,9 @@ namespace InvisibleHand
                     int diff = Math.Min(item2.maxStack - item2.stack, item.stack);
                     item2.stack += diff;
                     item.stack -= diff;
+
+                    Sound.ItemMoved.Play();
+
                     if (item.IsBlank())
                     {
                         item = new Item();

@@ -2,6 +2,7 @@
     -   Total rework of button system.  Was a huge effort, but the end result isn't largely noticeable on the front end.  However, should improve maintainability and perhaps support customization in the future.
     -   Replaced vanilla text buttons with enhanced versions that support the new functions of the mod.
     -   Added an option to have graphical buttons instead of the original text buttons.
+    -   Added option to disable the player-inventory buttons.
     -   Removed the separate chest buttons (at least for now).
     -   Added keybind-tip to button names/tooltips.
     -   Added modoptions to show/hide tooltips, show/hide keybind-hints
@@ -9,6 +10,7 @@
         -   The icon-buttons for Sort will now reverse-sort on right-click. Similarly but backwards for reverse-sort.
         -   For no reason whatsoever LootAll in icon mode will clean stacks on right click.
         -   The text version of LootAll now toggles to Sort when pressing shift.  This sort button also reverse-sorts on r-click.
+    -   Improved Sound handling.
 
 1.2.0-rc2
     -   Improved multiplayer support:

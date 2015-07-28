@@ -1,0 +1,575 @@
+[CENTER][URL='http://forums.terraria.org/index.php?attachments/ihicon-png.15743/&temp_hash=e7978175c98580499519c423e1d29afe'][ATTACH=full]15744[/ATTACH] [/URL]
+[B][SIZE=6]The Invisible Hand[/SIZE][/B]
+[SIZE=4]Inventory Management Assistance for the [S]Lazy[/S][/SIZE] "Organizationally-Challenged"
+version 1.1.5 for tAPI r16 and Terraria 1.2.4.1
+[/CENTER]
+[SIZE=5][COLOR=#ff4d4d]UPDATE: July 1, 2015[/COLOR] - TIH version 1.1.5+tr16
+[INDENT][SIZE=4]All the glory for this update should go to @krageon , who, in my long absence, took upon himself the burden of redressing a bit of my dumbs and added proper [B]multiplayer support[/B] to the mod. This is monumentous,* and likely something I would never have been able to do myself. I honestly can't express my thanks enough. All I've done here is recompile the mod for tAPI version r16. I tested by starting a fresh world (with an old character) and everything seemed to work fine; obviously this was singleplayer, but I didn't change krageon's code for this recompile, so I'd expect multiplayer to work just fine as well (fingers crossed). I should also note that this was on a 1.2.4.1 binary of the game, not 1.3 (on which tAPI may theoretically still run but without the features of 1.3?). Let me know if there are any issues.
+
+So...yeah! About 6 months since I've shown my face around here. It brings a tear to my eye to see that people have really taken to this mod, including liking it enough to fix it up when I was off-world! I always said I'd keep working on the mod unless "Life Stuff" got in the way, and that was true--I just didn't expect it to happen so...suddenly. But things are looking up! Doc tells me they can do wonders with prosthetics these days, and when you get right down to it, Turkish prisons aren't really as bad as they're made out to be. Maybe, like, 95% as bad as they're made out to be.
+
+Well anyway, the good news is, before things got crazy, I had mostly finished an [B]upgraded version[/B] of The Invisible Hand with a lot of [B]new features, optimizations, and bug fixes[/B]. Nothing crazy-out-there, just expansions on the theme and functionalities of the mod, hopefully making it easier to use and the game more fun to play. All the Internet hubbub about 1.3 being released drew me back here, and reading that tAPI may be discontinued motivated me to at least get this upgraded version working on the last version for 1.2.4.1. I'll need to integrate the multiplayer patches and put some final polish on it, but hopefully it won't take too long to get it ready to post.
+
+I may post some teaser screenshots later on...or maybe I'll just get to work finishing up the mod and not waste time on silly things....HAha ha, OH that was a good one, I'm cracking up here, "not waste time," haha, sure, ok, riiiight! Ahhh...phew. But really, I'll try to buckle down as much as I have time to and get this thing rolling. Stay tuned.
+
+[COLOR=#ffa000][B]EDIT:[/B] A bug has been reported with this version where it seems that the shift-click to move items may not sync with the server on multiplayer. I'm not sure if this happens occasionally or consistently, nor whether it results in duplicated items or lost items. Just be aware of this issue so you can watch out for it, and let me know if you have any information on it beyond what has already been given.[/COLOR]
+
+
+[COLOR=#00ffff][B]NOTE regarding support for 1.3:[/B] Unless tAPI gets updated for 1.3 (which is looking unlikely) or official mod support is added (a distant-future prospect, if it ever happens), TIH will [B]not[/B] be available for version 1.3+ of Terraria. It saddens me to say it, but there's not much I can do. IF I had the knowledge and technical chops to create a standalone version of the mod, I'd totally give it a shot, but I think that may be out of pay-grade (mainly because, well, I'm not getting paid for this). However, should anyone have any pointers or, preferably, a bulletted list of instructions on "How To Make a Standalone Terraria Mod," please don't hesitate to contact me and let me know![/COLOR]
+
+*Also monumentous is the fact that I just learned that apparently "monumentous" isn't really a word and now I feel like my whole life is a lie.[/INDENT]
+[SIZE=6][B]What is "The Invisible Hand"?[/B][/SIZE]
+[INDENT][SIZE=4]First off, thank you for your interest in this, my very first mod for Terraria, and my very first publicly-released mod for any game, period!  So, why did I spend the past week teaching myself C# just to create this mod?
+
+[SPOILER="Here's why."]
+I've played Terraria for years now, but as the awesome updates kept coming, I began to get overwhelmed by the sky-rocketing number of exciting things to collect.  I read thread after thread started by people in this same predicament, asking how others were able to keep themselves organized and afloat in this sea of awesome without spending more time sifting through through their inventories and chests than actually playing the game.  It seemed that many responding to these queries had trouble even understanding the problem; they had never had any issues with staying organized, and were surprised to hear that others had.  I myself had difficultly fathoming the fact that they couldn't fathom my fathoming of . . . um, of fathoms, uh . . . I'm lost.  Well anyway, I envied them their natural talent, but I understood that humanity possesses a near-infinite range of sensibilities, and there was nothing here to hold a grudge about.
+
+Of course, there were plenty of helpful responses and some good advice -- some of it common sense, some of it clever tricks -- but none of these managed to totally fit both my personality and play-style.  I often wished there were better tools to speed up some of the repetitive or tedious task I often found myself performing, but no adequate solution really presented itself.  I persevered, of course, still having fun due to the sheer excellence of the game, but I will admit there were some nights where I had to quit playing because I realized I was experiencing more frustration than enjoyment.
+
+I stopped playing for a while shortly after 1.2.4.1 was released -- not because of the afore-mentioned frustration, but simply because life got in the way.  A couple of weeks ago, I checked up on the game and was extremely pleased to see that tAPI was not only updated for 1.2.4.1, but in a nicely-mature state and there were some good mods already released for it!  I dove in, but all these excellent mods just exacerbated my previous problem, and now it seemed there were even [I]fewer[/I] tools available than last time I looked for one.
+
+Not one to curse the darkness when there's such an excellent candle available, I found myself a way to decompile the tAPI source and then procured an adequate development environment -- and these were not the easiest tasks, either, seeing as how . . . I don't actually possess a copy of Windows.  Or OS X. I'm a Linux man to my soul.  I realize its a bit of a hypocritical soul since I still run Windows [S]applications[/S] games fairly regularly in WINE . . . but I've always viewed "hypocritical" as another way to say "complexities of character."  I can be quite complex.
+
+Anyway, the wonders of Open Source did not fail me, and I managed to get a nice set-up that allowed me to grease up my quite rusty OO-programming skills and write this first draft of what I hope many will find to be a very useful mod!  [/SPOILER]
+
+"The Invisible Hand" is a mod that has [S]no[/S] little visual presence in the game, partially due to the fact that I feel keyboard-shortcuts are more apropos to the purpose of this utility . . . and partially because I'm terrible at making sprites and adding interface elements sounded like trying to design a warp drive when I started the mod.  That little icon up top is the extent of my artistic abilities, and it's far more Kindergarten than Klimt.  Anyway, naming the mod this also gave me the chance to recall the only thing I remember from Econ 101 [S]all those[/S] a few years ago.
+
+A number of key-binds and other settings have been added for various tasks related to managing and organizing one's inventory and vast hoard of glorious goodies.  All can be changed from the mod-options menu.[/SIZE][/INDENT]
+
+[SIZE=6][B]Mod Features [/B](version 1.1.5)[/SIZE]
+
+[INDENT]Here's a summarized version of the mod's features:
+[LIST]
+[*][B]Adds hotkeys[/B] (defaults in parentheses) for the vanilla [COLOR=#ff8000][B]Quick Stack[/B] [I]("Q")[/I][/COLOR], [COLOR=#ff8000][B]Loot All[/B] [I]("Z")[/I][/COLOR], and[COLOR=#ff8000] [B]Deposit All[/B] [I]("Y"[/I])[/COLOR] actions.
+[*][B]Adds FOUR new actions[/B] and hotkeys to aid in inventory management:
+[LIST]
+[*][COLOR=#00ffff][B]Sort[/B] [I]("R")[/I][/COLOR] - sorts items in Main Inventory or open chest according to item-category, amount in stack, and numerous other sub-traits.
+[LIST]
+[*]Hold [COLOR=#00ffff][B]Shift[/B][/COLOR] while pressing this key to reverse the sort order.
+[/LIST]
+[*][COLOR=#00ffff][B]Stack[/B] [I]("X")[/I] [/COLOR]- this consolidates all item stacks in the inventory or open chest into as few maximized stacks as possible.
+[*][COLOR=#00ffff][B]Smart Deposit [/B][I](Shift + Deposit-All)[/I][/COLOR] - deposits into the currently open chest any (and only) items in your inventory that [I]match the category[/I] of an item already in the chest.
+[*][COLOR=#00ffff][B]Quick Restock[/B] [I](Shift + Quick-Stack)[/I] [/COLOR]- previously called Reverse-Stack, this will attempt to refill any stack in your inventory with items from the currently open chest.
+[/LIST]
+[*][B]Supplementary Features[/B] (enable in Mod-Options menu):
+[LIST]
+[*][COLOR=#00ff80][B]Slot locking[/B][/COLOR] - [I]Shift + Right-click[/I] any individual slot in the player's main inventory to toggle the "locked" state of that slot. Put an item in a locked slot and it won't be affected by the Sort or Smart Deposit features.  Use this to keep your carefully planned organization of special and essential items in place!
+
+[*][B][COLOR=#00ff80]End-of-inventory item placement[/COLOR] [/B]- When picking up an item, Vanilla Terraria always places the item in the first available empty slot from the end of the player's inventory; enable this mod option for the inventory, chests, or both to use this placement style when sorting items.
+[*][COLOR=#00ff80][B]Reverse default sort order[/B] [/COLOR]- If you prefer the way items are sorted when using the "Reverse Sort" [I](Shift + Sort)[/I] command, you can use this mod-option to set reversed ordering as default for your inventory, chest, or both.
+[*][COLOR=#00ff80][B]Shift-click[/B] [B]to move item[/B] [/COLOR][I][COLOR=#00b359](NOTE: if you use a different mod with this functionality, you'll likely want to disable the feature in one of the mods to avoid conflicts)[/COLOR] - [/I]If you enable this option, you can simply hold shift and left-click on an item/stack to instantly move that item back-and-forth between the player's inventory and an open chest,the [I][COLOR=#ff4d4d]Guide's crafting-info slot[/COLOR][/I], or the [I][COLOR=#ff4d4d]Tinkerer's Reforge slot[/COLOR][/I] (assuming there's room in the destination for the item, of course)!
+[/LIST]
+[/LIST]
+Note that all the primary key-bindings can be changed in the Mod-Options menu for [I]The Invisible Hand[/I].  Be sure to set the options to your liking before loading a world!
+
+[SPOILER="The Old Wordy (More Detailed!) Version"]
+
+Three key-binding options were added for these actions that already exist in game:
+[LIST]
+[*][B]Quick Stack[/B] -- Default "Q"
+[*][B]Loot All[/B]          -- Default "Z"
+[*][B]Deposit All[/B]   -- Default "Y"  (placed a bit further away to avoid hitting it accidentally...like I always do)
+[/LIST]
+These [I]should [/I]all act exactly as if you had hit the corresponding button next to a chest inventory, and should have no effect without a chest open.
+
+These [B]new[/B] actions were added, along with their corresponding key-binds:
+[LIST]
+[*][B]Sort Inventory [/B]
+[LIST]
+[*]Default key "R"
+[*]Hold shift while pressing this key to reverse the sort order. 
+[*]If your main inventory is open, this will sort all your items (excluding the hotbar) first by category and then by several other factors. All stacks of items will be consolidated to the smallest number of full stacks possible, with all remainder items of that type placed in a single stack.
+[*]If a chest, safe, or piggy bank is open, that container is sorted instead.  Stacks consolidated here, as well.
+[/LIST]
+[*][B]Consolidate Stacks[/B]
+[LIST]
+[*]Default key "X"
+[*]This just performs the same stack-consolidation as the sort operation, but without, well . . . the sorting.  Stacks are converged as much as possible in the player's inventory or a chest if one is open.
+[/LIST]
+[/LIST]
+[LIST]
+[*] [B]Smart Deposit[/B]
+[LIST]
+[*]Hold Shift and press the Deposit All hot-key
+[*]With a chest/bank/safe open, this deposits all items from your inventory that match the category of an item already in that container.
+
+[*]Items in locked inventory slots will [I]not[/I] be deposited by this action.
+[/LIST]
+[/LIST]
+[LIST]
+[*][B]Reverse Stack[/B]
+[LIST]
+[*]Press Shift + your designated Quickstack hot-key.
+[*]Any stack of items in your inventory that is not already at its maximum will pull matching items from the open chest to refill its stack (either to maximum or as much as it can).
+[*]Good for a fast refill of materials when building and crafting or for replenishing your waning reserves of potions and ammo.
+[/LIST]
+[/LIST]
+And here are the current mod-options and their corresponding features:
+[LIST]
+[*][B]Enable/Disable slot-locking[/B]
+[LIST]
+[*]Enabled by default
+[*]In-game, hold shift and right click on a slot in your player inventory (other than the hotbar) to lock it. A little lock icon will appear in the upper right corner to indicate this. 
+[*]Any item/stack placed in a locked slot will not be moved around when you perform a sort operation. This can be useful if you like to keep certain potions, weapons, blocks, etc. in a certain spot in your inventory.
+[*]Shift + right click a locked slot to unlock it.
+[/LIST]
+[*][B]Set sorted items to be placed at the end of a container[/B] 
+[LIST]
+[*]Basically, rather than filling your containers from the top-left slot down, this will change the sort operation to fill from the bottom-right slot and up.
+[*]This is like how vanilla Terraria places items in your inventory when you pick up an item from the ground or do a loot-all on a chest.
+[*]The option is disabled by default, but you can set it for your player inventory, for chests/banks, or both.
+[/LIST]
+[*][B]Reverse the default sort order[/B]
+[LIST]
+[*]If you find you prefer the reversed ordering of items, you can set that to be the default sort order, without having to hold Shift while pressing Sort.
+[*]Shift+Sort will do a forward-sort in this instance.
+[*]Disabled by default, but can also be set for player, chests, or both.
+[/LIST]
+[/LIST]
+Play with various combinations of the last two options until you get a set-up that you really like!
+
+And that's it.  At the moment anyway.  All-in-all, it's like an "Invisible Hand" managing your inventory for you!  Get it? :D
+
+Ahem.  Right.  So, the default key-bindings are a bit arbitrary, I'll admit.  I didn't spend too much time thinking about them, so they may very well conflict with other things.  I'll tweak them if need be, but since they can easily be changed after activating the mod, you can switch them all around at your whim!
+
+[/SPOILER]
+
+[/INDENT]
+[SIZE=6][B]Category Details[/B][/SIZE]
+[INDENT]These are the currently implemented categories, and the order in which they will be sorted by the mod.  This is currently not configurable (without modifying the source code and recompiling).
+
+[SPOILER="Category Details"]
+
+[LIST=1]
+[*][B]Coins[/B]
+[LIST]
+[*]Money. New car, caviar, four star daydream.
+[/LIST]
+[*][B]Picks/Drills[/B]
+[LIST]
+[*]Because you must dig it.
+[/LIST]
+[*][B]Axes/Chainsaws[/B]
+[LIST]
+[*]For murdering trees (you monster).
+[/LIST]
+[*][B]Hammers[/B]
+[LIST]
+[*]"Mr. Redigit, tear down this wall!"
+[/LIST]
+[*][B]Tools (other)[/B]
+[LIST]
+[*]Non-pick/axe/hammer useful things, e.g. bug net, fishing poles, ropes, glowsticks, ...
+[/LIST]
+[*][B]Mechanisms[/B]
+[LIST]
+[*]Wire, switches, wrenches, most anything related to the wiring system. And minecart tracks.
+[/LIST]
+[*][B]Melee Weapons[/B]
+[LIST]
+[*]Swords, Flails, Spears. The classics. (Also boomerangs).
+[/LIST]
+[*][B]Ranged Weapons[/B]
+[LIST]
+[*]Bows, guns, shurikens--anything that keeps you out of poking distance.
+[/LIST]
+[*][B]Bombs[/B]
+[LIST]
+[*]Grenades, bombs, dynamite, et al. Boom.
+[/LIST]
+[*][B]Ammo[/B]
+[LIST]
+[*]Because throwing your gun at enemies is surprisingly ineffective.
+[/LIST]
+[*][B]Magic Weapons[/B]
+[LIST]
+[*]Wizard.
+[/LIST]
+[*][B]Summoning Weapons[/B]
+[LIST]
+[*]Minions of all magnitudes.
+[/LIST]
+[*][B]Pets[/B]
+[LIST]
+[*]Faithful and useless companions (though some produce light).
+[/LIST]
+[*][B]Head Armor[/B]
+[LIST]
+[*]For keeping your wits about you.
+[/LIST]
+[*][B]Body Armor[/B]
+[LIST]
+[*]For seriously tough torsos.
+[/LIST]
+[*][B]Leg Armor[/B]
+[LIST]
+[*]For preventing scuffed knees.
+[/LIST]
+[*][B]Accessories[/B]
+[LIST]
+[*]For feeling fabulous.
+[/LIST]
+[*][B]Vanity Items[/B]
+[LIST]
+[*]For looking glamorous.
+[/LIST]
+[*][B]Potions[/B]
+[LIST]
+[*]All things quaffable.
+[/LIST]
+[*][B]Consumables[/B]
+[LIST]
+[*]One time use stuff that you don't drink (includes food).
+[/LIST]
+[*][B]Bait[/B]
+[LIST]
+[*]Worms, fireflies, Master Bait, enough said.
+[/LIST]
+[*][B]Dyes[/B]
+[LIST]
+[*]Color is the spice of life. Or something like that.
+[/LIST]
+[*][B]Paint[/B]
+[LIST]
+[*]For when you're tired of brown and grey.
+[/LIST]
+[*][B]Ores[/B]
+[LIST]
+[*]Those rocks with "Ore" in their name. Also obsidian, hellstone, meteorite.
+[/LIST]
+[*][B]Metal Bars[/B]
+[LIST]
+[*]The above rocks made useful.
+[/LIST]
+[*][B]Gems[/B]
+[LIST]
+[*]All the shiny stones you can dig up. Also amber.
+[/LIST]
+[*][B]Seeds[/B]
+[LIST]
+[*]Herb, grass, and pumpkin seeds; acorns.
+[/LIST]
+[*][B]Light Sources[/B]
+[LIST]
+[*]Torches, candles, lamps, etc. (not glowsticks)
+[/LIST]
+[*][B]Crafting Stations[/B]
+[LIST]
+[*]From workbenches to kegs to the AutoHammer.
+[/LIST]
+[*][B]Furniture[/B]
+[LIST]
+[*]All household objects and containers (chests) not used for crafting.
+[/LIST]
+[*][B]Statues[/B]
+[LIST]
+[*]Statues (obviously); also gravestones & (you guessed it) the bubble machine.
+[/LIST]
+[*][B]Wall Decorations[/B]
+[LIST]
+[*]Paintings, trophies, a few other things.
+[/LIST]
+[*][B]Banners[/B]
+[LIST]
+[*]Both found and dropped by NPCs.
+[/LIST]
+[*][B]Decorative Clutter[/B]
+[LIST]
+[*]Bowls, books, bottles, etc
+[/LIST]
+[*][B]Wood[/B]
+[LIST]
+[*]Raw dead trees, all varieties.
+[/LIST]
+[*][B]Blocks[/B]
+[LIST]
+[*]e.g. dirt, stone, sand, etc.
+[/LIST]
+[*][B]Bricks[/B]
+[LIST]
+[*]Fancy blocks.
+[/LIST]
+[*][B]Tiles[/B]
+[LIST]
+[*]All other placeable items that do not fall into one of the above categories
+[/LIST]
+[*][B]Walls[/B]
+[LIST]
+[*]Universally reviled by hammers.
+[/LIST]
+[*][B]Miscellaneous Materials[/B]
+[LIST]
+[*]If you can't eat it, wear it, throw it, shoot it, or build your house out of it--but you [I]can[/I] make it into something else--it'll end up here. Think herbs, goblin cloth, rotten chunks, etc.
+[/LIST]
+[*][B]Special Items[/B]
+[LIST]
+[*]Boss summoning items, heart and mana crystals. This category may be unnecessary and/or annoying. Or it may be great, I haven't decided.
+[/LIST]
+[*][B]Other[/B]
+[LIST]
+[*]If, somehow, something doesn't fit ANY of the above categories, you'll find it here. Umbrellas are a Vanilla example; unique mod items may land here for now. Further revisions to categories could move these items up the list at any item.
+[/LIST]
+[/LIST]
+If it's a bit unclear, this means that items that fall within a given category will be grouped together when the inventory is sorted.  They're basically "clumps" of related items, and the items within each "clump" will then be sorted relative to each other.  The clumps themselves will appear in the order given above.
+[/SPOILER]
+
+[/INDENT]
+[SIZE=6][B]Screenshots[/B][/SIZE]
+[INDENT]See it in action! Er, well, maybe "action" isn't the most appropriate word.  But here are some pictures of stuff, anyway! (The menu pictures are a little outdated now. More options to click!)
+
+[SPOILER="Menu & Options"]
+[ATTACH=full]16385[/ATTACH]
+There it is in tAPI's Mods menu.  Yep, it exists. Hmm, I think maybe my icon needs a border...well anyway, if you click the Mod Options button...
+[ATTACH=full]16388[/ATTACH]
+...you get options for the mod!  Do I keep my promises or what.  Here you can choose which keys do what.  Go crazy.
+[/SPOILER]
+
+[SPOILER="Player Inventory Sorting"]
+Let's take a look at some of the effects of the new Consolidate and Sort actions (I know, a video would be better; I'm still working on that one).
+
+Here we have an inventory full of stuff and things (the hot bar is mostly empty both to reduce distraction and to show that the sort does not affect the hot bar slots).  Somebody just threw a bunch of items willy-nilly into their adventuring pack and took off across the countryside.  In this state, how will they ever find their bushel of acorns or Giant Pink Bow when they need it in an emergency?  Well, luckily for this disorganized derring-doer, they've got "The Invisible Hand! [SIZE=2](TM)[/SIZE]" to help them out!
+
+Here's the state of their inventory before the Invisible Hand works its magic.  First off, let's illustrate the Consolidate Stacks function by focusing on the four stacks of torches--conveniently circled in red by yours truly--none of which is at its maximum stack size of 99.
+[ATTACH=full]16381[/ATTACH]
+When we hit the Consolidate Stacks key (default "X")....
+[ATTACH=full]16382[/ATTACH]
+We end up with just [I]two[/I] stacks of torches. One has been filled to max of 99, and the remaining 62 torches ended up in the second stacks.  You'll notice that the other item stacks in the inventory were similarly merged.
+
+That's all fine and dandy, but as our eager adventurer continues in their exploits, their inventory becomes more and more dishevelled, until the point where it seems it can hold nothing else!  But fear not, you're not doomed to watch all the tasty treasure pass you by--no, you're just very bad at keeping your stuff straight (OK, I admit it, this is a contrived example, but it's just for demonstrative purposes, so deal).
+[ATTACH=full]16383[/ATTACH]
+So just press the Sort key (default "R"), and...
+[ATTACH=full]16384[/ATTACH]
+...voila!  The Invisible Hand has cleaned up all your stacks--clearing out several inventory slots--and put your items into a more reasonable order.  No, no, hold your applause.  Seriously, hold it--the Invisible Hand gets upset when people clap, because, well...you notice it's not called "The Invisible [I]Hands[/I]."  Kind of a touchy subject.
+[/SPOILER][/INDENT]
+
+[SIZE=6][B]Disclaimer[/B][/SIZE]
+[INDENT]I've tested the mod [I]in singleplayer [/I]with new characters on new worlds, and while I believe that most of the major bugs have been worked out, still note that this is still an early release and there are bound to be some hiccups.  As when installing any new mod, back up your characters and worlds before activating "The Invisible Hand."  I am not responsible for lost items or money, corrupted players or worlds, missing or injured pets, holes in the ozone, or targeting by shadow government agencies that may result from use of this mod.[/INDENT]
+
+[INDENT]Additionally, I only ever play LAN-multiplayer, but have not done so recently.  As such, I did not tested the mod on any form of multiplayer, and I cannot guarantee it to work under such circumstances, nor can I guarantee that it won't be considered cheating for some reason by certain server admins.  I welcome feedback from anyone who tries it in multiplayer and will endeavour to fix any bugs related thereto.
+
+[SPOILER="Mod Compatibility"]
+As far as compatibility with other mods, there really shouldn't be any issues (doesn't mean there [I]won't [/I]be, mind) unless the mod in question implements a feature identical to one found in TIH.  During my testing, my active mods were all from Shockah's Suite: Inventory Tweaks, Fancy Cheat Menu Base and FCM Standard (mainly to spawn in all the items I needed to test the sorting, so I didn't have to go dig up the whole world first), Insight, and  Enhanced Tooltip.
+
+Mod-added items shouldn't present a problem, and so long as the mod author gave them all the correct properties, they should be sorted together with other items of the same category. If they don't match any of the defined categories, they'll fall through to the "Other" category and be sorted at the end of player and chest inventories.[/INDENT]
+[/SPOILER]
+
+[SIZE=6][B]Credits[/B][/SIZE]
+[INDENT]
+[SPOILER="The Oscar Speech"]
+[LIST]
+[*]First off, thank you to Re-Logic for creating and continuing to support this incredible game!
+[*]Secondly, many thanks to all the developers of tAPI for their hard work in creating the tool that makes mod-development accessible to the unwashed masses like myself!
+[*]I'd like to specifically give credit to Shockah, Grox The Great, Arkhalis, and PoroCYon, whose well-written mods and tools gave me invaluable guidance while creating my own project.  Though I considered both Shockah.Base and BaseMod as required API mods at various times during the development, I eventually decided that the pieces I would actually be using from them were too few to add the additional dependency to this relatively small project and those pieces could be more easily reimplemented and tweaked to better fit within my own code.
+[*]Additional thanks to Arkhalis for his insight on my question in the tAPI forum thread before I posted this thread, and to GrtAndPwrflTrtl for advice offered on the same question.
+[*]HUGE thanks to Krageon for patching in proper multiplayer support to the mod.
+[*]And, though he said it was unnecessary, I'm still giving credit to Gubzs for the sprites posted in his "free resources" thread on the WIP board, some of which I used to throw together my icon, and others of which may prove useful in the future.
+[/LIST]
+[/SPOILER][/INDENT]
+
+[SIZE=6][B]Finally[/B][/SIZE]
+[INDENT][SIZE=4]Enjoy!  Not everyone will see a need for this mod, and I appreciate that.  But if you're one of the number of folks out there like me who do, then I hope you find it useful!  Please give me feedback, bug reports, and suggestions.  I'll soon be dusting off my old GitHub and uploading the source there, so anyone who wants to fork or expand on the mod is welcome to.[/SIZE]
+
+[SPOILER="Version History"]
+
+[INDENT][SPOILER="Version 1.2"]
+[SIZE=5][COLOR=#00ff80]Update III: Knurg's Revenge![/COLOR] 1/5/15 - TIH version 1.1.2[COLOR=#00ff80]b[/COLOR]+tr14a[/SIZE]
+[INDENT][SIZE=4]After muscle-memory led me to very nearly trash several irreplaceable items during a reforging-session, I enabled the ability to shift-move items in and out of the Reforge slot as well.  Download v1.1.2b if you've got the same itchy trigger finger.[/SIZE][/INDENT]
+
+[SIZE=5][COLOR=#00ff80]Update #2![/COLOR] 1/4/15 - TIH version 1.1.2[COLOR=#00ff80]a[/COLOR]+tr14a[/SIZE]
+[INDENT][SIZE=4]Weeeeeeellllll... maybe I lied a little bit when I said there weren't any new features this time. But wait! Put away the pitchforks and let me explain.
+
+[INDENT][SPOILER="Reasons"]You see, I had been testing with some of the other fine mods on here to make sure everything worked with what other people were likely to be running, but there came a time when I began to wonder if some of the mysterious crashes I occasionally experienced were actually due to an issue with my mod, a problem with my (unorthodox) setup, a bug in TAPI itself, or some elusive conflict with a different mod that I couldn't pin down. Thus, I decided to reduce the number of variables in the equation and disabled most of the mods I had been running.
+
+Unfortunately, my prime suspects were Shockah's various [I]Tweak Mods[/I] and [I]GRealm/Basemod[/I], those having the most complex and lowest-level modifications.  But as I soldiered on in my testing, I realized that the ONE, the IRREPLACEABLE feature that I COULD NOT LIVE WITHOUT . . . was the ability to shift-click-move items between chests and inventories, from Shockah's [I]Inventory Tweaks[/I] mod.  Yes, I admit it, I have become a shift-click-aholic!  My new prison . . . is SHAME.  Anyway, not wishing to nullify the accuracy of my new test results to feed my habit, I just went ahead and implemented my own version of the feature--[I]yes[/I], in spite of my declaration below that I was intentionally [I]not[/I] going to implement this feature, and I guess I need to delete that now, and I know you'll never be able to trust a word I [S]say[/S] type again and [I]I'm so sorry[/I]--along with a few personalizations and fixes (and hopefully no bugs) along the way.
+
+And since I know you're waiting with bated breath for me to tell you what I discovered about the source of the crashes . . . umm, I never did figure it out.  They did stop happening[I] as frequently [/I]with the other mods disabled, and I did eventually re-enable [I]GRealm[/I] and Miraimai's [I]MainSlotZero[/I] without any noticeable ill-effects, but I still get some sort of dictionary error on rare occasions of loading worlds, and I once got an index-out-of-bounds error while peacefully picking at some sand underground.  So no firm answers as yet, but also nothing has corrupted my characters or worlds and I can still get some hours-long play sessions in without incident.  When I get the chance, I'll collect my logs and ask in the tAPI thread.  Overall, I suspect much of it has to do with some instability introduced by the fact that I'm not actually playing on Windows, but rather running Terraria and tAPI on Arch Linux through the WINE translation layer.  In general, WINE is close to miraculous in its ability to run most any Window app I throw at it, often causing me to forget I'm not using a native application; but when it comes to games, I've enabled a few tweaks (specifically in how WINE deals with GPU threads) which greatly increase performance, but probably at the cost of a few hiccups every now and then.  Rare enough that I'm perfectly happy, though!  So long as I continue to make regular backups of my Terraria files (as everyone should!) I'm not going to worry too much about it.
+[LIST]
+[*]If you're wondering [B]which version[/B] to download, here's some suggestion:
+[LIST]
+[*]If you don't use Shockah's mods and you'd like this feature, [B]download 1.1.2a[/B]. Note that none of the other features of [I]Inventory Tweaks[/I] are implemented here.
+
+[*]If you don't use Shockah's mods and you don't care about this feature at all, [B]download either[/B] version; TIH 1.1.2a with the feature disabled (as it is by default) should be exactly the same as 1.1.2.
+[*]If you use Shockah's Inventory Tweaks and you've never noticed a conflict with TIH, you can [B]just get 1.1.2[/B] and be on your merry way--[B]unless[/B] of course you like the changes I made, in which case feel free to download 1.1.2a, disable the option in Shockah's mod and enable it in TIH.
+[*]With that said, I'll add that I don't [I]believe[/I] there would be a problem if you use 1.1.2a with [I]InvTweaks[/I] and keep the shift-move function of [I]TIH[/I] disabled, but I haven't tested that scenario yet.
+[/LIST]
+[/LIST]
+[/SPOILER][/INDENT]
+[LIST]
+[*]TL;DR: [B]NEW FEATURE [/B]in 1.1.2[B]a[/B] -- Hold [B]shift & left click[/B] [B]an item[/B] in a chest or your inventory[B] to move it [/B]between the two.
+[LIST]
+[*]One of those fixes I mentioned: Available [B]recipes[/B] [B]should update correctly [/B]after a shift-move.
+[*]And an addition: you can now[B] shift-click-move items between the Guide's crafting-info slot[/B] and the player inventory.
+[*]This feature is [B]disabled by default[/B]; if you'd like to use it, be sure to head to the mod options screen before you load up a world.
+[/LIST][/LIST]
+If you're not sure which version to download, check the suggestions at the end of the spoiler above.[/INDENT]
+[SIZE=5][COLOR=#00ff80]Update[/COLOR] 1/4/15 - TIH version 1.1.2+tr14a[/SIZE]
+[INDENT]Hullo everyone, I've been away for a little bit, but I'm back in the new year to bring you a shiny new update!  No big new features this time, I'm afraid, but a number of bug fixes (everybody loves bug fixes) and (what I hope are) improvements.  Let's get to it:
+[LIST]
+    [*]Highlights
+        [LIST]
+            [*]Fixed bugs in the [b]Shift+Right-click[/b] and [b]Reverse-Stack[/b] code.
+            [*]Increased specificity and total number of categories.[/LIST][/LIST]
+    [INDENT][SPOILER="Click for juicy details"][LIST]
+[*]Bugs Fixed:
+[LIST]
+[*][B]Fixed issue when shift-right-clicking to lock/unlock a slot[/B]; previously--if that slot contained a stackable item--this would unintentionally pick up an item from the stack.  Now it's all just lock-toggledy-goodness. (Just for full disclosure, I never really did figure exactly [I]what[/I] it was that caused this issue in the first place, but I changed it and now it's fixed therefore I win.)
+[*][B]Fixed a bug where Reverse-Stack would fill the player's ammo slots with ANY ammo[/B] found in the current chest, even if they had no ammo in their inventory at all.  Ammo now just attempts to fill any existing stacks, same as everything else.
+[*]I finally noticed that many of the functions of this mod were not [B]properly updating the available recipes [/B]upon their completion.  This could lead to a number of issues and unintended behaviour.  I believe I managed to take care of each situation in which this should happen; let me know if I missed any.
+[*]Tried to make the mod's [B]coin-handling a bit less wonky[/B].  It's still wonky, trust me, but I think I cleaned up every edge case that might have led to ending up with more or fewer coins than you should have.
+[/LIST]
+[*]Changes and Adjustments:
+[LIST]
+[*]The [B]number of categories is up to[/B], by my count, [SIZE=5][B]42[/B][/SIZE] . . . from about 25, I believe?  See the spoiler further down this post labeled "[B]Category Details[/B]" for the full list.
+[LIST]
+[*]So . . . is this excessive?  This might be excessive.  BUT, I have reasons!  I really wanted to make the Smart-Deposit feature [I]actually[/I] smart!  And clumping a bunch of pretty much unrelated things together as if trying to breed some horrific Grappling-Umbrella-Paintbrush hybrid isn't too smart if you ask me.  And maybe you didn't ask me, but [I]I [/I]programmed the thing so [I]I  [/I]asked me and now there's [SIZE=5][B]42[/B][/SIZE] categories and you're welcome.
+[*]On a serious note, if you do feel this hampers your organization efforts, please let me know. But I'm not removing categories. Nope nope nope not gonna do it well I might if you ask nicely [I]but really[/I] I think my preferred solution to any problems that arise is to implement some sort of capability to allow users to mark certain categories as combined.  I'm not quite sure the best way to go about this, and suggestions from other modders are welcome on this, though I fear it may involve implementing some sort of new interface, in which case . . . sigh . . . it might be a little while.
+[/LIST]
+[*]In addition to the fix listed above about the recipes updating properly, I reworked the stacking/depositing/looting-type functions to--for better or worse--[B]more accurately imitate[/B] the functionality of their [B]vanilla[/B] counterparts.  Ideally, you won't notice much difference, except that maybe  using the hotkeys seems even [I]more[/I] like you had just clicked the corresponding button next to a chest.  (Technical note: unfortunately, I wasn't able to just call an existing Vanilla method to perform these actions, as one might have expected.  This means I had to largely reimplement them, and, as my understanding of Terraria's code improves, so does the accuracy of my implementations.)
+[*]Changed the wording of some of the mod options to reduce the need of a magnifying glass to read them on the menu page. I'm not sure, but this [I]may[/I] require you to go and [B]reset your preferences in the mod option page[/B].
+[/LIST]
+[/LIST][/SPOILER][/INDENT]
+[/INDENT]
+[/SPOILER][/INDENT]
+[INDENT][SPOILER="Version 1.1.1+tr14a"]
+
+Update 12/27/14
+A couple of new features in this update, features that [I]I've[/I] been excited about for some time now! I won't put them behind a spoiler because they're pretty easy to explain and I'm too excited about them to hide them away. :D See the full description further down the post to see all the current features.
+[LIST=1]
+[*][SIZE=5] [B]Smart Deposit [/B][/SIZE]-- A simple, convenient tool for well-organized storage!
+[LIST]
+[*]Hold Shift and press the Deposit All hot-key with a chest/bank/safe open to deposit all items from your inventory that match the category of an item already in that container.  Nothing more, nothing less! Have a chest where you collect all  your ores and bars?  One for that collection of vanity items that you're [I]totally[/I] planning on putting on [wo]mannequins someday?  With this, just open the chest and throw them in without the need for an existing stack [I]and[/I] without tossing in unrelated items.
+[*]Items in locked inventory slots will [I]not[/I] be deposited by this action, so your essentials are safe.
+[*]The utility of this function will only increase as I make improvements to the categorization system.
+[/LIST]
+[*][SIZE=5][B] Reverse Stack[/B][SIZE=4] -- For a quick top-off.[/SIZE][/SIZE]
+[LIST]
+[*][SIZE=5][SIZE=4]Press Shift + your designated Quickstack hotkey to refill stacks in your inventory from those in the currently open chest.  [/SIZE][/SIZE]
+[*][SIZE=5][SIZE=4]Any stack of items in your inventory that is not already at its maximum will pull matching items from the open chest to refill its stack (either to maximum or as much as it can).[/SIZE][/SIZE]
+[*][SIZE=5][SIZE=4]Good for a fast refill of materials when building and crafting or for replenishing your waning reserves of potions and ammo.[/SIZE][/SIZE]
+[*][SIZE=5][SIZE=4]I'm not 100% sold on the name for this one; I originally called it "Smart Loot," but that didn't really feel like an accurate description since it's not so much a selective loot-all as it a backwards quickstack.  Well, actually, that's pretty much [I]exactly [/I]what it is.[/SIZE][/SIZE]
+[/LIST]
+[/LIST]
+[SIZE=5][SIZE=4]In related news, I've also separated Ores, Bars, Gems, and Seeds into their own categories since the "Tiles" category is just [I]too big[/I].  Still is, honestly, but hopefully this will make the Smart Deposit feature even handier.  Let me know if this was the worst idea I've ever had.[/SIZE][/SIZE]
+
+[/SPOILER]
+
+[SPOILER="Version 1.1.1-rc1+tr14a"]
+[LIST]
+[*]Now [I]this [/I]is the update you're really looking for.  I'm marking it as a release candidate because, while I don't [I]think[/I] it has any major bugs, it really needs more testing to fully justify that claim.  Additionally, there's a couple more features I'd like to add before I finally consider this update complete.
+[*]Here's all the new stuff you're getting (added since v1.0.0):
+[LIST]
+[*]All the features from the 1.1.0 release, namely:
+[LIST=1]
+[*][B][COLOR=#ffcc99]Shift+Right-click[/COLOR] [/B]to[COLOR=#00ffff] toggle a player inventory slot as locked [/COLOR]and prevent items in that slot from being sorted.
+[*][COLOR=#ffcc99][B]New[/B] [B]mod option[/B][/COLOR] to [COLOR=#00ffff]completely disable the slot-locking system[/COLOR] if you don't care for it.
+
+[*][COLOR=#ffcc99][B]New Mod option[/B][/COLOR] to [COLOR=#00ffff]sort items to the end of your inventory[/COLOR] (like Vanilla Terraria); can set this for the player, chests, both, or neither (the default).
+[*]Pressing [COLOR=#ffcc99][B]Shift+Sort-key[/B][/COLOR] will [COLOR=#00ffff]sort the items in reverse[/COLOR].
+[/LIST]
+[*]And some NEW new features:
+[LIST=1]
+[*]I did a[B] [COLOR=#ffcc99]major overhaul of the sorting system[/COLOR][/B], and a major refactor of the code base in general.  This is mostly back-end stuff and may not be too visible on the player  side of things, but it did allow me to really [COLOR=#00ffff]improve and tighten up the category and sorting parameters[/COLOR], and the more logical placement of items should help in organizing all your treasures more effectively (which is, after all, the point of this mod!)
+[LIST]
+[*]Perhaps more importantly, these changes made it [I]a lot[/I] easier for me to tweak the way things are sorted, which I'm sure I'll do as more testing is done.  I welcome  feedback from you on how everything feels and improvements you think could be made to the category- and sorting-systems.
+[*]This also opened the door to possible future player-configurable categories and sorting, something which would have been difficult--if not impossible--with the previous system. All in all, an exciting change, and one which has yet to display its full potential!
+[/LIST]
+[*][COLOR=#ffcc99][B]New Mod option[/B][/COLOR] to set your inventory or chests (or both) to do a [COLOR=#00ffff]reverse-sort by default[/COLOR].  Shift+Sort would then sort the items in regular order if this is set.
+[LIST]
+[*]I felt that some may find this useful when using the sort-to-end setting if they found that they still prefer the [I]ordering[/I] (i.e. left-to-right, top-to-bottom placement) of the original sort, but still want the items sorted from the end of the inventory.  Or maybe some people just like the reverse order.  Or maybe no one will use this feature, ever. Oh well. Choice is freedom!
+[/LIST]
+[/LIST]
+[/LIST]
+[/LIST]
+
+[/SPOILER]
+
+[SPOILER="Version 1.1.0+tr14a"]
+[LIST]
+[*]This is the [I]official[/I] release of version 1.1.0!  It's received a fair amount of testing and has yet to blow up any computers or delete any characters or worlds, so you have my totally-conditional non-binding-guarantee that this release is safe.
+[*]Features added since v1.0.0 (previously seen in 1.1.0-rc1 & rc2):
+[LIST]
+[*]Ability to [B]lock individual player inventory slots[/B] by holding Shift and right-clicking on them (do the same to unlock).  An item in a locked slot will not be moved around during a sort operation. See the original update notice under the "Version History" spoiler at the bottom of this post to find out more and see some screenshots.
+[/LIST]
+[/LIST]
+
+[LIST]
+[*]Features added since 1.1.0-rc2 (never before seen!):
+[LIST]
+[*]There is now a mod-option that allows you to[B] entirely disable the slot-locking function[/B] if you so desire.
+[*]Also added a mod-option that allows you to chose whether to have your[B] items sorted to end of your inventory[/B] (like vanilla Terraria does when you pick up items or use the loot all button) or to the front as this mod originally did.
+[LIST]
+[*]You can choose to do this for the Player Inventory, for Chests, for both, or neither.
+[/LIST]
+[*]And a feature that was added quite literally because I thought, "Hey, why not," you can now hold Shift and press the Sort key to [B]reverse the order[/B] in which the items of the current player/chest inventory are sorted.  While it may be a bit of a novelty here, I feel it comes into its own in the other update I posted today.  Check it out!
+[*]Slightly [B]improved sorting parameters[/B].  They're still not great.  Once again, check out the other update to see how I'm tackling that.
+[/LIST]
+[*]Bugs fixed:
+[LIST]
+[*]Uh...bugs? Fixed? I'm not sure I follow...
+[/LIST]
+[/LIST]
+[/SPOILER][/INDENT]
+[LIST]
+[*][SIZE=5][COLOR=#ffffff]v1.1.0-rc2 - [/COLOR]12-22-14[/SIZE]
+[LIST]
+[*]First implementation of a slot-locking mechanism!
+[B]Update to the update:[/B] I've changed the locked-slot indicator to something less horrible to look at (not sure I'm totally sold on it, but it's definitely better), and made it so it only appears when you've locked a slot (rather than having an "unlocked" state, there will just be no indicator on unlocked slots).  Also: pictures!
+[SPOILER="v1.1.0-rc2+tr14a"]
+[INDENT][LEFT]Despite my initial bemusement at the idea, I came around to see the usefulness of such a thing. :p  At first, I thought I'd just try a mod-option to just allow locking certain rows from being sorted, but that ended up feeling clunky and inelegant.  So I went all out and implemented the in-game ability to lock slots individually from the inventory itself.[/LEFT]
+
+[U]How it works[/U]  
+[LIST]
+[*]When you open up your inventory in-game, you won't notice anything different as, initially, all slots will be unlocked.
+[*]Simply hold shift and right-click on a slot to toggle its lock-state.
+[*]Items placed in locked slots will not be moved around when sorting your inventory, allowing you to manually arrange any important tools, potions, etc. exactly as you want them for quick access!
+[/LIST]
+Screenshots:
+[INDENT]In this example, we've locked a couple potions and some rope into the three slots on the upper left and a stack of torches in the top-rightmost slot right below the last hotbar item (with red arrows expertly added to draw attention to the lock indicator in the corner of each slot).  Shockah's Inventory Tweaks is in effect with the color-by-rarity option enabled so you can see that the indicator won't be covered up by the larger border if you have this mod enabled.
+[ATTACH=full]16344[/ATTACH]
+As you can see, this inventory is a mess.  Let's hit the "sort" key...
+[ATTACH=full]16345[/ATTACH]
+...and now things are a bit better (still working on tightening up the sorting algorithms).  But, more importantly, the items in the 4 locked slots were entirely unaffected by the sort operation!  All the other items were sorted around them.[/INDENT]
+[U]Known Issues[/U] (i.e. why this is a RC and not a true update)[/INDENT]
+
+[LIST]
+[*]Deposit All and Quick Stack don't give a single flip about the locked slots.  I'll have to teach them a lesson.  And possibly make some mod-options to adjust just how "absolute" the lock is for the various operations.
+
+[*]Shift-right-clicking to toggle the lock will also pick up a single item if the slot currently contains a stackable item.  I haven't quite figured out how to disable the default right-click action yet. But for now, just left-click to place the item back on the stack and you're good to go (but be sure to release the shift key first, though, or you'll send the entire stack to trash instead!).
+[*]Though the items in the locked slots will not be moved by the sort operation, stackable items can still be moved around by a stack-consolidation if they are not the first such stack in the inventory. I will lock them down from this, as well.
+[*]The mod is not quite so "invisible" as it used to be :p
+[/LIST]
+[/spoiler]
+[/LIST]
+[/LIST]
+[LIST]
+[*][B]Version 1.0.0_tr14a[/B], 12/20/2014
+[LIST]
+[*]Initial release. Hooray!
+[*]Compiled against tAPI r14a
+[*]Features added: all of them.
+[*]Bugs added: all of them.
+
+[*]Bugs fixed: Sort button no longer hands out infinite amounts of gold coins (sorry). That was kind of it, but confusing.
+[/LIST]
+[/LIST]
+[/SPOILER]
+
+[SPOILER="Known Issues"]
+[LIST]
+[*]Ironically given the mod's title, it seems to have troubles dealing with money, specifically coins in containers.  They don't combine like coins should and sometimes even stacks of <100 don't merge like other item stacks. 
+[*]Deposit-All and Loot-All don't recognize locked slots in any fashion.  I'm not quite sure yet how I'd like them to interact with the locks, but I think they should somehow.
+[*]Reverse-Stack will only pull from the first stack of an item type it finds in a chest to refill inventory stacks.  I only just noticed this, though, because this situation happens so rarely when using the other features of this mod that I had to engineer a scenario to see it happen.  I'll still try to patch it up, though.
+[/LIST]
+[/SPOILER]
+
+[SPOILER="Possible Future Enhancements"]
+While I will do my best to fix any bugs that people find and improve upon the existing functionality, I cannot guarantee that I'll have the time or will to add new features.  That said, here are a few ideas or enhancements (from myself or suggested by others) that I may like to add if I can.
+[LIST]
+[*]Interface buttons for the Sort and Consolidate Stacks options.  Maybe with an option to toggle their appearance, especially since I'm not sure where they'd go.
+[*]User-configurable categories, sort order, etc.  This idea could encompass a myriad of subjects, some of which would add far more complexity to the mod than I'd like, but others would be nice additions.
+
+[*]An option for "auto-sort items on pickup." Not terribly complicated, just places items at their sorted location in the player's inventory when they are picked up. Would be disabled by default.
+[*]A "item pickup filter" ? I don't know, that may be beyond the scope of this tool, though admittedly I can see how some of the code might be adaptable to this function without too much effort.  May function as an "auto-trash" option for select items.
+[*]Having the Smart Deposit function (optionally) key on Chest names; e.g. a chest labeled Ore will only accept ore during a smart-deposit...as one might expect.
+[/LIST]
+[/SPOILER]

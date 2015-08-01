@@ -6,32 +6,42 @@ version 1.2.0 for tAPI r16 and Terraria 1.2.4.1
 [SIZE=5][COLOR=#00ffff]OPEN QUESTION: Is there any interest in having this mod updated to Terraria 1.3 with Mac/Linux support?[/COLOR]
 [INDENT][SIZE=4]In short, if there's enough interest in getting this mod to work both for Terraria 1.3 [I]and[/I] on all of Mac/Linux/Windows--as I believe no other inventory management currently works for all three platforms--then I'll take a stab at it. Drop a comment if you're keen on this.
 
-[SPOILER="But is there a point?"]
-Had this I been able to release this update at the end of January like I had originally hoped, it likely may have had a bigger impact; even releasing in early July would have been better, but it was not to be. Now, nearly a month after the release of Terraria 1.3, I'm not really sure there's even a niche left for The Invisible Hand. Several of the mod's features have made it to Terraria proper*, and other inventory-management mods have popped up which not only work for 1.3, but are lightyears ahead of TIH in terms of bells and whistles and programming prowess. Now, most of these do have restrictions of some sort (like being stand-alone, or tied to a certain modloader) and don't have precisely the same mix of features that are found here, but I wonder if there's really anything that would recommend TIH either instead of or alongside these other mods.
+[SPOILER="But is there a need?"]
+With the release of Terraria 1.3, and in the month since, I've become increasingly unsure whether there's a niche left for The Invisible Hand--which would be fine if other, better solutions were available. Several of the mod's features have made it to Terraria proper*, and a couple other inventory-management mods have popped up that, while they may not have precisely the same mix of functionalities found here, do have a number of other fancy features (some likely too advanced for my C# skills to match) which recommend them.
 
-There is, however, One Big Reason that I may like to continue development: Mac & Linux support. I use (Arch) Linux exclusively these days and, through WINE, I've put over 500 hours into Terraria while doing so (70 or so on Windows before that). TIH was entirely developed and tested using tAPI through WINE. It all worked (nearly) flawlessly, but that's not to say it wasn't a hassle nor indeed extremely tedious to go through the process of "Wait for WINE to load tAPI Builder -> compile mod -> wait for WINE to load Terraria -> load world & test -> crash -> fix bug -> wait for WINE to load tAPI Builder -> ... etc." ad nauseam. Not to mention that the game's overall performance was noticeably diminished compared to Windows.
+The One Big Reason that I may like to continue development is Mac and Linux support. I use (Arch) Linux exclusively these days, and now that Terraria has native *nix support--which as of Open Beta Patch 5 seems to work pretty much perfectly--I'm not interested in using or developing mods that only work on Windows. TIH was entirely developed and tested using tAPI through WINE, and while this worked ([I]when[/I] it worked) almost flawlessly, the dev/testing process was tedious at best, infuriatingly frustrating at worst.
 
-But now that Terraria has native *nix support--which as of Open Beta Patch 5 seems to work pretty much perfectly--I'm not interested in using or developing a mod that only works on Windows. If there's any way I can support my platform of choice, then I will. As far as I can tell (please correct me if I'm wrong), none of the other inventory-management mods are available for Unix-based systems. I know there's at least one Modding framework currently in development that already has support for *nix and doesn't require decompiling Terraria to work (the cause of many bugs in tAPI and various standalone mods). Though the overall structure of The Invisible Hand is fairly dependent on tAPI's code base, the actual mechanics are fairly independent of it. So, while it may not be trivial, porting to a new framework would not be intractable. Should the audience be there, I'll gladly put in the work to make it happen.
+But I know there's at least one modding framework being developed that already has support for *nix [I]and[/I] doesn't require de/re-compiling Terraria (the cause of many bugs in tAPI and various standalone mods). As it stands now, to the best I can tell, none of the other inventory-management mods are available for Unix-based systems, nor do they look to be headed that way. So there's the niche--assuming there's anyone in that niche.
+
+Should the audience be there, I'll gladly put in the work to make the update. While it may not be trivial, I believe that porting to a new framework would not be intractable, but there's little point in that effort if no one will use the mod. So please let me know if this is something you'd like to happen!
 
 
-* including Restock--which not only functions exactly the same as it does in TIH, but has the same name and, if I understand correctly, was originally called "Smart Loot"--the exact same naming cycle that I went through....Coincidence? Hmmm...**
-
-** Ha, just being facetious. It's not exactly a revolutionary concept or a unique naming choice (nor was it even my idea to add it to the mod). If my implementation was their inspiration, then I'm honored--but I doubt it was.
+* including Restock--which not only functions exactly the same as it does in TIH, but has the same name and, if I understand correctly, was originally called "Smart Loot"--the exact same naming cycle that I went through. . . . Coincidence? [I]I think[/I] . . . yeah, probably :P
 [/SPOILER][/INDENT]
 [SIZE=5][COLOR=#ff4d4d]UPDATE: July 30, 2015[/COLOR] - TIH version 1.2.0 for Terraria 1.2.4.1
-[INDENT][SIZE=4]It's later than I'd hoped, but here it is. I may not have been able to give this mod the attention or support it and its users deserved, but I never really stopped working on it. And, whether or not it still holds relevance, I did put a lot of work into this project, so I'm going to release it to the wild to meet its fate.
-Without further ado, here are the new features:
+[INDENT][SIZE=4]It's later than I'd hoped, but here it is. I may not have been able to give this mod the attention or support it and its users deserved, but I never really stopped working on it. So, whether or not it still holds relevance, I did put a lot of work into this project, and now I release it into the wild to meet its fate.
+
+Without further ado, here are the new features (with fancy screenshots.gif!):
 [LIST][*][COLOR=#D5E8AF][B]Buttons![/B][/COLOR]
 [LIST][COLOR=#C4C6D1][B]Chest-side button enhancements[/B][/COLOR] -- All the same customizable key-binds are still there, but if you sometimes just feel mousey or your mind blanks on which key to press, you're in luck. Courtesy of [S]a nuclear accident[/S] The Invisible Hand, the words "Loot All", "Quick Stack", etc. that appear beside a chest's inventory when open have not only received new abilities, but can even morph into a new form. The options are:
 [LIST]
-[*][COLOR=#FFC6AF][B]Plain text (Vanilla-style) buttons[/B][/COLOR] -- if you don't want to mess with the aesthetic that the Terraria developers have created, choose this option and your interface will look just the same as ever, but have hidden powers. Right-click on Quick Stack or Deposit All to lock them (more on that below), or hold shift to see additional options like Sort, Restock, or Smart Deposit.
+[*][COLOR=#FFC6AF][B]Plain text (Vanilla-style) buttons[/B][/COLOR] -- if you don't want to mess with the aesthetic that Re-Logic have created, choose this option and your interface will look the same as ever, but have hidden powers. Right-click on Quick Stack or Deposit All to lock them (more on that below), or hold shift to see additional options like Sort, Restock, or Smart Deposit. [COLOR=#999999][I]See the spoiler on the "Right click..." feature further down for a look at these[/I][/COLOR]
 [*][COLOR=#FFC6AF][B]Graphical button icons[/B][/COLOR] -- Go to the mod-options page and set "Use Chest Buttons" to "True" to transform those boring old words into something that's not words! Thanks to my "finest" graphic design "skills," you'll receive "fancy" button icons in their place, with "exciting" hover effects and "informative" tooltips (which can be turned off in the options if you so desire). Yes, all the originals--including "Rename"-- have received their own button, and I've even included a Sort button at the top. Once again, holding Shift will reveal the extra functions, and right-clicking on QS or DA will toggle their "locked" status.
+[SPOILER="Have a look"][ATTACH=full]67157[/ATTACH]
+Here's a showcase of the new buttons, including the Shift-toggle feature. Note the tooltips with the keybind-reminder at the end (can be disabled in mod options). The beginning is just showing how the icons change; it's a little hard to see, and I guess that you just have to trust me that I'm pressing shift to make this happen. That's followed by a rundown of all the buttons and which alternate-button they change to when shift is held down (Loot All and Rename don't change atm).
+
+[ATTACH=full]67156[/ATTACH]
+Just showing off the Rename button here (well, mainly I wanted to show that it actually still works).[/SPOILER]
 [/LIST]
 [*][COLOR=#C4C6D1][B]Player inventory buttons[/B][/COLOR] -- when you have your inventory open but are not investigating a chest or dealing with an NPC, two buttons will appear above the Coin & Ammo slots: one for Sort (which can be shift-toggled [or just right-clicked] to Reverse-Sort) and one for Clean Stacks...if anyone actually uses that function. In order to be less distracting and avoid becoming an eyesore, these will fade out to near-transparency at all times except when the mouse is actively hovered above them. If you still find them annoying or you just never use them at all, they can be turned off entirely by going to the mod options page and setting "Inventory Buttons" (on page 2) to "False".
+[SPOILER="Here's a demo"][ATTACH=full]67159[/ATTACH]
+...a somewhat silly demo, to show what they look like. It just shift-toggles between sort & reverse-sort several times, though at the end there is a series of left-click-then-right-click (of course you can't tell which button I'm clicking...) to illustrate that right-click also performs a reverse-sort. This also happens to show how items in locked slots aren't affected by the sort operations. And oh yeah the Clean Stacks button is there too or whatever.[/SPOILER]
 [/LIST]
 [*][COLOR=#D5E8AF][B]Right click on Deposit-All/Quick-Stack buttons to prevent them from affecting locked inventory slots[/B][/COLOR]
 [LIST] 
 [*]As mentioned above, right-clicking on the buttons for Quick Stack or Deposit All will "lock" them, which really means that they will now ignore any locked inventory slots when performing their respective operations. This is somewhat like the "favorite" ability found in Terraria 1.3 (though I swear I had this idea months before I knew anything like this was coming to Terraria! :P ). When QS or DA are locked (indicated by a little lock-icon beside their names/buttons), any of your items in locked slots will not be transferred nor have their stack-size changed when using Quick Stack or Deposit All either through the hotkey or the chest-side buttons. Note that, unlike a "favorited" item in 1.3, this status is tied to the [I]slot[/I] an item resides in, not the item itself; thus, moving an item to unlocked slot will again cause it to be affected by QS/DA.
+[SPOILER="See it in action"][ATTACH=full]67158[/ATTACH]
+Here's the "Vanilla-style" text version of the buttons--with key-bind hints enabled--and a demonstration of the locking feature. At the beginning, Quick Stack and Deposit All are both unlocked. They're then right-clicked to toggle locking on; notice how the lock icon shows up to indicate this. Clicking on Loot All tosses the contents of the chest into the inventory where several of the items happen to land in open locked slots. Finally, a click of Deposit All shows that all items except those in the locked slots were deposited back into the chest (a.k.a. Gordon). I don't have a demo of the Quick Stack button, but it too ignores locked slots in a similar fashion.[/SPOILER]
 [/LIST]
 [*][COLOR=#D5E8AF][B]Mod-option to show key-bind reminders in button names/tooltips[/B][/COLOR]
 [LIST]
@@ -44,22 +54,7 @@ Without further ado, here are the new features:
 [*][COLOR=#D5E8AF][B]Better(?) multiplayer support (need testers!)[/B][/COLOR]
 [LIST]
 [*]Previous versions of the The Invisible Hand had some issues with inventory<->chest transfers not syncing correctly during multiplayer. @krageon was kind enough to dig through my code, identify the problem (as well as one related to texture-loading), and write up a patch for it. I've taken his patch and extended it to cover the new features of this update as well as (hopefully) fixing shift-click-to-move. The catch is that I'm not actually able to test this functionality, so I'll need testers and reports on any bugs that crop up with it. I [I]think[/I] I've got a better handle on how all that stuff works now, so I'd like to think that there won't be any problems--but experience has taught me that code rarely runs on computers the same as it runs in your head, so I'm ready to fix any issues that appear.
-[/LIST][/LIST]
-
-[SPOILER="Screenshots.gif!"]
-[INDENT]I finally did a video thing. Kinda. Editing and .gif-ing was waaaaay harder than I think it was supposed to be, but I do have a few fruits to show for my labor.
-
-[ATTACH=full]67157[/ATTACH]
-Here's the new icon-buttons in all their glory, including the shift-toggle feature. Note the tooltips with the keybind-reminder at the end (can be disabled in mod options). The beginning is just showing how the icons change; it's a little hard to see, and I guess that you just have to trust me that I'm pressing shift to make this happen. That's followed by a rundown of all the buttons and what alternate-button they toggle to when shift is held down (Loot All and Rename don't change). 
-
-[ATTACH=full]67156[/ATTACH]
-Just showing off the Rename button (well, mainly I wanted to show that it actually still works).
-
-[ATTACH=full]67158[/ATTACH]
-Here's the "Vanilla-style" text version of the buttons, as well as a demonstration of the locking feature. At the beginning, Quick Stack and Deposit All are unlocked. They're then right-clicked to toggle locking on (notice the lock icon shows up to indicate this). Loot All throws the contents of the chest into the inventory, where several of the items land in locked slots; finally, a click of Deposit All shows that all items except those in the locked slots were deposited back into the chest (a.k.a. Gordon). I don't have a demo of the Quick Stack button, but it too ignores locked slots in a similar fashion.
-
-[ATTACH=full]67159[/ATTACH]
-Lastly, this is a somewhat silly demonstration of the Player-inventory buttons, just to show what they look like. I just shift-toggle between sort & reverse-sort several times, though at the end there is a series of left-click-then-right-click (of course you can't tell which button I'm clicking...) to illustrate that right-click also performs a reverse-sort. Oh yeah the Clean Stacks button is also there or whatever.[/INDENT][/SPOILER][/INDENT][SIZE=6][B]What is "The Invisible Hand"?[/B][/SIZE]
+[/LIST][/LIST][/INDENT][SIZE=6][B]What is "The Invisible Hand"?[/B][/SIZE]
 
 [INDENT][SIZE=5]"The Invisible Hand" is a mod that strives to improve the Terraria gaming experience without getting in the way. A number of customizable key-binds and other settings have been added for various tasks related to managing and organizing one's inventory and vast hoard of glorious goodies. The inventory interface has been tweaked in certain ways to add new functionality and improve old ones. Most everything can be tweaked or disabled according to your preferences using the mod-options menu.[/INDENT]
 [SIZE=6][B]Mod Features [/B][/SIZE]
@@ -76,7 +71,7 @@ Lastly, this is a somewhat silly demonstration of the Player-inventory buttons, 
 [/LIST]
 [*][COLOR=#00ffff][B]Stack[/B] [I]("X")[/I] [/COLOR]- this consolidates all item stacks in the inventory or open chest into as few maximized stacks as possible.
 [*][COLOR=#00ffff][B]Smart Deposit [/B][I](Shift + Deposit-All)[/I][/COLOR] - deposits into the currently open chest any (and only) items in your inventory that [I]match the category[/I] of an item already in the chest.
-[*][COLOR=#00ffff][B]Quick Restock[/B] [I](Shift + Quick-Stack)[/I] [/COLOR]- previously called Reverse-Stack, this will attempt to refill any stack in your inventory with items from the currently open chest.
+[*][COLOR=#00ffff][B]Restock[/B] [I](Shift + Quick-Stack)[/I] [/COLOR]- previously called Reverse-Stack, this will attempt to refill any stack in your inventory with items from the currently open chest.
 [/LIST]
 [*][B]Supplementary Features[/B] (enable in Mod-Options menu):
 [LIST]
@@ -124,7 +119,7 @@ These [B]new[/B] actions were added, along with their corresponding key-binds:
 [/LIST]
 [/LIST]
 [LIST]
-[*][B]Reverse Stack[/B]
+[*][B]Restock[/B]
 [LIST]
 [*]Press Shift + your designated Quickstack hot-key.
 [*]Any stack of items in your inventory that is not already at its maximum will pull matching items from the open chest to refill its stack (either to maximum or as much as it can).
